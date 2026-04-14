@@ -40,6 +40,7 @@ class MainActivity : ComponentActivity() {
         setupActivityContent()
     }
 
+
     @SuppressLint("ObsoleteSdkInt")
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onResume() {
