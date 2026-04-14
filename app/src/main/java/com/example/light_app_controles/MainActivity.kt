@@ -79,14 +79,13 @@ class MainActivity : ComponentActivity() {
 
                 Light_App_ControlesTheme {
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                        Box(modifier = Modifier.fillMaxSize()) {
                             if (permissionsChecked) {
 
                                 if (!initDone) {
 
                                 } else {
                                     Greeting(
-                                        name = "Android",
+                                        name = "cc",
                                         modifier = Modifier.padding(innerPadding)
                                     )
                                 }
@@ -101,8 +100,6 @@ class MainActivity : ComponentActivity() {
                                     )
                                 }
                             }
-
-                        }
                     }
                 }
             }
