@@ -25,11 +25,11 @@ import com.example.light_app_controles.Modules.Uis.Ui.SyncProgressIndicator
 import kotlinx.coroutines.launch
 
 @Composable
-fun DropDownItemWBaseDonne_ImportFromCSV(
+fun ButtID_3_ImportFromCSV(
     appDatabase: AppDatabase,
     enabled: Boolean,
 ) {
-    val iconTint = Color(0xFFE53935)           // red — signals a destructive replace
+    val iconTint = Color(0xFFE53935)
     val scope = rememberCoroutineScope()
 
     var progress by remember { mutableStateOf<Float?>(null) }
@@ -37,7 +37,6 @@ fun DropDownItemWBaseDonne_ImportFromCSV(
     var errorMsg by remember { mutableStateOf<String?>(null) }
 
     Column(modifier = Modifier.fillMaxWidth()) {
-
         DropdownMenuItem(
             leadingIcon = {
                 Icon(
@@ -85,7 +84,6 @@ fun DropDownItemWBaseDonne_ImportFromCSV(
             }
         )
 
-        // Progress bar — visible while running or just finished
         if (progress != null) {
             if (currentTable.isNotBlank() && progress!! < 1f) {
                 Text(
@@ -107,7 +105,6 @@ fun DropDownItemWBaseDonne_ImportFromCSV(
             )
         }
 
-        // Inline error hint
         if (errorMsg != null) {
             Text(
                 text = errorMsg!!,

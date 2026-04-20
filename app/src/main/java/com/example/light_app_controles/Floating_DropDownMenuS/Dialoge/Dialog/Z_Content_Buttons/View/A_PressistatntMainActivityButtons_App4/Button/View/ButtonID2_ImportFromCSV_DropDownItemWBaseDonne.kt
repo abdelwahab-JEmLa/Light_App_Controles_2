@@ -1,11 +1,11 @@
 package A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View
 
-import EntreApps.Shared.Modules.Base.SQL.exportAllTablesToCSV
+import EntreApps.Shared.Modules.Base.SQL.importAllTablesFromCSV
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.SaveAlt
+import androidx.compose.material.icons.filled.RestoreFromTrash
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,11 +25,11 @@ import com.example.light_app_controles.Modules.Uis.Ui.SyncProgressIndicator
 import kotlinx.coroutines.launch
 
 @Composable
-fun DropDownItemWBaseDonne_ExportToCSV(
+fun ButtonID2_ImportFromCSV_DropDownItemWBaseDonne(
     appDatabase: AppDatabase,
     enabled: Boolean,
 ) {
-    val iconTint = Color(0xFF00897B)          // teal — distinct from other items
+    val iconTint = Color(0xFFE53935)
     val scope = rememberCoroutineScope()
 
     var progress by remember { mutableStateOf<Float?>(null) }
@@ -41,7 +41,7 @@ fun DropDownItemWBaseDonne_ExportToCSV(
         DropdownMenuItem(
             leadingIcon = {
                 Icon(
-                    imageVector = Icons.Default.SaveAlt,
+                    imageVector = Icons.Default.RestoreFromTrash,
                     contentDescription = null,
                     tint = if (enabled) iconTint
                     else iconTint.copy(alpha = 0.4f)
@@ -50,15 +50,15 @@ fun DropDownItemWBaseDonne_ExportToCSV(
             text = {
                 Text(
                     text = when {
-                        errorMsg != null -> "Erreur export ✗"
-                        progress == null -> "Exporter toutes tables → CSV"
+                        errorMsg != null -> "Erreur import ✗"
+                        progress == null -> "Réimporter toutes tables ← CSV"
                         progress!! < 1f -> {
                             val pct = (progress!! * 100).toInt()
-                            if (currentTable.isNotBlank()) "Export… $pct % — $currentTable"
-                            else "Export… $pct %"
+                            if (currentTable.isNotBlank()) "Import… $pct % — $currentTable"
+                            else "Import… $pct %"
                         }
 
-                        else -> "Export terminé ✓"
+                        else -> "Import terminé ✓"
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = when {
@@ -74,7 +74,7 @@ fun DropDownItemWBaseDonne_ExportToCSV(
             onClick = {
                 errorMsg = null
                 scope.launch {
-                    appDatabase.exportAllTablesToCSV(
+                    appDatabase.importAllTablesFromCSV(
                         onProgress = { progress = it },
                         onCurrentTable = { currentTable = it },
                     ).onFailure { t ->

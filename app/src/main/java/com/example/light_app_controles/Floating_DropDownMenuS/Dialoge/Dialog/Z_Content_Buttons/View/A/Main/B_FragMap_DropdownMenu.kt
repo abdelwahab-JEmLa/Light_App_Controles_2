@@ -4,12 +4,8 @@ import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.Ave
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.DropBox_Init_3
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.Local_Organizer
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.SyncReport
-import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View.DropDownItemWBaseDonne_ExportToCSV
-import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View.DropDownItemWBaseDonne_ImportFromCSV
-import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View.DropDownItemWBaseDonne_OrganiserLocaleParCatalogue
-import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View.DropDownItemWBaseDonne_OrganiserParCatalogue
-import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View.DropDownItemWBaseDonne_SyncDepuisImages2
-import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View.DropDownItemWBaseDonne_UpdateLocalTimestamps
+import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View.ExportToCSV_DropDownItemWBaseDonne
+import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View.ButtonID2_ImportFromCSV_DropDownItemWBaseDonne
 import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
 import EntreApps.Shared.Models.Relative_Produits.Models.M16CategorieProduit
 import EntreApps.Shared.Models.Relative_Produits.Models.M21CataloguesCategorie
@@ -186,39 +182,21 @@ fun B_FragMap_DropdownMenu(
         onDismissRequest = onDismiss,
         modifier = modifier.background(Color.White, RoundedCornerShape(8.dp))
     ) {
-        DropDownItemWBaseDonne_OrganiserParCatalogue(
-            progress = organizeDropBoxProgress,
-            enabled = organizeDropBoxProgress == null && pendingAction == null && !anyRunning,
-            onClick = { pendingAction = PendingAction.DropBox }
-        )
-        HorizontalDivider()
-        DropDownItemWBaseDonne_ExportToCSV(
+
+        ExportToCSV_DropDownItemWBaseDonne(
             appDatabase = appDatabase,
             enabled = true,
         )
-        DropDownItemWBaseDonne_ImportFromCSV(
+
+        ExportToCSV_DropDownItemWBaseDonne(
+            appDatabase = appDatabase,
+            enabled = true,
+        )
+        ButtonID2_ImportFromCSV_DropDownItemWBaseDonne(
             appDatabase = appDatabase,
             enabled = true,
         )
         HorizontalDivider()
-        DropDownItemWBaseDonne_OrganiserLocaleParCatalogue(
-            progress = organizeLocalProgress,
-            enabled = organizeLocalProgress == null && pendingAction == null && !anyRunning,
-            onClick = { pendingAction = PendingAction.Local }
-        )
-
-        DropDownItemWBaseDonne_SyncDepuisImages2(
-            progress = syncImages2Progress,
-            currentLabel = syncImages2Label,
-            enabled = syncImages2Progress == null && pendingAction == null && !anyRunning,
-            onClick = { pendingAction = PendingAction.SyncFromImages2 }
-        )
-
-        DropDownItemWBaseDonne_UpdateLocalTimestamps(
-            progress = updateTimestampsProgress,
-            enabled = updateTimestampsProgress == null && pendingAction == null && !anyRunning,
-            onClick = { pendingAction = PendingAction.UpdateLocalTimestamps }
-        )
 
     }
 }
