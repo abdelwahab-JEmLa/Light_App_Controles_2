@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.light_app_controles.Modules.Base.AppDatabase
+import com.example.light_app_controles.Modules.Base.SQL.AppDatabase
 import com.example.light_app_controles.Modules.Uis.Ui.SyncProgressIndicator
 import kotlinx.coroutines.launch
 

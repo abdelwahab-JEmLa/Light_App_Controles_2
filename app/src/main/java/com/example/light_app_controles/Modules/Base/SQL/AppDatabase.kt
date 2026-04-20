@@ -1,4 +1,4 @@
-package com.example.light_app_controles.Modules.Base
+package com.example.light_app_controles.Modules.Base.SQL
 
 import EntreApps.Shared.Models.AppType
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps

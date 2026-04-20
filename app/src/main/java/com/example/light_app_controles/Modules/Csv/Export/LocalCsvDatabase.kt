@@ -32,6 +32,7 @@ import android.database.sqlite.SQLiteConstraintException
 import android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE
 import android.util.Log
 import androidx.room.RoomDatabase
+import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -263,7 +264,7 @@ object LocalCsvDatabase {
 
 // ─── Extensions privées ───────────────────────────────────────────────────────
 
-private fun androidx.sqlite.db.SupportSQLiteDatabase.userTableNames(): List<String> =
+private fun SupportSQLiteDatabase.userTableNames(): List<String> =
     buildList {
         query(
             "SELECT name FROM sqlite_master " +
