@@ -14,13 +14,46 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.light_app_controles.Modules.DatesHandler
 
+object Jomla_Clients {
+    val ECHATILLANTS_KEY_ID =
+        AbdelwahabJomla_Client_Speciale.AbdelwahabJomla_ECHATILLANTS_Ditha_MarqueSel3a.keyID
+}
+
+enum class AbdelwahabJomla_Client_Speciale(
+    val keyID: String = "",
+    val autre_nom: String = "",
+    val moulahada: String = "",
+) {
+    Abdelwahab_Depo_Echant(
+        "-OV9dYujH9cA3yEx8AY2",
+    ),
+    AbdelwahabJomla_ECHATILLANTS_Ditha_MarqueSel3a(
+        "-Oh4W0-igT_bXGOo-LC_",
+        autre_nom = "AbdelwahabJomla Marke Wach Dina Échantillon"
+    ),
+    AbdelwahabJomla_Marque_Sel3a_Au_Depot(
+        "-OoK4WklxDWe_o19oc2F"
+    ),
+    Jomla_Marque_Sel3a_Ditha_Pour_Vendre(
+        "-OfYtzn5JtD6Ne7gCOLu",
+        autre_nom = " Abdelwahab mark sel3a ta3 Commande ",
+        moulahada = "non supprime l ami jamel"
+    ),
+    AbdelwahabJomla_Promo_Sel3a(
+        "-Op4u9T7KSOL5x5PSYa0",
+        autre_nom = "Abdelwahab Jomla Promo Sel3a "
+    ),
+}
+
 @Entity
 data class M2Client(
-
     @PrimaryKey
     var keyID: String = generePushKey(),
     var dernierTimeTampsSynchronisationAvecFireBase: Long = 0,
     var creationTimestamps: Long = System.currentTimeMillis(),
+
+    var c_un_admin_client: Boolean = false,
+
     //Infos De Base
     var nom: String = "Non Defini",
     var cretionTimestamps: Long = DatesHandler().getCurrentTimestamps(),
@@ -33,6 +66,8 @@ data class M2Client(
     var bonDuClientsSu: String = "",
     var currentCreditBalance: Double = 0.0,
     var positionDonClientsList: Int = 0,
+
+
     var cUnClientTemporaire: Boolean = true,
     var auFilterFAB: Boolean = false,
     var typeDeSonMagasine: TypeDeSonMagasine = TypeDeSonMagasine.ATAYAT_MOUKASSARAT,
@@ -207,35 +242,4 @@ data class M2Client(
             return M2Client()
         }
     }
-}
-
-object Jomla_Clients {
-    val ECHATILLANTS_KEY_ID =
-        AbdelwahabJomla_Client_Speciale.AbdelwahabJomla_ECHATILLANTS_Ditha_MarqueSel3a.keyID
-}
-
-enum class AbdelwahabJomla_Client_Speciale(
-    val keyID: String = "",
-    val autre_nom: String = "",
-    val moulahada: String = "",
-) {
-    Abdelwahab_Depo_Echant(
-        "-OV9dYujH9cA3yEx8AY2",
-    ),
-    AbdelwahabJomla_ECHATILLANTS_Ditha_MarqueSel3a(
-        "-Oh4W0-igT_bXGOo-LC_",
-        autre_nom = "AbdelwahabJomla Marke Wach Dina Échantillon"
-    ),
-    AbdelwahabJomla_Marque_Sel3a_Au_Depot(
-        "-OoK4WklxDWe_o19oc2F"
-    ),
-    Jomla_Marque_Sel3a_Ditha_Pour_Vendre(
-        "-OfYtzn5JtD6Ne7gCOLu",
-        autre_nom = " Abdelwahab mark sel3a ta3 Commande ",
-        moulahada = "non supprime l ami jamel"
-    ),
-    AbdelwahabJomla_Promo_Sel3a(
-        "-Op4u9T7KSOL5x5PSYa0",
-        autre_nom = "Abdelwahab Jomla Promo Sel3a "
-    ),
 }

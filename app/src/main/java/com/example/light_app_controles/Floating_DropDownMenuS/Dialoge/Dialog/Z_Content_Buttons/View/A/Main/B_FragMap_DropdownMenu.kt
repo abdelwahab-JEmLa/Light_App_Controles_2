@@ -4,8 +4,7 @@ import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.Ave
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.DropBox_Init_3
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.Local_Organizer
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.SyncReport
-import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View.ExportToCSV_DropDownItemWBaseDonne
-import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View.ButtonID2_ImportFromCSV_DropDownItemWBaseDonne
+import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View.ButID_4_upload_datas_fireBase_au_csv
 import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
 import EntreApps.Shared.Models.Relative_Produits.Models.M16CategorieProduit
 import EntreApps.Shared.Models.Relative_Produits.Models.M21CataloguesCategorie
@@ -37,6 +36,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.light_app_controles.Floating_DropDownMenuS.Dialoge.Dialog.Z_Content_Buttons.View.A.Main.Z.Buttons.View.ButID_3_ImportFromCSV
+import com.example.light_app_controles.Floating_DropDownMenuS.Dialoge.Dialog.Z_Content_Buttons.View.A.Main.Z.Buttons.View.ButID2_ImportFromCSV_DropDownItemWBaseDonne
+import com.example.light_app_controles.Floating_DropDownMenuS.Dialoge.Dialog.Z_Content_Buttons.View.A.Main.Z.Buttons.View.ButID_1_ExportToCSV_DropDownItemWBaseDonne
 import com.example.light_app_controles.Modules.Base.SQL.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -183,21 +185,24 @@ fun B_FragMap_DropdownMenu(
         modifier = modifier.background(Color.White, RoundedCornerShape(8.dp))
     ) {
 
-        ExportToCSV_DropDownItemWBaseDonne(
-            appDatabase = appDatabase,
-            enabled = true,
-        )
 
-        ExportToCSV_DropDownItemWBaseDonne(
+        ButID_1_ExportToCSV_DropDownItemWBaseDonne(
             appDatabase = appDatabase,
             enabled = true,
         )
-        ButtonID2_ImportFromCSV_DropDownItemWBaseDonne(
+        ButID2_ImportFromCSV_DropDownItemWBaseDonne(
             appDatabase = appDatabase,
             enabled = true,
         )
         HorizontalDivider()
+        ButID_3_ImportFromCSV(
+            appDatabase = appDatabase,
+            enabled = true,
+        )
 
+        ButID_4_upload_datas_fireBase_au_csv(
+            enabled = true,
+        )
     }
 }
 

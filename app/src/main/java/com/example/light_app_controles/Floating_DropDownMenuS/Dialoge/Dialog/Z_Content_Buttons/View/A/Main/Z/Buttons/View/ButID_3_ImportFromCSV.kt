@@ -1,11 +1,12 @@
-package A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View
+package com.example.light_app_controles.Floating_DropDownMenuS.Dialoge.Dialog.Z_Content_Buttons.View.A.Main.Z.Buttons.View
 
-import EntreApps.Shared.Modules.Base.SQL.exportAllTablesToCSV
+import EntreApps.Shared.Modules.Base.SQL.ImportCSV_Result
+import EntreApps.Shared.Modules.Base.SQL.importAllTablesFromCSV
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.SaveAlt
+import androidx.compose.material.icons.filled.RestoreFromTrash
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -18,6 +19,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.light_app_controles.Modules.Base.SQL.AppDatabase
@@ -25,23 +28,24 @@ import com.example.light_app_controles.Modules.Uis.Ui.SyncProgressIndicator
 import kotlinx.coroutines.launch
 
 @Composable
-fun ExportToCSV_DropDownItemWBaseDonne(
+fun ButID_3_ImportFromCSV(
     appDatabase: AppDatabase,
     enabled: Boolean,
 ) {
-    val iconTint = Color(0xFF00897B)          // teal — distinct from other items
+    val iconTint = Color(0xFFE53935)
     val scope = rememberCoroutineScope()
 
     var progress by remember { mutableStateOf<Float?>(null) }
     var currentTable by remember { mutableStateOf("") }
     var errorMsg by remember { mutableStateOf<String?>(null) }
 
-    Column(modifier = Modifier.fillMaxWidth()) {
+    var importResult by remember { mutableStateOf<ImportCSV_Result?>(null) }
 
+    Column(modifier = Modifier.fillMaxWidth()) {
         DropdownMenuItem(
             leadingIcon = {
                 Icon(
-                    imageVector = Icons.Default.SaveAlt,
+                    imageVector = Icons.Default.RestoreFromTrash,
                     contentDescription = null,
                     tint = if (enabled) iconTint
                     else iconTint.copy(alpha = 0.4f)
@@ -49,16 +53,19 @@ fun ExportToCSV_DropDownItemWBaseDonne(
             },
             text = {
                 Text(
+                    modifier = Modifier.semantics(mergeDescendants = true) {
+                        set(value = "", key = SemanticsPropertyKey(""))
+                    },
                     text = when {
-                        errorMsg != null -> "Erreur export ✗"
-                        progress == null -> "Exporter toutes tables → CSV"
+                        errorMsg != null -> "Erreur import ✗"
+                        progress == null -> "Réimporter toutes tables ← CSV"
                         progress!! < 1f -> {
                             val pct = (progress!! * 100).toInt()
-                            if (currentTable.isNotBlank()) "Export… $pct % — $currentTable"
-                            else "Export… $pct %"
+                            if (currentTable.isNotBlank()) "Import… $pct % — $currentTable"
+                            else "Import… $pct %"
                         }
 
-                        else -> "Export terminé ✓"
+                        else -> "Import terminé ✓"
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = when {
@@ -73,19 +80,22 @@ fun ExportToCSV_DropDownItemWBaseDonne(
             enabled = enabled && (progress == null || progress == 1f),
             onClick = {
                 errorMsg = null
+                importResult = null
                 scope.launch {
-                    appDatabase.exportAllTablesToCSV(
-                        onProgress = { progress = it },
-                        onCurrentTable = { currentTable = it },
-                    ).onFailure { t ->
-                        errorMsg = t.localizedMessage
+                    progress = 0f
+                    appDatabase.importAllTablesFromCSV(
+                        onProgress = { p -> progress = p },
+                        onCurrentTable = { t -> currentTable = t },
+                    ).onSuccess { result ->
+                        importResult = result
+                    }.onFailure { e ->
+                        errorMsg = e.message ?: "Erreur inconnue"
                         progress = null
                     }
                 }
             }
         )
 
-        // Progress bar — visible while running or just finished
         if (progress != null) {
             if (currentTable.isNotBlank() && progress!! < 1f) {
                 Text(
@@ -107,7 +117,6 @@ fun ExportToCSV_DropDownItemWBaseDonne(
             )
         }
 
-        // Inline error hint
         if (errorMsg != null) {
             Text(
                 text = errorMsg!!,

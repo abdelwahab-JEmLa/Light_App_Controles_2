@@ -29,15 +29,12 @@ import java.util.Date
         //Sorted ID
         M3CouleurProduitInfos::class,
         M13TarificationInfos::class,
-
         M2Client::class,
-
         M10OperationVentCouleur::class,
         M09AppCompt::class,
         M8BonVent::class,
         M14VentPeriode::class,
         M15Grossist::class,
-
         M00CentralParametresOfAllApps::class,
         M01Produit::class,
         M16CategorieProduit::class,
