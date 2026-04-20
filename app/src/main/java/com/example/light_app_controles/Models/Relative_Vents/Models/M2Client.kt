@@ -2,6 +2,7 @@ package EntreApps.Shared.Models.Relative_Vents.Models
 
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_MainDataBases_RefProduction
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.genereUnPushKeyFireBase
 import android.R
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -12,7 +13,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.light_app_controles.Modules.DatesHandler
-import org.mongodb.kbson.BsonObjectId
 
 @Entity
 data class M2Client(
@@ -50,7 +50,7 @@ data class M2Client(
     // Section keyFireBase et dernierFireBaseUpdateTimestamps
     var id: Long = 0L,
     var keyByParent: String = "",
-    var bsonObjectId: String = BsonObjectId.Companion().toHexString(),
+    var bsonObjectId: String = genereUnPushKeyFireBase(ref),
 
     val nomPrenomArabe: String = "حمنيش عبد الوهاب",
     val register_Commerce_Nm: String = "16/00 – 5138424 D20",
@@ -179,7 +179,7 @@ data class M2Client(
 //        )
 //        val ref = parent.child("B_ClientInfosProtoJuin3")
 
-        fun generePushKey() = M00CentralParametresOfAllApps.genereUnPushKeyFireBase(ref)
+        fun generePushKey() = genereUnPushKeyFireBase(ref)
 
         const val keyModel = "ID2"
 

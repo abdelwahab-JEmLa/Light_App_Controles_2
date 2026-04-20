@@ -1,5 +1,6 @@
 package com.example.light_app_controles.A.Main  // FIX: lowercase 'a' and 'main'
 
+// FIX: updated import to match the corrected lowercase package name
 import EntreApps.Shared.Modules.Base.StoragePermissionDialog
 import android.Manifest
 import android.annotation.SuppressLint
@@ -16,18 +17,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember               // FIX: use remember, not rememberSaveable (AppDatabase is not Parcelable)
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
-// FIX: updated import to match the corrected lowercase package name
 import com.example.light_app_controles.B.Screens.MainScreen
 import com.example.light_app_controles.Modules.Base.AppDatabase
 import com.example.light_app_controles.Modules.PermissionHandler
 import com.example.light_app_controles.ui.theme.Light_App_ControlesTheme
-import org.koin.core.annotation.KoinExperimentalAPI
 
 class MainActivity : ComponentActivity() {
     lateinit var content: () -> Unit
@@ -71,7 +70,6 @@ class MainActivity : ComponentActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    @OptIn(KoinExperimentalAPI::class)
     private fun setupActivityContent() {
         runCatching {
             setContent {

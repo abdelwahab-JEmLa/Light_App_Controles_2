@@ -21,8 +21,6 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import java.util.Date
 
 
@@ -49,7 +47,6 @@ import java.util.Date
 )
 @TypeConverters(
     DateConverter::class,
-    ListLongConverter::class,
     AppTypeConverter::class,
     TypeChoisiConverter::class
 )
@@ -102,21 +99,6 @@ class AppTypeConverter {
     @TypeConverter
     fun toAppType(value: String?): AppType? =
         value?.let { name -> AppType.entries.firstOrNull { it.name == name } }
-}
-
-class ListLongConverter {
-    @TypeConverter
-    fun fromListLong(value: List<Long>): String {
-        val gson = Gson()
-        return gson.toJson(value)
-    }
-
-    @TypeConverter
-    fun toListLong(value: String): List<Long> {
-        val gson = Gson()
-        val listType = object : TypeToken<List<Long>>() {}.type
-        return gson.fromJson(value, listType)
-    }
 }
 
 class DateConverter {

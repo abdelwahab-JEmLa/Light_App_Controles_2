@@ -41,7 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.bumptech.glide.Glide
 import com.example.light_app_controles.Modules.Base.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -273,8 +272,6 @@ private suspend fun launchSyncFromImages2(
     )
     onDone()
 
-    withContext(Dispatchers.Main) { Glide.get(context).clearMemory() }
-    withContext(Dispatchers.IO) { Glide.get(context).clearDiskCache() }
 
     return report
 }

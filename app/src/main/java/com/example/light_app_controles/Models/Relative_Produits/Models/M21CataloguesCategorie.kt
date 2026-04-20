@@ -1,10 +1,11 @@
 package EntreApps.Shared.Models.Relative_Produits.Models
 
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.centralRef
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.genereUnPushKeyFireBase
 import androidx.compose.ui.graphics.Color
-import org.mongodb.kbson.BsonObjectId
 
 data class M21CataloguesCategorie(
-    var keyID: String = BsonObjectId.Companion().toHexString(),
+    var keyID: String = genereUnPushKeyFireBase(centralRef),
     val id: Long = 0,
     val nom: String = "",
     val drp_image_folder_catalogue_path: String = "${M3CouleurProduitInfos.rootFolder_DropBox}/$keyID",

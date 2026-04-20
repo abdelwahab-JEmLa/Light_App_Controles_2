@@ -95,11 +95,6 @@ xmlns:tools="http://schemas.android.com/tools">
         </intent-filter>
     </activity>
 
-    <service
-        android:name="V.DiviseParSections.App.SectionID6.Messager.App.FragID1.Messager.Fragment.Options.ScreenRecordingService"
-        android:enabled="true"
-        android:exported="false"
-        android:foregroundServiceType="mediaProjection" />
 
     <provider
         android:name="androidx.core.content.FileProvider"
