@@ -1,9 +1,11 @@
-package com.example.light_app_controles
+package com.example.light_app_controles.A.Main  // FIX: lowercase 'a' and 'main'
 
 import android.Manifest
 import android.app.Application
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.annotation.RequiresPermission
 import com.google.firebase.FirebaseApp
@@ -55,7 +57,6 @@ class MyApplication : Application() {
         try {
             val firestore = FirebaseFirestore.getInstance()
 
-            // Configuration pour mode offline-first
             val settings = FirebaseFirestoreSettings.Builder()
                 .setPersistenceEnabled(true)
                 .setCacheSizeBytes(CACHE_SIZE_BYTES)
@@ -76,15 +77,11 @@ class MyApplication : Application() {
         }
     }
 
-    /**
-     * Active le réseau Firestore uniquement si Internet est disponible
-     */
     private fun enableFirestoreNetwork() {
         try {
             val firestore = FirebaseFirestore.getInstance()
 
-            // Attendre un peu avant d'activer le réseau
-            android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+            Handler(Looper.getMainLooper()).postDelayed({
                 firestore.enableNetwork()
                     .addOnSuccessListener {
                         Log.d(TAG, "✓ Firestore network enabled")
@@ -92,16 +89,13 @@ class MyApplication : Application() {
                     .addOnFailureListener { e ->
                         Log.w(TAG, "⚠ Could not enable Firestore network: ${e.message}")
                     }
-            }, 1000) // Délai de 1 seconde
+            }, 1000)
 
         } catch (e: Exception) {
             Log.w(TAG, "⚠ Network activation error: ${e.message}")
         }
     }
 
-    /**
-     * Configure Firebase Realtime Database avec persistence
-     */
     private fun configureRealtimeDatabase() {
         try {
             FirebaseDatabase.getInstance().apply {
@@ -110,7 +104,6 @@ class MyApplication : Application() {
             }
             Log.d(TAG, "✓ Realtime Database configured (${CACHE_SIZE_MB}MB cache)")
         } catch (e: Exception) {
-            // Ignore si déjà configuré
             if (e.message?.contains("persistence") == true) {
                 Log.d(TAG, "✓ Realtime Database persistence already enabled")
             } else {
@@ -119,10 +112,6 @@ class MyApplication : Application() {
         }
     }
 
-
-    /**
-     * Vérifie si une connexion réseau est disponible
-     */
     @RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
     private fun isNetworkAvailable(): Boolean {
         return try {

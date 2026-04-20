@@ -1,4 +1,4 @@
-package com.example.light_app_controles
+package com.example.light_app_controles.Modules
 
 import android.Manifest
 import android.content.Context
@@ -14,6 +14,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
+import com.example.light_app_controles.A.Main.MainActivity
 
 class PermissionHandler(private val activity: MainActivity) {
     companion object {
@@ -21,7 +23,8 @@ class PermissionHandler(private val activity: MainActivity) {
         private const val PERMISSIONS_GRANTED_KEY = "PermissionsGranted"
     }
 
-    private val prefs: SharedPreferences = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences =
+        activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     private var showDialog by mutableStateOf(false)
     var showStorageExplanationDialog by mutableStateOf(false)
     private var permissionCallback: PermissionCallback? = null
@@ -56,6 +59,7 @@ class PermissionHandler(private val activity: MainActivity) {
                 Manifest.permission.CHANGE_WIFI_STATE,
                 Manifest.permission.NEARBY_WIFI_DEVICES
             )
+
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> arrayOf(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.ACCESS_FINE_LOCATION,
@@ -66,6 +70,7 @@ class PermissionHandler(private val activity: MainActivity) {
                 Manifest.permission.ACCESS_WIFI_STATE,
                 Manifest.permission.CHANGE_WIFI_STATE
             )
+
             else -> arrayOf(
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -89,8 +94,14 @@ class PermissionHandler(private val activity: MainActivity) {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             Environment.isExternalStorageManager()
         } else {
-            ContextCompat.checkSelfPermission(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(activity, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(
+                activity,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(
+                        activity,
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                    ) == PackageManager.PERMISSION_GRANTED
         }
     }
 
@@ -126,7 +137,7 @@ class PermissionHandler(private val activity: MainActivity) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             try {
                 val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
-                    data = Uri.parse("package:${activity.packageName}")
+                    data = "package:${activity.packageName}".toUri()
                 }
                 activity.startActivity(intent)
             } catch (e: Exception) {

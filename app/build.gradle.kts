@@ -1,16 +1,16 @@
-import com.android.build.gradle.ProguardFiles.getDefaultProguardFile
 import java.util.Properties
-//<--
-//(1): searche au files les nessaissers lib et enleve tout les autres deplace tou ici no use ob tomel
+
 val localProps = Properties().apply {
     val f = rootProject.file("local.properties")
     if (f.exists()) load(f.inputStream())
 }
 
+
+//noinspection UseTomlInstead
 plugins {
-    alias(libs.plugins.android.application)
-    alias(libs.plugins.jetbrains.kotlin.android)
-    alias(libs.plugins.google.gms.google.services)
+    id("com.android.application") version "8.6.1"
+    id("org.jetbrains.kotlin.android") version "1.9.24"
+    id("com.google.gms.google-services") version "4.4.2"
     id("kotlin-kapt")
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.24"
     id("io.realm.kotlin")
@@ -51,12 +51,13 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+        isCoreLibraryDesugaringEnabled = true
     }
     kotlinOptions { jvmTarget = "1.8" }
 
     buildFeatures {
         compose = true
-        buildConfig = true   // ← génère la classe BuildConfig
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.14"
@@ -79,115 +80,144 @@ android {
     }
 }
 
+kapt {
+    correctErrorTypes = true
+    useBuildCache = true
+    arguments {
+        arg("room.schemaLocation", "$projectDir/schemas")
+        arg("room.incremental", "true")
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force("org.jetbrains.kotlin:kotlin-stdlib:1.9.24")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.24")
+        force("org.jetbrains.kotlin:kotlin-reflect:1.9.24")
+    }
+}
+
+//noinspection UseTomlInstead
 dependencies {
-    // Core Android
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.foundation)
-    implementation(libs.androidx.foundation.layout)
-    implementation(libs.androidx.ui.graphics)
-    implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
+    // ─── Core Android ────────────────────────────────────────────────────────
+    implementation("androidx.core:core-ktx:1.13.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+    implementation("androidx.activity:activity-compose:1.9.3")
 
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.database)
-    implementation(libs.engage.core)
-    implementation(libs.firebase.firestore)
-    implementation(libs.firebase.storage.ktx)
+    // ─── Compose BOM ─────────────────────────────────────────────────────────
+    implementation(platform("androidx.compose:compose-bom:2024.10.00"))
 
-    // Compose
-    implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.runtime.livedata)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.lifecycle.runtime.compose.android)
-    implementation(libs.androidx.compose.material)
-    implementation(libs.material)
+    implementation("androidx.compose.ui:ui:1.7.4")
 
-    // AI & Serialization
-    implementation(libs.generativeai)
-    implementation(libs.kotlinx.serialization.json)
+    implementation("androidx.compose.foundation:foundation:1.7.4")
 
-    // Image loading
-    implementation(libs.coil.compose)
-    implementation(libs.glide)
-    kapt(libs.compiler)
-    implementation(libs.compose.v100beta01)
-    implementation(libs.glide.transformations)
+    implementation("androidx.compose.foundation:foundation-layout:1.7.4")
 
-    // Room
-    implementation(libs.androidx.room.runtime)
-    kapt(libs.androidx.room.compiler)
-    implementation(libs.androidx.room.ktx)
+    implementation("androidx.compose.ui:ui-graphics:1.7.4")
 
-    // Utilities
-    implementation(libs.kotlin.reflect)
-    implementation(libs.androidx.material.icons.extended)
-    implementation(libs.gson)
-    implementation(libs.androidx.paging.runtime)
-    implementation(libs.androidx.paging.compose)
+    implementation("androidx.compose.ui:ui-tooling-preview:1.7.4")
 
-    // Maps
-    implementation(libs.play.services.nearby)
-    implementation(libs.osmdroid.android)
-    implementation(libs.osmdroid.wms)
-    implementation(libs.osmdroid.mapsforge)
+    implementation("androidx.compose.material3:material3:1.3.0")
+
+    implementation("androidx.wear.compose:compose-material:1.4.0")
+    implementation("com.google.android.material:material:1.12.0")
+    // ─── Lifecycle / Navigation ───────────────────────────────────────────────
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
+
+    implementation("androidx.compose.runtime:runtime-livedata:1.7.4")
+    implementation("androidx.navigation:navigation-compose:2.8.3")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose-android:2.8.6")
+
+    // ─── Firebase ────────────────────────────────────────────────────────────
+    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
+    implementation("com.google.firebase:firebase-database:21.0.0")
+
+    implementation("com.google.android.engage:engage-core:1.5.5")
+    implementation("com.google.firebase:firebase-firestore:25.1.1")
+    implementation("com.google.firebase:firebase-storage-ktx:21.0.1")
+
+    // ─── AI & Serialization ──────────────────────────────────────────────────
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+    // ─── Image loading (Glide + Coil) ────────────────────────────────────────
+    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+    implementation("jp.wasabeef:glide-transformations:4.3.0")
+
+    // ─── Room ────────────────────────────────────────────────────────────────
+    implementation("androidx.room:room-runtime:2.6.1")
+    kapt("androidx.room:room-compiler:2.6.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+
+    // ─── Utilities ───────────────────────────────────────────────────────────
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.24")
+    implementation("androidx.compose.material:material-icons-extended:1.7.4")
+    implementation("com.google.code.gson:gson:2.8.9")
+    implementation("androidx.paging:paging-runtime:3.3.2")
+    implementation("androidx.paging:paging-compose:3.3.2")
+
+    // ─── Maps (OSMDroid) ─────────────────────────────────────────────────────
+    implementation("com.google.android.gms:play-services-nearby:19.3.0")
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
+    implementation("org.osmdroid:osmdroid-wms:6.1.16")
+    implementation("org.osmdroid:osmdroid-mapsforge:6.1.16")
     implementation("org.apache.commons:commons-imaging:1.0-alpha3")
 
-    // Animations
+    // ─── Animations (Lottie) ─────────────────────────────────────────────────
     implementation("com.airbnb.android:lottie-compose:6.1.0")
 
-    // Koin DI
+    // ─── Koin DI ─────────────────────────────────────────────────────────────
     implementation("io.insert-koin:koin-android:3.5.0")
     implementation("io.insert-koin:koin-androidx-compose:3.5.0")
 
-    // Realm
+    // ─── Realm ───────────────────────────────────────────────────────────────
     implementation("io.realm.kotlin:library-base:1.12.0")
     implementation("io.realm.kotlin:library-sync:1.12.0")
 
-    // Camera
+    // ─── Camera ──────────────────────────────────────────────────────────────
     implementation("com.google.guava:guava:32.1.3-android")
     implementation("androidx.camera:camera-core:1.3.1")
     implementation("androidx.camera:camera-camera2:1.3.1")
     implementation("androidx.camera:camera-lifecycle:1.3.1")
     implementation("androidx.camera:camera-view:1.3.1")
 
-    // MongoDB
+    // ─── MongoDB (BSON) ──────────────────────────────────────────────────────
     implementation("org.mongodb:bson:4.11.1")
 
-    // PDF
+    // ─── PDF (iText) ─────────────────────────────────────────────────────────
     implementation("com.itextpdf:itext7-core:7.2.5")
     implementation("com.itextpdf:html2pdf:4.0.5")
 
-    // Coroutines + Firebase
+    // ─── Coroutines + Firebase ───────────────────────────────────────────────
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
 
-    // Dropbox SDK officiel
+    // ─── Dropbox SDK ─────────────────────────────────────────────────────────
     implementation("com.dropbox.core:dropbox-core-sdk:7.0.0")
 
-    // ExoPlayer
+    // ─── ExoPlayer ───────────────────────────────────────────────────────────
     implementation("com.google.android.exoplayer:exoplayer:2.19.1")
     implementation("com.google.android.exoplayer:exoplayer-ui:2.19.1")
     implementation("com.google.android.exoplayer:extension-mediasession:2.19.1")
 
-    // ExifInterface
+    // ─── ExifInterface ───────────────────────────────────────────────────────
     implementation("androidx.exifinterface:exifinterface:1.3.6")
 
-    // Desugaring
+    // ─── Desugaring ──────────────────────────────────────────────────────────
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
-    // Excel
+    // ─── Excel (Apache POI) ──────────────────────────────────────────────────
     implementation("org.apache.poi:poi-ooxml:5.2.3")
 
-    // Calendar
+    // ─── Calendar ────────────────────────────────────────────────────────────
     implementation("com.aminography:primecalendar:1.7.0")
 
-    // Tests
-    testImplementation(libs.junit)
-    testImplementation(libs.junit.jupiter)
+    // ─── Tests unitaires ─────────────────────────────────────────────────────
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
     testImplementation("org.mockito:mockito-core:4.11.0")
     testImplementation("org.mockito:mockito-inline:4.11.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3")
@@ -197,16 +227,18 @@ dependencies {
     testImplementation("io.insert-koin:koin-test:3.5.0")
     testImplementation("io.insert-koin:koin-test-junit4:3.5.0")
 
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+    // ─── Tests instrumentés ──────────────────────────────────────────────────
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.10.00"))
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.4")
     androidTestImplementation("androidx.arch.core:core-testing:2.2.0")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     androidTestImplementation("androidx.compose.ui:ui-test-manifest")
     androidTestImplementation("io.insert-koin:koin-test:3.5.0")
     androidTestImplementation("io.insert-koin:koin-test-junit4:3.5.0")
 
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
+    // ─── Debug ───────────────────────────────────────────────────────────────
+    debugImplementation("androidx.compose.ui:ui-tooling:1.7.4")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:1.7.4")
 }

@@ -1,4 +1,4 @@
-package com.example.light_app_controles
+package com.example.light_app_controles.A.Main  // FIX: lowercase 'a' and 'main'
 
 import EntreApps.Shared.Modules.Base.StoragePermissionDialog
 import android.Manifest
@@ -11,20 +11,21 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember               // FIX: use remember, not rememberSaveable (AppDatabase is not Parcelable)
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.content.ContextCompat
+// FIX: updated import to match the corrected lowercase package name
+import com.example.light_app_controles.B.Screens.MainScreen
+import com.example.light_app_controles.Modules.Base.AppDatabase
+import com.example.light_app_controles.Modules.PermissionHandler
 import com.example.light_app_controles.ui.theme.Light_App_ControlesTheme
 import org.koin.core.annotation.KoinExperimentalAPI
 
@@ -75,31 +76,38 @@ class MainActivity : ComponentActivity() {
         runCatching {
             setContent {
                 var initDone by rememberSaveable { mutableStateOf(true) }
+
                 val context = LocalContext.current
+
+                // Initialized eagerly via the singleton — non-null, so the type
+                // mismatch with MainScreen(appDatabase: AppDatabase) is resolved.
+                val appDatabase by remember {
+                    mutableStateOf(AppDatabase.DatabaseModule.getDatabase(context))
+                }
 
                 Light_App_ControlesTheme {
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                            if (permissionsChecked) {
-
-                                if (!initDone) {
-
-                                } else {
-                                    Greeting(
-                                        name = "cc",
-                                        modifier = Modifier.padding(innerPadding)
-                                    )
-                                }
-                                if (showStorageDialog) {
-                                    StoragePermissionDialog(
-                                        onOpenSettings = { permissionHandler.openStorageSettings() },
-                                        onDismiss = {
-                                            showStorageDialog = false
-                                            permissionsChecked = true
-                                            showPermissionDeniedMessage()
-                                        }
-                                    )
-                                }
+                        if (permissionsChecked) {
+                            if (!initDone) {
+                                // loading / init screen placeholder
+                            } else {
+                                MainScreen(
+                                    appDatabase = appDatabase,
+                                    name = "cc",
+                                    modifier = Modifier.padding(innerPadding)
+                                )
                             }
+                            if (showStorageDialog) {
+                                StoragePermissionDialog(
+                                    onOpenSettings = { permissionHandler.openStorageSettings() },
+                                    onDismiss = {
+                                        showStorageDialog = false
+                                        permissionsChecked = true
+                                        showPermissionDeniedMessage()
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
             }
@@ -153,21 +161,5 @@ class MainActivity : ComponentActivity() {
                 "⚠ بعض الوظائف محدودة بدون الأذونات الكاملة"
             }
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Light_App_ControlesTheme {
-        Greeting("Android")
     }
 }

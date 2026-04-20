@@ -17,8 +17,9 @@ buildscript {
         google()
         mavenCentral()
     }
+    //noinspection UseTomlInstead
     dependencies {
-        classpath(libs.gradle.v800)
-        classpath(libs.kotlin.gradle.plugin)
+        classpath("com.android.tools.build:gradle")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
     }
 }
