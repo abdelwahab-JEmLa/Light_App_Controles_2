@@ -44,12 +44,6 @@ import androidx.compose.ui.unit.dp
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Z.Components.EditableAmountField
 import com.example.light_app_controles.Modules.DatesHandler
 
-//<--
-//TODO(1): cree un preview
-
-//<--
-//TODO(1): les datas de allBonVentList depuit dao m8 le relative == le last situation credit  on update ca update dao
-
 @SuppressLint("AutoboxingStateCreation")
 @Composable
 fun Situation_Card_ItemView(

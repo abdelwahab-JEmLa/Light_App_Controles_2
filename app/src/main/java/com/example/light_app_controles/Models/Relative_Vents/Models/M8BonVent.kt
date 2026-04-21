@@ -100,6 +100,9 @@ data class M8BonVent(
         Cette_Transaction_Type_Est_Credit(R.color.holo_red_dark, "تم اقراضه  "),
         Versemment(R.color.holo_red_dark, ""),
         Demande_Versemet(R.color.holo_red_dark, "طلب تحظير الدين القديم عند احظار الطلبية"),
+
+        New_Situation_Credit(R.color.holo_red_dark, "الحالة الجديدة للدين"),
+
         ACHETEUR_NON_DISPO(R.color.holo_red_dark, "الشاري غائب"),
         AVEC_MARCHANDISE(R.color.holo_red_dark, "عندو سلعة"),
         FERME(R.color.darker_gray, "مغلق"),

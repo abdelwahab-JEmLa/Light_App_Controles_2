@@ -77,8 +77,6 @@ class MainActivity : ComponentActivity() {
 
                 val context = LocalContext.current
 
-                // Initialized eagerly via the singleton — non-null, so the type
-                // mismatch with MainScreen(appDatabase: AppDatabase) is resolved.
                 val appDatabase by remember {
                     mutableStateOf(AppDatabase.DatabaseModule.getDatabase(context))
                 }
@@ -90,9 +88,8 @@ class MainActivity : ComponentActivity() {
                                 // loading / init screen placeholder
                             } else {
                                 MainScreen(
-                                    appDatabase = appDatabase,
-                                    name = "cc",
-                                    modifier = Modifier.padding(innerPadding)
+                                    modifier = Modifier.padding(innerPadding),
+                                    appDatabase = appDatabase
                                 )
                             }
                             if (showStorageDialog) {
