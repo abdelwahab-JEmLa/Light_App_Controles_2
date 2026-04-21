@@ -21,22 +21,24 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.example.light_app_controles.Modules.Base.SQL.Daos.Dao_M8BonVent
 import java.util.Date
 
 
 @Database(
     entities = [
+        M01Produit::class,
+        M8BonVent::class,
+
         //Sorted ID
         M3CouleurProduitInfos::class,
         M13TarificationInfos::class,
         M2Client::class,
         M10OperationVentCouleur::class,
         M09AppCompt::class,
-        M8BonVent::class,
         M14VentPeriode::class,
         M15Grossist::class,
         M00CentralParametresOfAllApps::class,
-        M01Produit::class,
         M16CategorieProduit::class,
     ],
     version = 4, // Bumped from 3 → 4 to register the new AppTypeConverter
@@ -49,8 +51,9 @@ import java.util.Date
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun dao_M1Produit(): Dao_M1Produit
-    abstract fun dao_16CategorieProduit(): Dao_M16CategorieProduit
     abstract fun dao_M03CouleurProduitInfos(): Dao_M03CouleurProduitInfos
+    abstract fun dao_M8BonVent(): Dao_M8BonVent
+    abstract fun dao_16CategorieProduit(): Dao_M16CategorieProduit
 
     object DatabaseModule {
 

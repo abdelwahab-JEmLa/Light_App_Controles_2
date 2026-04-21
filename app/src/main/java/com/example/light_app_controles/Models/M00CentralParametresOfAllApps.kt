@@ -3,7 +3,7 @@ package EntreApps.Shared.Models
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.light_app_controles.B.Screens.AppNavigationHost.Navigation.Screen
+import com.example.light_app_controles.B.Screens.Y.AppNavigationHost.Navigation.Screen
 import com.google.firebase.Firebase
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.database

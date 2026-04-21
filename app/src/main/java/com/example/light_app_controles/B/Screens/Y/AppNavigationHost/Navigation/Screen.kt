@@ -1,4 +1,4 @@
-package com.example.light_app_controles.B.Screens.AppNavigationHost.Navigation
+package com.example.light_app_controles.B.Screens.Y.AppNavigationHost.Navigation
 
 import androidx.annotation.DrawableRes
 import androidx.compose.material.icons.Icons
