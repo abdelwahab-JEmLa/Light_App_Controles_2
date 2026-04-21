@@ -44,12 +44,12 @@ import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.A
 
 @SuppressLint("AutoboxingStateCreation")
 @Composable
-fun Situation_Card_ItemView(
+fun Y_Credit_And_Versement_ItemView(
     allBonVentList: List<M8BonVent>,
     relative_M8BonVent: M8BonVent,
     onUpdate: (M8BonVent) -> Unit,
     onDelete: (M8BonVent) -> Unit,
-) {       
+) {
     // Computed main value for this bon (e.g. Σ credits − Σ versements for New_Situation_Credit)
     val calculatedMainVal = relative_M8BonVent.fun_calculative_du_main_val(allBonVentList)
 

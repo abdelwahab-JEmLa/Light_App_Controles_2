@@ -1,6 +1,5 @@
 package com.example.light_app_controles.Modules.Base.SQL.Daos
 
-import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -8,6 +7,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import androidx.room.Upsert
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import kotlinx.coroutines.flow.Flow
 
 @Dao

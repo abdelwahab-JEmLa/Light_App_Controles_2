@@ -1,7 +1,8 @@
-package EntreApps.Shared.Models.Relative_Vents.Models
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
 
-//noinspection SuspiciousImport
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
+import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
+import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
 import android.R
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -12,6 +13,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.Objects
+import kotlin.collections.filter
 
 @Entity
 data class M8BonVent(
@@ -49,6 +51,8 @@ data class M8BonVent(
     var cUn_Versement_duBonVentKey: String = "",
     var vala_supp: Int = 0,
     var a_etai_imprime_au_moi_ne_foit: Boolean = false,
+
+    var new_situation: Double = 0.0,
     var versement_fait: Double = 0.0,
     var ancien_credit: Double = 0.0,
     var cUn_Credit_duBonVentKey: String = "",
@@ -80,6 +84,40 @@ data class M8BonVent(
         }
     }
 
+    /**
+     * Calculates the primary monetary value for this bon depending on its state:
+     * - New_Situation_Credit → Σ credit_fait  −  Σ versement_fait  (for same client + period)
+     * - Versemment           → versement_fait
+     * - Credit / Cette_Transaction_Type_Est_Credit → credit_fait
+     * - Demande_Versemet     → demande_Versemet_si_Type
+     * - everything else      → 0.0
+     */
+    fun fun_calculative_du_main_val(allBons: List<M8BonVent>): Double {
+        val samePeriodClientBons = allBons.filter {
+            it.parent_M2Client_KeyID == this.parent_M2Client_KeyID &&
+                    it.parent_M14VentPeriod_KeyId == this.parent_M14VentPeriod_KeyId
+        }
+        return when (etateActuellementEst) {
+            EtateActuellementEst.New_Situation_Credit -> {
+                val sumCredits = samePeriodClientBons
+                    .filter {
+                        it.etateActuellementEst == EtateActuellementEst.Credit ||
+                                it.etateActuellementEst == EtateActuellementEst.Cette_Transaction_Type_Est_Credit
+                    }
+                    .sumOf { it.credit_fait }
+                val sumVersements = samePeriodClientBons
+                    .filter { it.etateActuellementEst == EtateActuellementEst.Versemment }
+                    .sumOf { it.versement_fait }
+                sumCredits - sumVersements
+            }
+            EtateActuellementEst.Versemment -> versement_fait
+            EtateActuellementEst.Credit,
+            EtateActuellementEst.Cette_Transaction_Type_Est_Credit -> credit_fait
+            EtateActuellementEst.Demande_Versemet -> demande_Versemet_si_Type
+            else -> 0.0
+        }
+    }
+
     @IgnoreExtraProperties
     enum class EtateActuellementEst(val color: Int, val nomArabe: String) {
         CreeMaisNonDefinie(R.color.white, "غير محدد"),
@@ -101,6 +139,7 @@ data class M8BonVent(
         Versemment(R.color.holo_red_dark, ""),
         Demande_Versemet(R.color.holo_red_dark, "طلب تحظير الدين القديم عند احظار الطلبية"),
 
+        // Value = Σ credit_fait − Σ versement_fait  (computed by fun_calculative_du_main_val)
         New_Situation_Credit(R.color.holo_red_dark, "الحالة الجديدة للدين"),
 
         ACHETEUR_NON_DISPO(R.color.holo_red_dark, "الشاري غائب"),

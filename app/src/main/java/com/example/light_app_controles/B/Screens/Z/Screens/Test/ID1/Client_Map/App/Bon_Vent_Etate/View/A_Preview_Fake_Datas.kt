@@ -1,6 +1,4 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Preview
-
-import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
 
 
 const val FAKE_CLIENT_KEY = "fake_client_key_001"

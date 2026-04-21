@@ -1,6 +1,5 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Preview
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
 
-import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,33 +11,32 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Situation_Card_ItemView
 import com.example.light_app_controles.Modules.Base.SQL.AppDatabase
+import com.google.protobuf.LazyStringArrayList.emptyList
 import kotlinx.coroutines.launch
 
 @Composable
-fun BonVentEtateScreen(
+fun Main_Preview_BonVentEtateScreen(
     context: Context = LocalContext.current,
     appDatabase: AppDatabase = AppDatabase.DatabaseModule.getDatabase(context),
+    fake_allBonVentList: List<M8BonVent> = FAKE_ALL_BONS,
     parentClientKeyID: String = FAKE_CLIENT_KEY,
     parentPeriodKeyID: String = FAKE_PERIOD_KEY,
     modifier: Modifier = Modifier.Companion,
 ) {
     val scope = rememberCoroutineScope()
-
-    val allBonVentList: List<M8BonVent> by appDatabase
+    val collectAsState = appDatabase  // TODO: use collectAsState for live DB data once fake_allBonVentList is replaced
         .dao_M8BonVent()
         .getAllFlow()
         .collectAsState(initial = emptyList())
 
-    val relative: M8BonVent? = allBonVentList
+    val relative: M8BonVent? = fake_allBonVentList
         .filter { bon ->
             bon.parent_M2Client_KeyID == parentClientKeyID &&
                     bon.parent_M14VentPeriod_KeyId == parentPeriodKeyID &&
@@ -63,8 +61,9 @@ fun BonVentEtateScreen(
                 .padding(horizontal = 8.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+            // Situation card (New_Situation_Credit) — shows Σ credits − Σ versements
             items(
-                items = allBonVentList.filter { bon ->
+                items = fake_allBonVentList.filter { bon ->
                     bon.parent_M2Client_KeyID == parentClientKeyID &&
                             bon.parent_M14VentPeriod_KeyId == parentPeriodKeyID &&
                             bon.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit
@@ -72,16 +71,39 @@ fun BonVentEtateScreen(
                 key = { it.keyID }
             ) { bon ->
                 Situation_Card_ItemView(
-                    allBonVentList = allBonVentList,
+                    allBonVentList = fake_allBonVentList,
                     relative_M8BonVent = bon,
                     onUpdate = { updatedBon ->
-                        // FIX: was referencing undefined `dao` — route through appDatabase
                         scope.launch { appDatabase.dao_M8BonVent().upsert(updatedBon) }
                     },
                     onDelete = { bonToDelete ->
-                        scope.launch {
-                            appDatabase.dao_M8BonVent().deleteByKeyId(bonToDelete.keyID)
-                        }
+                        scope.launch { appDatabase.dao_M8BonVent().deleteByKeyId(bonToDelete.keyID) }
+                    },
+                )
+            }
+
+            // Versement / Credit / Demande bons — shown below the situation card
+            items(
+                items = fake_allBonVentList.filter { bon ->
+                    bon.parent_M2Client_KeyID == parentClientKeyID &&
+                            bon.parent_M14VentPeriod_KeyId == parentPeriodKeyID &&
+                            bon.etateActuellementEst in listOf(
+                                M8BonVent.EtateActuellementEst.Versemment,
+                                M8BonVent.EtateActuellementEst.Credit,
+                                M8BonVent.EtateActuellementEst.Cette_Transaction_Type_Est_Credit,
+                                M8BonVent.EtateActuellementEst.Demande_Versemet,
+                            )
+                },
+                key = { it.keyID }
+            ) { bon ->
+                Y_Credit_And_Versement_ItemView(
+                    allBonVentList = fake_allBonVentList,
+                    relative_M8BonVent = bon,
+                    onUpdate = { updatedBon ->
+                        scope.launch { appDatabase.dao_M8BonVent().upsert(updatedBon) }
+                    },
+                    onDelete = { bonToDelete ->
+                        scope.launch { appDatabase.dao_M8BonVent().deleteByKeyId(bonToDelete.keyID) }
                     },
                 )
             }
