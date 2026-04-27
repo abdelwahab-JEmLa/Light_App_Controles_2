@@ -31,7 +31,7 @@ fun Main_Preview_BonVentEtateScreen(
     modifier: Modifier = Modifier.Companion,
 ) {
     val scope = rememberCoroutineScope()
-    val collectAsState = appDatabase  // TODO: use collectAsState for live DB data once fake_allBonVentList is replaced
+    val collectAsState = appDatabase
         .dao_M8BonVent()
         .getAllFlow()
         .collectAsState(initial = emptyList())

@@ -52,7 +52,8 @@ data class M8BonVent(
     var vala_supp: Int = 0,
     var a_etai_imprime_au_moi_ne_foit: Boolean = false,
 
-    var new_situation: Double = 0.0,
+    var new_situation: Double = 0.0, //06_21
+    
     var versement_fait: Double = 0.0,
     var ancien_credit: Double = 0.0,
     var cUn_Credit_duBonVentKey: String = "",
@@ -70,7 +71,8 @@ data class M8BonVent(
     val parentID8C2TypeTransactionKeyByParent: String = "",
     var vid: Long = 0L,
 ) {
-
+           //<--
+           //TODO(1): cree toFirebaseMap
     fun get_DebugInfos(): String {
         return buildString {
             append("Bon")
