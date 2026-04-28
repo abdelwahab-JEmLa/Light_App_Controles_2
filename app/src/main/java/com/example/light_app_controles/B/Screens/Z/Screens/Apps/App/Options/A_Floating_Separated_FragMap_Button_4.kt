@@ -91,56 +91,6 @@ data class Button_State(
     }
 }
 
-@Composable
-fun Floating_Separated_Button(
-    appDatabase: AppDatabase,
-    buttonState: Button_State = Button_State.get_Default().copy(
-        text_Label = "",
-        icons = Pair(Icons.Default.FilterList, Icons.Default.AllInbox),
-        colors = Pair(Color.Red, Color.Blue)
-    ),
-    vm :    A_ViewModel_SeparatedAppsCodingPattern
-) {
-    val isShowingAll = true
-    val updatedButtonState = buttonState.copy(its_Active = isShowingAll)
-
-    val haptic = LocalHapticFeedback.current
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
-    val screenHeightDp = configuration.screenHeightDp.dp
-
-    var offsetX by remember { mutableFloatStateOf(screenWidth.value - 200f) }
-    var offsetY by remember { mutableFloatStateOf(screenHeightDp.value - 300f) }
-    var showDropdown by remember { mutableStateOf(false) }
-
-
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Box(
-            modifier = Modifier
-                .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
-                .pointerInput(Unit) {
-                    detectDragGestures { change, dragAmount ->
-                        change.consume()
-                        offsetX = (offsetX + dragAmount.x).coerceIn(0f, screenWidth.value - 100f)
-                        offsetY = (offsetY + dragAmount.y).coerceIn(0f, screenHeightDp.value - 100f)
-                    }
-                }
-                .padding(16.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                B_FragMap_DropdownMenu_App5(
-                    vm = vm,
-                    expanded = showDropdown,
-                    onDismiss = { showDropdown = false },
-                    appDatabase = appDatabase
-                )
-            }
-        }
-    }
-}
 
 @Composable
 fun FabDropdownMenu_WhenIts_FragmentEducation(

@@ -3,11 +3,13 @@ package com.example.light_app_controles.B.Screens.Z.Screens.Apps.App
 import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
 import Application5.App.EtudiantCard_SeparatedAppsCodingPattern
 import Application5.App.MonthSelectionDialog_SeparatedAppsCodingPattern
+import Application5.App.Options.FabButton_When_Its_EducationFragment
 import Application5.App.Options.FabDropdownMenu_WhenIts_FragmentEducation
 import Application5.App.Repository.M19Etudiant
 import Application5.App.View.DropDownItems.View.ButID8.SessionsEducationDialog.Dialog.SessionsEducationDialog
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +20,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,17 +43,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -63,6 +70,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -111,7 +119,7 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
     val selectedMonth = activeDatas.displaye_sections_education_du_mois
     if (selectedMonth != null) {
         SessionsEducationDialog(
-            viewModel=viewModel,
+            viewModel = viewModel,
             selectedMonth = selectedMonth,
             repo20Observation = repo20Obsarvation,
             onDismiss = {
@@ -151,6 +159,16 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
         isSameDay(updateTimestamp, System.currentTimeMillis())
     }
 
+    // ── Screen dimensions for drag bounds ──────────────────────────────────────
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.toFloat()
+    val screenHeight = configuration.screenHeightDp.toFloat()
+
+    // ── FAB state: collapsed by default, opens on tap ─────────────────────────
+    var showFabMenu by remember { mutableStateOf(false) }
+    var fabOffsetX by remember { mutableFloatStateOf(screenWidth - 80f) }
+    var fabOffsetY by remember { mutableFloatStateOf(screenHeight - 200f) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -185,10 +203,37 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
         }
     }
 
-    FabDropdownMenu_WhenIts_FragmentEducation(
-        aCentralFacade = viewModel,
-        onDismissDropdown = {}
-    )
+    // ── FIX TODO(1): draggable FAB starts collapsed; menu appears on tap ──────
+    Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .offset { IntOffset(fabOffsetX.roundToInt(), fabOffsetY.roundToInt()) }
+                .pointerInput(Unit) {
+                    detectDragGestures { change, dragAmount ->
+                        change.consume()
+                        fabOffsetX = (fabOffsetX + dragAmount.x).coerceIn(0f, screenWidth - 80f)
+                        fabOffsetY = (fabOffsetY + dragAmount.y).coerceIn(0f, screenHeight - 80f)
+                    }
+                }
+        ) {
+            // The button is always visible; menu only shows after a tap.
+            FabButton_When_Its_EducationFragment(
+                showWarningState = etudiants.isNotEmpty() && !hasUpdateToday,
+                isFabVisible = showFabMenu,
+                its_Targeted_Frag = true,
+                onToggleFabVisibility = { showFabMenu = !showFabMenu },
+                onShowDropdown = { showFabMenu = true }
+            )
+
+            // Rendered only when the FAB was tapped — starts hidden.
+            if (showFabMenu) {
+                FabDropdownMenu_WhenIts_FragmentEducation(
+                    aCentralFacade = viewModel,
+                    onDismissDropdown = { showFabMenu = false }
+                )
+            }
+        }
+    }
 }
 
 @Composable
