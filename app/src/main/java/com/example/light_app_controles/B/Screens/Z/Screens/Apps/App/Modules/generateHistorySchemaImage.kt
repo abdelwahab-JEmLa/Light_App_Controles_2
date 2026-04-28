@@ -1,6 +1,7 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Apps.App.Modules
 
 import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
+import Application5.App.Repository.M20ObsarvationEtudion
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.ParentCommunicationCardData_2
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.Table.drawRTLText
 import android.content.ContentValues
@@ -30,6 +31,7 @@ private data class ObsRow(
     val takyimLabel: String,
     val takyimColor: Int,
     val takyimScore: Float,
+    val typeLabel: String,       // "استدراك" / "تمام" / "أستاذ" / "غياب" — shown next to the badge
 )
 
 fun generateHistorySchemaImage(
@@ -68,11 +70,18 @@ private fun resolveObservations(
         .takeLast(10)
         .map { obs ->
             val takyimName = obs.takyim.arabicName
+            val typeLabel = when (obs.type) {
+                M20ObsarvationEtudion.Type.Moukarrar_Itmamouhou    -> "استدراك"
+                M20ObsarvationEtudion.Type.Tama_Hifdoha            -> "تمام"
+                M20ObsarvationEtudion.Type.Ousstad_kama_Bil_moundat -> "أستاذ"
+                M20ObsarvationEtudion.Type.Raeeb                   -> "غياب"
+            }
             ObsRow(
                 dateLabel   = getArabicDateSchema(obs.creationTimestamps),
                 takyimLabel = takyimName,
                 takyimColor = takyimToColor(takyimName),
                 takyimScore = takyimToScore(takyimName),
+                typeLabel   = typeLabel,
             )
         }
 
@@ -133,7 +142,7 @@ private fun drawChart(
     paints: SchemaPaints
 ): Float {
     val yAxisW    = 62f
-    val xAxisH    = 34f
+    val xAxisH    = 56f          // taller to fit 2-row staggered dates
     val chartLeft = marginH
     val chartRight = marginH + contentWidth - yAxisW
     val chartW    = chartRight - chartLeft
@@ -202,15 +211,36 @@ private fun drawChart(
         canvas.drawCircle(cx, cy, 7f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; style = Paint.Style.FILL })
         canvas.drawCircle(cx, cy, 5f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = row.takyimColor; style = Paint.Style.FILL })
 
-        val badgeW = 52f; val badgeH = 14f
-        val bLeft = (cx - badgeW / 2f).coerceIn(chartLeft, chartRight - badgeW)
-        val bTop  = (cy - badgeH - 7f).coerceAtLeast(chartTop)
-        canvas.drawRoundRect(RectF(bLeft, bTop, bLeft + badgeW, bTop + badgeH), 3f, 3f,
-            Paint(Paint.ANTI_ALIAS_FLAG).apply { color = row.takyimColor; style = Paint.Style.FILL })
-        drawRTLText(canvas, row.takyimLabel, bLeft + 2f, bTop + 1f, (badgeW - 4f).toInt(), paints.badgeText, Layout.Alignment.ALIGN_CENTER)
+        // ── Takyim badge + typeLabel badge side by side ───────────────────────
+        val badgeH     = 14f
+        val takyimW    = 52f
+        val typeBadgeW = if (row.typeLabel.isBlank()) 0f else 36f
+        val gap        = if (row.typeLabel.isBlank()) 0f else 2f
+        val totalW     = takyimW + gap + typeBadgeW
 
-        val labelW = 50; val lx = (cx - labelW / 2f).coerceIn(chartLeft, chartRight - labelW)
-        drawRTLText(canvas, row.dateLabel.take(9), lx, chartBot + 5f, labelW, paints.dateText, Layout.Alignment.ALIGN_CENTER)
+        // Position the combined badge centered above the dot, raised enough to clear the dot
+        val bLeft = (cx - totalW / 2f).coerceIn(chartLeft, chartRight - totalW)
+        val bTop  = (cy - badgeH - 20f).coerceAtLeast(chartTop)
+
+        // Takyim badge
+        canvas.drawRoundRect(RectF(bLeft, bTop, bLeft + takyimW, bTop + badgeH), 3f, 3f,
+            Paint(Paint.ANTI_ALIAS_FLAG).apply { color = row.takyimColor; style = Paint.Style.FILL })
+        drawRTLText(canvas, row.takyimLabel, bLeft + 2f, bTop + 1f, (takyimW - 4f).toInt(), paints.badgeText, Layout.Alignment.ALIGN_CENTER)
+
+        // Type label badge (e.g. "استدراك"), lighter tint of the same colour
+        if (row.typeLabel.isNotBlank()) {
+            val tLeft = bLeft + takyimW + gap
+            canvas.drawRoundRect(RectF(tLeft, bTop, tLeft + typeBadgeW, bTop + badgeH), 3f, 3f,
+                Paint(Paint.ANTI_ALIAS_FLAG).apply { color = row.takyimColor; alpha = 110; style = Paint.Style.FILL })
+            drawRTLText(canvas, row.typeLabel, tLeft + 2f, bTop + 1f, (typeBadgeW - 4f).toInt(), paints.badgeText, Layout.Alignment.ALIGN_CENTER)
+        }
+
+        // ── Full date at the base, staggered to avoid overlap ─────────────────
+        // Even index → first row (chartBot + 5), odd → second row (chartBot + 26)
+        val dateY  = if (i % 2 == 0) chartBot + 5f else chartBot + 26f
+        val labelW = 56
+        val lx     = (cx - labelW / 2f).coerceIn(chartLeft, chartRight - labelW)
+        drawRTLText(canvas, row.dateLabel, lx, dateY, labelW, paints.dateText, Layout.Alignment.ALIGN_CENTER)
     }
 
     return chartBot + xAxisH
