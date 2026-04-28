@@ -87,15 +87,15 @@ fun B_FragMap_DropdownMenu_App5(
         HorizontalDivider()
 
         // But 4 — قائمة الطلبة (PDF table of all students)
-        DropDownItem_Imprime_pdf_List_Talaba()
+        DropDownItem_Imprime_pdf_List_Talaba(aCentralFacade = vm)
         HorizontalDivider()
 
         // But 5 — شبكة الحضور (checkbox grid PDF, 20 pages)
-        DropDownItem_Imprime_pdf_Case_A_Cochet()
+        DropDownItem_Imprime_pdf_Case_A_Cochet(aCentralFacade = vm)
         HorizontalDivider()
 
         // But 9 — إرسال البطاقات عبر واتساب (send today's JPG cards via WhatsApp)
-        DropDownItem_Send_Cards_WhatsApp_Parent()
+        DropDownItem_Send_Cards_WhatsApp_Parent(aCentralFacade = vm)
 
     }
 }

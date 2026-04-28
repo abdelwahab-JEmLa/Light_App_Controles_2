@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.compose.koinInject
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
@@ -52,7 +51,7 @@ import java.util.Locale
 
 @Composable
 fun DropDownItem_Imprime_pdf_collecte_numeros_whatsapp(
-    aCentralFacade: A_ViewModel_SeparatedAppsCodingPattern = koinInject(),
+    aCentralFacade: A_ViewModel_SeparatedAppsCodingPattern ,
     repo19Etudiant: Repo19Etudiant = aCentralFacade.repo19Etudiant,
     context: Context = LocalContext.current
 ) {

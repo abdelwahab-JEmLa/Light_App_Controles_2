@@ -7,7 +7,7 @@ import Application5.App.Repository.M20ObsarvationEtudion
 import Application5.App.Repository.SessionDate
 import Application5.App.View.DropDownItems.View.ButID6.createAndOpenPdfDocument
 import EntreApps.Shared.Models.Components.Ousstad_Tahfid
-import V.DiviseParSections.App.Shared.Repository.A.Base.FocusedValues.Base.Get.Download.FocusedValuesGetter
+import EntreApps.Shared.Models.Utilisateur
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import org.koin.compose.koinInject
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -44,7 +43,6 @@ fun DropDownID3(
     sessionObservations: List<M20ObsarvationEtudion>,
     aCentralFacade: A_ViewModel_SeparatedAppsCodingPattern,
     repo19Etudiant: Repo19Etudiant = aCentralFacade.repo19Etudiant,
-    focusedValuesGetter: FocusedValuesGetter = koinInject()
 ) {
     val context = LocalContext.current
     var showTeacherDialog by remember { mutableStateOf(false) }
@@ -60,11 +58,8 @@ fun DropDownID3(
             timeInMillis = sessionDate.timestamp
         }
     }
-
-    // FIXED: Get the actual current teacher from focused values
-    val selectedTeacher = remember(focusedValuesGetter.active_Central_Values) {
-        focusedValuesGetter.active_Central_Values.active_Ousstad_Tahfid
-            ?: Ousstad_Tahfid.Abdelwahab_Osstad // Fallback to Admin if no teacher is selected
+    val selectedTeacher = remember(aCentralFacade.activeCentralValues) {
+        Ousstad_Tahfid.Abdelwahab_Osstad
     }
 
     if (raeebObservations.isEmpty()) {

@@ -10,7 +10,6 @@ import Application5.App.Dialog.Dialog.Sub.Moukarar_SeparatedAppsCodingPattern
 import Application5.App.Repository.Data.Repo19Etudiant
 import Application5.App.Repository.Data.Repo20ObsarvationEtudion
 import Application5.App.Repository.M19Etudiant
-import Application5.App.formatDate
 import android.text.format.DateUtils.isToday
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -48,6 +47,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.example.light_app_controles.B.Screens.Z.Screens.Apps.App.formatDate
 
 @Composable
 fun EtudiantDetailsDialog_SeparatedAppsCodingPattern(

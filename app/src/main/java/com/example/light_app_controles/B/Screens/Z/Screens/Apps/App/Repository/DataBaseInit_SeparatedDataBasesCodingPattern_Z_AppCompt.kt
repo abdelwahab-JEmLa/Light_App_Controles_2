@@ -1,10 +1,8 @@
 package Application5.App.Repository
 
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.ifTrue
 import EntreApps.Shared.Modules.Base.AppDatabase
-import EntreApps.Shared.Modules.Loading_Datas.Init.WDatabaseInitializationManager.Repository
-import Application5.App.Repository.M19Etudiant
-import V.DiviseParSections.App.Shared.Repository.A.Base.MainRepositoys.Base.Get.Download.RepositorysMainGetter.Companion.ifTrue
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -21,7 +19,7 @@ class DataBaseInit_SeparatedDataBasesCodingPattern_Z_AppCompt(
     val dao = appDatabase.Dao19Etudiant()
     private val factoryScope = CoroutineScope(Dispatchers.IO)
     val repoRef = M19Etudiant.ref
-    val name = Repository.Entity_19Etudiant.name
+    val name = W_DatabaseInitializationManager_SeparatedDataBasesCodingPattern.Repository.Entity_19Etudiant.name
     var isListenerRegistered = false
 
     suspend fun init(

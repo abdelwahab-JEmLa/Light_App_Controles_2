@@ -36,7 +36,6 @@ import androidx.core.content.FileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.compose.koinInject
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -45,7 +44,7 @@ import java.util.Locale
 @Composable
 fun DropDownItem_Imprime_pdf_List_Talaba(
     nomFun: String = "قائمة الطلبة (PDF)",
-    aCentralFacade: A_ViewModel_SeparatedAppsCodingPattern = koinInject(),
+    aCentralFacade: A_ViewModel_SeparatedAppsCodingPattern ,
     repo19Etudiant: Repo19Etudiant = aCentralFacade.repo19Etudiant,
     context: Context = LocalContext.current
 ) {

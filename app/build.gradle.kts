@@ -144,4 +144,7 @@ dependencies {
 
     // ─── Local Unit Tests ─────────────────────────────────────────────────────
     testImplementation("junit:junit:4.13.2")
+    // Calendar
+    implementation("com.aminography:primecalendar:1.7.0")
+
 }

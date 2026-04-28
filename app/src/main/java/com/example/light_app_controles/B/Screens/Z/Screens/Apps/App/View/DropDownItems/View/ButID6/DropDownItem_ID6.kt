@@ -10,7 +10,6 @@ import Application5.App.View.DropDownItems.View.ButID6.Pdf_Generateur.ParentComm
 import Application5.App.View.DropDownItems.View.ButID6.Pdf_Generateur.generatePdfDocument_6
 import EntreApps.Shared.Models.Components.Ousstad_Tahfid
 import EntreApps.Shared.Models.Utilisateur
-import V.DiviseParSections.App.Shared.Repository.A.Base.FocusedValues.Base.Get.Download.FocusedValuesGetter
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -50,7 +49,6 @@ import androidx.core.content.FileProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.compose.koinInject
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -66,7 +64,6 @@ fun DropDownItem_ID6(
     aCentralFacade: A_ViewModel_SeparatedAppsCodingPattern,
     repo19Etudiant: Repo19Etudiant = aCentralFacade.repo19Etudiant,
     repo20Observation: Repo20ObsarvationEtudion = aCentralFacade.repo20ObsarvationEtudion,
-    focusedValuesGetter: FocusedValuesGetter = koinInject(),
     context: Context = LocalContext.current
 ) {
     var isLoading by remember { mutableStateOf(false) }
@@ -78,8 +75,8 @@ fun DropDownItem_ID6(
     val scope = rememberCoroutineScope()
 
     // FIXED: Get the actual current teacher from focused values
-    val currentUtilisateur = remember(focusedValuesGetter.active_Central_Values) {
-        focusedValuesGetter.active_Central_Values.active_filter_du_utilisateur
+    val currentUtilisateur = remember(aCentralFacade.activeCentralValues) {
+        aCentralFacade.activeCentralValues.active_Ousstad_Tahfid
             ?: Utilisateur.Admin // Fallback to Admin if no teacher is selected
     }
 

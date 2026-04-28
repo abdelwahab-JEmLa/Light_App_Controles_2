@@ -13,6 +13,7 @@ import Application5.App.View.DropDownItems.View.ButID8.DropDownItem_ButID8
 import EntreApps.Shared.Models.Components.Ousstad_Tahfid
 import EntreApps.Shared.Models.Compts.AbdelwahabTravailleChezGros_KeyId
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
+import EntreApps.Shared.Modules.Base.AppDatabase
 import android.text.format.DateUtils
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -74,8 +75,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.example.clientjetpack.R
-import org.koin.compose.koinInject
+import com.example.light_app_controles.R
 import kotlin.math.roundToInt
 
 data class Button_State(
@@ -93,11 +93,13 @@ data class Button_State(
 
 @Composable
 fun Floating_Separated_Button(
+    appDatabase: AppDatabase,
     buttonState: Button_State = Button_State.get_Default().copy(
         text_Label = "",
         icons = Pair(Icons.Default.FilterList, Icons.Default.AllInbox),
         colors = Pair(Color.Red, Color.Blue)
     ),
+    vm :    A_ViewModel_SeparatedAppsCodingPattern
 ) {
     val isShowingAll = true
     val updatedButtonState = buttonState.copy(its_Active = isShowingAll)
@@ -111,8 +113,6 @@ fun Floating_Separated_Button(
     var offsetY by remember { mutableFloatStateOf(screenHeightDp.value - 300f) }
     var showDropdown by remember { mutableStateOf(false) }
 
-    // so the composable signature stays unchanged for existing callers.
-    val vm: A_ViewModel_SeparatedAppsCodingPattern = koinInject()
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Box(
@@ -135,7 +135,7 @@ fun Floating_Separated_Button(
                     vm = vm,
                     expanded = showDropdown,
                     onDismiss = { showDropdown = false },
-                    appDatabase = koinInject()
+                    appDatabase = appDatabase
                 )
             }
         }

@@ -3,8 +3,8 @@ package Application5.App.Dialog.Dialog.Sub.C_Moulahadat_Kadima
 import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
 import Application5.App.Dialog.Dialog.Sub.A_Takiyim.TakiyimSelectionDialog_SeparatedAppsCodingPattern
 import Application5.App.Dialog.Dialog.Sub.A_Takiyim.Utils.SouraSelectionDialog
+import Application5.App.Dialog.Dialog.Sub.C_Moulahadat_Kadima.T.Dialog.String_OutlinedText_Avec_Init_Click_Button_Modulable_Proto4_ForStrings_SeparatedAppsCodingPattern
 import Application5.App.Repository.M20ObsarvationEtudion
-import V.DiviseParSections.App.Shared.Modules.Ui.FastEdite_OutlinedTextField.View.V.Proto.String_OutlinedText_Avec_Init_Click_Button_Modulable_Proto4_ForStrings
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -199,7 +199,7 @@ fun ObservationEditDialog_SeparatedAppsCodingPattern(
                     )
 
                     // Use the smart text field component
-                    String_OutlinedText_Avec_Init_Click_Button_Modulable_Proto4_ForStrings(
+                    String_OutlinedText_Avec_Init_Click_Button_Modulable_Proto4_ForStrings_SeparatedAppsCodingPattern(
                         start_text = tabrire,
                         placeholder = "اضغط للتبرير",
                         icon = Icons.Default.Edit,

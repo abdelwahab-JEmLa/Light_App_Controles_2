@@ -3,7 +3,6 @@ package Application5.App.Dialog.Dialog.Sub
 import Application5.App.Dialog.Dialog.Sub.A_Takiyim.Utils.ClickableFieldWithIcon
 import Application5.App.Repository.M19Etudiant
 import V.DiviseParSections.App.Shared.Modules.Ui.FastEdite_OutlinedTextField.View.FastEdite_OutlinedTextField
-import V.DiviseParSections.App.Shared.Repository.A.Base.ACentralFacade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.unit.dp
-import org.koin.compose.koinInject
 
 @Composable
 fun Moukarar_SeparatedAppsCodingPattern(
@@ -39,7 +37,6 @@ fun Moukarar_SeparatedAppsCodingPattern(
     onMokarrareAyaaSave: () -> Unit,
     mokarrareAyaaFocusRequester: FocusRequester,
     onShowTakiyimDialog: () -> Unit,
-    aCentralFacade: ACentralFacade = koinInject()
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.dp)

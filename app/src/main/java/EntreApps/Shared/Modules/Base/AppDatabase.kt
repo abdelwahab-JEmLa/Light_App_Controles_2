@@ -1,5 +1,9 @@
-package com.example.light_app_controles.Modules.Base.SQL
+package EntreApps.Shared.Modules.Base
 
+import Application5.App.Repository.Dao19Etudiant
+import Application5.App.Repository.Data.Dao20ObsarvationEtudion
+import Application5.App.Repository.M19Etudiant
+import Application5.App.Repository.M20ObsarvationEtudion
 import EntreApps.Shared.Models.AppType
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import EntreApps.Shared.Models.M09AppCompt
@@ -20,6 +24,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
+import com.example.light_app_controles.B.Screens.Z.Screens.Apps.App.Repository.Dao_M9AppCompt
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import com.example.light_app_controles.Modules.Base.SQL.Daos.Dao_M8BonVent
 import java.util.Date
@@ -35,11 +40,14 @@ import java.util.Date
         M13TarificationInfos::class,
         M2Client::class,
         M10OperationVentCouleur::class,
-        M09AppCompt::class,
         M14VentPeriode::class,
         M15Grossist::class,
         M00CentralParametresOfAllApps::class,
         M16CategorieProduit::class,
+
+        M09AppCompt::class,
+        M19Etudiant::class,
+        M20ObsarvationEtudion::class,
     ],
     version = 4, // Bumped from 3 → 4 to register the new AppTypeConverter
     exportSchema = false
@@ -55,6 +63,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun dao_M8BonVent(): Dao_M8BonVent
     abstract fun dao_16CategorieProduit(): Dao_M16CategorieProduit
 
+    abstract fun dao_M9AppCompt(): Dao_M9AppCompt
+    abstract fun Dao19Etudiant(): Dao19Etudiant
+    abstract fun Dao20ObsarvationEtudion(): Dao20ObsarvationEtudion
     object DatabaseModule {
 
         @Volatile

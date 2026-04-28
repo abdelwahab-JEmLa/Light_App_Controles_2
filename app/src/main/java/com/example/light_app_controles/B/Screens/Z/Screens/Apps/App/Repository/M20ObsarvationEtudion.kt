@@ -1,7 +1,7 @@
 package Application5.App.Repository
 
 import EntreApps.Shared.Models.Compts
-import V.DiviseParSections.App.Shared.Repository.A.Base.MainRepositoys.Base.Set.Upload.RepositorysMainSetter
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.firebase.Firebase
@@ -87,7 +87,7 @@ data class M20ObsarvationEtudion(
             "/00_DataPrototype-04-02/_1_developingRef/C_InfosSqlDataBases"
         ).child("DatasM20ObsarvationEtudion")
 
-        fun generePushKey() = RepositorysMainSetter.Companion.genereUnPushKeyFireBase(ref)
+        fun generePushKey() = M00CentralParametresOfAllApps.genereUnPushKeyFireBase(ref)
 
         fun get_default(): M20ObsarvationEtudion {
             return M20ObsarvationEtudion()

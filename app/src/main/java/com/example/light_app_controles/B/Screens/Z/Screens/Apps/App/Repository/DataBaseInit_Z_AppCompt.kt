@@ -1,10 +1,9 @@
 package Application5.App.Repository
 
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.ifTrue
 import EntreApps.Shared.Models.M09AppCompt
-import EntreApps.Shared.Modules.Loading_Datas.Init.WDatabaseInitializationManager.Repository
-import V.DiviseParSections.App.Shared.Repository.A.Base.MainRepositoys.Base.Get.Download.RepositorysMainGetter.Companion.ifTrue
-import Z_CodePartageEntreApps.DataBase.Main.Main.Z.Base.SQL.Dao_M9AppCompt
+import com.example.light_app_controles.B.Screens.Z.Screens.Apps.App.Repository.Dao_M9AppCompt
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -28,14 +27,14 @@ class DataBaseInit_SeparatedDataBasesCodingPattern_M9AppCompt(
         updateRepoProgress: (String, Float) -> Unit
     ) {
         if (!dao.isTableEmpty()) return
-        updateRepoProgress(Repository.Z_AppComptEntity.name, 0.4f)
+        updateRepoProgress(W_DatabaseInitializationManager_SeparatedDataBasesCodingPattern.Repository.Z_AppComptEntity.name, 0.4f)
         val data: List<M09AppCompt> = if (isInternetAvailable) {
-            updateRepoProgress(Repository.Z_AppComptEntity.name, 0.6f)
+            updateRepoProgress(W_DatabaseInitializationManager_SeparatedDataBasesCodingPattern.Repository.Z_AppComptEntity.name, 0.6f)
             onLoadFromFireBase()
         } else {
             onLoadFromFireBase()
         }
-        updateRepoProgress(Repository.Z_AppComptEntity.name, 0.8f)
+        updateRepoProgress(W_DatabaseInitializationManager_SeparatedDataBasesCodingPattern.Repository.Z_AppComptEntity.name, 0.8f)
         dao.insertAll(data)
     }
 
