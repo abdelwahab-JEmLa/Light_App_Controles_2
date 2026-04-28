@@ -27,7 +27,6 @@ import androidx.core.content.FileProvider
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Calendar
-import androidx.core.graphics.toColorInt
 
 private data class ObsRow(
     val dateLabel: String,
@@ -100,7 +99,7 @@ private fun resolveObservations(
     viewModel.repo20ObsarvationEtudion.datasValue
         .filter { it.etudiant_keyID == cardData.studentInfo.keyID }
         .sortedBy { it.creationTimestamps }   // oldest → newest so the chart reads left → right
-        .takeLast(10)
+        // no takeLast limit — show full history
         .map { obs ->
             val takyimName = obs.takyim.arabicName
             val typeLabel = when (obs.type) {
@@ -177,9 +176,9 @@ private fun drawChart(
     paints: SchemaPaints
 ): Float {
     val yAxisW    = 62f
-    val xAxisH    = 56f          // taller to fit 2-row staggered dates
-    val chartLeft = marginH
-    val chartRight = marginH + contentWidth - yAxisW
+    val xAxisH    = 46f          // date-label rows only (range is now inside the chart)
+    val chartLeft = marginH + yAxisW          // leave room on the LEFT for Y-axis labels
+    val chartRight = marginH + contentWidth   // extend to full content width
     val chartW    = chartRight - chartLeft
     val chartTop  = startY
     val chartBot  = startY + 190f
@@ -201,7 +200,8 @@ private fun drawChart(
     yLevels.forEach { (score, label) ->
         val gy = chartBot - score * chartH
         canvas.drawLine(chartLeft, gy, chartRight, gy, gridPaint)
-        drawRTLText(canvas, label, chartRight + 4f, gy - 5f, yAxisW.toInt(), paints.legendText, Layout.Alignment.ALIGN_NORMAL)
+        // ← labels on the LEFT axis
+        drawRTLText(canvas, label, marginH, gy - 5f, yAxisW.toInt(), paints.legendText, Layout.Alignment.ALIGN_NORMAL)
     }
 
     val axisPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -270,21 +270,16 @@ private fun drawChart(
             drawRTLText(canvas, row.typeLabel, tLeft + 2f, bTop + 1f, (typeBadgeW - 4f).toInt(), paints.badgeText, Layout.Alignment.ALIGN_CENTER)
         }
 
-        // ── Range label — rotated -90° between the dot and the X-axis ──────
-        // e.g. "الفاتحة (1) ← البقرة (5)"
+        // ── Range label — inside chart, just below the dot ───────────────────
+        // Placed at the point's own Y level so it reads "at the dot"
         if (row.rangeLabel.isNotBlank()) {
-            val rangeP = paints.rangeText
-            rangeP.textAlign = Paint.Align.CENTER
-            // Centre the text vertically in the available space below the dot
-            val midY = (cy + chartBot) / 2f
-            canvas.save()
-            canvas.rotate(-90f, cx, midY)
-            canvas.drawText(row.rangeLabel, cx, midY + rangeP.textSize / 3f, rangeP)
-            canvas.restore()
+            val rangeY = (cy + 9f).coerceAtMost(chartBot - 14f)
+            val rangeW = 80
+            val rlx    = (cx - rangeW / 2f).coerceIn(chartLeft, chartRight - rangeW)
+            drawRTLText(canvas, row.rangeLabel, rlx, rangeY, rangeW, paints.rangeTP, Layout.Alignment.ALIGN_CENTER)
         }
 
-        // ── Full date at the base, staggered to avoid overlap ─────────────────
-        // Even index → first row (chartBot + 5), odd → second row (chartBot + 26)
+        // ── Date label below the X-axis, staggered even/odd ──────────────────
         val dateY  = if (i % 2 == 0) chartBot + 5f else chartBot + 26f
         val labelW = 56
         val lx     = (cx - labelW / 2f).coerceIn(chartLeft, chartRight - labelW)
@@ -347,7 +342,8 @@ private data class SchemaPaints(
     val legendText: TextPaint,
     val dateText:   TextPaint,
     val badgeText:  TextPaint,
-    val rangeText:  Paint,       // plain Paint for rotated canvas.drawText
+    val rangeText:  Paint,       // kept for any future rotated use
+    val rangeTP:    TextPaint,   // horizontal range label below the date
 )
 
 private fun buildSchemaPaints() = SchemaPaints(
@@ -357,6 +353,7 @@ private fun buildSchemaPaints() = SchemaPaints(
     dateText   = TextPaint().apply { textSize =  7f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL); isAntiAlias = true; color = Color.parseColor("#757575") },
     badgeText  = TextPaint().apply { textSize =  8f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD);   isAntiAlias = true; color = Color.WHITE },
     rangeText  = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 7f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL); color = Color.parseColor("#546E7A"); alpha = 200 },
+    rangeTP    = TextPaint().apply { textSize =  7f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL); isAntiAlias = true; color = Color.parseColor("#546E7A"); alpha = 200 },
 )
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
@@ -386,8 +383,8 @@ private fun takyimToScore(takyim: String): Float = when (takyim) {
 
 @SuppressLint("UseKtx")
 private fun takyimToColor(takyim: String): Int = when (takyim) {
-    "ممتاز"                -> "#4CAF50".toColorInt()
-    "جيد جداً", "جيد جدا" -> "#2196F3".toColorInt()
+    "ممتاز"                -> Color.parseColor("#4CAF50")
+    "جيد جداً", "جيد جدا" -> Color.parseColor("#2196F3")
     "فوق الجيد"            -> Color.parseColor("#03A9F4")
     "جيد"                  -> Color.parseColor("#9C27B0")
     "فوق المقبول"          -> Color.parseColor("#FF9800")
