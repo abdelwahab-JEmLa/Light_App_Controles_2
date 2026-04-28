@@ -34,6 +34,8 @@ private data class ObsRow(
     val typeLabel: String,       // "استدراك" / "تمام" / "أستاذ" / "غياب" — shown next to the badge
 )
 
+//<--
+//TODO(1): fait que au pont affiche اسورة الى سوؤ 
 fun generateHistorySchemaImage(
     context: Context,
     cardData: ParentCommunicationCardData_2,
