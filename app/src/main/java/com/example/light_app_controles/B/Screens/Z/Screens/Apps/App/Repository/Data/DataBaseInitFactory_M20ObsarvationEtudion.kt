@@ -4,7 +4,7 @@ import Application5.App.Repository.M20ObsarvationEtudion
 import Application5.App.Repository.W_DatabaseInitializationManager_SeparatedDataBasesCodingPattern
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.ifTrue
-import EntreApps.Shared.Modules.Base.AppDatabase
+import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -15,7 +15,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import kotlin.coroutines.resume
 
-class DataBaseInitFactory_M20ObsarvationEtudion_SeparatedAppsCodingPattern(
+class DataBaseInitFactory_M20ObsarvationEtudion(
     appDatabase: AppDatabase
 ) {
     val dao = appDatabase.Dao20ObsarvationEtudion()

@@ -1,6 +1,6 @@
 package Application5.App
 
-import Application5.App.Repository.Data.DataBaseInitFactory_M20ObsarvationEtudion_SeparatedAppsCodingPattern
+import Application5.App.Repository.Data.DataBaseInitFactory_M20ObsarvationEtudion
 import Application5.App.Repository.Data.Repo19Etudiant
 import Application5.App.Repository.Data.Repo20ObsarvationEtudion
 import Application5.App.Repository.DataBaseInitFactory_SeparatedAppsCodingPattern_19Etudiant
@@ -23,7 +23,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import EntreApps.Shared.Modules.Base.AppDatabase
+import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -66,12 +66,12 @@ class A_ViewModel_SeparatedAppsCodingPattern(
         dataBaseCreationFactory = dataBaseInitFactory_19Etudiant,
     )
 
-    val dataBaseInitFactory_M20ObsarvationEtudion_SeparatedAppsCodingPattern =
-        DataBaseInitFactory_M20ObsarvationEtudion_SeparatedAppsCodingPattern(appDatabase)
+    val dataBaseInitFactory_M20ObsarvationEtudion =
+        DataBaseInitFactory_M20ObsarvationEtudion(appDatabase)
 
     val repo20ObsarvationEtudion = Repo20ObsarvationEtudion(
         context = context,
-        dataBaseCreationFactory = dataBaseInitFactory_M20ObsarvationEtudion_SeparatedAppsCodingPattern,
+        dataBaseCreationFactory = dataBaseInitFactory_M20ObsarvationEtudion,
     )
 
     val dataBaseInit_SeparatedDataBasesCodingPattern_M9AppCompt =
@@ -87,6 +87,7 @@ class A_ViewModel_SeparatedAppsCodingPattern(
             appComptComposeRepositoryPJ17 = repo9AppCompt,
             dataBaseInitZ_AppCompt = DataBaseInit_SeparatedDataBasesCodingPattern_Z_AppCompt(appDatabase),
             dataBaseInitFactory_19Etudiant = dataBaseInitFactory_19Etudiant,
+            dataBaseInitFactory_M20ObsarvationEtudion=dataBaseInitFactory_M20ObsarvationEtudion
         )
 
     val activeCentralValues = ActiveDatas_SeparatedAppsCodingPattern()

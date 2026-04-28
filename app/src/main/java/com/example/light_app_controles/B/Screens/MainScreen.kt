@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.light_app_controles.B.Screens.Z.Screens.Apps.App.A_EducationFragment_SeparatedAppsCodingPattern
 import com.example.light_app_controles.Floating_DropDownMenuS.Dialoge.Dialog.Z_Content_Buttons.View.A.Main.Floating_Separated_Button
-import EntreApps.Shared.Modules.Base.AppDatabase
+import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 
 @Composable
 fun MainScreen(

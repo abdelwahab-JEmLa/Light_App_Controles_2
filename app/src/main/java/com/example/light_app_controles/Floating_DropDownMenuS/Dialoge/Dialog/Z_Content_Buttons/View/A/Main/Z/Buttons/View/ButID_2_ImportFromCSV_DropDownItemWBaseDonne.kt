@@ -25,7 +25,7 @@ import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import EntreApps.Shared.Modules.Base.AppDatabase
+import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import com.example.light_app_controles.Modules.Uis.Ui.SyncProgressIndicator
 import kotlinx.coroutines.launch
 

@@ -2,7 +2,7 @@ package Application5.App.Repository
 
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.ifTrue
-import EntreApps.Shared.Modules.Base.AppDatabase
+import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener

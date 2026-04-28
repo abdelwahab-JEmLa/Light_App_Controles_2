@@ -1,7 +1,7 @@
 package EntreApps.Shared.Modules.Base.SQL
 
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_Local_storageLink
-import EntreApps.Shared.Modules.Base.AppDatabase
+import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import java.io.File
 
 // ---------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-package EntreApps.Shared.Modules.Base
+package com.example.light_app_controles.Modules.Base.SQL.Daos
 
 import Application5.App.Repository.Dao19Etudiant
 import Application5.App.Repository.Data.Dao20ObsarvationEtudion
@@ -24,9 +24,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverter
 import androidx.room.TypeConverters
-import com.example.light_app_controles.B.Screens.Z.Screens.Apps.App.Repository.Dao_M9AppCompt
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
-import com.example.light_app_controles.Modules.Base.SQL.Daos.Dao_M8BonVent
 import java.util.Date
 
 

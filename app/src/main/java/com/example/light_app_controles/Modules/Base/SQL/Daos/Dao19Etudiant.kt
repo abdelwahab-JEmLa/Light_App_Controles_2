@@ -1,6 +1,5 @@
 package Application5.App.Repository
 
-import Application5.App.Repository.M19Etudiant
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert

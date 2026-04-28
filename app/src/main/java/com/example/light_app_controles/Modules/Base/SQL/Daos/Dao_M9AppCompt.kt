@@ -1,4 +1,4 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Apps.App.Repository
+package com.example.light_app_controles.Modules.Base.SQL.Daos
 
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import EntreApps.Shared.Models.M09AppCompt

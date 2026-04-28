@@ -7,7 +7,7 @@ import Application5.App.View.DropDownItems.View.But2.DropDownItem_Imprime_pdf_co
 import Application5.App.View.DropDownItems.View.But4.DropDownItem_Imprime_pdf_List_Talaba
 import Application5.App.View.DropDownItems.View.But5.DropDownItem_Imprime_pdf_Case_A_Cochet
 import Application5.App.View.DropDownItems.View.But9.DropDownItem_Send_Cards_WhatsApp_Parent
-import EntreApps.Shared.Modules.Base.AppDatabase
+import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DropdownMenu

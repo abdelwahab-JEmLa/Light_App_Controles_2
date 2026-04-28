@@ -1,5 +1,6 @@
 package Application5.App.Repository
 
+import Application5.App.Repository.Data.DataBaseInitFactory_M20ObsarvationEtudion
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -16,6 +17,7 @@ class W_DatabaseInitializationManager_SeparatedDataBasesCodingPattern(
     val appComptComposeRepositoryPJ17: Repo9AppCompt_SeparatedAppsCodingPattern,
     val dataBaseInitZ_AppCompt: DataBaseInit_SeparatedDataBasesCodingPattern_Z_AppCompt,
     val dataBaseInitFactory_19Etudiant: DataBaseInitFactory_SeparatedAppsCodingPattern_19Etudiant,
+    val dataBaseInitFactory_M20ObsarvationEtudion: DataBaseInitFactory_M20ObsarvationEtudion,
 ) {
     private val mutex = Mutex()
     private val repositories = mutableMapOf<String, Float>()
@@ -45,6 +47,15 @@ class W_DatabaseInitializationManager_SeparatedDataBasesCodingPattern(
             {
                 val factory = dataBaseInitFactory_19Etudiant
                 initRepo(Repository.Entity_19Etudiant.name, context) {
+                    factory.init(isInternetAvailable = internet) { name, progress ->
+                        scope.launch { updateRepoProgress(name, progress) }
+                    }
+                    factory.triggerUpdateFbParTimestampsListener()
+                }
+            },
+            {
+                val factory = dataBaseInitFactory_M20ObsarvationEtudion
+                initRepo(Repository.Entity_M20ObsarvationEtudion.name, context) {
                     factory.init(isInternetAvailable = internet) { name, progress ->
                         scope.launch { updateRepoProgress(name, progress) }
                     }

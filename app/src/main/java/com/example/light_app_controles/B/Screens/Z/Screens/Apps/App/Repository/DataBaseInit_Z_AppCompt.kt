@@ -3,7 +3,7 @@ package Application5.App.Repository
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.ifTrue
 import EntreApps.Shared.Models.M09AppCompt
-import com.example.light_app_controles.B.Screens.Z.Screens.Apps.App.Repository.Dao_M9AppCompt
+import com.example.light_app_controles.Modules.Base.SQL.Daos.Dao_M9AppCompt
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener

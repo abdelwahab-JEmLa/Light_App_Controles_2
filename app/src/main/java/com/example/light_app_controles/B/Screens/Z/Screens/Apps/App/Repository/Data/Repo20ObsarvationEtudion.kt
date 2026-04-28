@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 @Stable
 class Repo20ObsarvationEtudion(
     private val context: Context,
-    val dataBaseCreationFactory: DataBaseInitFactory_M20ObsarvationEtudion_SeparatedAppsCodingPattern,
+    val dataBaseCreationFactory: DataBaseInitFactory_M20ObsarvationEtudion,
 ) {
     private val repoScope = CoroutineScope(Dispatchers.IO)
     private val _datas = mutableStateOf<List<M20ObsarvationEtudion>>(emptyList())
