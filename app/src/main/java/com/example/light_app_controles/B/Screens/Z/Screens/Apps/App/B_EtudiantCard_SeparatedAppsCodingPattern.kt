@@ -1,5 +1,6 @@
-package Application5.App
+package com.example.light_app_controles.B.Screens.Z.Screens.Apps.App
 
+import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
 import Application5.App.Dialog.Dialog.EtudiantDetailsDialog_SeparatedAppsCodingPattern
 import Application5.App.Dialog.Dialog.Sub.A_Takiyim.TakiyimSelectionDialog_SeparatedAppsCodingPattern
 import Application5.App.Dialog.Dialog.Sub.A_Takiyim.processTakiyimEvaluation
@@ -8,6 +9,7 @@ import Application5.App.Dialog.Dialog.Sub.Utils.SouraSelectionDialog_SeparatedAp
 import Application5.App.Repository.M19Etudiant
 import Application5.App.View.DropDownItems.View.But2.convertSingleCardToJpg
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.ParentCommunicationCardData_2
+import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.generateHistoryImage
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.generatePdfDocument
 import Application5.App.View.DropDownItems.View.But2.getStoredCardUriForStudent
 import EntreApps.Shared.Models.Components.Ousstad_Tahfid
@@ -29,6 +31,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.EventSeat
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
@@ -60,12 +63,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.example.light_app_controles.B.Screens.Z.Screens.Apps.App.Modules.generateHistorySchemaImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun EtudiantCard_SeparatedAppsCodingPattern(
+fun B_EtudiantCard_SeparatedAppsCodingPattern(
     etudiant: M19Etudiant,
     modifier: Modifier = Modifier,
     viewModel: A_ViewModel_SeparatedAppsCodingPattern
@@ -322,6 +326,7 @@ fun EtudiantCard_SeparatedAppsCodingPattern(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+                    // ── Full card share button (icon top, smaller text) ───────
                     OutlinedButton(
                         onClick  = { if (!isSharing) shareCardOnWhatsApp() },
                         enabled  = !isSharing,
@@ -329,26 +334,197 @@ fun EtudiantCard_SeparatedAppsCodingPattern(
                     ) {
                         if (isSharing) {
                             CircularProgressIndicator(
-                                modifier    = Modifier.size(18.dp),
+                                modifier    = Modifier.size(16.dp),
                                 strokeWidth = 2.dp
                             )
-                            Spacer(modifier = Modifier.size(8.dp))
-                            Text("جاري الإرسال…")
-                        } else {
-                            Icon(
-                                imageVector        = Icons.Default.Share,
-                                contentDescription = null,
-                                modifier           = Modifier.size(20.dp),
-                                tint               = Color(0xFF25D366)   // WhatsApp green
-                            )
-                            Spacer(modifier = Modifier.size(8.dp))
+                            Spacer(modifier = Modifier.size(6.dp))
                             Text(
-                                text  = "إرسال البطاقة واتساب بيزنس",
-                                color = Color(0xFF25D366)
+                                text  = "جاري الإرسال…",
+                                style = MaterialTheme.typography.labelSmall
                             )
+                        } else {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                Icon(
+                                    imageVector        = Icons.Default.Share,
+                                    contentDescription = null,
+                                    modifier           = Modifier.size(18.dp),
+                                    tint               = Color(0xFF25D366)
+                                )
+                                Text(
+                                    text  = "إرسال البطاقة واتساب",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFF25D366)
+                                )
+                            }
+                        }
+                    }
+                    // ── Schema image share button ─────────────────────────────────────────
+// Uses generateHistorySchemaImage — visual progress bars + coloured badges,
+// content-height-wrapped Bitmap, no PDF intermediate.
+                    var isSharingSchema by remember(etudiantId) { mutableStateOf(false) }
+                    OutlinedButton(
+                        onClick = {
+                            if (!isSharingSchema) {
+                                val rawPhone = etudiant.num_telephone_parent.trim()
+                                val phone = rawPhone.ifBlank { "0553885037" }
+                                isSharingSchema = true
+                                scope.launch {
+                                    try {
+                                        val schemaCardData = ParentCommunicationCardData_2.fromEtudiant(etudiant)
+                                        val imageUri = withContext(Dispatchers.IO) {
+                                            generateHistorySchemaImage(context, schemaCardData, viewModel)
+                                        }
+                                        if (imageUri == null) {
+                                            withContext(Dispatchers.Main) {
+                                                Toast.makeText(
+                                                    context,
+                                                    "❌ فشل إنشاء صورة المخطط",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                            return@launch
+                                        }
+                                        withContext(Dispatchers.Main) {
+                                            var n = phone.replace(Regex("[^0-9]"), "")
+                                            if (!n.startsWith("213")) {
+                                                if (n.startsWith("0")) n = n.drop(1)
+                                                n = "213$n"
+                                            }
+                                            val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                                type = "image/jpeg"
+                                                setPackage("com.whatsapp.w4b")
+                                                putExtra(android.content.Intent.EXTRA_STREAM, imageUri)
+                                                putExtra("jid", "$n@s.whatsapp.net")
+                                                addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                            }
+                                            context.startActivity(intent)
+                                        }
+                                    } catch (e: Exception) {
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(context, "❌ خطأ: ${e.message}", Toast.LENGTH_LONG).show()
+                                        }
+                                    } finally {
+                                        isSharingSchema = false
+                                    }
+                                }
+                            }
+                        },
+                        enabled  = !isSharingSchema,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (isSharingSchema) {
+                            CircularProgressIndicator(
+                                modifier    = Modifier.size(16.dp),
+                                strokeWidth = 2.dp
+                            )
+                            Spacer(modifier = Modifier.size(6.dp))
+                            Text(
+                                text  = "جاري الإرسال…",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        } else {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                Icon(
+                                    imageVector        = Icons.Default.BarChart,
+                                    contentDescription = null,
+                                    modifier           = Modifier.size(18.dp),
+                                    tint               = Color(0xFF7B1FA2)   // violet — distinct des deux autres
+                                )
+                                Text(
+                                    text  = "إرسال مخطط التقدم",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFF7B1FA2)
+                                )
+                            }
                         }
                     }
 
+                    // ── History-only image share button ───────────────────────
+                    // Uses generateHistoryImage — content-height-wrapped Bitmap,
+                    // no PDF intermediate, no trailing whitespace.
+                    var isSharingHistory by remember(etudiantId) { mutableStateOf(false) }
+                    OutlinedButton(
+                        onClick = {
+                            if (!isSharingHistory) {
+                                val rawPhone = etudiant.num_telephone_parent.trim()
+                                val phone = rawPhone.ifBlank { "0553885037" }
+                                isSharingHistory = true
+                                scope.launch {
+                                    try {
+                                        val historyCardData = ParentCommunicationCardData_2.fromEtudiant(etudiant)
+                                        // Content-height-wrapped image — no PDF, no whitespace
+                                        val imageUri = withContext(Dispatchers.IO) {
+                                            generateHistoryImage(context, historyCardData, viewModel)
+                                        }
+                                        if (imageUri == null) {
+                                            withContext(Dispatchers.Main) {
+                                                Toast.makeText(context, "❌ فشل إنشاء صورة سجل المتابعة", Toast.LENGTH_SHORT).show()
+                                            }
+                                            return@launch
+                                        }
+                                        withContext(Dispatchers.Main) {
+                                            var n = phone.replace(Regex("[^0-9]"), "")
+                                            if (!n.startsWith("213")) {
+                                                if (n.startsWith("0")) n = n.drop(1)
+                                                n = "213$n"
+                                            }
+                                            val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                                type = "image/jpeg"
+                                                setPackage("com.whatsapp.w4b")
+                                                putExtra(android.content.Intent.EXTRA_STREAM, imageUri)
+                                                putExtra("jid", "$n@s.whatsapp.net")
+                                                addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                            }
+                                            context.startActivity(intent)
+                                        }
+                                    } catch (e: Exception) {
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(context, "❌ خطأ: ${e.message}", Toast.LENGTH_LONG).show()
+                                        }
+                                    } finally {
+                                        isSharingHistory = false
+                                    }
+                                }
+                            }
+                        },
+                        enabled  = !isSharingHistory,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (isSharingHistory) {
+                            CircularProgressIndicator(
+                                modifier    = Modifier.size(16.dp),
+                                strokeWidth = 2.dp
+                            )
+                            Spacer(modifier = Modifier.size(6.dp))
+                            Text(
+                                text  = "جاري الإرسال…",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        } else {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                Icon(
+                                    imageVector        = Icons.Default.Share,
+                                    contentDescription = null,
+                                    modifier           = Modifier.size(18.dp),
+                                    tint               = Color(0xFF128C7E)
+                                )
+                                Text(
+                                    text  = "إرسال سجل المتابعة",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFF128C7E)
+                                )
+                            }
+                        }
+                    }
                     // ── Teacher-transfer button ───────────────────────────────
                     Box(modifier = Modifier.fillMaxWidth()) {
                         OutlinedButton(
@@ -579,3 +755,5 @@ fun EtudiantCard_SeparatedAppsCodingPattern(
         )
     }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────

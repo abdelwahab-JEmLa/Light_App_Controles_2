@@ -1,7 +1,6 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Apps.App
 
 import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
-import Application5.App.EtudiantCard_SeparatedAppsCodingPattern
 import Application5.App.MonthSelectionDialog_SeparatedAppsCodingPattern
 import Application5.App.Options.FabButton_When_Its_EducationFragment
 import Application5.App.Options.FabDropdownMenu_WhenIts_FragmentEducation
@@ -118,7 +117,7 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
 
     val selectedMonth = activeDatas.displaye_sections_education_du_mois
     if (selectedMonth != null) {
-        SessionsEducationDialog(
+       SessionsEducationDialog(
             viewModel = viewModel,
             selectedMonth = selectedMonth,
             repo20Observation = repo20Obsarvation,
@@ -193,7 +192,7 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(items = etudiants) { etudiant ->
-                    EtudiantCard_SeparatedAppsCodingPattern(
+                    B_EtudiantCard_SeparatedAppsCodingPattern(
                         viewModel = viewModel,
                         etudiant = etudiant,
                         modifier = Modifier.fillMaxWidth(),
