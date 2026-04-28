@@ -4,7 +4,6 @@ import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
 import Application5.App.Repository.M20ObsarvationEtudion
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.ParentCommunicationCardData_2
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.Table.drawRTLText
-import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
@@ -99,7 +98,7 @@ private fun resolveObservations(
     viewModel.repo20ObsarvationEtudion.datasValue
         .filter { it.etudiant_keyID == cardData.studentInfo.keyID }
         .sortedBy { it.creationTimestamps }   // oldest → newest so the chart reads left → right
-        // no takeLast limit — show full history
+        .takeLast(5)                          // max 5 most-recent observations
         .map { obs ->
             val takyimName = obs.takyim.arabicName
             val typeLabel = when (obs.type) {
@@ -166,7 +165,6 @@ private fun renderSchema(
 
 // ── Chart: line graph with X/Y axes showing takyim trend over time ────────────
 
-@SuppressLint("UseKtx")
 private fun drawChart(
     canvas: Canvas,
     rows: List<ObsRow>,
@@ -197,11 +195,37 @@ private fun drawChart(
     val gridPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.parseColor("#E0E0E0"); strokeWidth = 0.5f; style = Paint.Style.STROKE
     }
+    // ── Styled Y-axis labels: coloured pill + dot indicator ──────────────────
+    val pillH  = 12f
+    val pillW  = yAxisW - 6f
+    val dotR   = 2.5f
     yLevels.forEach { (score, label) ->
-        val gy = chartBot - score * chartH
+        val gy         = chartBot - score * chartH
+        val labelColor = takyimToColor(label)
+
+        // Grid line (drawn first, behind everything)
         canvas.drawLine(chartLeft, gy, chartRight, gy, gridPaint)
-        // ← labels on the LEFT axis
-        drawRTLText(canvas, label, marginH, gy - 5f, yAxisW.toInt(), paints.legendText, Layout.Alignment.ALIGN_NORMAL)
+
+        // Small filled dot sitting ON the grid line, at the axis edge
+        canvas.drawCircle(chartLeft - dotR - 2f, gy, dotR,
+            Paint(Paint.ANTI_ALIAS_FLAG).apply { color = labelColor; style = Paint.Style.FILL })
+
+        // Pill background (very light tint of the label colour)
+        val pillTop = gy - pillH / 2f
+        canvas.drawRoundRect(
+            RectF(marginH, pillTop, marginH + pillW, pillTop + pillH),
+            pillH / 2f, pillH / 2f,
+            Paint(Paint.ANTI_ALIAS_FLAG).apply { color = labelColor; alpha = 28; style = Paint.Style.FILL }
+        )
+
+        // Pill text in the matching colour
+        drawRTLText(
+            canvas, label,
+            marginH + 2f, pillTop + 1f,
+            (pillW - 4f).toInt(),
+            TextPaint(paints.legendText).apply { color = labelColor },
+            Layout.Alignment.ALIGN_CENTER
+        )
     }
 
     val axisPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -246,37 +270,30 @@ private fun drawChart(
         canvas.drawCircle(cx, cy, 7f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = Color.WHITE; style = Paint.Style.FILL })
         canvas.drawCircle(cx, cy, 5f, Paint(Paint.ANTI_ALIAS_FLAG).apply { color = row.takyimColor; style = Paint.Style.FILL })
 
-        // ── Takyim badge + typeLabel badge side by side ───────────────────────
+        // ── Range badge (min→ila) + typeLabel badge side by side ─────────────
+        // The range text ("سورة X (n) ← سورة Y (m)") replaces the takyim label
+        // inside the coloured badge; takyim level is already readable from the dot
+        // position on the Y-axis.
         val badgeH     = 14f
-        val takyimW    = 52f
+        val rangeW     = 88f                          // wide enough for two soura names
         val typeBadgeW = if (row.typeLabel.isBlank()) 0f else 36f
         val gap        = if (row.typeLabel.isBlank()) 0f else 2f
-        val totalW     = takyimW + gap + typeBadgeW
+        val totalW     = rangeW + gap + typeBadgeW
 
-        // Position the combined badge centered above the dot, raised enough to clear the dot
         val bLeft = (cx - totalW / 2f).coerceIn(chartLeft, chartRight - totalW)
         val bTop  = (cy - badgeH - 20f).coerceAtLeast(chartTop)
 
-        // Takyim badge
-        canvas.drawRoundRect(RectF(bLeft, bTop, bLeft + takyimW, bTop + badgeH), 3f, 3f,
+        // Range badge — coloured with the takyim colour
+        canvas.drawRoundRect(RectF(bLeft, bTop, bLeft + rangeW, bTop + badgeH), 3f, 3f,
             Paint(Paint.ANTI_ALIAS_FLAG).apply { color = row.takyimColor; style = Paint.Style.FILL })
-        drawRTLText(canvas, row.takyimLabel, bLeft + 2f, bTop + 1f, (takyimW - 4f).toInt(), paints.badgeText, Layout.Alignment.ALIGN_CENTER)
+        drawRTLText(canvas, row.rangeLabel, bLeft + 2f, bTop + 1f, (rangeW - 4f).toInt(), paints.badgeText, Layout.Alignment.ALIGN_CENTER)
 
-        // Type label badge (e.g. "استدراك"), lighter tint of the same colour
+        // Type label badge (e.g. "استدراك"), lighter tint
         if (row.typeLabel.isNotBlank()) {
-            val tLeft = bLeft + takyimW + gap
+            val tLeft = bLeft + rangeW + gap
             canvas.drawRoundRect(RectF(tLeft, bTop, tLeft + typeBadgeW, bTop + badgeH), 3f, 3f,
                 Paint(Paint.ANTI_ALIAS_FLAG).apply { color = row.takyimColor; alpha = 110; style = Paint.Style.FILL })
             drawRTLText(canvas, row.typeLabel, tLeft + 2f, bTop + 1f, (typeBadgeW - 4f).toInt(), paints.badgeText, Layout.Alignment.ALIGN_CENTER)
-        }
-
-        // ── Range label — inside chart, just below the dot ───────────────────
-        // Placed at the point's own Y level so it reads "at the dot"
-        if (row.rangeLabel.isNotBlank()) {
-            val rangeY = (cy + 9f).coerceAtMost(chartBot - 14f)
-            val rangeW = 80
-            val rlx    = (cx - rangeW / 2f).coerceIn(chartLeft, chartRight - rangeW)
-            drawRTLText(canvas, row.rangeLabel, rlx, rangeY, rangeW, paints.rangeTP, Layout.Alignment.ALIGN_CENTER)
         }
 
         // ── Date label below the X-axis, staggered even/odd ──────────────────
@@ -381,7 +398,6 @@ private fun takyimToScore(takyim: String): Float = when (takyim) {
     else                   -> 0.20f
 }
 
-@SuppressLint("UseKtx")
 private fun takyimToColor(takyim: String): Int = when (takyim) {
     "ممتاز"                -> Color.parseColor("#4CAF50")
     "جيد جداً", "جيد جدا" -> Color.parseColor("#2196F3")
