@@ -85,7 +85,6 @@ class MainActivity : ComponentActivity() {
                     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                         if (permissionsChecked) {
                             if (!initDone) {
-                                // loading / init screen placeholder
                             } else {
                                 MainScreen(
                                     modifier = Modifier.padding(innerPadding),

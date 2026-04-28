@@ -1,5 +1,6 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
 
+//noinspection SuspiciousImport,SuspiciousImport
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
 import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
@@ -51,11 +52,12 @@ data class M8BonVent(
     var cUn_Versement_duBonVentKey: String = "",
     var vala_supp: Int = 0,
     var a_etai_imprime_au_moi_ne_foit: Boolean = false,
-
-    var new_situation: Double = 0.0, //06_21
-    
     var versement_fait: Double = 0.0,
     var ancien_credit: Double = 0.0,
+
+
+
+
     var cUn_Credit_duBonVentKey: String = "",
     var new_credit_apre_tout_fait: Double = 0.0,
     var affiche_le_verssement_au_prochen_print: Boolean = false,
@@ -70,22 +72,9 @@ data class M8BonVent(
     var cActive: Boolean = false,
     val parentID8C2TypeTransactionKeyByParent: String = "",
     var vid: Long = 0L,
+    var moulahada: String = "",    //06_27
+    var new_situation: Double = 0.0, //06_21
 ) {
-           //<--
-           //TODO(1): cree toFirebaseMap
-    fun get_DebugInfos(): String {
-        return buildString {
-            append("Bon")
-            append("[")
-            append("p.cli->")
-            append(parent_M2Client_DebugInfos)
-            append(") ")
-            append("[")
-            append(keyID.takeLast(4))
-            append("])")
-        }
-    }
-
     /**
      * Calculates the primary monetary value for this bon depending on its state:
      * - New_Situation_Credit → Σ credit_fait  −  Σ versement_fait  (for same client + period)
@@ -119,6 +108,21 @@ data class M8BonVent(
             else -> 0.0
         }
     }
+
+
+    fun get_DebugInfos(): String {
+        return buildString {
+            append("Bon")
+            append("[")
+            append("p.cli->")
+            append(parent_M2Client_DebugInfos)
+            append(") ")
+            append("[")
+            append(keyID.takeLast(4))
+            append("])")
+        }
+    }
+
 
     @IgnoreExtraProperties
     enum class EtateActuellementEst(val color: Int, val nomArabe: String) {
