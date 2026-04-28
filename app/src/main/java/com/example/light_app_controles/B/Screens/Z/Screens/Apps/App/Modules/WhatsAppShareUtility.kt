@@ -20,8 +20,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private const val TAG          = "WhatsAppShareUtility"
-private const val CARDS_FOLDER = "whatsapp_cards"
+ const val TAG          = "WhatsAppShareUtility"
+ const val CARDS_FOLDER = "whatsapp_cards"
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Naming helpers
@@ -32,10 +32,10 @@ fun getTodayFolderName(): String =
     SimpleDateFormat("MM_dd", Locale.getDefault()).format(Date())
 
 /** MediaStore RELATIVE_PATH for today's cards */
-private fun todayRelativePath() =
+ fun todayRelativePath() =
     "${Environment.DIRECTORY_PICTURES}/$CARDS_FOLDER/${getTodayFolderName()}"
 
-private fun sanitize(s: String) =
+ fun sanitize(s: String) =
     s.trim().replace(Regex("[/\\\\:*?\"<>|]"), "_").take(40)
 
 /** Canonical filename: "{keyID}_{nom}.jpg" */
@@ -144,7 +144,7 @@ fun getStoredCardUris(context: Context): List<Uri> =
     getStoredCardUriMap(context).values.toList()
 
 @androidx.annotation.RequiresApi(Build.VERSION_CODES.Q)
-private fun queryMediaStoreCardMap(context: Context): Map<String, Uri> {
+ fun queryMediaStoreCardMap(context: Context): Map<String, Uri> {
     val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
     val map = mutableMapOf<String, Uri>()
     context.contentResolver.query(
@@ -167,7 +167,7 @@ private fun queryMediaStoreCardMap(context: Context): Map<String, Uri> {
 }
 
 @Suppress("DEPRECATION")
-private fun queryPublicPicturesCardMap(context: Context): Map<String, Uri> {
+ fun queryPublicPicturesCardMap(context: Context): Map<String, Uri> {
     val dir = File(
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
         "$CARDS_FOLDER/${getTodayFolderName()}"
@@ -187,7 +187,7 @@ private fun queryPublicPicturesCardMap(context: Context): Map<String, Uri> {
 // Cleanup
 // ─────────────────────────────────────────────────────────────────────────────
 
-private fun deleteTodayCards(context: Context) {
+ fun deleteTodayCards(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         val n = context.contentResolver.delete(
             MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY),
@@ -209,14 +209,14 @@ private fun deleteTodayCards(context: Context) {
 // Internal save dispatcher
 // ─────────────────────────────────────────────────────────────────────────────
 
-private fun saveJpg(context: Context, bitmap: Bitmap, fileName: String): Uri? =
+ fun saveJpg(context: Context, bitmap: Bitmap, fileName: String): Uri? =
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
         saveJpgViaMediaStore(context, bitmap, fileName)
     else
         saveJpgToPublicPictures(context, bitmap, fileName)
 
 @androidx.annotation.RequiresApi(Build.VERSION_CODES.Q)
-private fun saveJpgViaMediaStore(context: Context, bitmap: Bitmap, fileName: String): Uri? {
+ fun saveJpgViaMediaStore(context: Context, bitmap: Bitmap, fileName: String): Uri? {
     val resolver   = context.contentResolver
     val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
     // Remove stale entry with same name
@@ -242,7 +242,7 @@ private fun saveJpgViaMediaStore(context: Context, bitmap: Bitmap, fileName: Str
 }
 
 @Suppress("DEPRECATION")
-private fun saveJpgToPublicPictures(context: Context, bitmap: Bitmap, fileName: String): Uri? {
+ fun saveJpgToPublicPictures(context: Context, bitmap: Bitmap, fileName: String): Uri? {
     return try {
         val dir = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),

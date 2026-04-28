@@ -4,6 +4,7 @@ import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
 import Application5.App.Repository.M20ObsarvationEtudion
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.ParentCommunicationCardData_2
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.Table.drawRTLText
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
@@ -21,10 +22,12 @@ import android.os.Environment
 import android.provider.MediaStore
 import android.text.Layout
 import android.text.TextPaint
+import android.util.Log
 import androidx.core.content.FileProvider
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Calendar
+import androidx.core.graphics.toColorInt
 
 private data class ObsRow(
     val dateLabel: String,
@@ -32,34 +35,62 @@ private data class ObsRow(
     val takyimColor: Int,
     val takyimScore: Float,
     val typeLabel: String,       // "استدراك" / "تمام" / "أستاذ" / "غياب" — shown next to the badge
+    val rangeLabel: String,      // "الفاتحة (1) ← البقرة (5)" — shown rotated below the dot
 )
 
-//<--
-//TODO(1): fait que au pont affiche اسورة الى سوؤ 
+private const val TAG = "SchemaImage"
+
 fun generateHistorySchemaImage(
     context: Context,
     cardData: ParentCommunicationCardData_2,
     viewModel: A_ViewModel_SeparatedAppsCodingPattern
 ): Uri? {
+    val studentId   = cardData.studentInfo.keyID
+    val studentName = cardData.studentInfo.fullName
+    Log.d(TAG, "▶ début génération — étudiant: $studentName (id=$studentId)")
+
     return try {
         val scale = 2
         val imgWidth = 480
         val marginH = 20f
         val contentWidth = imgWidth - marginH * 2
+
+        val allObs = viewModel.repo20ObsarvationEtudion.datasValue
+        Log.d(TAG, "  total observations en mémoire: ${allObs.size}")
+
         val rows = resolveObservations(cardData, viewModel)
-        if (rows.isEmpty()) return null
+        Log.d(TAG, "  observations filtrées pour cet étudiant: ${rows.size}")
+
+        if (rows.isEmpty()) {
+            Log.w(TAG, "⚠ فشل الإنشاء — لا توجد ملاحظات للطالب $studentName (id=$studentId)")
+            return null
+        }
+
         val paints = buildSchemaPaints()
         val measuredH = measureSchemaHeight(rows, imgWidth, marginH, contentWidth, paints)
+        Log.d(TAG, "  hauteur mesurée: $measuredH px")
+
         val totalHeight = (measuredH + 24f).toInt()
+        Log.d(TAG, "  création bitmap ${imgWidth * scale} × ${totalHeight * scale}")
+
         val bitmap = Bitmap.createBitmap(imgWidth * scale, totalHeight * scale, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap).apply {
             drawColor(Color.parseColor("#FAFAFA"))
             scale(scale.toFloat(), scale.toFloat())
         }
         renderSchema(canvas, rows, cardData, imgWidth, marginH, contentWidth, paints)
-        val fileName = "schema_${cardData.studentInfo.keyID.trim()}_${System.currentTimeMillis()}.jpg"
-        saveSchemaJpg(context, bitmap, fileName).also { bitmap.recycle() }
-    } catch (e: Exception) { null }
+
+        val fileName = "schema_${studentId.trim()}_${System.currentTimeMillis()}.jpg"
+        val uri = saveSchemaJpg(context, bitmap, fileName).also { bitmap.recycle() }
+
+        if (uri != null) Log.d(TAG, "✅ image sauvegardée → $uri")
+        else             Log.e(TAG, "❌ فشل الإنشاء — saveSchemaJpg a retourné null pour $studentName")
+
+        uri
+    } catch (e: Exception) {
+        Log.e(TAG, "❌ فشل الإنشاء — exception pour l'étudiant $studentName (id=$studentId)", e)
+        null
+    }
 }
 
 private fun resolveObservations(
@@ -84,6 +115,7 @@ private fun resolveObservations(
                 takyimColor = takyimToColor(takyimName),
                 takyimScore = takyimToScore(takyimName),
                 typeLabel   = typeLabel,
+                rangeLabel  = "${formatAyaSchema(obs.min_soura, obs.min_aya)} ← ${formatAyaSchema(obs.ila_soura, obs.ila_aya)}",
             )
         }
 
@@ -135,6 +167,7 @@ private fun renderSchema(
 
 // ── Chart: line graph with X/Y axes showing takyim trend over time ────────────
 
+@SuppressLint("UseKtx")
 private fun drawChart(
     canvas: Canvas,
     rows: List<ObsRow>,
@@ -237,6 +270,19 @@ private fun drawChart(
             drawRTLText(canvas, row.typeLabel, tLeft + 2f, bTop + 1f, (typeBadgeW - 4f).toInt(), paints.badgeText, Layout.Alignment.ALIGN_CENTER)
         }
 
+        // ── Range label — rotated -90° between the dot and the X-axis ──────
+        // e.g. "الفاتحة (1) ← البقرة (5)"
+        if (row.rangeLabel.isNotBlank()) {
+            val rangeP = paints.rangeText
+            rangeP.textAlign = Paint.Align.CENTER
+            // Centre the text vertically in the available space below the dot
+            val midY = (cy + chartBot) / 2f
+            canvas.save()
+            canvas.rotate(-90f, cx, midY)
+            canvas.drawText(row.rangeLabel, cx, midY + rangeP.textSize / 3f, rangeP)
+            canvas.restore()
+        }
+
         // ── Full date at the base, staggered to avoid overlap ─────────────────
         // Even index → first row (chartBot + 5), odd → second row (chartBot + 26)
         val dateY  = if (i % 2 == 0) chartBot + 5f else chartBot + 26f
@@ -265,13 +311,20 @@ private fun saveSchemaViaMediaStore(context: Context, bitmap: Bitmap, fileName: 
         put(MediaStore.Images.Media.RELATIVE_PATH, "${Environment.DIRECTORY_PICTURES}/whatsapp_cards/schema/")
         put(MediaStore.Images.Media.IS_PENDING,    1)
     }
-    val uri = resolver.insert(collection, values) ?: return null
+    val uri = resolver.insert(collection, values)
+    if (uri == null) {
+        Log.e(TAG, "❌ MediaStore.insert a retourné null — permission WRITE_EXTERNAL_STORAGE manquante ou volume indisponible")
+        return null
+    }
     return try {
         resolver.openOutputStream(uri)?.use { bitmap.compress(Bitmap.CompressFormat.JPEG, 95, it) }
         values.clear(); values.put(MediaStore.Images.Media.IS_PENDING, 0)
         resolver.update(uri, values, null, null)
         uri
-    } catch (e: Exception) { resolver.delete(uri, null, null); null }
+    } catch (e: Exception) {
+        Log.e(TAG, "❌ écriture MediaStore échouée — fileName=$fileName", e)
+        resolver.delete(uri, null, null); null
+    }
 }
 
 @Suppress("DEPRECATION")
@@ -281,7 +334,10 @@ private fun saveSchemaToPublicPictures(context: Context, bitmap: Bitmap, fileNam
         val file = File(dir, fileName)
         FileOutputStream(file).use { bitmap.compress(Bitmap.CompressFormat.JPEG, 95, it) }
         FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-    } catch (e: Exception) { null }
+    } catch (e: Exception) {
+        Log.e(TAG, "❌ sauvegarde fichier public échouée — fileName=$fileName", e)
+        null
+    }
 
 // ── Paints ────────────────────────────────────────────────────────────────────
 
@@ -291,6 +347,7 @@ private data class SchemaPaints(
     val legendText: TextPaint,
     val dateText:   TextPaint,
     val badgeText:  TextPaint,
+    val rangeText:  Paint,       // plain Paint for rotated canvas.drawText
 )
 
 private fun buildSchemaPaints() = SchemaPaints(
@@ -299,9 +356,22 @@ private fun buildSchemaPaints() = SchemaPaints(
     legendText = TextPaint().apply { textSize =  7f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL); isAntiAlias = true; color = Color.DKGRAY },
     dateText   = TextPaint().apply { textSize =  7f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL); isAntiAlias = true; color = Color.parseColor("#757575") },
     badgeText  = TextPaint().apply { textSize =  8f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD);   isAntiAlias = true; color = Color.WHITE },
+    rangeText  = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 7f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL); color = Color.parseColor("#546E7A"); alpha = 200 },
 )
 
 // ── Utilities ─────────────────────────────────────────────────────────────────
+
+/**
+ * Formats a (soura, aya) pair into a human-readable Arabic label.
+ * Aya = 0 is treated as "نهاية" (end of surah), matching the convention
+ * used in [ParentCommunicationCardData_2.formatAyaForDisplay].
+ *
+ * Example output: "الفاتحة (1)"  /  "البقرة (نهاية)"
+ */
+private fun formatAyaSchema(soura: Application5.App.Repository.SOUAR, aya: Int): String {
+    val ayaDisplay = if (aya == 0) "نهاية" else aya.toString()
+    return "${soura.arabicName} ($ayaDisplay)"
+}
 
 private fun takyimToScore(takyim: String): Float = when (takyim) {
     "ممتاز"                -> 1.00f
@@ -314,9 +384,10 @@ private fun takyimToScore(takyim: String): Float = when (takyim) {
     else                   -> 0.20f
 }
 
+@SuppressLint("UseKtx")
 private fun takyimToColor(takyim: String): Int = when (takyim) {
-    "ممتاز"                -> Color.parseColor("#4CAF50")
-    "جيد جداً", "جيد جدا" -> Color.parseColor("#2196F3")
+    "ممتاز"                -> "#4CAF50".toColorInt()
+    "جيد جداً", "جيد جدا" -> "#2196F3".toColorInt()
     "فوق الجيد"            -> Color.parseColor("#03A9F4")
     "جيد"                  -> Color.parseColor("#9C27B0")
     "فوق المقبول"          -> Color.parseColor("#FF9800")
