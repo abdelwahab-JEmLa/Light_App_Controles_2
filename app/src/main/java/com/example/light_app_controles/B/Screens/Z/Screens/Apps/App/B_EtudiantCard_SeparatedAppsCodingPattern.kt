@@ -357,13 +357,15 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                     text  = "إرسال البطاقة واتساب",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = Color(0xFF25D366)
+
                                 )
                             }
                         }
                     }
-                    // ── Schema image share button ─────────────────────────────────────────
-// Uses generateHistorySchemaImage — visual progress bars + coloured badges,
-// content-height-wrapped Bitmap, no PDF intermediate.
+                    //<--
+                    //TODO(1): ajout un button qui n affiche que moukarrare tabeelaeu
+
+
                     var isSharingSchema by remember(etudiantId) { mutableStateOf(false) }
                     OutlinedButton(
                         onClick = {

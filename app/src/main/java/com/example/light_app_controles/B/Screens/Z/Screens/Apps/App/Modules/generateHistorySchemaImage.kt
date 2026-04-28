@@ -276,8 +276,8 @@ private fun drawChart(
         // position on the Y-axis.
         val badgeH     = 14f
         val rangeW     = 88f                          // wide enough for two soura names
-        val typeBadgeW = if (row.typeLabel.isBlank()) 0f else 36f
-        val gap        = if (row.typeLabel.isBlank()) 0f else 2f
+        val typeBadgeW = if (row.typeLabel.isBlank() || row.typeLabel == "تمام") 0f else 36f
+        val gap        = if (row.typeLabel.isBlank() || row.typeLabel == "تمام") 0f else 2f
         val totalW     = rangeW + gap + typeBadgeW
 
         val bLeft = (cx - totalW / 2f).coerceIn(chartLeft, chartRight - totalW)
@@ -288,8 +288,9 @@ private fun drawChart(
             Paint(Paint.ANTI_ALIAS_FLAG).apply { color = row.takyimColor; style = Paint.Style.FILL })
         drawRTLText(canvas, row.rangeLabel, bLeft + 2f, bTop + 1f, (rangeW - 4f).toInt(), paints.badgeText, Layout.Alignment.ALIGN_CENTER)
 
-        // Type label badge (e.g. "استدراك"), lighter tint
-        if (row.typeLabel.isNotBlank()) {
+        // Type label badge — shown only for non-default types (استدراك / غياب / أستاذ)
+        // "تمام" is the normal case and adds no information so it is suppressed.
+        if (row.typeLabel.isNotBlank() && row.typeLabel != "تمام") {
             val tLeft = bLeft + rangeW + gap
             canvas.drawRoundRect(RectF(tLeft, bTop, tLeft + typeBadgeW, bTop + badgeH), 3f, 3f,
                 Paint(Paint.ANTI_ALIAS_FLAG).apply { color = row.takyimColor; alpha = 110; style = Paint.Style.FILL })
