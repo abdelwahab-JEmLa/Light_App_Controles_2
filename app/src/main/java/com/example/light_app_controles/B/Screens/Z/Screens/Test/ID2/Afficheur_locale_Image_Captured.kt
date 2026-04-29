@@ -29,7 +29,9 @@ fun Afficheur_locale_Image_Captured(
     capturedBitmap: ImageBitmap,
     onDismiss: () -> Unit,
     onSave: (Bitmap) -> Unit,
-) {
+) {       //<--
+//TODO(1): fait que ca affiche plusieur images avec le sclrolle au click save cree dossie clienKey et metreles images par image_mmdd_HHmm_type si dossied exisce efface et mete le new
+
     var scale by remember { mutableFloatStateOf(1f) }
     var offsetX by remember { mutableFloatStateOf(0f) }
     var offsetY by remember { mutableFloatStateOf(0f) }

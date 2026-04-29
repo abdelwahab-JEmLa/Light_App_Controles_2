@@ -17,9 +17,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID2.Afficheur_locale_Image_Captured
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID2.rememberCapturableLayer
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import com.example.light_app_controles.R
-import com.google.protobuf.LazyStringArrayList.emptyList
+// FIX: removed wrong protobuf import `com.google.protobuf.LazyStringArrayList.emptyList`.
+//      Kotlin stdlib's emptyList() needs no import.
 import kotlinx.coroutines.launch
 
 @Composable
@@ -30,12 +32,12 @@ fun Main_Preview_BonVentEtateScreen(
     parentClientKeyID: String = FAKE_CLIENT_KEY,
     parentPeriodKeyID: String = FAKE_PERIOD_KEY,
     modifier: Modifier = Modifier,
-    onClick_Lence_Test: () -> Unit = {},
+    onClick_Lence_Capture: () -> Unit = {},
     lenceTestActive: Boolean = false,
-) {
+) {                 //<--
+//TODO(1): fait passe chanque item au capture layer pour cree son image 
     val captureState = rememberCapturableLayer(backgroundRes = R.drawable.logo)
     val scope = rememberCoroutineScope()
-    val collectAsState = appDatabase.dao_M8BonVent().getAllFlow().collectAsState(initial = emptyList())
 
     var capturedBitmap: ImageBitmap? by remember { mutableStateOf(null) }
     var showCapturedDialog by remember { mutableStateOf(false) }
@@ -108,13 +110,13 @@ fun Main_Preview_BonVentEtateScreen(
             onDismiss = {
                 showCapturedDialog = false
                 capturedBitmap = null
-                onClick_Lence_Test()
+                onClick_Lence_Capture()
             },
             onSave = { androidBitmap ->
                 saveToMediaStore(androidBitmap, context, parentClientKeyID)
                 showCapturedDialog = false
                 capturedBitmap = null
-                onClick_Lence_Test()
+                onClick_Lence_Capture()
             }
         )
     }
