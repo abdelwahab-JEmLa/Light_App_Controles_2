@@ -1,11 +1,14 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
 
+import android.content.ContentValues
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.os.Build
+import android.provider.MediaStore
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -66,33 +69,66 @@ class MultiCaptureController {
         entries.remove(key)
     }
 
-    suspend fun captureAll(): List<ImageBitmap> = entries.values.toList().map { it() }
+    /**
+     * Captures all registered items and returns them paired with their registration key.
+     * Using key-based pairing ensures image names are correctly matched to their
+     * source bon (by creationTimestamps), regardless of list order.
+     */
+    suspend fun captureAll(): List<Pair<String, ImageBitmap>> =
+        entries.entries.toList().map { (key, capture) -> key to capture() }
 }
 
 @Composable
 fun rememberMultiCaptureController() = remember { MultiCaptureController() }
 
-@Composable
-fun CapturableItem(
-    itemKey: String,
-    controller: MultiCaptureController,
-    content: @Composable (captureModifier: Modifier) -> Unit,
+fun saveAllToMediaStore(
+    bitmaps: List<Pair<Bitmap, String>>,
+    context: Context,
+    clientKeyID: String,
 ) {
-    val graphicsLayer = rememberGraphicsLayer()
+    if (bitmaps.isEmpty()) return
 
-    val captureModifier = Modifier.drawWithContent {
-        graphicsLayer.record { this@drawWithContent.drawContent() }
-        drawContent()
+    val safeClientKey = clientKeyID.replace(Regex("[^a-zA-Z0-9_\\-]"), "_")
+    val folderPath = "Download/Image_Compose_Screen/$safeClientKey"
+
+    val resolver = context.contentResolver
+    val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+        MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+    else
+        MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        resolver.delete(
+            collection,
+            "${MediaStore.Images.Media.RELATIVE_PATH} = ?",
+            arrayOf("$folderPath/"),
+        )
     }
 
-    DisposableEffect(itemKey) {
-        controller.register(itemKey) {
-            delay(50)
-            val hw = graphicsLayer.toImageBitmap()
-            hw.asAndroidBitmap().copy(Bitmap.Config.ARGB_8888, false).asImageBitmap()
+    val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+        Bitmap.CompressFormat.WEBP_LOSSLESS
+    else
+        @Suppress("DEPRECATION") Bitmap.CompressFormat.WEBP
+
+    bitmaps.forEach { (bitmap, label) ->
+        val fileName = "image_${label}.webp"
+
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+            put(MediaStore.Images.Media.MIME_TYPE, "image/webp")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                put(MediaStore.Images.Media.RELATIVE_PATH, "$folderPath/")
+                put(MediaStore.Images.Media.IS_PENDING, 1)
+            }
         }
-        onDispose { controller.unregister(itemKey) }
-    }
 
-    content(captureModifier)
+        val uri = resolver.insert(collection, contentValues) ?: return@forEach
+        resolver.openOutputStream(uri)?.use { out -> bitmap.compress(format, 100, out) }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            resolver.update(uri, ContentValues().apply {
+                put(MediaStore.Images.Media.IS_PENDING, 0)
+            }, null, null)
+        }
+    }
 }

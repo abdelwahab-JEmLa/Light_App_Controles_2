@@ -3,11 +3,10 @@ package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.rememberTransformableState
-import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -19,7 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -86,40 +84,42 @@ fun Afficheur_locale_Image_Captured(
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
                         itemsIndexed(capturedBitmaps) { index, (bitmap, label) ->
-                            var scale by remember { mutableFloatStateOf(1f) }
-                            var offsetX by remember { mutableFloatStateOf(0f) }
-                            var offsetY by remember { mutableFloatStateOf(0f) }
-                            val transformState = rememberTransformableState { zoomChange, panChange, _ ->
-                                scale = (scale * zoomChange).coerceIn(1f, 5f)
-                                offsetX += panChange.x
-                                offsetY += panChange.y
-                            }
-
                             Column(modifier = Modifier.fillMaxWidth()) {
-                                val displayLabel = label.substringAfterLast('_', label)
-                                Text(
-                                    text = "${index + 1}. $displayLabel",
-                                    style = MaterialTheme.typography.labelMedium,
-                                    color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.SemiBold,
-                                    modifier = Modifier.padding(bottom = 4.dp),
-                                )
+                                // ── Image title header: index number + full image name ──
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(
+                                            MaterialTheme.colorScheme.primaryContainer,
+                                            shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
+                                        )
+                                        .padding(horizontal = 10.dp, vertical = 6.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                ) {
+                                    Text(
+                                        text = "${index + 1}",
+                                        style = MaterialTheme.typography.labelLarge,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    )
+                                    Text(
+                                        text = label,
+                                        style = MaterialTheme.typography.titleSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                    )
+                                }
+                                // ───────────────────────────────────────────────────────
 
                                 Image(
                                     bitmap = bitmap,
-                                    contentDescription = displayLabel,
+                                    contentDescription = label,
                                     contentScale = ContentScale.Fit,
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(260.dp)
-                                        .background(Color.Transparent)
-                                        .transformable(transformState)
-                                        .graphicsLayer {
-                                            scaleX = scale
-                                            scaleY = scale
-                                            translationX = offsetX
-                                            translationY = offsetY
-                                        },
+                                        .background(Color.Transparent),
                                 )
                             }
                         }

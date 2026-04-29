@@ -1,10 +1,7 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
 
-import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.Build
-import android.provider.MediaStore
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +31,14 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/** States that belong to the "credit / versement" section of the list. */
+private val CREDIT_VERSEMENT_STATES = setOf(
+    M8BonVent.EtateActuellementEst.Versemment,
+    M8BonVent.EtateActuellementEst.Credit,
+    M8BonVent.EtateActuellementEst.Cette_Transaction_Type_Est_Credit,
+    M8BonVent.EtateActuellementEst.Demande_Versemet,
+)
+
 @Composable
 fun Main_Preview_BonVentEtateScreen(
     context: Context = LocalContext.current,
@@ -50,26 +56,20 @@ fun Main_Preview_BonVentEtateScreen(
     var capturedBitmaps by remember { mutableStateOf<List<Pair<ImageBitmap, String>>>(emptyList()) }
     var showCapturedDialog by remember { mutableStateOf(false) }
 
+    val isForThisClientPeriod: (M8BonVent) -> Boolean = { bon ->
+        bon.parent_M2Client_KeyID == parentClientKeyID &&
+                bon.parent_M14VentPeriod_KeyId == parentPeriodKeyID
+    }
+
     val situationBons = fake_allBonVentList
-        .filter {
-            it.parent_M2Client_KeyID == parentClientKeyID &&
-                    it.parent_M14VentPeriod_KeyId == parentPeriodKeyID &&
-                    it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit
-        }
+        .filter { isForThisClientPeriod(it) && it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit }
         .sortedByDescending { it.creationTimestamps }
 
     val creditVersementBons = fake_allBonVentList
-        .filter {
-            it.parent_M2Client_KeyID == parentClientKeyID &&
-                    it.parent_M14VentPeriod_KeyId == parentPeriodKeyID &&
-                    it.etateActuellementEst in listOf(
-                M8BonVent.EtateActuellementEst.Versemment,
-                M8BonVent.EtateActuellementEst.Credit,
-                M8BonVent.EtateActuellementEst.Cette_Transaction_Type_Est_Credit,
-                M8BonVent.EtateActuellementEst.Demande_Versemet,
-            )
-        }
+        .filter { isForThisClientPeriod(it) && it.etateActuellementEst in CREDIT_VERSEMENT_STATES }
         .sortedByDescending { it.creationTimestamps }
+
+    val allDisplayBons: List<M8BonVent> = situationBons + creditVersementBons
 
     val relative = situationBons.maxByOrNull { it.creationTimestamps }
 
@@ -78,15 +78,15 @@ fun Main_Preview_BonVentEtateScreen(
 
         kotlinx.coroutines.delay(200)
 
-        val allBons = situationBons + creditVersementBons
-        val rawBitmaps: List<ImageBitmap> = multiCaptureController.captureAll()
+        val rawBitmaps: List<Pair<String, ImageBitmap>> = multiCaptureController.captureAll()
+        val sdf = SimpleDateFormat("MMdd_HHmmss_SSS", Locale.getDefault())
 
-        val sdf = SimpleDateFormat("MMdd_HHmmss", Locale.getDefault())
-        capturedBitmaps = rawBitmaps.mapIndexed { i, bmp ->
-            val bon = allBons.getOrNull(i)
-            val dateStr = sdf.format(Date(bon?.creationTimestamps ?: System.currentTimeMillis()))
-            val typeName = bon?.etateActuellementEst?.name ?: "item_$i"
-            bmp to "${dateStr}_${typeName}"
+        capturedBitmaps = rawBitmaps.map { (key, bmp) ->
+            val parts = key.split("|")           // [ts, keyID, stateName]
+            val ts = parts.getOrNull(0)?.toLongOrNull()
+            val stateName = parts.getOrNull(2) ?: key
+            val dateStr = sdf.format(Date(ts ?: System.currentTimeMillis()))
+            bmp to "${dateStr}_${stateName}"
         }
 
         if (capturedBitmaps.isNotEmpty()) showCapturedDialog = true
@@ -104,36 +104,33 @@ fun Main_Preview_BonVentEtateScreen(
         }
 
         LazyColumn(
-            modifier = Modifier      //<--
-            //TODO(1): creee fun que si je passe n lazy colum il capture les items 
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {    //<--
-        //TODO(1): fait que les items soit do la mem list passe si etat situation affiche Situation_Card_ItemView sinon autres 
-            items(situationBons, key = { it.keyID }) { bon ->
-                CapturableItem(    //<--
-                //TODO(1): cee log qi affiche pk le nom des images est le meme pour tout normalement c par m8 creation timtamp 
-                    itemKey = bon.keyID,
-                    controller = multiCaptureController,
-                ) { captureMod ->
-                    Box(modifier = captureMod) {
+        ) {
+            items(allDisplayBons, key = { it.keyID }) { bon ->
+                val capturableLayer = rememberCapturableLayer()
+                val captureKey = "${bon.creationTimestamps}|${bon.keyID}|${bon.etateActuellementEst.name}"
+
+                DisposableEffect(captureKey) {
+                    multiCaptureController.register(captureKey) { capturableLayer.capture() }
+                    android.util.Log.d("CaptureLayer", "✅ Image registered  → $captureKey")
+                    onDispose {
+                        multiCaptureController.unregister(captureKey)
+                        android.util.Log.d("CaptureLayer", "🗑 Image unregistered → $captureKey")
+                    }
+                }
+
+                Box(modifier = capturableLayer.modifier) {
+                    if (bon.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit) {
                         Situation_Card_ItemView(
                             allBonVentList = fake_allBonVentList,
                             relative_M8BonVent = bon,
                             onUpdate = { scope.launch { appDatabase.dao_M8BonVent().upsert(it) } },
                             onDelete = { scope.launch { appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID) } },
                         )
-                    }
-                }
-            }
-
-            items(creditVersementBons, key = { it.keyID }) { bon ->
-                CapturableItem(
-                    itemKey = bon.keyID,
-                    controller = multiCaptureController,
-                ) { captureMod ->
-                    Box(modifier = captureMod) {
+                    } else {
                         Y_Credit_And_Versement_ItemView(
                             allBonVentList = fake_allBonVentList,
                             relative_M8BonVent = bon,
@@ -155,71 +152,20 @@ fun Main_Preview_BonVentEtateScreen(
                 onClick_Lence_Capture()
             },
             onSave = { bitmapList ->
+                android.util.Log.d("CaptureLayer", "💾 Saving ${bitmapList.size} image(s):")
+                bitmapList.forEachIndexed { i, (_, label) ->
+                    android.util.Log.d("CaptureLayer", "   [${i + 1}] image_${label}.webp")
+                }
                 saveAllToMediaStore(
                     bitmaps = bitmapList,
                     context = context,
                     clientKeyID = parentClientKeyID,
                 )
+                android.util.Log.d("CaptureLayer", "✅ Save complete — folder: Download/Image_Compose_Screen/$parentClientKeyID")
                 showCapturedDialog = false
                 capturedBitmaps = emptyList()
                 onClick_Lence_Capture()
             },
         )
     }
-}
-
-fun saveAllToMediaStore(
-    bitmaps: List<Pair<Bitmap, String>>,
-    context: Context,
-    clientKeyID: String,
-) {
-    if (bitmaps.isEmpty()) return
-
-    val safeClientKey = clientKeyID.replace(Regex("[^a-zA-Z0-9_\\-]"), "_")
-    val folderPath = "Download/Image_Compose_Screen/$safeClientKey"
-
-    val resolver = context.contentResolver
-    val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-        MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-    else
-        MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        resolver.delete(
-            collection,
-            "${MediaStore.Images.Media.RELATIVE_PATH} = ?",
-            arrayOf("$folderPath/"),
-        )
-    }
-
-    val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
-        Bitmap.CompressFormat.WEBP_LOSSLESS
-    else
-        @Suppress("DEPRECATION") Bitmap.CompressFormat.WEBP
-
-    bitmaps.forEach { (bitmap, label) ->
-        val fileName = "image_${label}.webp"
-
-        val contentValues = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
-            put(MediaStore.Images.Media.MIME_TYPE, "image/webp")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                put(MediaStore.Images.Media.RELATIVE_PATH, "$folderPath/")
-                put(MediaStore.Images.Media.IS_PENDING, 1)
-            }
-        }
-
-        val uri = resolver.insert(collection, contentValues) ?: return@forEach
-        resolver.openOutputStream(uri)?.use { out -> bitmap.compress(format, 100, out) }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            resolver.update(uri, ContentValues().apply {
-                put(MediaStore.Images.Media.IS_PENDING, 0)
-            }, null, null)
-        }
-    }
-}
-
-fun saveToMediaStore(bitmap: Bitmap, context: Context, clientKeyID: String) {
-    saveAllToMediaStore(listOf(bitmap to "single"), context, clientKeyID)
 }
