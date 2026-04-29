@@ -42,6 +42,8 @@ fun Main_Preview_BonVentEtateScreen(
 
     LaunchedEffect(lenceTestActive) {
         if (lenceTestActive) {
+            // Small delay to ensure UI is fully rendered before capture
+            kotlinx.coroutines.delay(100)
             capturedBitmap = captureState.capture()
             showCapturedDialog = true
         }
