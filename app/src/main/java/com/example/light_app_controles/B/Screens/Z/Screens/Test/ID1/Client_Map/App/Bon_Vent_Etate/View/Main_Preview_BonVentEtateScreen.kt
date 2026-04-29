@@ -1,7 +1,10 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
 
+import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.Build
+import android.provider.MediaStore
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -10,8 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.layer.rememberGraphicsLayer
 import androidx.compose.ui.graphics.layer.drawLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -22,7 +23,6 @@ import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID2.Afficheur_lo
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import com.google.protobuf.LazyStringArrayList.emptyList
 import kotlinx.coroutines.launch
-import java.io.File
 
 @Composable
 fun Main_Preview_BonVentEtateScreen(
@@ -38,10 +38,13 @@ fun Main_Preview_BonVentEtateScreen(
     val graphicsLayer = rememberGraphicsLayer()
     val scope = rememberCoroutineScope()
     val collectAsState = appDatabase.dao_M8BonVent().getAllFlow().collectAsState(initial = emptyList())
-    
+
     var capturedBitmap: ImageBitmap? by remember { mutableStateOf(null) }
     var showCapturedDialog by remember { mutableStateOf(false) }
 
+    // TODO(1) FIXED: capture the composable with rememberGraphicsLayer, hold it in state,
+    // then show the dialog. On Save the dialog calls saveToMediaStore which writes the
+    // bitmap to Downloads/Image_Compose_Screen/{clientKey}.webp via MediaStore.
     LaunchedEffect(lenceTestActive) {
         if (lenceTestActive) {
             val bitmap = graphicsLayer.toImageBitmap()
@@ -67,12 +70,19 @@ fun Main_Preview_BonVentEtateScreen(
             }
     ) {
         if (relative == null) {
-            Text(text = "لا توجد حالة دين جديدة", color = Color.Companion.Gray, fontWeight = FontWeight.Companion.Medium, modifier = Modifier.Companion.padding(16.dp))
+            Text(
+                text = "لا توجد حالة دين جديدة",
+                color = Color.Companion.Gray,
+                fontWeight = FontWeight.Companion.Medium,
+                modifier = Modifier.Companion.padding(16.dp)
+            )
             return
         }
 
         LazyColumn(
-            modifier = Modifier.Companion.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.Companion
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(
@@ -127,18 +137,72 @@ fun Main_Preview_BonVentEtateScreen(
             capturedBitmap = capturedBitmap!!,
             onDismiss = {
                 showCapturedDialog = false
+                capturedBitmap = null
                 onClick_Lence_Test()
             },
             onSave = { androidBitmap ->
-                saveComposableAsWebP(androidBitmap, context)
+                // TODO(1) FIXED: save via MediaStore to Downloads/Image_Compose_Screen/{clientKey}.webp
+                saveToMediaStore(
+                    bitmap = androidBitmap,
+                    context = context,
+                    clientKeyID = parentClientKeyID,
+                )
+                showCapturedDialog = false
+                capturedBitmap = null
+                onClick_Lence_Test()
             }
         )
     }
 }
 
-fun saveComposableAsWebP(bitmap: Bitmap, context: Context, fileName: String = "snapshot.webp") {
-    val file = File(context.filesDir, fileName)
-    file.outputStream().use { out ->
-        bitmap.compress(Bitmap.CompressFormat.WEBP_LOSSLESS, 100, out)
+/**
+ * Saves [bitmap] as a lossless WebP file to the public Downloads folder under
+ * Downloads/Image_Compose_Screen/{clientKeyID}.webp using MediaStore.
+ *
+ * Requires READ/WRITE_EXTERNAL_STORAGE on API < 29, or just
+ * READ_EXTERNAL_STORAGE on API 29+ (scoped storage handles writes automatically).
+ */
+fun saveToMediaStore(
+    bitmap: Bitmap,
+    context: Context,
+    clientKeyID: String,
+) {
+    val fileName = "$clientKeyID.webp"
+    val mimeType = "image/webp"
+    val relativePath = "Download/Image_Compose_Screen"
+
+    val contentValues = ContentValues().apply {
+        put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+        put(MediaStore.Images.Media.MIME_TYPE, mimeType)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            put(MediaStore.Images.Media.RELATIVE_PATH, relativePath)
+            put(MediaStore.Images.Media.IS_PENDING, 1)
+        }
+    }
+
+    val resolver = context.contentResolver
+    val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+    } else {
+        MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+    }
+
+    val uri = resolver.insert(collection, contentValues) ?: return
+
+    resolver.openOutputStream(uri)?.use { outputStream ->
+        val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            Bitmap.CompressFormat.WEBP_LOSSLESS
+        } else {
+            @Suppress("DEPRECATION")
+            Bitmap.CompressFormat.WEBP
+        }
+        bitmap.compress(format, 100, outputStream)
+    }
+
+    // Mark the file as no longer pending so it becomes visible in the gallery
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        contentValues.clear()
+        contentValues.put(MediaStore.Images.Media.IS_PENDING, 0)
+        resolver.update(uri, contentValues, null, null)
     }
 }

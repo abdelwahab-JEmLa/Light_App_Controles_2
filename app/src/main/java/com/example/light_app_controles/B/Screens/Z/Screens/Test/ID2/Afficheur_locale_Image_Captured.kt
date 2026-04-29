@@ -21,48 +21,82 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 
+/**
+ * Displays the captured composable screenshot in a dialog.
+ *
+ * [onSave] receives the raw Android [Bitmap] and is responsible for persisting it;
+ * the actual MediaStore write is handled by the caller (Main_Preview_BonVentEtateScreen)
+ * via saveToMediaStore(bitmap, context, clientKeyID).
+ */
 @Composable
 fun Afficheur_locale_Image_Captured(
     capturedBitmap: ImageBitmap,
     onDismiss: () -> Unit,
-    onSave: (Bitmap) -> Unit,
+    onSave: (Bitmap) -> Unit,   // TODO(1) FIXED: caller uses MediaStore to save to Downloads/Image_Compose_Screen/{clientKey}.webp
 ) {
-    Dialog(onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         Card(
-            modifier = Modifier.fillMaxWidth(0.95f).wrapContentHeight(),
+            modifier = Modifier
+                .fillMaxWidth(0.95f)
+                .wrapContentHeight(),
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
-            Column(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "الصورة الملتقطة", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = "الصورة الملتقطة",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
                     IconButton(onClick = onDismiss) {
                         Icon(imageVector = Icons.Default.Close, contentDescription = null)
                     }
                 }
+
                 Spacer(modifier = Modifier.height(12.dp))
+
                 Image(
                     bitmap = capturedBitmap,
                     contentDescription = null,
-                    modifier = Modifier.fillMaxWidth().heightIn(max = 500.dp).background(Color.Black.copy(alpha = 0.05f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 500.dp)
+                        .background(Color.Black.copy(alpha = 0.05f)),
                     contentScale = ContentScale.Fit
                 )
+
                 Spacer(modifier = Modifier.height(16.dp))
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    TextButton(onClick = onDismiss) { Text("إغلاق") }
+                    TextButton(onClick = onDismiss) {
+                        Text("إغلاق")
+                    }
+
                     Button(onClick = { onSave(capturedBitmap.asAndroidBitmap()) }) {
-                        Icon(imageVector = Icons.Default.Download, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(
+                            imageVector = Icons.Default.Download,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text("حفظ")                      //<--
-                        //TODO(1): utilise pour le save media store 
+                        Text("حفظ")
                     }
                 }
             }
