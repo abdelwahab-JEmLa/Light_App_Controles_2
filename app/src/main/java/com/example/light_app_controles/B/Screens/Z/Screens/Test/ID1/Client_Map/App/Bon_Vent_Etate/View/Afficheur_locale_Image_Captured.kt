@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -83,9 +82,8 @@ fun Afficheur_locale_Image_Captured(
                             .fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
-                        itemsIndexed(capturedBitmaps) { index, (bitmap, label) ->
+                        itemsIndexed(capturedBitmaps) { i, (bmp, lbl) ->
                             Column(modifier = Modifier.fillMaxWidth()) {
-                                // ── Image title header: index number + full image name ──
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -98,23 +96,22 @@ fun Afficheur_locale_Image_Captured(
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                 ) {
                                     Text(
-                                        text = "${index + 1}",
+                                        text = "${i + 1}",
                                         style = MaterialTheme.typography.labelLarge,
                                         fontWeight = FontWeight.ExtraBold,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                                     )
                                     Text(
-                                        text = label,
+                                        text = lbl,
                                         style = MaterialTheme.typography.titleSmall,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                                     )
                                 }
-                                // ───────────────────────────────────────────────────────
 
                                 Image(
-                                    bitmap = bitmap,
-                                    contentDescription = label,
+                                    bitmap = bmp,
+                                    contentDescription = lbl,
                                     contentScale = ContentScale.Fit,
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -137,17 +134,13 @@ fun Afficheur_locale_Image_Captured(
 
                     Button(
                         onClick = {
-                            val androidBitmaps = capturedBitmaps.map { (img, label) ->
-                                img.asAndroidBitmap() to label
+                            val bitmaps = capturedBitmaps.map { (img, lbl) ->
+                                img.asAndroidBitmap() to lbl
                             }
-                            onSave(androidBitmaps)
+                            onSave(bitmaps)
                         }
                     ) {
-                        Icon(
-                            Icons.Default.Download,
-                            contentDescription = null,
-                            modifier = Modifier.size(18.dp),
-                        )
+                        Icon(Icons.Default.Download, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(6.dp))
                         Text("حفظ الكل")
                     }

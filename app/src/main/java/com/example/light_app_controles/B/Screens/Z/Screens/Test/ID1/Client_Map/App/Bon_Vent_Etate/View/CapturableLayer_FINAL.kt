@@ -28,32 +28,31 @@ class CapturableLayerState(
 fun rememberCapturableLayer(
     @DrawableRes backgroundRes: Int? = null,
 ): CapturableLayerState {
-    val context = LocalContext.current
-    val graphicsLayer = rememberGraphicsLayer()
+    val ctx = LocalContext.current
+    val gLayer = rememberGraphicsLayer()
 
-    val modifier = Modifier.drawWithContent {
-        graphicsLayer.record { this@drawWithContent.drawContent() }
+    val mod = Modifier.drawWithContent {
+        gLayer.record { this@drawWithContent.drawContent() }
         drawContent()
     }
 
     return CapturableLayerState(
-        modifier = modifier,
+        modifier = mod,
         capture = {
             delay(100)
+            val hw = gLayer.toImageBitmap()
+            val sw = hw.asAndroidBitmap().copy(Bitmap.Config.ARGB_8888, false)
 
-            val hardware = graphicsLayer.toImageBitmap()
-            val software = hardware.asAndroidBitmap().copy(Bitmap.Config.ARGB_8888, false)
+            if (backgroundRes == null) return@CapturableLayerState sw.asImageBitmap()
 
-            if (backgroundRes == null) return@CapturableLayerState software.asImageBitmap()
-
-            val output = Bitmap.createBitmap(software.width, software.height, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(output)
-            AppCompatResources.getDrawable(context, backgroundRes)?.let { drawable ->
-                drawable.setBounds(0, 0, software.width, software.height)
-                drawable.draw(canvas)
+            val out = Bitmap.createBitmap(sw.width, sw.height, Bitmap.Config.ARGB_8888)
+            val cvs = Canvas(out)
+            AppCompatResources.getDrawable(ctx, backgroundRes)?.let { drw ->
+                drw.setBounds(0, 0, sw.width, sw.height)
+                drw.draw(cvs)
             }
-            canvas.drawBitmap(software, 0f, 0f, null)
-            output.asImageBitmap()
+            cvs.drawBitmap(sw, 0f, 0f, null)
+            out.asImageBitmap()
         },
     )
 }
@@ -69,13 +68,8 @@ class MultiCaptureController {
         entries.remove(key)
     }
 
-    /**
-     * Captures all registered items and returns them paired with their registration key.
-     * Using key-based pairing ensures image names are correctly matched to their
-     * source bon (by creationTimestamps), regardless of list order.
-     */
     suspend fun captureAll(): List<Pair<String, ImageBitmap>> =
-        entries.entries.toList().map { (key, capture) -> key to capture() }
+        entries.entries.toList().map { (k, cap) -> k to cap() }
 }
 
 @Composable
@@ -88,8 +82,8 @@ fun saveAllToMediaStore(
 ) {
     if (bitmaps.isEmpty()) return
 
-    val safeClientKey = clientKeyID.replace(Regex("[^a-zA-Z0-9_\\-]"), "_")
-    val folderPath = "Download/Image_Compose_Screen/$safeClientKey"
+    val safeKey = clientKeyID.replace(Regex("[^a-zA-Z0-9_\\-]"), "_")
+    val folderPath = "Download/Image_Compose_Screen/$safeKey"
 
     val resolver = context.contentResolver
     val collection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
@@ -105,16 +99,15 @@ fun saveAllToMediaStore(
         )
     }
 
-    val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
+    val fmt = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R)
         Bitmap.CompressFormat.WEBP_LOSSLESS
     else
         @Suppress("DEPRECATION") Bitmap.CompressFormat.WEBP
 
-    bitmaps.forEach { (bitmap, label) ->
-        val fileName = "image_${label}.webp"
-
-        val contentValues = ContentValues().apply {
-            put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+    bitmaps.forEach { (bmp, lbl) ->
+        val fname = "image_${lbl}.webp"
+        val cv = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, fname)
             put(MediaStore.Images.Media.MIME_TYPE, "image/webp")
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 put(MediaStore.Images.Media.RELATIVE_PATH, "$folderPath/")
@@ -122,8 +115,8 @@ fun saveAllToMediaStore(
             }
         }
 
-        val uri = resolver.insert(collection, contentValues) ?: return@forEach
-        resolver.openOutputStream(uri)?.use { out -> bitmap.compress(format, 100, out) }
+        val uri = resolver.insert(collection, cv) ?: return@forEach
+        resolver.openOutputStream(uri)?.use { out -> bmp.compress(fmt, 100, out) }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             resolver.update(uri, ContentValues().apply {
