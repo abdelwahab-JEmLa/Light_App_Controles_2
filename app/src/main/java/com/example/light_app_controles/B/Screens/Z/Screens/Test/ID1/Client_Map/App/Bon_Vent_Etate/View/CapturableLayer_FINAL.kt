@@ -6,6 +6,7 @@ import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.ImageBitmap
@@ -69,7 +70,7 @@ class MultiCaptureController {
 }
 
 @Composable
-fun rememberMultiCaptureController() = androidx.compose.runtime.remember { MultiCaptureController() }
+fun rememberMultiCaptureController() = remember { MultiCaptureController() }
 
 @Composable
 fun CapturableItem(

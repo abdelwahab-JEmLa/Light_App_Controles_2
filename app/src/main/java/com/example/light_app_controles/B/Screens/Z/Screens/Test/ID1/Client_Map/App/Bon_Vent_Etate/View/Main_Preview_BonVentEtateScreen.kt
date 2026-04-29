@@ -104,13 +104,16 @@ fun Main_Preview_BonVentEtateScreen(
         }
 
         LazyColumn(
-            modifier = Modifier
+            modifier = Modifier      //<--
+            //TODO(1): creee fun que si je passe n lazy colum il capture les items 
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
+        ) {    //<--
+        //TODO(1): fait que les items soit do la mem list passe si etat situation affiche Situation_Card_ItemView sinon autres 
             items(situationBons, key = { it.keyID }) { bon ->
-                CapturableItem(
+                CapturableItem(    //<--
+                //TODO(1): cee log qi affiche pk le nom des images est le meme pour tout normalement c par m8 creation timtamp 
                     itemKey = bon.keyID,
                     controller = multiCaptureController,
                 ) { captureMod ->
