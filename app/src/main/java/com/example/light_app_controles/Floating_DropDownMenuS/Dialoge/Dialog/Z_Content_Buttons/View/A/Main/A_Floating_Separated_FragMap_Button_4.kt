@@ -54,7 +54,7 @@ data class Button_State(
 
 @Composable
 fun Floating_Separated_Button(
-    appDatabase: AppDatabase,                              // FIX: added as explicit parameter
+    appDatabase: AppDatabase,
     list_m16: List<M16CategorieProduit>? = emptyList(),
     list_m1: List<M01Produit>? = emptyList(),
     list_m3: List<M3CouleurProduitInfos>? = emptyList(),
@@ -64,6 +64,10 @@ fun Floating_Separated_Button(
         icons = Pair(Icons.Default.FilterList, Icons.Default.AllInbox),
         colors = Pair(Color.Red, Color.Blue)
     ),
+    // FIX TODO(1): onClick_Lence_Test added as explicit callback parameter.
+    // When provided, the FAB click is delegated to this action (guarded by click_Lence_Test).
+    // When omitted (default), the FAB falls back to showing the dropdown as before.
+    onClick_Lence_Test: (() -> Unit)? = null,
 ) {
     val isShowingAll = true
     val updatedButtonState = buttonState.copy(its_Active = isShowingAll)
@@ -76,6 +80,11 @@ fun Floating_Separated_Button(
     var offsetX by remember { mutableFloatStateOf(screenWidth.value - 200f) }
     var offsetY by remember { mutableFloatStateOf(screenHeightDp.value - 300f) }
     var showDropdown by remember { mutableStateOf(false) }
+
+    // FIX TODO(1): click_Lence_Test gates whether the FAB executes onClick_Lence_Test.
+    // true  → the test-launch callback is enabled and will fire on click.
+    // false → click falls back to the normal dropdown behaviour.
+    val click_Lence_Test: Boolean = onClick_Lence_Test != null
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Box(
@@ -98,7 +107,13 @@ fun Floating_Separated_Button(
                     modifier = Modifier.size(48.dp),
                     onClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        showDropdown = true
+                        // FIX TODO(1): if click_Lence_Test is active, delegate to the
+                        // test-launch callback; otherwise fall back to the dropdown.
+                        if (click_Lence_Test) {
+                            onClick_Lence_Test?.invoke()
+                        } else {
+                            showDropdown = true
+                        }
                     },
                     containerColor = if (updatedButtonState.its_Active)
                         updatedButtonState.colors.second
@@ -118,14 +133,12 @@ fun Floating_Separated_Button(
 
                 B_FragMap_DropdownMenu(
                     expanded = showDropdown,
-                    onDismiss = {
-                        showDropdown = false
-                    },
+                    onDismiss = { showDropdown = false },
                     list_m16 = list_m16,
                     list_m1 = list_m1,
                     list_m3 = list_m3,
                     on_vent_key = on_vent_key,
-                    appDatabase = appDatabase        // FIX: now properly passed from parameter
+                    appDatabase = appDatabase
                 )
             }
         }
