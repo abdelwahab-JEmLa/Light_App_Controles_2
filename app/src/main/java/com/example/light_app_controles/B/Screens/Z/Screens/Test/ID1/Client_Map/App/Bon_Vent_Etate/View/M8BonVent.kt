@@ -15,6 +15,7 @@ import java.util.Date
 import java.util.Locale
 import java.util.Objects
 import kotlin.collections.filter
+import androidx.compose.ui.graphics.Color
 
 @Entity
 data class M8BonVent(
@@ -124,48 +125,44 @@ data class M8BonVent(
     }
 
 
+
     @IgnoreExtraProperties
-    enum class EtateActuellementEst(val color: Int, val nomArabe: String) {
-        CreeMaisNonDefinie(R.color.white, "غير محدد"),
+    enum class EtateActuellementEst(val color: Color, val nomArabe: String) {
+        CreeMaisNonDefinie(Color(0xFFFFFFFF), "غير محدد"),
         ON_MODE_COMMEND_ACTUELLEMENT(
-            R.color.holo_green_light,
+            Color(0xFF99CC00),
             " تنفيذ المطلوب في تحسين الوضع معه"
         ),
         Rapport_Entre_On_Etate_De_Bloquage(
-            R.color.holo_red_light,
+            Color(0xFFFF4444),
             ":تقرير الدخول معه في حالة انسداد في التجارة بسبب"
         ),
-        Bloque_Probleme(R.color.holo_red_dark, "حدث مشكل معه"),
-        Ordre_Gerant(R.color.holo_red_dark, "توجيه المسير"),
-        A_COMMANDE_CONFIRME(
-            R.color.holo_purple, "تم تاكيد الطلبية"
-        ),
-        COMMANDE_LIVRAI(R.color.holo_blue_dark, "تم أيصال منتجاته"),
-        Cette_Transaction_Type_Est_Credit(R.color.holo_red_dark, "تم اقراضه  "),
-        Versemment(R.color.holo_red_dark, ""),
-        Demande_Versemet(R.color.holo_red_dark, "طلب تحظير الدين القديم عند احظار الطلبية"),
+        Bloque_Probleme(Color(0xFFCC0000), "حدث مشكل معه"),
+        Ordre_Gerant(Color(0xFFCC0000), "توجيه المسير"),
+        A_COMMANDE_CONFIRME(Color(0xFF9933CC), "تم تاكيد الطلبية"),
+        COMMANDE_LIVRAI(Color(0xFF0099CC), "تم أيصال منتجاته"),
 
-        // Value = Σ credit_fait − Σ versement_fait  (computed by fun_calculative_du_main_val)
-        New_Situation_Credit(R.color.holo_red_dark, "الحالة الجديدة للدين"),
-
-        ACHETEUR_NON_DISPO(R.color.holo_red_dark, "الشاري غائب"),
-        AVEC_MARCHANDISE(R.color.holo_red_dark, "عندو سلعة"),
-        FERME(R.color.darker_gray, "مغلق"),
-        Cible(R.color.holo_orange_dark, "معين من المسير"),
-        CIBLE_PRIORITE_2(R.color.holo_orange_dark, "CIBLE_PRIORITE_2"),
-        CIBLE_PRIORITE_3(R.color.holo_green_light, "CIBLE_PRIORITE_3"),
-        CIBLE_POUR_2(R.color.holo_blue_dark, "CIBLE_POUR_2"),
-        PourVoirPanie(
-            R.color.holo_red_light, "للنظر"
-        ),
-        RAPPORT_AU_ENREGESTREMENT_VOCALE(R.color.black, "التقرير قي التسجيل الصوتي "),
-        ON_MODE_VOIRE_PANIE_ARTICLES(R.color.holo_blue_dark, "في معاينة السلة"),
-        A_EVITE(R.color.holo_green_light, "اقترح ان يتجنب لمدة اسبوعين"),
-        PASSE(R.color.holo_red_dark, "اقترح ان يؤجل الى مدة قادمة"),
-        CommantaireSpeciale(R.color.holo_red_dark, "ملاحظة خاصة بالطلبية"),
-        Passed_Sans_Livre(R.color.darker_gray, "Passed_Sans_Livre"),
-        Credit(R.color.holo_red_dark, " "), ;
-
+        ACHETEUR_NON_DISPO(Color(0xFFCC0000), "الشاري غائب"),
+        AVEC_MARCHANDISE(Color(0xFFCC0000), "عندو سلعة"),
+        FERME(Color(0xFF444444), "مغلق"),
+        Cible(Color(0xFFFF6700), "معين من المسير"),
+        CIBLE_PRIORITE_2(Color(0xFFFF6700), "CIBLE_PRIORITE_2"),
+        CIBLE_PRIORITE_3(Color(0xFF99CC00), "CIBLE_PRIORITE_3"),
+        CIBLE_POUR_2(Color(0xFF0099CC), "CIBLE_POUR_2"),
+        PourVoirPanie(Color(0xFFFF4444), "للنظر"),
+        RAPPORT_AU_ENREGESTREMENT_VOCALE(Color(0xFF000000), "التقرير قي التسجيل الصوتي "),
+        ON_MODE_VOIRE_PANIE_ARTICLES(Color(0xFF0099CC), "في معاينة السلة"),
+        A_EVITE(Color(0xFF99CC00), "اقترح ان يتجنب لمدة اسبوعين"),
+        PASSE(Color(0xFFCC0000), "اقترح ان يؤجل الى مدة قادمة"),
+        CommantaireSpeciale(Color(0xFFCC0000), "ملاحظة خاصة بالطلبية"),
+        Passed_Sans_Livre(Color(0xFF444444), "Passed_Sans_Livre"),
+        //Credits
+        Credit(Color(0xFFCC0000), " "),
+        Cette_Transaction_Type_Est_Credit(Color(0xFFCC0000), "تم اقراضه  "),
+        Versemment(Color(0xFF4CAF50), ""),
+        Demande_Versemet(Color(0xFFFF9800), "المبلغ المرجو تحظيره"),
+        New_Situation_Credit(Color(0xFF673AB7), "الحالة الجديدة للدين"),
+        ;
         companion object {
             const val keyModel = "ID8C2"
         }

@@ -1,9 +1,7 @@
 package A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog
 
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.AvertissementDialog
-import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.DropBox_Init_3
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.Local_Organizer
-import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.SyncReport
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View.ButID_4_upload_datas_fireBase_au_csv
 import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
 import EntreApps.Shared.Models.Relative_Produits.Models.M16CategorieProduit
@@ -47,7 +45,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private enum class PendingAction { DropBox, Local, SyncFromImages2, UpdateLocalTimestamps }
+private enum class PendingAction {
+    Local,
+    UpdateLocalTimestamps,
+}
 
 @Composable
 fun B_FragMap_DropdownMenu(
@@ -69,36 +70,11 @@ fun B_FragMap_DropdownMenu(
     var syncImages2Label by remember { mutableStateOf("") }
     var updateTimestampsProgress by remember { mutableStateOf<Float?>(null) }
     var pendingAction by remember { mutableStateOf<PendingAction?>(null) }
-    var syncReport by remember { mutableStateOf<SyncReport?>(null) }
 
-    syncReport?.let { report ->
-        SyncReportDialog(report = report, onDismiss = { syncReport = null })
-    }
 
     pendingAction?.let { action ->
         when (action) {
 
-            PendingAction.DropBox -> AvertissementDialog(
-                title = "Organiser sur DropBox",
-                message = "Cette action va déplacer toutes les images vers leurs dossiers " +
-                        "catalogues sur DropBox. Les fichiers seront déplacés de façon " +
-                        "permanente. Continuer ?",
-                confirmLabel = "Déplacer",
-                onConfirm = {
-                    pendingAction = null
-                    coroutineScope.launch {
-                        organizeDropBoxProgress = 0f
-                        val groups = buildCatalogueGroups(list_m16, list_m1, list_m3)
-                        DropBox_Init_3.organizeByCategories(
-                            catalogueGroups = groups,
-                            onProgress = { p -> organizeDropBoxProgress = p }
-                        )
-                        organizeDropBoxProgress = null
-                        onDismiss()
-                    }
-                },
-                onDismiss = { pendingAction = null }
-            )
 
             PendingAction.Local -> AvertissementDialog(
                 title = "Organiser en local",
@@ -122,34 +98,6 @@ fun B_FragMap_DropdownMenu(
                 onDismiss = { pendingAction = null }
             )
 
-            PendingAction.SyncFromImages2 -> AvertissementDialog(
-                title = "Sync local ← DropBox Images_2",
-                message = "Seules les images des catalogues t1 et t4 modifiées sur DropBox " +
-                        "dans les 20 derniers jours seront téléchargées. " +
-                        "Les fichiers locaux plus anciens seront écrasés. Continuer ?",
-                confirmLabel = "Synchroniser",
-                onConfirm = {
-                    pendingAction = null
-                    coroutineScope.launch {
-                        syncReport = launchSyncFromImages2(
-                            list_m16 = list_m16,
-                            list_m1 = list_m1,
-                            list_m3 = list_m3,
-                            context = context,
-                            onProgress = { p, label ->
-                                syncImages2Progress = p
-                                syncImages2Label = label
-                            },
-                            onDone = {
-                                syncImages2Progress = null
-                                syncImages2Label = ""
-                            }
-                        )
-                        onDismiss()
-                    }
-                },
-                onDismiss = { pendingAction = null }
-            )
 
             PendingAction.UpdateLocalTimestamps -> AvertissementDialog(
                 title = "Mettre à jour dates locales",
@@ -203,154 +151,6 @@ fun B_FragMap_DropdownMenu(
         ButID_4_upload_datas_fireBase_au_csv(
             enabled = true,
         )
-    }
-}
-
-// ─── Extracted sync logic ─────────────────────────────────────────────────────
-
-private suspend fun launchSyncFromImages2(
-    list_m16: List<M16CategorieProduit>?,
-    list_m1: List<M01Produit>?,
-    list_m3: List<M3CouleurProduitInfos>?,
-    context: Context,
-    onProgress: (Float, String) -> Unit,
-    onDone: () -> Unit,
-): SyncReport {
-    val TAG = "DropBox_Sync"
-    val cutoffMs = System.currentTimeMillis() - 20L * 24 * 3_600 * 1_000
-
-    val filteredM3 = filterM3ByCatalogueKeys(
-        catalogueKeys = setOf("t1", "t4"),
-        list_m16 = list_m16,
-        list_m1 = list_m1,
-        list_m3 = list_m3,
-    )
-
-    Log.d(TAG, "=== SYNC DÉMARRÉ ===")
-    Log.d(
-        TAG, "cutoffMs = $cutoffMs " +
-                "(${
-                    SimpleDateFormat(
-                        "dd/MM/yyyy HH:mm",
-                        Locale.getDefault()
-                    ).format(Date(cutoffMs))
-                })"
-    )
-    Log.d(TAG, "list_m3 total=${list_m3?.size} | après filtre catalogue(t1,t4)=${filteredM3?.size}")
-    if (filteredM3.isNullOrEmpty()) {
-        Log.w(
-            TAG,
-            "⚠️ filteredM3 VIDE — l'image cherchée n'est peut-être pas dans catalogue t1 ou t4"
-        )
-    }
-
-    val produitKeyToName = list_m1?.associate { it.keyID to it.nom } ?: emptyMap()
-
-    onProgress(0f, "")
-    val report = DropBox_Init_3.syncFromImages2(
-        list_m3 = filteredM3,
-        sinceMs = cutoffMs,
-        produitKeyToName = produitKeyToName,
-        onProgress = onProgress,
-    )
-    onDone()
-
-
-    return report
-}
-
-// ─── Sync report dialog ───────────────────────────────────────────────────────
-
-@Composable
-private fun SyncReportDialog(report: SyncReport, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        icon = {
-            Icon(
-                imageVector = Icons.Default.CheckCircle,
-                contentDescription = null,
-                tint = Color(0xFF4CAF50)
-            )
-        },
-        title = {
-            Text(
-                text = "Synchronisation terminée",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-        },
-        text = {
-            Column {
-                if (report.isEmpty) {
-                    Text(
-                        text = "Aucun fichier modifié — tout est déjà à jour.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                } else {
-                    if (report.added.isNotEmpty()) {
-                        Text(
-                            text = "✅ Ajoutés (${report.added.size})",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                        report.added.forEach { name ->
-                            Text(
-                                text = "  • $name",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                    if (report.added.isNotEmpty() && report.overwritten.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                    if (report.overwritten.isNotEmpty()) {
-                        Text(
-                            text = "🔄 Écrasés (${report.overwritten.size})",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.secondary,
-                        )
-                        report.overwritten.forEach { name ->
-                            Text(
-                                text = "  • $name",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(text = "OK", color = MaterialTheme.colorScheme.primary)
-            }
-        }
-    )
-}
-
-// ─── Shared helpers ───────────────────────────────────────────────────────────
-
-private suspend fun filterM3ByCatalogueKeys(
-    catalogueKeys: Set<String>,
-    list_m16: List<M16CategorieProduit>?,
-    list_m1: List<M01Produit>?,
-    list_m3: List<M3CouleurProduitInfos>?,
-): List<M3CouleurProduitInfos>? = withContext(Dispatchers.Default) {
-    if (list_m3.isNullOrEmpty()) return@withContext list_m3
-
-    val catalogues = get_ListM21CataloguesCategorie()
-    val catalogueById = catalogues.associateBy { it.id }
-    val catalogueByCategorieId = list_m16?.associate { cat ->
-        cat.id to catalogueById[cat.catalogueParentId]
-    }
-    val catalogueByProduitKey = list_m1?.associate { p ->
-        p.keyID to catalogueByCategorieId?.get(p.idParentCategorie)
-    }
-
-    list_m3.filter { color ->
-        catalogueByProduitKey?.get(color.parentBProduitInfosKeyID)?.keyID in catalogueKeys
     }
 }
 

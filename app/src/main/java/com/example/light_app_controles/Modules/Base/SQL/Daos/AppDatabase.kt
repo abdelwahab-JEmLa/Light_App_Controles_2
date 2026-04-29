@@ -1,9 +1,5 @@
 package com.example.light_app_controles.Modules.Base.SQL.Daos
 
-import Application5.App.Repository.Dao19Etudiant
-import Application5.App.Repository.Data.Dao20ObsarvationEtudion
-import Application5.App.Repository.M19Etudiant
-import Application5.App.Repository.M20ObsarvationEtudion
 import EntreApps.Shared.Models.AppType
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import EntreApps.Shared.Models.M09AppCompt
@@ -27,7 +23,6 @@ import androidx.room.TypeConverters
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import java.util.Date
 
-
 @Database(
     entities = [
         M01Produit::class,
@@ -44,10 +39,8 @@ import java.util.Date
         M16CategorieProduit::class,
 
         M09AppCompt::class,
-        M19Etudiant::class,
-        M20ObsarvationEtudion::class,
     ],
-    version = 4, // Bumped from 3 → 4 to register the new AppTypeConverter
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(
@@ -62,8 +55,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun dao_16CategorieProduit(): Dao_M16CategorieProduit
 
     abstract fun dao_M9AppCompt(): Dao_M9AppCompt
-    abstract fun Dao19Etudiant(): Dao19Etudiant
-    abstract fun Dao20ObsarvationEtudion(): Dao20ObsarvationEtudion
     object DatabaseModule {
 
         @Volatile

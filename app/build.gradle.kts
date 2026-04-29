@@ -126,7 +126,7 @@ dependencies {
 
 
     // ─── Dropbox SDK ─────────────────────────────────────────────────────────
-    implementation("com.dropbox.core:dropbox-core-sdk:7.0.0")
+  //  implementation("com.dropbox.core:dropbox-core-sdk:7.0.0")
 
     // ─── Coroutines + Firebase ───────────────────────────────────────────────
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
@@ -144,6 +144,7 @@ dependencies {
 
     // ─── Local Unit Tests ─────────────────────────────────────────────────────
     testImplementation("junit:junit:4.13.2")
+
     // Calendar
     implementation("com.aminography:primecalendar:1.7.0")
 

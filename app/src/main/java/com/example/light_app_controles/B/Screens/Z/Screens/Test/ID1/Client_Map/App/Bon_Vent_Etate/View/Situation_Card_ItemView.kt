@@ -31,13 +31,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Z.Components.EditableAmountField
@@ -57,8 +55,6 @@ fun Situation_Card_ItemView(
         relative_M8BonVent.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit
 
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
-
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     var localVersementFait by remember { mutableStateOf(relative_M8BonVent.versement_fait) }
@@ -86,7 +82,7 @@ fun Situation_Card_ItemView(
             .fillMaxWidth()
             .height(if (isVersement || isDemandeVersement) 220.dp else if (isNewSituationCredit) 160.dp else 140.dp),
         colors = CardDefaults.cardColors(
-            containerColor = colorResource(id = relative_M8BonVent.etateActuellementEst.color)
+            containerColor = relative_M8BonVent.etateActuellementEst.color
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
