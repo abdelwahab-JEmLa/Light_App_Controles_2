@@ -3,6 +3,7 @@ package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.AvertissementDialog
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.Local_Organizer
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View.ButID_4_upload_datas_fireBase_au_csv
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
 import EntreApps.Shared.Models.Relative_Produits.Models.M16CategorieProduit
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
@@ -51,7 +52,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -62,6 +62,8 @@ import com.example.light_app_controles.Floating_DropDownMenuS.Dialoge.Dialog.Z_C
 import com.example.light_app_controles.Floating_DropDownMenuS.Dialoge.Dialog.Z_Content_Buttons.View.A.Main.Z.Buttons.View.ButID_3_ImportFromCSV
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import kotlinx.coroutines.launch
+import java.io.File
+import java.io.FileWriter
 import kotlin.math.roundToInt
 
 data class Button_State(
@@ -154,6 +156,8 @@ fun Floating_Separated_Button(
 
 private enum class PendingAction {
     UpdateLocalTimestamps,
+    InsertAllFakeBons,
+    ExportM8BonsToLocalCsv,
 }
 
 @Composable
@@ -171,8 +175,8 @@ fun B_FragMap_DropdownMenu(
 ) {
     val coroutineScope = rememberCoroutineScope()
 
-    val latestSituationMontant: Int? = remember(vm.activeCentralValues.list_M8bon) {
-        vm.activeCentralValues.list_M8bon
+    val latestSituationMontant: Int? = remember(vm.active_Datas.list_M8bon) {
+        vm.active_Datas.list_M8bon
             ?.filter {
                 it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit &&
                         (on_vent_key.isEmpty() || it.parent_M2Client_KeyID == on_vent_key)
@@ -201,6 +205,81 @@ fun B_FragMap_DropdownMenu(
 
     pendingAction?.let { action ->
         when (action) {
+            PendingAction.ExportM8BonsToLocalCsv -> AvertissementDialog(
+                title = "تصدير البيانات إلى CSV",
+                message = "سيتم تصدير جميع بيانات M8BonVent إلى\nTestDatas/M8BonVent.csv\n" +
+                        "إذا كان الملف موجوداً سيتم تحديث الصفوف الموجودة وإضافة الجديدة. هل تريد المتابعة؟",
+                confirmLabel = "تصدير",
+                onConfirm = {
+                    pendingAction = null
+                    coroutineScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+                        val bons = vm.active_Datas.list_M8bon ?: emptyList()
+                        if (bons.isEmpty()) { onDismiss(); return@launch }    //<--
+                        //TODO(1): export don une un
+
+                        val csvFile = File(
+                            M00CentralParametresOfAllApps.central_Local_Csv,
+                            "TestDatas/M8BonVent.csv"
+                        )
+                        csvFile.parentFile?.mkdirs()
+
+                        // Build a mutable map of existing rows keyed by keyID
+                        val headers: List<String> = bons.first().to_Map().keys.toList()
+                        val existingRows: LinkedHashMap<String, List<String>> = linkedMapOf()
+
+                        if (csvFile.exists()) {
+                            val lines = csvFile.readLines()
+                            if (lines.size > 1) {
+                                val fileHeaders = lines[0].split(",")
+                                val keyIdx = fileHeaders.indexOf("keyID")
+                                lines.drop(1).forEach { line ->
+                                    val cells = line.split(",")
+                                    val id = cells.getOrNull(keyIdx) ?: ""
+                                    if (id.isNotEmpty()) existingRows[id] = cells
+                                }
+                            }
+                        }
+
+                        // Upsert: replace existing row or append new one
+                        fun String.escapeCsv() =
+                            if (contains(',') || contains('"') || contains('\n'))
+                                "\"${replace("\"", "\"\"")}\""
+                            else this
+
+                        bons.forEach { bon ->
+                            val row = bon.to_Map().values.map { v ->
+                                (v?.toString() ?: "").escapeCsv()
+                            }
+                            existingRows[bon.keyID] = row
+                        }
+
+                        // Write header + all rows
+                        FileWriter(csvFile, false).use { w ->
+                            w.write(headers.joinToString(",") + "\n")
+                            existingRows.values.forEach { row ->
+                                w.write(row.joinToString(",") + "\n")
+                            }
+                        }
+                        onDismiss()
+                    }
+                },
+                onDismiss = { pendingAction = null }
+            )
+            PendingAction.InsertAllFakeBons -> AvertissementDialog(
+                title = "حفظ كل البيانات",
+                message = "سيتم حفظ جميع البيانات الحالية في قاعدة البيانات المحلية. هل تريد المتابعة؟",
+                confirmLabel = "حفظ",
+                onConfirm = {
+                    pendingAction = null
+                    coroutineScope.launch {
+                        vm.active_Datas.list_M8bon?.let { bons ->
+                            vm.setter_LongOperations.insertAll(bons)
+                        }
+                        onDismiss()
+                    }
+                },
+                onDismiss = { pendingAction = null }
+            )
             PendingAction.UpdateLocalTimestamps -> AvertissementDialog(
                 title = "Mettre à jour dates locales",
                 message = "La date de modification de chaque fichier image local sera " +
@@ -271,7 +350,6 @@ fun B_FragMap_DropdownMenu(
                         value = out_val,
                         onValueChange = { input ->
                             val accepted = input.all { it.isDigit() }
-                            BonVentFlowLogger.inputChange(raw = input, accepted = accepted)
                             if (accepted) out_val = input
                         },
                         singleLine = true,
@@ -285,22 +363,9 @@ fun B_FragMap_DropdownMenu(
                                 val montant = parsed?.toDouble() ?: 0.0
                                 val diff = (fake_init_val_du_ancien_credits_situation ?: 0) - (parsed ?: 0)
 
-                                BonVentFlowLogger.donePressedParsed(
-                                    outVal = out_val,
-                                    parsed = parsed,
-                                    montant = montant,
-                                    ancienSit = fake_init_val_du_ancien_credits_situation,
-                                    diff = diff,
-                                    clientKey = on_vent_key.ifEmpty { FAKE_CLIENT_KEY },
-                                )
-
                                 if (parsed != null) fake_init_val_du_ancien_credits_situation = parsed
                                 out_val = fake_init_val_du_ancien_credits_situation?.toString() ?: ""
                                 isEditingCredits = false
-                                           //<--
-                                           //TODO(2.C Relative Au Todo(1): 
-                                                   //... je lnce normalent ca add le new lancien situat rest comme il est 
-                                // Launch credit + New_Situation_Credit update, then trigger capture
                                 vm.ajoute_credit_et_affiche_compos_image(
                                     montant = montant,
                                     clientKey = on_vent_key.ifEmpty { FAKE_CLIENT_KEY },
@@ -333,11 +398,25 @@ fun B_FragMap_DropdownMenu(
                 }
             }
         )
-
         HorizontalDivider()
-
-        ButID_1_ExportToCSV_DropDownItemWBaseDonne(appDatabase = appDatabase, enabled = true)
-        ButID2_ImportFromCSV_DropDownItemWBaseDonne(appDatabase = appDatabase, enabled = true)
+        DropdownMenuItem(
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.FilterList,
+                    contentDescription = null,
+                    tint = Color(0xFF1565C0)
+                )
+            },
+            text = {
+                Text(
+                    text = "تصدير البيانات إلى CSV محلي",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            onClick = {
+                pendingAction = PendingAction.ExportM8BonsToLocalCsv
+            }
+        )
         HorizontalDivider()
         ButID_3_ImportFromCSV(appDatabase = appDatabase, enabled = true)
         ButID_4_upload_datas_fireBase_au_csv(enabled = true)

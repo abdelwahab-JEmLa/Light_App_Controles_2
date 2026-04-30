@@ -7,6 +7,7 @@ import com.example.light_app_controles.B.Screens.Y.AppNavigationHost.Navigation.
 import com.google.firebase.Firebase
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.database
+import java.io.File
 
 enum class Compts(val keyId: String) {
     AbdelwahabTravailleChezGros_KeyId("-OV9dYujH9cA3yEx8AY2"),
@@ -87,6 +88,8 @@ data class M00CentralParametresOfAllApps(
         val central_Local_storageLink = buildString {
             append("/storage/emulated/0/Abdelwahab_jeMla.com")
         }
+
+        val central_Local_Csv= File(central_Local_storageLink, "CSV_Export")
 
         fun genereUnPushKeyFireBase(ref: DatabaseReference): String {
             return ref.push().key ?: throw IllegalStateException("Failed to generate Firebase key")

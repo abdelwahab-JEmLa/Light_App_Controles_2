@@ -37,20 +37,20 @@ fun Main_Preview_BonVentEtateScreen(
     context: Context = LocalContext.current,
     appDatabase: AppDatabase = AppDatabase.DatabaseModule.getDatabase(context),
     fake_allBonVentList: List<M8BonVent> = FAKE_ALL_BONS,
-    parentClientKeyID: String = FAKE_CLIENT_KEY,
-    parentPeriodKeyID: String = FAKE_PERIOD_KEY,
     modifier: Modifier = Modifier,
     onClick_Lence_Capture: () -> Unit = {},
     lenceTestActive: Boolean = false,
 ) {
-    val viewModel: A_ViewModel = viewModel(
+    val vm: A_ViewModel = viewModel(
         factory = viewModelFactory {
-            initializer { A_ViewModel(context = context) }
+            initializer { A_ViewModel(context = context, appDatabase = appDatabase) }
         }
     )
 
+    val active_Datas = vm.active_Datas
+
     val allBonVentList: List<M8BonVent> =
-        viewModel.activeCentralValues.list_M8bon ?: fake_allBonVentList
+        active_Datas.list_M8bon ?: fake_allBonVentList
 
     var lenceCaptureActive by remember { mutableStateOf(false) }
     val onLenceCapture: () -> Unit = { lenceCaptureActive = !lenceCaptureActive }
@@ -81,16 +81,16 @@ fun Main_Preview_BonVentEtateScreen(
         runCapture()
     }
 
-    LaunchedEffect(viewModel.captureRequested) {
-        if (!viewModel.captureRequested) return@LaunchedEffect
+    LaunchedEffect(vm.captureRequested) {
+        if (!vm.captureRequested) return@LaunchedEffect
         runCapture()
-        viewModel.captureRequested = false
+        vm.captureRequested = false
     }
     // ─────────────────────────────────────────────────────────────────────────
 
     val sameClientPeriod: (M8BonVent) -> Boolean = { b ->
-        b.parent_M2Client_KeyID == parentClientKeyID &&
-                b.parent_M14VentPeriod_KeyId == parentPeriodKeyID
+        b.parent_M2Client_KeyID == active_Datas.focused_M2Client?.keyID &&
+                b.parent_M14VentPeriod_KeyId == active_Datas.focused_period_Key
     }
 
     // Situation bons (New_Situation_Credit) shown first
@@ -112,15 +112,6 @@ fun Main_Preview_BonVentEtateScreen(
         .sortedByDescending { it.creationTimestamps }
     val latestSit = sitBons.maxByOrNull { it.creationTimestamps }
 
-    BonVentFlowLogger.screenRecompose(
-        allBons = allBons.size,
-        sitBons = sitBons.size,
-        cvBons = cvBons.size,
-        nonCreditBons = nonCreditBons.size,
-        latestSitKey = latestSit?.keyID,
-        latestSitMontant = latestSit?.montant_principale_du_type,
-    )
-
     Column(modifier = modifier.fillMaxSize()) {
         if (latestSit == null) {
             Text(
@@ -137,8 +128,7 @@ fun Main_Preview_BonVentEtateScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) { //<--
-        //TODO(1): assure que les item son trie par creation time tamps decending 
+        ) {
             items(allBons, key = { it.keyID }) { b ->
                 val cap = rememberCapturableLayer()
                 val capKey = "${b.creationTimestamps}|${b.keyID}|${b.etateActuellementEst.name}"
@@ -149,39 +139,54 @@ fun Main_Preview_BonVentEtateScreen(
                 }
 
                 Box(modifier = cap.modifier) {
-                    BonVentFlowLogger.itemRender(
-                        etat = b.etateActuellementEst,
-                        key = b.keyID,
-                        montant = b.montant_principale_du_type,
-                    )
                     when {
                         b.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit -> {
                             Situation_Card_ItemView(
                                 allBonVentList = allBonVentList,
                                 relative_M8BonVent = b,
-                                onUpdate = { scope.launch { appDatabase.dao_M8BonVent().upsert(it) } },
+                                onUpdate = {
+                                    scope.launch {
+                                        vm.update_M8( it)
+                                    }
+                                },
                                 onDelete = {
-                                    scope.launch { appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID) }
+                                    scope.launch {
+                                        appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID)
+                                    }
                                 },
                             )
                         }
+
                         b.etateActuellementEst.credit_type -> {
                             Y_Credit_And_Versement_ItemView(
                                 allBonVentList = allBonVentList,
                                 relative_M8BonVent = b,
-                                onUpdate = { scope.launch { appDatabase.dao_M8BonVent().upsert(it) } },
+                                onUpdate = {
+                                    scope.launch {
+                                        vm.update_M8( it)
+                                    }
+                                },
                                 onDelete = {
-                                    scope.launch { appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID) }
+                                    scope.launch {
+                                        appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID)
+                                    }
                                 },
                             )
                         }
+
                         else -> {
                             Affiche_NonCredit_Etate(
                                 allBonVentList = allBonVentList,
                                 relative_M8BonVent = b,
-                                onUpdate = { scope.launch { appDatabase.dao_M8BonVent().upsert(it) } },
+                                onUpdate = {
+                                    scope.launch {
+                                        vm.update_M8( it)
+                                    }
+                                },
                                 onDelete = {
-                                    scope.launch { appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID) }
+                                    scope.launch {
+                                        appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID)
+                                    }
                                 },
                             )
                         }
@@ -192,7 +197,7 @@ fun Main_Preview_BonVentEtateScreen(
     }
 
     Floating_Separated_Button(
-        vm = viewModel,
+        vm = vm,
         appDatabase = appDatabase,
         onClick_Lence_Capture = onLenceCapture,
     )
@@ -206,11 +211,13 @@ fun Main_Preview_BonVentEtateScreen(
                 onClick_Lence_Capture()
             },
             onSave = { bmpList ->
-                saveAllToMediaStore(
-                    bitmaps = bmpList,
-                    context = context,
-                    clientKeyID = parentClientKeyID,
-                )
+                active_Datas.focused_M2Client?.let {
+                    saveAllToMediaStore(
+                        bitmaps = bmpList,
+                        context = context,
+                        clientKeyID = it.keyID,
+                    )
+                }
                 showDlg = false
                 captured = emptyList()
                 onClick_Lence_Capture()

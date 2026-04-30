@@ -58,7 +58,7 @@ fun ButID_3_ImportFromCSV(
                     },
                     text = when {
                         errorMsg != null -> "Erreur import ✗"
-                        progress == null -> "Réimporter toutes tables ← CSV"
+                        progress == null -> "Import Tout Room Au FireBase"
                         progress!! < 1f -> {
                             val pct = (progress!! * 100).toInt()
                             if (currentTable.isNotBlank()) "Import… $pct % — $currentTable"

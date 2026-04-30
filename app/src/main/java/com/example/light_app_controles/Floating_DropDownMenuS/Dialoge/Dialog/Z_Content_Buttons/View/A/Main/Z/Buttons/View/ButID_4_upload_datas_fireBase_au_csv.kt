@@ -91,7 +91,7 @@ fun ButID_4_upload_datas_fireBase_au_csv(
                             val pct = (progress!! * 100).toInt()
                             "Sync Firebase→CSV… $pct %"
                         }
-                        else -> "Firebase($fbSize) → CSV($csvSize) — écraser CSV"
+                        else -> "Import Firebase($fbSize) To CSV($csvSize) — écraser CSV"
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = when {

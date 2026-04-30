@@ -9,7 +9,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
+import com.example.light_app_controles.Repository.Setter_LongOperations
+import kotlinx.coroutines.launch
 
 @Stable
 class ActiveDatas {
@@ -17,22 +20,27 @@ class ActiveDatas {
 
     var list_M8bon: List<M8BonVent>? by mutableStateOf(null)
     var focused_M2Client: M2Client? by mutableStateOf(null)
-    var focused_prriod: String? by mutableStateOf(null) // holds parent_M14VentPeriod_KeyId
+    var focused_period_Key: String? by mutableStateOf(null)
 }
 
 @SuppressLint("StaticFieldLeak")
 class A_ViewModel(
     private val context: Context,
+    appDatabase: AppDatabase,
 ) : ViewModel() {
-    val activeCentralValues = ActiveDatas()
+    val active_Datas = ActiveDatas()
+    val setter_LongOperations = Setter_LongOperations(
+        appDatabase,
+    )
 
-    /** Set to true by [ajoute_credit_et_affiche_compos_image] to signal the screen to capture. */
     var captureRequested by mutableStateOf(false)
 
     init {
-        activeCentralValues.list_M8bon = FAKE_ALL_BONS
-        activeCentralValues.focused_M2Client = null
-        activeCentralValues.focused_prriod = FAKE_PERIOD_KEY
+        active_Datas.list_M8bon = FAKE_ALL_BONS
+        active_Datas.focused_M2Client = M2Client.get_default().copy(
+            keyID = FAKE_CLIENT_KEY
+        )
+        active_Datas.focused_period_Key = FAKE_PERIOD_KEY
     }
 
     override fun onCleared() {
@@ -46,14 +54,8 @@ class A_ViewModel(
         periodKey: String = FAKE_PERIOD_KEY,
     ) {
         val baseTs = System.currentTimeMillis()
-        val currentList = activeCentralValues.list_M8bon?.toMutableList() ?: mutableListOf()
+        val currentList = active_Datas.list_M8bon?.toMutableList() ?: mutableListOf()
 
-        BonVentFlowLogger.vmEntry(
-            montant = montant,
-            clientKey = clientKey,
-            periodKey = periodKey,
-            listSize = currentList.size,
-        )
 
         val versementBon = M8BonVent(
             keyID = "fake_key_versement_$baseTs",
@@ -64,7 +66,6 @@ class A_ViewModel(
             versement_fait = montant,
         )
         currentList.add(versementBon)
-        BonVentFlowLogger.versementCreated(key = versementBon.keyID, versementFait = montant)
 
         val latestSit = currentList
             .filter {
@@ -73,12 +74,6 @@ class A_ViewModel(
                         it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit
             }
             .maxByOrNull { it.creationTimestamps }
-
-        BonVentFlowLogger.latestSitFound(
-            found = latestSit != null,
-            key = latestSit?.keyID,
-            oldMontant = latestSit?.montant_principale_du_type,
-        )
 
         val newMontant = (latestSit?.montant_principale_du_type ?: 0.0) - montant
 
@@ -92,13 +87,21 @@ class A_ViewModel(
         )
 
         currentList.add(newSituationBon)
-        BonVentFlowLogger.newSitCreated(key = newSituationBon.keyID, newMontant = newMontant)
 
-        activeCentralValues.list_M8bon = currentList
+        active_Datas.list_M8bon = currentList
         captureRequested = true
-        BonVentFlowLogger.listUpdated(list = currentList, captureRequested = true)
+    }
+
+    fun update_M8(it: M8BonVent) {
+        active_Datas.list_M8bon = active_Datas.list_M8bon
+            ?.map { bon -> if (bon.keyID == it.keyID) it else bon }
+
+        viewModelScope.launch {
+            setter_LongOperations.update_M8(it)
+        }
     }
 }
+
 const val FAKE_CLIENT_KEY = "fake_client_key_001"
 const val FAKE_PERIOD_KEY = "fake_period_key_001"
 
