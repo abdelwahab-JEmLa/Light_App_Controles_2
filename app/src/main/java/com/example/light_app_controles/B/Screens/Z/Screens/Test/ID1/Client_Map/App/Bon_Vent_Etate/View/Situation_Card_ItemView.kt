@@ -48,7 +48,9 @@ fun Situation_Card_ItemView(
     relative_M8BonVent: M8BonVent,
     onUpdate: (M8BonVent) -> Unit,
     onDelete: (M8BonVent) -> Unit,
-) {       
+) {
+
+    val colore_text = relative_M8BonVent.etateActuellementEst.text_color
     val isNewSituationCredit =
         relative_M8BonVent.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit
 
@@ -111,7 +113,7 @@ fun Situation_Card_ItemView(
                         text = relative_M8BonVent.etateActuellementEst.nomArabe,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = colore_text
                     )
 
                     Spacer(modifier = Modifier.width(8.dp))
@@ -169,7 +171,8 @@ fun Situation_Card_ItemView(
                                 },
                                 Toast.LENGTH_SHORT
                             ).show()
-                        }
+                        },
+                        color =colore_text
                     )
                 }
 
@@ -189,7 +192,8 @@ fun Situation_Card_ItemView(
                                 "تم تحديث مبلغ القرض",
                                 Toast.LENGTH_SHORT
                             ).show()
-                        }
+                        },
+                        color = colore_text
                     )
                 }
 
@@ -209,7 +213,8 @@ fun Situation_Card_ItemView(
                                 "تم تحديث طلب الدفع",
                                 Toast.LENGTH_SHORT
                             ).show()
-                        }
+                        },
+                        color = colore_text
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))

@@ -93,9 +93,11 @@ data class M8BonVent(
                     .sumOf { it.versement_fait }
                 sumCredits - sumVersements
             }
+
             EtateActuellementEst.Versemment -> versement_fait
             EtateActuellementEst.Credit,
             EtateActuellementEst.Cette_Transaction_Type_Est_Credit -> credit_fait
+
             EtateActuellementEst.Demande_Versemet -> demande_Versemet_si_Type
             else -> 0.0
         }
@@ -116,7 +118,12 @@ data class M8BonVent(
     }
 
     @IgnoreExtraProperties
-    enum class EtateActuellementEst(val color: Color, val nomArabe: String,val credit_type : Boolean = false) {
+    enum class EtateActuellementEst(
+        val color: Color,
+        val nomArabe: String,
+        val credit_type: Boolean = false,
+        val text_color: Color = Color(0xFFFFFFFF)
+    ) {
         CreeMaisNonDefinie(Color(0xFFFFFFFF), "غير محدد"),
         ON_MODE_COMMEND_ACTUELLEMENT(
             Color(0xFF99CC00),
@@ -145,13 +152,18 @@ data class M8BonVent(
         PASSE(Color(0xFFCC0000), "اقترح ان يؤجل الى مدة قادمة"),
         CommantaireSpeciale(Color(0xFFCC0000), "ملاحظة خاصة بالطلبية"),
         Passed_Sans_Livre(Color(0xFF444444), "Passed_Sans_Livre"),
+
         //Credits
-        Credit(Color(0xFFCC0000), " ",credit_type =true),
-        Cette_Transaction_Type_Est_Credit(Color(0xFFCC0000), "تم اقراضه  ",credit_type =true),
-        Versemment(Color(0xFF4CAF50), "",credit_type =true),
-        Demande_Versemet(Color(0xFFFF9800), "المبلغ المرجو تحظيره",credit_type =true),
-        New_Situation_Credit(Color(0xFF673AB7), "الحالة الجديدة للدين",credit_type =true),
+        Credit(Color(0xFFFF5722), " ", credit_type = true),
+        Cette_Transaction_Type_Est_Credit(Color(0xFFFF5722), "تم اقراضه  ", credit_type = true),
+        Versemment(Color(0xFF4CAF50), "", credit_type = true),
+        Demande_Versemet(
+            Color(0xFFCDDC39), "المبلغ المرجو تحظيره", credit_type = true,
+            text_color = Color(0xFF000000)
+        ),
+        New_Situation_Credit(Color(0xFFD2180D), "الحالة الجديدة للدين", credit_type = true),
         ;
+
         companion object {
             const val keyModel = "ID8C2"
         }
