@@ -49,24 +49,24 @@ data class M8BonVent(
     var sonVocaleEstEcoute: Boolean = false,
     var sonEcoutementEstFaitAutimestamps: Long = 0,
     var totale_saved: Double = 0.0,
-    var cUn_Versement_duBonVentKey: String = "",
     var vala_supp: Int = 0,
     var a_etai_imprime_au_moi_ne_foit: Boolean = false,
+
+    var cUn_Versement_duBonVentKey: String = "",
     var versement_fait: Double = 0.0,
     var ancien_credit: Double = 0.0,
-
-
-
-
     var cUn_Credit_duBonVentKey: String = "",
     var new_credit_apre_tout_fait: Double = 0.0,
-    var affiche_le_verssement_au_prochen_print: Boolean = false,
     var demande_Versemet_si_Type: Double = 0.0,
     var demande_Versemet_si_Type_est_regle: Boolean = false,
-    var credit_fait: Double = 0.0,
-    var sum_De_Totale_Vents: Double = 0.0,
+    var affiche_le_verssement_au_prochen_print: Boolean = false,
     var sum_De_Credit_Fait: Double = 0.0,
     var versement: Double = 0.0,
+    var credit_fait: Double = 0.0,
+    var montant_principale_du_type: Double = 0.0,
+
+
+    var sum_De_Totale_Vents: Double = 0.0,
     var position_Don_Lis_Cible_Clients_au_VentPeriod: Int = 0,
     var cLeDataOuvertDuParentList: Boolean? = null,
     var cActive: Boolean = false,
@@ -75,14 +75,6 @@ data class M8BonVent(
     var moulahada: String = "",    //06_27
     var new_situation: Double = 0.0, //06_21
 ) {
-    /**
-     * Calculates the primary monetary value for this bon depending on its state:
-     * - New_Situation_Credit → Σ credit_fait  −  Σ versement_fait  (for same client + period)
-     * - Versemment           → versement_fait
-     * - Credit / Cette_Transaction_Type_Est_Credit → credit_fait
-     * - Demande_Versemet     → demande_Versemet_si_Type
-     * - everything else      → 0.0
-     */
     fun fun_calculative_du_main_val(allBons: List<M8BonVent>): Double {
         val samePeriodClientBons = allBons.filter {
             it.parent_M2Client_KeyID == this.parent_M2Client_KeyID &&

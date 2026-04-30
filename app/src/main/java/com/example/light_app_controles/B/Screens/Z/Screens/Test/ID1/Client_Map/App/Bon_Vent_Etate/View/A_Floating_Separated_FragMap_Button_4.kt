@@ -1,13 +1,11 @@
-package com.example.light_app_controles.B.Screens
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
 
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.AvertissementDialog
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.Local_Organizer
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View.ButID_4_upload_datas_fireBase_au_csv
 import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
 import EntreApps.Shared.Models.Relative_Produits.Models.M16CategorieProduit
-import EntreApps.Shared.Models.Relative_Produits.Models.M21CataloguesCategorie
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
-import EntreApps.Shared.Models.Relative_Produits.Models.get_ListM21CataloguesCategorie
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -63,9 +61,7 @@ import com.example.light_app_controles.Floating_DropDownMenuS.Dialoge.Dialog.Z_C
 import com.example.light_app_controles.Floating_DropDownMenuS.Dialoge.Dialog.Z_Content_Buttons.View.A.Main.Z.Buttons.View.ButID_1_ExportToCSV_DropDownItemWBaseDonne
 import com.example.light_app_controles.Floating_DropDownMenuS.Dialoge.Dialog.Z_Content_Buttons.View.A.Main.Z.Buttons.View.ButID_3_ImportFromCSV
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
 data class Button_State(
@@ -94,6 +90,7 @@ fun Floating_Separated_Button(
         colors = Pair(Color.Red, Color.Blue)
     ),
     onClick_Lence_Capture: (() -> Unit)? = null,
+    vm: A_ViewModel,
 ) {
     val updatedButtonState = buttonState.copy(its_Active = true)
 
@@ -140,14 +137,15 @@ fun Floating_Separated_Button(
                 }
 
                 B_FragMap_DropdownMenu(
+                    appDatabase = appDatabase,
                     expanded = showDropdown,
                     onDismiss = { showDropdown = false },
                     list_m16 = list_m16,
                     list_m1 = list_m1,
                     list_m3 = list_m3,
                     on_vent_key = on_vent_key,
-                    appDatabase = appDatabase,
                     onClick_Lence_Capture = onClick_Lence_Capture,
+                    vm = vm,
                 )
             }
         }
@@ -155,11 +153,12 @@ fun Floating_Separated_Button(
 }
 
 private enum class PendingAction {
-    Local,
-    UpdateLocalTimestamps }
+    UpdateLocalTimestamps,
+}
 
 @Composable
 fun B_FragMap_DropdownMenu(
+    vm: A_ViewModel,
     appDatabase: AppDatabase,
     expanded: Boolean,
     onDismiss: () -> Unit,
@@ -171,9 +170,20 @@ fun B_FragMap_DropdownMenu(
     onClick_Lence_Capture: (() -> Unit)? = null,
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
 
-    var fake_init_val_du_ancien_credits_situation by remember { mutableStateOf<Int?>(2000) }
+    val latestSituationMontant: Int? = remember(vm.activeCentralValues.list_M8bon) {
+        vm.activeCentralValues.list_M8bon
+            ?.filter {
+                it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit &&
+                        (on_vent_key.isEmpty() || it.parent_M2Client_KeyID == on_vent_key)
+            }
+            ?.maxByOrNull { it.creationTimestamps }
+            ?.montant_principale_du_type
+            ?.toInt()
+    }
+    var fake_init_val_du_ancien_credits_situation by remember(latestSituationMontant) {
+        mutableStateOf<Int?>(latestSituationMontant)
+    }
 
     var organizeDropBoxProgress by remember { mutableStateOf<Float?>(null) }
     var organizeLocalProgress by remember { mutableStateOf<Float?>(null) }
@@ -191,28 +201,6 @@ fun B_FragMap_DropdownMenu(
 
     pendingAction?.let { action ->
         when (action) {
-            PendingAction.Local -> AvertissementDialog(
-                title = "Organiser en local",
-                message = "Cette action va déplacer toutes les images depuis le dossier " +
-                        "central local vers leurs dossiers catalogues dans le dossier " +
-                        "de sauvegarde. Les fichiers sources seront supprimés. Continuer ?",
-                confirmLabel = "Déplacer",
-                onConfirm = {
-                    pendingAction = null
-                    coroutineScope.launch {
-                        organizeLocalProgress = 0f
-                        val groups = buildCatalogueGroups(list_m16, list_m1, list_m3)
-                        Local_Organizer.organizeByCategories(
-                            catalogueGroups = groups,
-                            onProgress = { p -> organizeLocalProgress = p }
-                        )
-                        organizeLocalProgress = null
-                        onDismiss()
-                    }
-                },
-                onDismiss = { pendingAction = null }
-            )
-
             PendingAction.UpdateLocalTimestamps -> AvertissementDialog(
                 title = "Mettre à jour dates locales",
                 message = "La date de modification de chaque fichier image local sera " +
@@ -292,9 +280,17 @@ fun B_FragMap_DropdownMenu(
                         keyboardActions = KeyboardActions(
                             onDone = {
                                 val parsed = out_val.toIntOrNull()
+                                val montant = parsed?.toDouble() ?: 0.0
+
                                 if (parsed != null) fake_init_val_du_ancien_credits_situation = parsed
                                 out_val = fake_init_val_du_ancien_credits_situation?.toString() ?: ""
                                 isEditingCredits = false
+
+                                // Launch credit + New_Situation_Credit update, then trigger capture
+                                vm.ajoute_credit_et_affiche_compos_image(
+                                    montant = montant,
+                                    clientKey = on_vent_key.ifEmpty { FAKE_CLIENT_KEY },
+                                )
                             }
                         ),
                         label = {
@@ -333,26 +329,3 @@ fun B_FragMap_DropdownMenu(
         ButID_4_upload_datas_fireBase_au_csv(enabled = true)
     }
 }
-
-private suspend fun buildCatalogueGroups(
-    list_m16: List<M16CategorieProduit>?,
-    list_m1: List<M01Produit>?,
-    list_m3: List<M3CouleurProduitInfos>?,
-): Map<M21CataloguesCategorie, List<M3CouleurProduitInfos>>? =
-    withContext(Dispatchers.Default) {
-        val catalogues = get_ListM21CataloguesCategorie()
-        val sansCatalogue = catalogues.find { it.nom == "Sans Catalogue" }
-            ?: M21CataloguesCategorie(keyID = "t4", id = 4, nom = "Sans Catalogue")
-
-        val catalogueById = catalogues.associateBy { it.id }
-        val catalogueByCategorieId = list_m16?.associate { cat ->
-            cat.id to (catalogueById[cat.catalogueParentId] ?: sansCatalogue)
-        }
-        val catalogueByProduitKey = list_m1?.associate { p ->
-            p.keyID to (catalogueByCategorieId?.get(p.idParentCategorie) ?: sansCatalogue)
-        }
-
-        list_m3
-            ?.filter { it.nomImageFichieSansEtansion.isNotBlank() && it.nomImageFichieSansEtansion != "Non Dispo" }
-            ?.groupBy { catalogueByProduitKey?.get(it.parentBProduitInfosKeyID) ?: sansCatalogue }
-    }
