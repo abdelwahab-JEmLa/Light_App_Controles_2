@@ -297,7 +297,9 @@ fun B_FragMap_DropdownMenu(
                                 if (parsed != null) fake_init_val_du_ancien_credits_situation = parsed
                                 out_val = fake_init_val_du_ancien_credits_situation?.toString() ?: ""
                                 isEditingCredits = false
-
+                                           //<--
+                                           //TODO(2.C Relative Au Todo(1): 
+                                                   //... je lnce normalent ca add le new lancien situat rest comme il est 
                                 // Launch credit + New_Situation_Credit update, then trigger capture
                                 vm.ajoute_credit_et_affiche_compos_image(
                                     montant = montant,

@@ -145,7 +145,8 @@ val FAKE_ALL_BONS = listOf(
         "new_credit_1",
         M8BonVent.EtateActuellementEst.New_Situation_Credit,
         creationOffset = 0,
-        montantPrincipale = 1500.0,
+        montantPrincipale = 1500.0,   //<--
+        //TODO(1): pk ca comme ce change  a 1100 quand
     ),
     fakeBon(
         "versement_1",
