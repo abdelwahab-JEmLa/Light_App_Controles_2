@@ -4,7 +4,6 @@ package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
 import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
-import android.R
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.firebase.Firebase
