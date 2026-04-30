@@ -284,7 +284,10 @@ fun B_FragMap_DropdownMenu(
                                 val parsed = out_val.toIntOrNull()
                                 val montant = parsed?.toDouble() ?: 0.0
                                 val diff = (fake_init_val_du_ancien_credits_situation ?: 0) - (parsed ?: 0)
-
+                                                       //<--
+                                                       //TODO(1): pk la list du lazy n ai pas new sit 1000
+                                //ver 500
+                                //new 1500
                                 BonVentFlowLogger.donePressedParsed(
                                     outVal = out_val,
                                     parsed = parsed,
