@@ -31,7 +31,6 @@ class A_ViewModel(
 
     init {
         activeCentralValues.list_M8bon = FAKE_ALL_BONS
-        // Replace with real M2Client lookup when a real data source is wired in
         activeCentralValues.focused_M2Client = null
         activeCentralValues.focused_prriod = FAKE_PERIOD_KEY
     }
@@ -40,18 +39,12 @@ class A_ViewModel(
         super.onCleared()
     }
 
-    /**
-     * Adds a [Versemment] bon for [montant], then subtracts [montant] from the latest
-     * [M8BonVent.EtateActuellementEst.New_Situation_Credit]'s [M8BonVent.montant_principale_du_type].
-     * Afterwards sets [captureRequested] = true so the screen triggers a capture + dialog.
-     */
+
     fun ajoute_credit_et_affiche_compos_image(
         montant: Double,
         clientKey: String = FAKE_CLIENT_KEY,
         periodKey: String = FAKE_PERIOD_KEY,
     ) {
-        // One stable base timestamp so every item created in this call is
-        // guaranteed to differ by exactly 1 second from the next.
         val baseTs = System.currentTimeMillis()
         val currentList = activeCentralValues.list_M8bon?.toMutableList() ?: mutableListOf()
 
@@ -62,7 +55,6 @@ class A_ViewModel(
             listSize = currentList.size,
         )
 
-        // 1. Create and add the new Versement bon  (t + 0 s)
         val versementBon = M8BonVent(
             keyID = "fake_key_versement_$baseTs",
             parent_M2Client_KeyID = clientKey,
@@ -74,8 +66,6 @@ class A_ViewModel(
         currentList.add(versementBon)
         BonVentFlowLogger.versementCreated(key = versementBon.keyID, versementFait = montant)
 
-        // 2. Read the current principal from the latest New_Situation_Credit — do NOT mutate it.
-        //    The old record is kept as a historical snapshot.
         val latestSit = currentList
             .filter {
                 it.parent_M2Client_KeyID == clientKey &&
@@ -92,7 +82,6 @@ class A_ViewModel(
 
         val newMontant = (latestSit?.montant_principale_du_type ?: 0.0) - montant
 
-        // New situation bon is created 1 second after the versement bon (t + 1 s)
         val newSituationBon = M8BonVent(
             keyID = "fake_key_new_sit_${baseTs + 1_000L}",
             parent_M2Client_KeyID = clientKey,
@@ -106,17 +95,12 @@ class A_ViewModel(
         BonVentFlowLogger.newSitCreated(key = newSituationBon.keyID, newMontant = newMontant)
 
         activeCentralValues.list_M8bon = currentList
-        captureRequested = true          // signal the screen to capture + show dialog
+        captureRequested = true
         BonVentFlowLogger.listUpdated(list = currentList, captureRequested = true)
     }
 }
-
-// ─── Constants ───────────────────────────────────────────────────────────────
-
 const val FAKE_CLIENT_KEY = "fake_client_key_001"
 const val FAKE_PERIOD_KEY = "fake_period_key_001"
-
-// ─── Fake data helpers ────────────────────────────────────────────────────────
 
 private fun fakeBon(
     keySuffix: String,
@@ -145,8 +129,7 @@ val FAKE_ALL_BONS = listOf(
         "new_credit_1",
         M8BonVent.EtateActuellementEst.New_Situation_Credit,
         creationOffset = 0,
-        montantPrincipale = 1500.0,   //<--
-        //TODO(1): pk ca comme ce change  a 1100 quand
+        montantPrincipale = 1500.0,
     ),
     fakeBon(
         "versement_1",
