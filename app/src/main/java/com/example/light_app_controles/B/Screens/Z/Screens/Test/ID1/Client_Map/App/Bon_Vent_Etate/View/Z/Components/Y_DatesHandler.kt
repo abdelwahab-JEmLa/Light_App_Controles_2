@@ -1,7 +1,8 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Z.Components
 
 import android.annotation.SuppressLint
 import android.util.Log
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date

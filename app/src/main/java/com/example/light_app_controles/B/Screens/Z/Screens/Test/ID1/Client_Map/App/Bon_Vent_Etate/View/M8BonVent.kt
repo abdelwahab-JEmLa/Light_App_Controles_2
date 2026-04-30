@@ -115,10 +115,8 @@ data class M8BonVent(
         }
     }
 
-
-
     @IgnoreExtraProperties
-    enum class EtateActuellementEst(val color: Color, val nomArabe: String) {
+    enum class EtateActuellementEst(val color: Color, val nomArabe: String,val credit_type : Boolean = false) {
         CreeMaisNonDefinie(Color(0xFFFFFFFF), "غير محدد"),
         ON_MODE_COMMEND_ACTUELLEMENT(
             Color(0xFF99CC00),
@@ -148,11 +146,11 @@ data class M8BonVent(
         CommantaireSpeciale(Color(0xFFCC0000), "ملاحظة خاصة بالطلبية"),
         Passed_Sans_Livre(Color(0xFF444444), "Passed_Sans_Livre"),
         //Credits
-        Credit(Color(0xFFCC0000), " "),
-        Cette_Transaction_Type_Est_Credit(Color(0xFFCC0000), "تم اقراضه  "),
-        Versemment(Color(0xFF4CAF50), ""),
-        Demande_Versemet(Color(0xFFFF9800), "المبلغ المرجو تحظيره"),
-        New_Situation_Credit(Color(0xFF673AB7), "الحالة الجديدة للدين"),
+        Credit(Color(0xFFCC0000), " ",credit_type =true),
+        Cette_Transaction_Type_Est_Credit(Color(0xFFCC0000), "تم اقراضه  ",credit_type =true),
+        Versemment(Color(0xFF4CAF50), "",credit_type =true),
+        Demande_Versemet(Color(0xFFFF9800), "المبلغ المرجو تحظيره",credit_type =true),
+        New_Situation_Credit(Color(0xFF673AB7), "الحالة الجديدة للدين",credit_type =true),
         ;
         companion object {
             const val keyModel = "ID8C2"

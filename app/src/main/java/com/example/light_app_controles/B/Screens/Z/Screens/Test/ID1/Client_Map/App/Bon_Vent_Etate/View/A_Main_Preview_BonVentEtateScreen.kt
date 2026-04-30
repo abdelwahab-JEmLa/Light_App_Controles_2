@@ -49,8 +49,6 @@ fun Main_Preview_BonVentEtateScreen(
         }
     )
 
-    // Use the ViewModel's live list (which gets modified by ajoute_credit_et_affiche_compos_image),
-    // falling back to the static fake list when the VM list is not yet populated.
     val allBonVentList: List<M8BonVent> =
         viewModel.activeCentralValues.list_M8bon ?: fake_allBonVentList
 
@@ -78,13 +76,11 @@ fun Main_Preview_BonVentEtateScreen(
         if (captured.isNotEmpty()) showDlg = true
     }
 
-    // Triggered by the external lenceTestActive prop (preview / test mode)
     LaunchedEffect(lenceTestActive) {
         if (!lenceTestActive) return@LaunchedEffect
         runCapture()
     }
 
-    // Triggered by ajoute_credit_et_affiche_compos_image via the ViewModel
     LaunchedEffect(viewModel.captureRequested) {
         if (!viewModel.captureRequested) return@LaunchedEffect
         runCapture()
@@ -97,16 +93,32 @@ fun Main_Preview_BonVentEtateScreen(
                 b.parent_M14VentPeriod_KeyId == parentPeriodKeyID
     }
 
+    // Situation bons (New_Situation_Credit) shown first
     val sitBons = allBonVentList
         .filter { sameClientPeriod(it) && it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit }
         .sortedByDescending { it.creationTimestamps }
 
+    // Credit/versement bons shown second
     val cvBons = allBonVentList
         .filter { sameClientPeriod(it) && it.etateActuellementEst in CREDIT_VERSEMENT_STATES }
         .sortedByDescending { it.creationTimestamps }
 
-    val allBons: List<M8BonVent> = sitBons + cvBons
+    // Non-credit-type bons (e.g. COMMANDE_LIVRAI, A_COMMANDE_CONFIRME, …) shown last
+    val nonCreditBons = allBonVentList
+        .filter { sameClientPeriod(it) && !it.etateActuellementEst.credit_type }
+        .sortedByDescending { it.creationTimestamps }
+
+    val allBons: List<M8BonVent> = sitBons + cvBons + nonCreditBons
     val latestSit = sitBons.maxByOrNull { it.creationTimestamps }
+
+    BonVentFlowLogger.screenRecompose(
+        allBons = allBons.size,
+        sitBons = sitBons.size,
+        cvBons = cvBons.size,
+        nonCreditBons = nonCreditBons.size,
+        latestSitKey = latestSit?.keyID,
+        latestSitMontant = latestSit?.montant_principale_du_type,
+    )
 
     Column(modifier = modifier.fillMaxSize()) {
         if (latestSit == null) {
@@ -135,24 +147,42 @@ fun Main_Preview_BonVentEtateScreen(
                 }
 
                 Box(modifier = cap.modifier) {
-                    if (b.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit) {
-                        Situation_Card_ItemView(
-                            allBonVentList = allBonVentList,
-                            relative_M8BonVent = b,
-                            onUpdate = { scope.launch { appDatabase.dao_M8BonVent().upsert(it) } },
-                            onDelete = {
-                                scope.launch { appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID) }
-                            },
-                        )
-                    } else {
-                        Y_Credit_And_Versement_ItemView(
-                            allBonVentList = allBonVentList,
-                            relative_M8BonVent = b,
-                            onUpdate = { scope.launch { appDatabase.dao_M8BonVent().upsert(it) } },
-                            onDelete = {
-                                scope.launch { appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID) }
-                            },
-                        )
+                    BonVentFlowLogger.itemRender(
+                        etat = b.etateActuellementEst,
+                        key = b.keyID,
+                        montant = b.montant_principale_du_type,
+                    )
+                    when {
+                        b.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit -> {
+                            Situation_Card_ItemView(
+                                allBonVentList = allBonVentList,
+                                relative_M8BonVent = b,
+                                onUpdate = { scope.launch { appDatabase.dao_M8BonVent().upsert(it) } },
+                                onDelete = {
+                                    scope.launch { appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID) }
+                                },
+                            )
+                        }
+                        b.etateActuellementEst.credit_type -> {
+                            Y_Credit_And_Versement_ItemView(
+                                allBonVentList = allBonVentList,
+                                relative_M8BonVent = b,
+                                onUpdate = { scope.launch { appDatabase.dao_M8BonVent().upsert(it) } },
+                                onDelete = {
+                                    scope.launch { appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID) }
+                                },
+                            )
+                        }
+                        else -> {
+                            Affiche_NonCredit_Etate(
+                                allBonVentList = allBonVentList,
+                                relative_M8BonVent = b,
+                                onUpdate = { scope.launch { appDatabase.dao_M8BonVent().upsert(it) } },
+                                onDelete = {
+                                    scope.launch { appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID) }
+                                },
+                            )
+                        }
                     }
                 }
             }

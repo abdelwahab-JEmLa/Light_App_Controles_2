@@ -52,6 +52,13 @@ class A_ViewModel(
     ) {
         val currentList = activeCentralValues.list_M8bon?.toMutableList() ?: mutableListOf()
 
+        BonVentFlowLogger.vmEntry(
+            montant = montant,
+            clientKey = clientKey,
+            periodKey = periodKey,
+            listSize = currentList.size,
+        )
+
         // 1. Create and add the new Versement bon
         val versementBon = M8BonVent(
             keyID = "fake_key_versement_${System.currentTimeMillis()}",
@@ -62,22 +69,42 @@ class A_ViewModel(
             versement_fait = montant,
         )
         currentList.add(versementBon)
+        BonVentFlowLogger.versementCreated(key = versementBon.keyID, versementFait = montant)
 
-        // 2. Find the latest New_Situation_Credit for this client+period and reduce its principal
-        val latestSitIdx = currentList
-            .indexOfLast {
+        // 2. Read the current principal from the latest New_Situation_Credit — do NOT mutate it.
+        //    The old record is kept as a historical snapshot.
+        val latestSit = currentList
+            .filter {
                 it.parent_M2Client_KeyID == clientKey &&
                         it.parent_M14VentPeriod_KeyId == periodKey &&
                         it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit
             }
-        if (latestSitIdx != -1) {
-            val sit = currentList[latestSitIdx]
-            currentList[latestSitIdx] = sit.copy(
-                montant_principale_du_type = sit.montant_principale_du_type - montant
-            )
-        }
+            .maxByOrNull { it.creationTimestamps }
+
+        BonVentFlowLogger.latestSitFound(
+            found = latestSit != null,
+            key = latestSit?.keyID,
+            oldMontant = latestSit?.montant_principale_du_type,
+        )
+
+        val newMontant = (latestSit?.montant_principale_du_type ?: 0.0) - montant
+
+        // 3. Append a fresh New_Situation_Credit with the updated principal.
+        //    Timestamp +1 ms ensures it always sorts after the versement bon above.
+        val newSituationBon = M8BonVent(
+            keyID = "fake_key_new_sit_${System.currentTimeMillis()}",
+            parent_M2Client_KeyID = clientKey,
+            parent_M14VentPeriod_KeyId = periodKey,
+            etateActuellementEst = M8BonVent.EtateActuellementEst.New_Situation_Credit,
+            creationTimestamps = System.currentTimeMillis() + 1L,
+            montant_principale_du_type = newMontant,
+        )
+        currentList.add(newSituationBon)
+        BonVentFlowLogger.newSitCreated(key = newSituationBon.keyID, newMontant = newMontant)
 
         activeCentralValues.list_M8bon = currentList
+        captureRequested = true          // signal the screen to capture + show dialog
+        BonVentFlowLogger.listUpdated(list = currentList, captureRequested = true)
     }
 }
 
@@ -112,38 +139,33 @@ private fun fakeBon(
 
 val FAKE_ALL_BONS = listOf(
     fakeBon(
-        "commande_old",
-        M8BonVent.EtateActuellementEst.ON_MODE_COMMEND_ACTUELLEMENT,
-        creationOffset = 60_000,
-    ),
-    fakeBon(
-        "commande_new",
-        M8BonVent.EtateActuellementEst.ON_MODE_COMMEND_ACTUELLEMENT,
-        creationOffset = 50_000,
-    ),
-    fakeBon(
-        "versement",
-        M8BonVent.EtateActuellementEst.Versemment,
-        creationOffset = 40_000,
-        versementFait = 1500.0,
-    ),
-    fakeBon(
-        "credit",
-        M8BonVent.EtateActuellementEst.Credit,
-        creationOffset = 30_000,
-        creditFait = 3000.0,
-    ),
-    fakeBon(
-        "demande",
-        M8BonVent.EtateActuellementEst.Demande_Versemet,
-        creationOffset = 20_000,
-        demandeVersement = 500.0,
-    ),
-    // new_credit is the most recent entry (creationOffset = 0) with montant_principale = 1500
-    fakeBon(
         "new_credit",
         M8BonVent.EtateActuellementEst.New_Situation_Credit,
         creationOffset = 0,
         montantPrincipale = 1500.0,
+    ),
+    fakeBon(
+        "versement",
+        M8BonVent.EtateActuellementEst.Versemment,
+        creationOffset = 30_000,
+        versementFait = 1500.0,
+    ),
+    fakeBon(
+        "demande",
+        M8BonVent.EtateActuellementEst.Demande_Versemet,
+        creationOffset = 40_000,
+        demandeVersement = 500.0,
+    ),
+    fakeBon(
+        "credit",
+        M8BonVent.EtateActuellementEst.Credit,
+        creationOffset = 50_000,
+        creditFait = 3000.0,
+    ),
+    fakeBon(
+        "COMMANDE_LIVRAI",
+        M8BonVent.EtateActuellementEst.COMMANDE_LIVRAI,
+        creationOffset = 60_000,
+        montantPrincipale = 3000.0,
     ),
 )

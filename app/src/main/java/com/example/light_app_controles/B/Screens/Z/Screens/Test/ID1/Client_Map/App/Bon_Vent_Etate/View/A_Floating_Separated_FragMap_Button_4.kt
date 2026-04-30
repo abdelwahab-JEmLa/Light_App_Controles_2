@@ -270,7 +270,9 @@ fun B_FragMap_DropdownMenu(
                     OutlinedTextField(
                         value = out_val,
                         onValueChange = { input ->
-                            if (input.all { it.isDigit() }) out_val = input
+                            val accepted = input.all { it.isDigit() }
+                            BonVentFlowLogger.inputChange(raw = input, accepted = accepted)
+                            if (accepted) out_val = input
                         },
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(
@@ -281,6 +283,16 @@ fun B_FragMap_DropdownMenu(
                             onDone = {
                                 val parsed = out_val.toIntOrNull()
                                 val montant = parsed?.toDouble() ?: 0.0
+                                val diff = (fake_init_val_du_ancien_credits_situation ?: 0) - (parsed ?: 0)
+
+                                BonVentFlowLogger.donePressedParsed(
+                                    outVal = out_val,
+                                    parsed = parsed,
+                                    montant = montant,
+                                    ancienSit = fake_init_val_du_ancien_credits_situation,
+                                    diff = diff,
+                                    clientKey = on_vent_key.ifEmpty { FAKE_CLIENT_KEY },
+                                )
 
                                 if (parsed != null) fake_init_val_du_ancien_credits_situation = parsed
                                 out_val = fake_init_val_du_ancien_credits_situation?.toString() ?: ""
