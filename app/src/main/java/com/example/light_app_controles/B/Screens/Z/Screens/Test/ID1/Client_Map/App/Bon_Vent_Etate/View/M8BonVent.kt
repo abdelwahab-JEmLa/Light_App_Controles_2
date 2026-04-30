@@ -2,6 +2,7 @@ package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.
 
 //noinspection SuspiciousImport,SuspiciousImport
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_MainDataBases_RefProduction
 import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
 import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
 import androidx.room.Entity
@@ -243,6 +244,10 @@ data class M8BonVent(
         val ref = Firebase.database.getReference(
             "/00_DataPrototype-04-02/_1_developingRef/C_InfosSqlDataBases"
         ).child("Datas08BonVent")
+
+
+        val ref_Test = central_MainDataBases_RefProduction
+            .child("M8BonVent")
 
         fun generePushKey() = M00CentralParametresOfAllApps.genereUnPushKeyFireBase(ref)
 
