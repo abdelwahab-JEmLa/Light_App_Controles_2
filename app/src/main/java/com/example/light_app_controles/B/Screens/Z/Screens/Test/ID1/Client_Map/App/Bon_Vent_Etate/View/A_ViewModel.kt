@@ -50,6 +50,9 @@ class A_ViewModel(
         clientKey: String = FAKE_CLIENT_KEY,
         periodKey: String = FAKE_PERIOD_KEY,
     ) {
+        // One stable base timestamp so every item created in this call is
+        // guaranteed to differ by exactly 1 second from the next.
+        val baseTs = System.currentTimeMillis()
         val currentList = activeCentralValues.list_M8bon?.toMutableList() ?: mutableListOf()
 
         BonVentFlowLogger.vmEntry(
@@ -59,13 +62,13 @@ class A_ViewModel(
             listSize = currentList.size,
         )
 
-        // 1. Create and add the new Versement bon
+        // 1. Create and add the new Versement bon  (t + 0 s)
         val versementBon = M8BonVent(
-            keyID = "fake_key_versement_${System.currentTimeMillis()}",
+            keyID = "fake_key_versement_$baseTs",
             parent_M2Client_KeyID = clientKey,
             parent_M14VentPeriod_KeyId = periodKey,
             etateActuellementEst = M8BonVent.EtateActuellementEst.Versemment,
-            creationTimestamps = System.currentTimeMillis(),
+            creationTimestamps = baseTs,
             versement_fait = montant,
         )
         currentList.add(versementBon)
@@ -89,16 +92,16 @@ class A_ViewModel(
 
         val newMontant = (latestSit?.montant_principale_du_type ?: 0.0) - montant
 
-        // 3. Append a fresh New_Situation_Credit with the updated principal.
-        //    Timestamp +1 ms ensures it always sorts after the versement bon above.
+        // New situation bon is created 1 second after the versement bon (t + 1 s)
         val newSituationBon = M8BonVent(
-            keyID = "fake_key_new_sit_${System.currentTimeMillis()}",
+            keyID = "fake_key_new_sit_${baseTs + 1_000L}",
             parent_M2Client_KeyID = clientKey,
             parent_M14VentPeriod_KeyId = periodKey,
             etateActuellementEst = M8BonVent.EtateActuellementEst.New_Situation_Credit,
-            creationTimestamps = System.currentTimeMillis() + 1L,
+            creationTimestamps = baseTs + 1_000L,
             montant_principale_du_type = newMontant,
         )
+
         currentList.add(newSituationBon)
         BonVentFlowLogger.newSitCreated(key = newSituationBon.keyID, newMontant = newMontant)
 
@@ -139,31 +142,31 @@ private fun fakeBon(
 
 val FAKE_ALL_BONS = listOf(
     fakeBon(
-        "new_credit",
+        "new_credit_1",
         M8BonVent.EtateActuellementEst.New_Situation_Credit,
         creationOffset = 0,
         montantPrincipale = 1500.0,
     ),
     fakeBon(
-        "versement",
+        "versement_1",
         M8BonVent.EtateActuellementEst.Versemment,
         creationOffset = 30_000,
         versementFait = 1500.0,
     ),
     fakeBon(
-        "demande",
+        "demande_1",
         M8BonVent.EtateActuellementEst.Demande_Versemet,
         creationOffset = 40_000,
         demandeVersement = 500.0,
     ),
     fakeBon(
-        "credit",
+        "credit_1",
         M8BonVent.EtateActuellementEst.Credit,
         creationOffset = 50_000,
         creditFait = 3000.0,
     ),
     fakeBon(
-        "COMMANDE_LIVRAI",
+        "COMMANDE_LIVRAI_1",
         M8BonVent.EtateActuellementEst.COMMANDE_LIVRAI,
         creationOffset = 60_000,
         montantPrincipale = 3000.0,

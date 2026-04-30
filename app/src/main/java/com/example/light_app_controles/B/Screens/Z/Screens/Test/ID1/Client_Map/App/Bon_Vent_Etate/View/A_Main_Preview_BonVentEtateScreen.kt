@@ -108,7 +108,8 @@ fun Main_Preview_BonVentEtateScreen(
         .filter { sameClientPeriod(it) && !it.etateActuellementEst.credit_type }
         .sortedByDescending { it.creationTimestamps }
 
-    val allBons: List<M8BonVent> = sitBons + cvBons + nonCreditBons
+    val allBons: List<M8BonVent> = (sitBons + cvBons + nonCreditBons)
+        .sortedByDescending { it.creationTimestamps }
     val latestSit = sitBons.maxByOrNull { it.creationTimestamps }
 
     BonVentFlowLogger.screenRecompose(
@@ -136,7 +137,8 @@ fun Main_Preview_BonVentEtateScreen(
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
+        ) { //<--
+        //TODO(1): assure que les item son trie par creation time tamps decending 
             items(allBons, key = { it.keyID }) { b ->
                 val cap = rememberCapturableLayer()
                 val capKey = "${b.creationTimestamps}|${b.keyID}|${b.etateActuellementEst.name}"
