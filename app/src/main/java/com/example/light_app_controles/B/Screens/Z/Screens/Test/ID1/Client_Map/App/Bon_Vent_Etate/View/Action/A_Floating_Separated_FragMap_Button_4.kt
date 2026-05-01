@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AllInbox
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
@@ -159,6 +160,7 @@ enum class PendingAction {
     But2_Export_M8_Csv_To_FireBase,
     But3_Import_M8Csv_To_Room,
     But5_Import_M8_Ui_To_Room,
+    But6_Import_M8_FireBase_To_Csv,
 }
 
 @Composable
@@ -239,6 +241,13 @@ fun B_FragMap_DropdownMenu(
                 onPendingClear = { pendingAction = null },
                 action_definition= PendingAction.But1_Export_M8_Room_To_Csv,
             )
+            PendingAction.But6_Import_M8_FireBase_To_Csv -> But6_Import_M8_FireBase_To_Csv(
+                vm = vm,
+                coroutineScope = coroutineScope,
+                onDismiss = onDismiss,
+                onPendingClear = { pendingAction = null },
+                action_definition = PendingAction.But6_Import_M8_FireBase_To_Csv,
+            )
             PendingAction.But5_Import_M8_Ui_To_Room -> {
                 AvertissementDialog(
                     title = action.name,
@@ -260,6 +269,7 @@ fun B_FragMap_DropdownMenu(
             else -> {}
         }
     }
+
 
 
     DropdownMenu(
@@ -289,6 +299,7 @@ fun B_FragMap_DropdownMenu(
             )
             HorizontalDivider()
         }
+
 
         DropdownMenuItem(
             leadingIcon = {
@@ -352,7 +363,46 @@ fun B_FragMap_DropdownMenu(
                 }
             }
         )
+        HorizontalDivider(thickness = 3.dp, color = Color.Red)
         HorizontalDivider()
+        Text("FireBase")
+        DropdownMenuItem(
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.CloudUpload,
+                    contentDescription = null,
+                    tint = Color(0xFFE65100)
+                )
+            },
+            text = {
+                Text(
+                    text = PendingAction.But2_Export_M8_Csv_To_FireBase.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            onClick = {
+                pendingAction = PendingAction.But2_Export_M8_Csv_To_FireBase
+            }
+        )
+        DropdownMenuItem(
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.CloudDownload,
+                    contentDescription = null,
+                    tint = Color(0xFFFF6F00)
+                )
+            },
+            text = {
+                Text(
+                    text = PendingAction.But6_Import_M8_FireBase_To_Csv.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            onClick = {
+                pendingAction = PendingAction.But6_Import_M8_FireBase_To_Csv
+            }
+        )
+        HorizontalDivider(thickness = 3.dp, color = Color.Red)
         DropdownMenuItem(
             leadingIcon = {
                 Icon(
@@ -371,26 +421,7 @@ fun B_FragMap_DropdownMenu(
                 pendingAction = PendingAction.But1_Export_M8_Room_To_Csv
             }
         )
-        DropdownMenuItem(
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.CloudUpload,
-                    contentDescription = null,
-                    tint = Color(0xFFE65100)
-                )
-            },
-            text = {
-                // Progress/error display is handled by But2_Export_M8_Csv_To_FireBase
-                // (shown via the pendingAction when-block above), driven by uploadState.
-                Text(
-                    text = PendingAction.But2_Export_M8_Csv_To_FireBase.name,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            },
-            onClick = {
-                pendingAction = PendingAction.But2_Export_M8_Csv_To_FireBase
-            }
-        )
+
         DropdownMenuItem(
             leadingIcon = {
                 Icon(
@@ -428,6 +459,7 @@ fun B_FragMap_DropdownMenu(
                 pendingAction = PendingAction.But5_Import_M8_Ui_To_Room
             }
         )
+
         HorizontalDivider()
     }
 }

@@ -3,7 +3,10 @@ package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.
 import android.util.Log
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -125,6 +128,72 @@ class Setter_LongOperations(
 
         Log.d(TAG, "set_scv_m8_au_fireBase: envoi de ${bons.size} bons vers Firebase…")
         bach_update_FireBase_M8(bons, refDataBase)
+    }
+
+    suspend fun import_M8_FireBase_To_Csv(
+        refDataBase: DatabaseReference,
+        csvFile: File,
+    ) = withContext(Dispatchers.IO) {
+        Log.d(TAG, "import_M8_FireBase_To_Csv: ref=$refDataBase | csv=${csvFile.absolutePath}")
+
+        val snapshot = suspendCancellableCoroutine<DataSnapshot> { cont ->
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snap: DataSnapshot) {
+                    if (cont.isActive) cont.resume(snap)
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    if (cont.isActive) cont.resumeWithException(error.toException())
+                }
+            }
+            refDataBase.addListenerForSingleValueEvent(listener)
+            cont.invokeOnCancellation { refDataBase.removeEventListener(listener) }
+        }
+
+        val bons = snapshot.children.mapNotNull { child ->
+            val raw = child.value
+            if (raw !is Map<*, *>) return@mapNotNull null
+            @Suppress("UNCHECKED_CAST")
+            val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
+            runCatching { M8BonVent.to_Map(map) }.onFailure { err ->
+                Log.e(TAG, "import_M8_FireBase_To_Csv: parse échoué | keyID=${child.key} | ${err.message}", err)
+            }.getOrNull()
+        }
+
+        if (bons.isEmpty()) {
+            Log.w(TAG, "import_M8_FireBase_To_Csv: aucun bon valide extrait de Firebase → abandon")
+            return@withContext
+        }
+
+        Log.d(TAG, "import_M8_FireBase_To_Csv: ${bons.size} bons récupérés, écriture CSV…")
+
+        csvFile.parentFile?.mkdirs()
+
+        val headers = bons.first().to_Map().keys.toList()
+        val existingRows: LinkedHashMap<String, List<String>> = linkedMapOf()
+
+        if (csvFile.exists()) {
+            val lines = csvFile.readLines()
+            if (lines.size > 1) {
+                val fileHeaders = lines[0].split(",")
+                val keyIdx = fileHeaders.indexOf("keyID")
+                lines.drop(1).forEach { line ->
+                    val cells = line.split(",")
+                    val id = cells.getOrNull(keyIdx) ?: ""
+                    if (id.isNotEmpty()) existingRows[id] = cells
+                }
+            }
+        }
+
+        bons.forEach { bon ->
+            existingRows[bon.keyID] = bon.to_Map().values.map { (it?.toString() ?: "").escapeCsv() }
+        }
+
+        FileWriter(csvFile, false).use { w ->
+            w.write(headers.joinToString(",") + "\n")
+            existingRows.values.forEach { w.write(it.joinToString(",") + "\n") }
+        }
+
+        Log.d(TAG, "import_M8_FireBase_To_Csv: CSV mis à jour avec ${bons.size} bons.")
     }
 
     suspend fun import_M8Csv_To_Room(csvFile: File) = withContext(Dispatchers.IO) {
