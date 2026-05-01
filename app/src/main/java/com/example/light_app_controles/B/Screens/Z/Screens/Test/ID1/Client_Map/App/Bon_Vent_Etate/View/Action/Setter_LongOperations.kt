@@ -22,7 +22,6 @@ private const val TAG = "Setter_LongOperations"
 class Setter_LongOperations(
     private val appDatabase: AppDatabase,
 ) {
-
     suspend fun add_New_M8BonVent(bon: M8BonVent)  {
         appDatabase.dao_M8BonVent().insert(bon)
     }

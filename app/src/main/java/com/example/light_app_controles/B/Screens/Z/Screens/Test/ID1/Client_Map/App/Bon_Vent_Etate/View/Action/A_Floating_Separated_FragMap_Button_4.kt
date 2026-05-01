@@ -143,12 +143,8 @@ fun Floating_Separated_Button(
                 }
 
                 B_FragMap_DropdownMenu(
-                    appDatabase = appDatabase,
                     expanded = showDropdown,
                     onDismiss = { showDropdown = false },
-                    list_m16 = list_m16,
-                    list_m1 = list_m1,
-                    list_m3 = list_m3,
                     on_vent_key = on_vent_key,
                     onClick_Lence_Capture = onClick_Lence_Capture,
                     vm = vm,
@@ -172,15 +168,11 @@ enum class PendingAction() {
 
 @Composable
 fun B_FragMap_DropdownMenu(
+    modifier: Modifier = Modifier,
     vm: A_ViewModel,
-    appDatabase: AppDatabase,
     expanded: Boolean,
     onDismiss: () -> Unit,
-    list_m16: List<M16CategorieProduit>?,
-    list_m1: List<M01Produit>?,
-    list_m3: List<M3CouleurProduitInfos>?,
     on_vent_key: String = "",
-    modifier: Modifier = Modifier,
     onClick_Lence_Capture: (() -> Unit)? = null,
 ) {
     val coroutineScope = rememberCoroutineScope()
@@ -390,8 +382,10 @@ fun B_FragMap_DropdownMenu(
             HorizontalDivider()
         }
 
+        val relative_M2Client = FAKE_CLIENT_KEY
 
-        DropdownMenuItem(
+        DropdownMenuItem(       //<--
+        //TODO(1): exctract
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Edit,
@@ -424,7 +418,7 @@ fun B_FragMap_DropdownMenu(
                                 isEditingCredits = false
                                 vm.ajoute_credit_et_affiche_compos_image(
                                     montant = montant,
-                                    clientKey = on_vent_key.ifEmpty { FAKE_CLIENT_KEY },
+                                    clientKey = relative_M2Client,
                                 )
                             }
                         ),
@@ -620,3 +614,4 @@ fun B_FragMap_DropdownMenu(
         HorizontalDivider()
     }
 }
+
