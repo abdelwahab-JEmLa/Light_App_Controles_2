@@ -161,8 +161,7 @@ enum class PendingAction() {
     But5_Import_M8_Ui_To_Room,
     But6_Import_M8_FireBase_To_Csv,
     But7_DeleteImport_M8Csv_To_Room,
-    But8_DeleteAll_M8_Room,
-    ;
+    But8_DeleteAll_M8_Room, ;
 
 }
 
