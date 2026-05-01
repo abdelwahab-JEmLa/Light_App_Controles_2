@@ -1,7 +1,6 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action
 
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.AvertissementDialog
-import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.Local_Organizer
 import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
 import EntreApps.Shared.Models.Relative_Produits.Models.M16CategorieProduit
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
@@ -155,12 +154,13 @@ fun Floating_Separated_Button(
     }
 }
 
-enum class PendingAction {
+enum class PendingAction() {
     But1_Export_M8_Room_To_Csv,
     But2_Export_M8_Csv_To_FireBase,
     But3_Import_M8Csv_To_Room,
     But5_Import_M8_Ui_To_Room,
     But6_Import_M8_FireBase_To_Csv,
+    But7_DeleteImport_M8Csv_To_Room,
 }
 
 @Composable
@@ -269,6 +269,25 @@ fun B_FragMap_DropdownMenu(
                 )
             }
 
+            PendingAction.But7_DeleteImport_M8Csv_To_Room -> {
+                AvertissementDialog(
+                    title = action.name,
+                    message =
+                            "هل تريد المتابعة؟",
+                    onConfirm = {
+                        pendingAction = null
+                        coroutineScope.launch {
+                            vm.active_Datas.list_M8bon?.let { bons ->
+                                vm.setter_LongOperations.delete_All_M8()
+                                vm.setter_LongOperations.insertAll(bons)
+                            }
+                            onDismiss()
+                        }
+                    },
+                    onDismiss = { pendingAction = null },
+                )
+            }
+
             else -> {}
         }
     }
@@ -329,8 +348,6 @@ fun B_FragMap_DropdownMenu(
                             onDone = {
                                 val parsed = out_val.toIntOrNull()
                                 val montant = parsed?.toDouble() ?: 0.0
-                                val diff =
-                                    (fake_init_val_du_ancien_credits_situation ?: 0) - (parsed ?: 0)
 
                                 if (parsed != null) fake_init_val_du_ancien_credits_situation =
                                     parsed
@@ -426,6 +443,25 @@ fun B_FragMap_DropdownMenu(
             },
             onClick = {
                 pendingAction = PendingAction.But1_Export_M8_Room_To_Csv
+            }
+        )
+
+        DropdownMenuItem(
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Download,
+                    contentDescription = null,
+                    tint = Color(0xFF6A1B9A)
+                )
+            },
+            text = {
+                Text(
+                    text = PendingAction.But7_DeleteImport_M8Csv_To_Room.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            onClick = {
+                pendingAction = PendingAction.But3_Import_M8Csv_To_Room
             }
         )
 

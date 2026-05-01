@@ -27,8 +27,12 @@ class Setter_LongOperations(
         appDatabase.dao_M8BonVent().upsert(bon)
     }
 
+    // Uses upsert instead of plain insert to avoid UNIQUE constraint crashes
+    // when the same keyID already exists in Room.
+    // Tip: add @Upsert fun upsertAll(bons: List<M8BonVent>) to your DAO
+    // and replace the loop below with a single dao call for better performance.
     suspend fun insertAll(bons: List<M8BonVent>) = withContext(Dispatchers.IO) {
-        appDatabase.dao_M8BonVent().insertAll(bons)
+        bons.forEach { appDatabase.dao_M8BonVent().upsert(it) }
     }
 
     suspend fun bach_update_FireBase_M8(
@@ -210,7 +214,11 @@ class Setter_LongOperations(
             runCatching { M8BonVent.to_Map(map) }.getOrNull()
         }
 
-        if (bons.isNotEmpty()) appDatabase.dao_M8BonVent().insertAll(bons)
+        if (bons.isNotEmpty()) bons.forEach { appDatabase.dao_M8BonVent().upsert(it) }
+    }
+
+    suspend fun delete_All_M8() {
+        appDatabase.dao_M8BonVent().deleteAll()
     }
 }
 
