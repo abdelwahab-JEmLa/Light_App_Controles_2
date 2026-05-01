@@ -384,8 +384,7 @@ fun B_FragMap_DropdownMenu(
 
         val relative_M2Client = FAKE_CLIENT_KEY
 
-        DropdownMenuItem(       //<--
-        //TODO(1): exctract
+        DropdownMenuItem(
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Edit,
@@ -417,8 +416,8 @@ fun B_FragMap_DropdownMenu(
                                     fake_init_val_du_ancien_credits_situation?.toString() ?: ""
                                 isEditingCredits = false
                                 vm.ajoute_credit_et_affiche_compos_image(
-                                    montant = montant,
                                     clientKey = relative_M2Client,
+                                    montant = montant,
                                 )
                             }
                         ),
