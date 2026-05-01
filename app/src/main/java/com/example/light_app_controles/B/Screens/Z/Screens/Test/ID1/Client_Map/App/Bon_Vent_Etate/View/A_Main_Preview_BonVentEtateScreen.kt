@@ -1,11 +1,23 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
 
 import android.content.Context
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -113,95 +125,98 @@ fun Main_Preview_BonVentEtateScreen(
         .sortedByDescending { it.creationTimestamps }
     val latestSit = sitBons.maxByOrNull { it.creationTimestamps }
 
-    Column(modifier = modifier.fillMaxSize()) {
-        if (latestSit == null) {
-            Text(
-                "لا توجد حالة دين جديدة",
-                color = Color.Gray,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(16.dp),
-            )
-            return
-        }
+    Box() {
+        Column(modifier = modifier.fillMaxSize()) {
+            if (latestSit == null) {
+                Text(
+                    "لا توجد حالة دين جديدة",
+                    color = Color.Gray,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(16.dp),
+                )
+                return
+            }
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 4.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            items(allBons, key = { it.keyID }) { b ->
-                val cap = rememberCapturableLayer()
-                val capKey = "${b.creationTimestamps}|${b.keyID}|${b.etateActuellementEst.name}"
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                items(allBons, key = { it.keyID }) { b ->
+                    val cap = rememberCapturableLayer()
+                    val capKey = "${b.creationTimestamps}|${b.keyID}|${b.etateActuellementEst.name}"
 
-                DisposableEffect(capKey) {
-                    ctrl.register(capKey) { cap.capture() }
-                    onDispose { ctrl.unregister(capKey) }
-                }
+                    DisposableEffect(capKey) {
+                        ctrl.register(capKey) { cap.capture() }
+                        onDispose { ctrl.unregister(capKey) }
+                    }
 
-                Box(modifier = cap.modifier) {
-                    when {
-                        b.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit -> {
-                            Situation_Card_ItemView(
-                                allBonVentList = allBonVentList,
-                                relative_M8BonVent = b,
-                                onUpdate = {
-                                    scope.launch {
-                                        vm.update_M8( it)
-                                    }
-                                },
-                                onDelete = {
-                                    scope.launch {
-                                        appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID)
-                                    }
-                                },
-                            )
-                        }
+                    Box(modifier = cap.modifier) {
+                        when {
+                            b.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit -> {
+                                Situation_Card_ItemView(
+                                    allBonVentList = allBonVentList,
+                                    relative_M8BonVent = b,
+                                    onUpdate = {
+                                        scope.launch {
+                                            vm.update_M8(it)
+                                        }
+                                    },
+                                    onDelete = {
+                                        scope.launch {
+                                            appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID)
+                                        }
+                                    },
+                                )
+                            }
 
-                        b.etateActuellementEst.credit_type -> {
-                            Y_Credit_And_Versement_ItemView(
-                                allBonVentList = allBonVentList,
-                                relative_M8BonVent = b,
-                                onUpdate = {
-                                    scope.launch {
-                                        vm.update_M8( it)
-                                    }
-                                },
-                                onDelete = {
-                                    scope.launch {
-                                        appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID)
-                                    }
-                                },
-                            )
-                        }
+                            b.etateActuellementEst.credit_type -> {
+                                Y_Credit_And_Versement_ItemView(
+                                    allBonVentList = allBonVentList,
+                                    relative_M8BonVent = b,
+                                    onUpdate = {
+                                        scope.launch {
+                                            vm.update_M8(it)
+                                        }
+                                    },
+                                    onDelete = {
+                                        scope.launch {
+                                            appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID)
+                                        }
+                                    },
+                                )
+                            }
 
-                        else -> {
-                            Affiche_NonCredit_Etate(
-                                allBonVentList = allBonVentList,
-                                relative_M8BonVent = b,
-                                onUpdate = {
-                                    scope.launch {
-                                        vm.update_M8( it)
-                                    }
-                                },
-                                onDelete = {
-                                    scope.launch {
-                                        appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID)
-                                    }
-                                },
-                            )
+                            else -> {
+                                Affiche_NonCredit_Etate(
+                                    allBonVentList = allBonVentList,
+                                    relative_M8BonVent = b,
+                                    onUpdate = {
+                                        scope.launch {
+                                            vm.update_M8(it)
+                                        }
+                                    },
+                                    onDelete = {
+                                        scope.launch {
+                                            appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID)
+                                        }
+                                    },
+                                )
+                            }
                         }
                     }
                 }
             }
         }
-    }
 
-    Floating_Separated_Button(
-        vm = vm,
-        appDatabase = appDatabase,
-        onClick_Lence_Capture = onLenceCapture,
-    )
+        Floating_Separated_Button(    //<--
+        //TODO(1): pk ca ne saffiche pas quen il n a aucune donne 
+            vm = vm,
+            appDatabase = appDatabase,
+            onClick_Lence_Capture = onLenceCapture,
+        )
+    }
 
     if (showDlg && captured.isNotEmpty()) {
         Afficheur_locale_Image_Captured(

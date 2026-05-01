@@ -23,14 +23,13 @@ class Setter_LongOperations(
     private val appDatabase: AppDatabase,
 ) {
 
+    suspend fun add_New_M8BonVent(bon: M8BonVent)  {
+        appDatabase.dao_M8BonVent().insert(bon)
+    }
     suspend fun update_M8(bon: M8BonVent) = withContext(Dispatchers.IO) {
         appDatabase.dao_M8BonVent().upsert(bon)
     }
 
-    // Uses upsert instead of plain insert to avoid UNIQUE constraint crashes
-    // when the same keyID already exists in Room.
-    // Tip: add @Upsert fun upsertAll(bons: List<M8BonVent>) to your DAO
-    // and replace the loop below with a single dao call for better performance.
     suspend fun insertAll(bons: List<M8BonVent>) = withContext(Dispatchers.IO) {
         bons.forEach { appDatabase.dao_M8BonVent().upsert(it) }
     }

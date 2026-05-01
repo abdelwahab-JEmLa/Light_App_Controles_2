@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -64,6 +65,7 @@ import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.A
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
 data class Button_State(
@@ -198,6 +200,38 @@ fun B_FragMap_DropdownMenu(
     var updateTimestampsProgress by remember { mutableStateOf<Float?>(null) }
     var pendingAction by remember { mutableStateOf<PendingAction?>(null) }
 
+    // CSV stats for But7 label: total rows, new (not in Room), updates (already in Room)
+    var csvRowCount by remember { mutableStateOf<Int?>(null) }
+    var csvNewCount by remember { mutableStateOf<Int?>(null) }
+    var csvUpdateCount by remember { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(vm.active_Datas.list_M8bon) {
+        withContext(Dispatchers.IO) {
+            val csv = M8BonVent.csv_test
+            if (csv.exists() && csv.length() > 0L) {
+                val lines = csv.readLines().filter { it.isNotBlank() }
+                if (lines.size >= 2) {
+                    val headers = lines[0].split(",")
+                    val keyIdx = headers.indexOf("keyID")
+                    val csvKeys = lines.drop(1).mapNotNull { line ->
+                        line.split(",").getOrNull(keyIdx)
+                            ?.trim()?.removeSurrounding("\"")
+                            ?.takeIf { it.isNotBlank() }
+                    }.toSet()
+                    val roomKeys = vm.active_Datas.list_M8bon
+                        ?.map { it.keyID }?.toSet() ?: emptySet()
+                    csvRowCount = csvKeys.size
+                    csvNewCount = (csvKeys - roomKeys).size
+                    csvUpdateCount = (csvKeys intersect roomKeys).size
+                }
+            } else {
+                csvRowCount = 0
+                csvNewCount = 0
+                csvUpdateCount = 0
+            }
+        }
+    }
+
     var isEditingCredits by remember { mutableStateOf(false) }
     var out_val by remember { mutableStateOf("") }
     val creditsFocusRequester = remember { FocusRequester() }
@@ -273,7 +307,7 @@ fun B_FragMap_DropdownMenu(
                 AvertissementDialog(
                     title = action.name,
                     message =
-                            "هل تريد المتابعة؟",
+                        "هل تريد المتابعة؟",
                     onConfirm = {
                         pendingAction = null
                         coroutineScope.launch {
@@ -455,13 +489,26 @@ fun B_FragMap_DropdownMenu(
                 )
             },
             text = {
-                Text(
-                    text = PendingAction.But7_DeleteImport_M8Csv_To_Room.name,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
+                val statsLine = when {
+                    csvRowCount == null -> "..."
+                    csvRowCount == 0    -> "CSV فارغ"
+                    else -> "CSV: $csvRowCount | +${csvNewCount} جديد | ↺${csvUpdateCount} تحديث"
+                }           //<--
+                //TODO(1): fait ici de relence le init du vm
+                Column {
+                    Text(
+                        text = PendingAction.But7_DeleteImport_M8Csv_To_Room.name,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Text(
+                        text = statsLine,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             },
             onClick = {
-                pendingAction = PendingAction.But3_Import_M8Csv_To_Room
+                pendingAction = PendingAction.But7_DeleteImport_M8Csv_To_Room
             }
         )
 

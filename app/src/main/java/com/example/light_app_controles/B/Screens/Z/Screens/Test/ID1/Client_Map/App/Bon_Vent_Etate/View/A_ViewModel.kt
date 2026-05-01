@@ -36,11 +36,14 @@ class A_ViewModel(
     var captureRequested by mutableStateOf(false)
 
     init {
-        active_Datas.list_M8bon = FAKE_ALL_BONS
         active_Datas.focused_M2Client = M2Client.get_default().copy(
             keyID = FAKE_CLIENT_KEY
         )
         active_Datas.focused_period_Key = FAKE_PERIOD_KEY
+
+        viewModelScope.launch {
+            active_Datas.list_M8bon = appDatabase.dao_M8BonVent().getAll()
+        }
     }
 
     override fun onCleared() {
@@ -55,10 +58,7 @@ class A_ViewModel(
     ) {
         val baseTs = System.currentTimeMillis()
         val currentList = active_Datas.list_M8bon?.toMutableList() ?: mutableListOf()
-
-
         val versementBon = M8BonVent(
-            keyID = "fake_key_versement_$baseTs",
             parent_M2Client_KeyID = clientKey,
             parent_M14VentPeriod_KeyId = periodKey,
             etateActuellementEst = M8BonVent.EtateActuellementEst.Versemment,
@@ -78,7 +78,6 @@ class A_ViewModel(
         val newMontant = (latestSit?.montant_principale_du_type ?: 0.0) - montant
 
         val newSituationBon = M8BonVent(
-            keyID = "fake_key_new_sit_${baseTs + 1_000L}",
             parent_M2Client_KeyID = clientKey,
             parent_M14VentPeriod_KeyId = periodKey,
             etateActuellementEst = M8BonVent.EtateActuellementEst.New_Situation_Credit,
@@ -87,9 +86,13 @@ class A_ViewModel(
         )
 
         currentList.add(newSituationBon)
-
         active_Datas.list_M8bon = currentList
         captureRequested = true
+
+        viewModelScope.launch {
+            setter_LongOperations.add_New_M8BonVent(versementBon)
+            setter_LongOperations.add_New_M8BonVent(newSituationBon)
+        }
     }
 
     fun update_M8(it: M8BonVent) {
