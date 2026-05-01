@@ -254,6 +254,8 @@ fun B_FragMap_DropdownMenu(
                         vm.setter_LongOperations.import_M8Csv_To_Room(
                             M8BonVent.csv_test
                         )
+                        vm.reload()
+
                         onDismiss()
                     }
                 },
@@ -315,6 +317,7 @@ fun B_FragMap_DropdownMenu(
                                 vm.setter_LongOperations.delete_All_M8()
                                 vm.setter_LongOperations.insertAll(bons)
                             }
+                            vm.reload()
                             onDismiss()
                         }
                     },
@@ -493,8 +496,7 @@ fun B_FragMap_DropdownMenu(
                     csvRowCount == null -> "..."
                     csvRowCount == 0    -> "CSV فارغ"
                     else -> "CSV: $csvRowCount | +${csvNewCount} جديد | ↺${csvUpdateCount} تحديث"
-                }           //<--
-                //TODO(1): fait ici de relence le init du vm
+                }
                 Column {
                     Text(
                         text = PendingAction.But7_DeleteImport_M8Csv_To_Room.name,

@@ -134,10 +134,7 @@ fun Main_Preview_BonVentEtateScreen(
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(16.dp),
                 )
-                return
-            }
-
-            LazyColumn(
+            } else LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp, vertical = 4.dp),
@@ -210,8 +207,7 @@ fun Main_Preview_BonVentEtateScreen(
             }
         }
 
-        Floating_Separated_Button(    //<--
-        //TODO(1): pk ca ne saffiche pas quen il n a aucune donne 
+        Floating_Separated_Button(
             vm = vm,
             appDatabase = appDatabase,
             onClick_Lence_Capture = onLenceCapture,
