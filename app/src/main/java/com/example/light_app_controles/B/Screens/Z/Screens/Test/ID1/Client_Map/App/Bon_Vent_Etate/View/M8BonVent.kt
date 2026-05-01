@@ -2,6 +2,7 @@ package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.
 
 //noinspection SuspiciousImport,SuspiciousImport
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_Developing_Test
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_MainDataBases_RefProduction
 import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
 import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
@@ -16,6 +17,7 @@ import java.util.Locale
 import java.util.Objects
 import kotlin.collections.filter
 import androidx.compose.ui.graphics.Color
+import java.io.File
 
 @Entity
 data class M8BonVent(
@@ -130,6 +132,7 @@ data class M8BonVent(
             "new_situation" to new_situation,
         )
     }
+
     fun fun_calculative_du_main_val(allBons: List<M8BonVent>): Double {
         val samePeriodClientBons = allBons.filter {
             it.parent_M2Client_KeyID == this.parent_M2Client_KeyID &&
@@ -246,8 +249,13 @@ data class M8BonVent(
         ).child("Datas08BonVent")
 
 
-        val ref_Test = central_MainDataBases_RefProduction
+        val ref_Test = central_Developing_Test
             .child("M8BonVent")
+
+        val csv_test = File(
+            M00CentralParametresOfAllApps.central_Local_Csv,
+            "TestDatas/M8BonVent.csv"
+        )
 
         fun generePushKey() = M00CentralParametresOfAllApps.genereUnPushKeyFireBase(ref)
 
@@ -273,6 +281,96 @@ data class M8BonVent(
                 parent_M2Client_DebugInfos = parent_M2Client_DebugInfos,
                 etateActuellementEst = etateActuellementEst
                     ?: EtateActuellementEst.ON_MODE_COMMEND_ACTUELLEMENT
+            )
+        }
+
+        fun to_Map(map: Map<String, String?>): M8BonVent {
+            return M8BonVent(
+                keyID = map["keyID"] ?: generePushKey(),
+                creationTimestamps = map["creationTimestamps"]?.toLongOrNull()
+                    ?: System.currentTimeMillis(),
+                dernierTimeTampsSynchronisationAvecFireBase = map["dernierTimeTampsSynchronisationAvecFireBase"]?.toLongOrNull()
+                    ?: System.currentTimeMillis(),
+                confirmeCommande_TimeTamp = map["confirmeCommande_TimeTamp"]?.toLongOrNull() ?: 0L,
+                pourcentage_AffichageDuCatalogue_Conficerie = map["pourcentage_AffichageDuCatalogue_Conficerie"]?.toDoubleOrNull()
+                    ?: 0.0,
+                pourcentage_AffichageDuCatalogue_Cosmitiques = map["pourcentage_AffichageDuCatalogue_Cosmitiques"]?.toDoubleOrNull()
+                    ?: 0.0,
+                pourcentage_AffichageDuCatalogue_tebnage = map["pourcentage_AffichageDuCatalogue_tebnage"]?.toDoubleOrNull()
+                    ?: 0.0,
+                nombre_produits_don_dernier_pdf_stoked = map["nombre_produits_don_dernier_pdf_stoked"]?.toIntOrNull()
+                    ?: 0,
+                last_sort_pdf_locale_totale_a_paye = map["last_sort_pdf_locale_totale_a_paye"]?.toDoubleOrNull()
+                    ?: 0.0,
+                path_pdf_bon_file = map["path_pdf_bon_file"] ?: "",
+                parent_M9AppCompt_KeyID = map["parent_M9AppCompt_KeyID"] ?: "null",
+                parent_M9AppCompt_DebugInfos = map["parent_M9AppCompt_DebugInfos"] ?: "null",
+                parent_M14VentPeriod_KeyId = map["parent_M14VentPeriod_KeyId"] ?: "null",
+                parent_M14VentPeriod_DebugInfos = map["parent_M14VentPeriod_DebugInfos"] ?: "null",
+                parent_M2Client_KeyID = map["parent_M2Client_KeyID"] ?: "null",
+                parent_M2Client_DebugInfos = map["parent_M2Client_DebugInfos"] ?: "null",
+                parent_M2Client_OldLongID = map["parent_M2Client_OldLongID"]?.toLongOrNull() ?: 0L,
+                parent_M17Message_KeyID = map["parent_M17Message_KeyID"] ?: "null",
+                parent_M17Message_DebugInfos = map["parent_M17Message_DebugInfos"] ?: "null",
+                its_Confirmation_de_TransactionKeyId = map["its_Confirmation_de_TransactionKeyId"]
+                    ?: "",
+                heurDebutInString = map["heurDebutInString"] ?: SimpleDateFormat(
+                    "HH:mm",
+                    Locale.getDefault()
+                ).format(Date()),
+                heurFinInString = map["heurFinInString"] ?: "Non Defini",
+                its_working_for_wholesaler = map["its_working_for_wholesaler"]?.equals(
+                    "true",
+                    ignoreCase = true
+                ) ?: false,
+                etateActuellementEst = map["etateActuellementEst"]?.let {
+                    runCatching { EtateActuellementEst.valueOf(it) }.getOrDefault(
+                        EtateActuellementEst.ON_MODE_COMMEND_ACTUELLEMENT
+                    )
+                } ?: EtateActuellementEst.ON_MODE_COMMEND_ACTUELLEMENT,
+                vocaleKeyID = map["vocaleKeyID"] ?: "",
+                sonVocaleEstEcoute = map["sonVocaleEstEcoute"]?.equals("true", ignoreCase = true)
+                    ?: false,
+                sonEcoutementEstFaitAutimestamps = map["sonEcoutementEstFaitAutimestamps"]?.toLongOrNull()
+                    ?: 0L,
+                totale_saved = map["totale_saved"]?.toDoubleOrNull() ?: 0.0,
+                vala_supp = map["vala_supp"]?.toIntOrNull() ?: 0,
+                a_etai_imprime_au_moi_ne_foit = map["a_etai_imprime_au_moi_ne_foit"]?.equals(
+                    "true",
+                    ignoreCase = true
+                ) ?: false,
+                cUn_Versement_duBonVentKey = map["cUn_Versement_duBonVentKey"] ?: "",
+                versement_fait = map["versement_fait"]?.toDoubleOrNull() ?: 0.0,
+                ancien_credit = map["ancien_credit"]?.toDoubleOrNull() ?: 0.0,
+                cUn_Credit_duBonVentKey = map["cUn_Credit_duBonVentKey"] ?: "",
+                new_credit_apre_tout_fait = map["new_credit_apre_tout_fait"]?.toDoubleOrNull()
+                    ?: 0.0,
+                demande_Versemet_si_Type = map["demande_Versemet_si_Type"]?.toDoubleOrNull() ?: 0.0,
+                demande_Versemet_si_Type_est_regle = map["demande_Versemet_si_Type_est_regle"]?.equals(
+                    "true",
+                    ignoreCase = true
+                ) ?: false,
+                affiche_le_verssement_au_prochen_print = map["affiche_le_verssement_au_prochen_print"]?.equals(
+                    "true",
+                    ignoreCase = true
+                ) ?: false,
+                sum_De_Credit_Fait = map["sum_De_Credit_Fait"]?.toDoubleOrNull() ?: 0.0,
+                versement = map["versement"]?.toDoubleOrNull() ?: 0.0,
+                credit_fait = map["credit_fait"]?.toDoubleOrNull() ?: 0.0,
+                montant_principale_du_type = map["montant_principale_du_type"]?.toDoubleOrNull()
+                    ?: 0.0,
+                sum_De_Totale_Vents = map["sum_De_Totale_Vents"]?.toDoubleOrNull() ?: 0.0,
+                position_Don_Lis_Cible_Clients_au_VentPeriod = map["position_Don_Lis_Cible_Clients_au_VentPeriod"]?.toIntOrNull()
+                    ?: 0,
+                cLeDataOuvertDuParentList = map["cLeDataOuvertDuParentList"]?.let {
+                    if (it.isBlank()) null else it.equals("true", ignoreCase = true)
+                },
+                cActive = map["cActive"]?.equals("true", ignoreCase = true) ?: false,
+                parentID8C2TypeTransactionKeyByParent = map["parentID8C2TypeTransactionKeyByParent"]
+                    ?: "",
+                vid = map["vid"]?.toLongOrNull() ?: 0L,
+                moulahada = map["moulahada"] ?: "",
+                new_situation = map["new_situation"]?.toDoubleOrNull() ?: 0.0,
             )
         }
 

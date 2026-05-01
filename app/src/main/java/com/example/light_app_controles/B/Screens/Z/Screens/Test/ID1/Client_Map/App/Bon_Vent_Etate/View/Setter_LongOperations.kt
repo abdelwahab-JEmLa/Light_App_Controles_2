@@ -1,9 +1,11 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
 
-import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -11,37 +13,60 @@ import java.io.FileWriter
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
+sealed class FirebaseUploadState {
+    object Idle : FirebaseUploadState()
+    data class InProgress(val done: Int, val total: Int) : FirebaseUploadState()
+    object Success : FirebaseUploadState()
+    data class Error(val message: String) : FirebaseUploadState()
+}
+
 class Setter_LongOperations(
     private val appDatabase: AppDatabase,
 ) {
+    private val _uploadState = MutableStateFlow<FirebaseUploadState>(FirebaseUploadState.Idle)
+    val uploadState: StateFlow<FirebaseUploadState> = _uploadState.asStateFlow()
 
-    suspend fun update_M8(bon: M8BonVent) {
-        withContext(Dispatchers.IO) {
-            appDatabase.dao_M8BonVent().upsert(bon)
-        }
+    suspend fun update_M8(bon: M8BonVent) = withContext(Dispatchers.IO) {
+        appDatabase.dao_M8BonVent().upsert(bon)
     }
 
-    suspend fun insertAll(bons: List<M8BonVent>) {
-        withContext(Dispatchers.IO) {
-            appDatabase.dao_M8BonVent().insertAll(bons)
-        }
+    suspend fun insertAll(bons: List<M8BonVent>) = withContext(Dispatchers.IO) {
+        appDatabase.dao_M8BonVent().insertAll(bons)
     }
 
-    suspend fun exportToCsv(
-        datas: List<M8BonVent>,
-        fileName: String,
+    suspend fun bach_update_FireBase_M8(
+        bons: List<M8BonVent>,
+        refDataBase: DatabaseReference,
     ) = withContext(Dispatchers.IO) {
+        val total = bons.size
+        _uploadState.value = FirebaseUploadState.InProgress(0, total)
+        bons.forEachIndexed { index, bon ->
+            runCatching {
+                suspendCancellableCoroutine { cont ->
+                    refDataBase.child(bon.keyID).setValue(bon.to_Map())
+                        .addOnSuccessListener { cont.resume(Unit) }
+                        .addOnFailureListener { cont.resumeWithException(it) }
+                }
+            }.onFailure {
+                _uploadState.value = FirebaseUploadState.Error(it.message ?: "Unknown error")
+                return@withContext
+            }
+            _uploadState.value = FirebaseUploadState.InProgress(index + 1, total)
+        }
+        _uploadState.value = FirebaseUploadState.Success
+    }
+
+    suspend fun export_M8_Room_To_Csv(csv: File) = withContext(Dispatchers.IO) {
+        val datas = appDatabase.dao_M8BonVent().getAll()
         if (datas.isEmpty()) return@withContext
 
-        val csvFile = File(M00CentralParametresOfAllApps.central_Local_Csv, fileName)
-        csvFile.parentFile?.mkdirs()
+        csv.parentFile?.mkdirs()
 
-        val headers: List<String> = datas.first().to_Map().keys.toList()
-
-        // Build a mutable map of existing rows keyed by keyID
+        val headers = datas.first().to_Map().keys.toList()
         val existingRows: LinkedHashMap<String, List<String>> = linkedMapOf()
-        if (csvFile.exists()) {
-            val lines = csvFile.readLines()
+
+        if (csv.exists()) {
+            val lines = csv.readLines()
             if (lines.size > 1) {
                 val fileHeaders = lines[0].split(",")
                 val keyIdx = fileHeaders.indexOf("keyID")
@@ -53,62 +78,59 @@ class Setter_LongOperations(
             }
         }
 
-        // Upsert: replace existing row or append new one
         datas.forEach { bon ->
-            val row = bon.to_Map().values.map { v -> (v?.toString() ?: "").escapeCsv() }
-            existingRows[bon.keyID] = row
+            existingRows[bon.keyID] = bon.to_Map().values.map { (it?.toString() ?: "").escapeCsv() }
         }
 
-        // Write header + all rows
-        FileWriter(csvFile, false).use { w ->
+        FileWriter(csv, false).use { w ->
             w.write(headers.joinToString(",") + "\n")
-            existingRows.values.forEach { row ->
-                w.write(row.joinToString(",") + "\n")
-            }
+            existingRows.values.forEach { w.write(it.joinToString(",") + "\n") }
         }
     }
-
 
     suspend fun set_scv_m8_au_fireBase(
         csvFile: File,
         refDataBase: DatabaseReference,
     ) = withContext(Dispatchers.IO) {
         if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
-
         val lines = csvFile.readLines().filter { it.isNotBlank() }
-        if (lines.size < 2) return@withContext          // header-only or empty
+        if (lines.size < 2) return@withContext
 
         val headers = lines[0].split(",")
         val keyIdx = headers.indexOf("keyID")
-        if (keyIdx == -1) return@withContext            // malformed CSV
+        if (keyIdx == -1) return@withContext
 
-        val batch: Map<String, Any> = lines.drop(1)
-            .mapNotNull { line ->
-                val cells = line.split(",")
-                val keyID = cells.getOrNull(keyIdx)?.trim()?.removeSurrounding("\"")
-                if (keyID.isNullOrBlank()) return@mapNotNull null
-                val fieldMap: Map<String, Any> = headers
-                    .zip(cells)
-                    .associate { (header, value) ->
-                        header to value.trim().removeSurrounding("\"")
-                    }
-                keyID to fieldMap
+        val bons = lines.drop(1).mapNotNull { line ->
+            val cells = line.split(",")
+            val keyID = cells.getOrNull(keyIdx)?.trim()?.removeSurrounding("\"")
+            if (keyID.isNullOrBlank()) return@mapNotNull null
+            val map = headers.zip(cells).associate { (h, v) ->
+                h to v.trim().removeSurrounding("\"").ifEmpty { null }
             }
-            .toMap()
-
-        if (batch.isEmpty()) return@withContext
-
-        suspendCancellableCoroutine { cont ->
-            refDataBase.updateChildren(batch)
-                .addOnSuccessListener { cont.resume(Unit) }
-                .addOnFailureListener { e -> cont.resumeWithException(e) }
+            runCatching { M8BonVent.to_Map(map) }.getOrNull()
         }
+
+        if (bons.isEmpty()) return@withContext
+        bach_update_FireBase_M8(bons, refDataBase)
     }
 
+    suspend fun import_M8Csv_To_Room(csvFile: File) = withContext(Dispatchers.IO) {
+        if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
+        val lines = csvFile.readLines().filter { it.isNotBlank() }
+        if (lines.size < 2) return@withContext
+
+        val headers = lines[0].split(",")
+        val bons = lines.drop(1).mapNotNull { line ->
+            val cells = line.split(",")
+            val map = headers.zip(cells).associate { (h, v) ->
+                h to v.trim().removeSurrounding("\"").ifEmpty { null }
+            }
+            runCatching { M8BonVent.to_Map(map) }.getOrNull()
+        }
+
+        if (bons.isNotEmpty()) appDatabase.dao_M8BonVent().insertAll(bons)
+    }
 }
 
-// Private helpers
-private fun String.escapeCsv(): String =
-    if (contains(',') || contains('"') || contains('\n'))
-        "\"${replace("\"", "\"\"")}\""
-    else this
+private fun String.escapeCsv() =
+    if (contains(',') || contains('"') || contains('\n')) "\"${replace("\"", "\"\"")}\"" else this

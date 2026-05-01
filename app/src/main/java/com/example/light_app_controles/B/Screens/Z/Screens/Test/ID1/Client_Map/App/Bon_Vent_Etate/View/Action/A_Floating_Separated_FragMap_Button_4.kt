@@ -1,9 +1,7 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action
 
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.AvertissementDialog
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.Local_Organizer
-import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.Z_Content_Buttons.View.ButID_4_upload_datas_fireBase_au_csv
-import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
 import EntreApps.Shared.Models.Relative_Produits.Models.M16CategorieProduit
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
@@ -24,9 +22,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AllInbox
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
@@ -57,10 +58,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import com.example.light_app_controles.Floating_DropDownMenuS.Dialoge.Dialog.Z_Content_Buttons.View.A.Main.Z.Buttons.View.ButID2_ImportFromCSV_DropDownItemWBaseDonne
-import com.example.light_app_controles.Floating_DropDownMenuS.Dialoge.Dialog.Z_Content_Buttons.View.A.Main.Z.Buttons.View.ButID_1_ExportToCSV_DropDownItemWBaseDonne
-import com.example.light_app_controles.Floating_DropDownMenuS.Dialoge.Dialog.Z_Content_Buttons.View.A.Main.Z.Buttons.View.ButID_3_ImportFromCSV
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.A_ViewModel
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.FAKE_CLIENT_KEY
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -152,10 +154,11 @@ fun Floating_Separated_Button(
     }
 }
 
-private enum class PendingAction {
-    UpdateLocalTimestamps,
-    InsertAllFakeBons,
-    ExportM8BonsToLocalCsv,
+enum class PendingAction {
+    But1_Export_M8_Room_To_Csv,
+    But2_Export_M8_Csv_To_FireBase,
+    But3_Import_M8Csv_To_Room,
+    But5_Import_M8_Ui_To_Room,
 }
 
 @Composable
@@ -203,54 +206,61 @@ fun B_FragMap_DropdownMenu(
 
     pendingAction?.let { action ->
         when (action) {
-            PendingAction.ExportM8BonsToLocalCsv -> ExportM8BonsToLocalCsvDialog(
+            PendingAction.But3_Import_M8Csv_To_Room -> AvertissementDialog(
+                title = PendingAction.But3_Import_M8Csv_To_Room.name,
+                message = "سيتم استيراد بيانات M8BonVent.csv إلى قاعدة البيانات المحلية.\n" +
+                        "الصفوف الموجودة ستُحدَّث والجديدة ستُضاف.\n" +
+                        "هل تريد المتابعة؟",
+                confirmLabel = "استيراد",
+                onConfirm = {
+                    pendingAction = null
+                    coroutineScope.launch(Dispatchers.IO) {
+                        vm.setter_LongOperations.import_M8Csv_To_Room(
+                            M8BonVent.csv_test
+                        )
+                        onDismiss()
+                    }
+                },
+                onDismiss = { pendingAction = null },
+            )
+
+            PendingAction.But2_Export_M8_Csv_To_FireBase -> But2_Export_M8_Csv_To_FireBase(
                 vm = vm,
                 coroutineScope = coroutineScope,
                 onDismiss = onDismiss,
                 onPendingClear = { pendingAction = null },
+                action_definition= PendingAction.But2_Export_M8_Csv_To_FireBase,
             )
-            PendingAction.InsertAllFakeBons -> AvertissementDialog(
-                title = "حفظ كل البيانات",
-                message = "سيتم حفظ جميع البيانات الحالية في قاعدة البيانات المحلية. هل تريد المتابعة؟",
-                confirmLabel = "حفظ",
-                onConfirm = {
-                    pendingAction = null
-                    coroutineScope.launch {
-                        vm.active_Datas.list_M8bon?.let { bons ->
-                            vm.setter_LongOperations.insertAll(bons)
+
+            PendingAction.But1_Export_M8_Room_To_Csv -> But1_Export_M8_Room_To_Csv(
+                vm = vm,
+                coroutineScope = coroutineScope,
+                onDismiss = onDismiss,
+                onPendingClear = { pendingAction = null },
+                action_definition= PendingAction.But1_Export_M8_Room_To_Csv,
+            )
+            PendingAction.But5_Import_M8_Ui_To_Room -> {
+                AvertissementDialog(
+                    title = action.name,
+                    message = "سيتم حفظ بيانات M8BonVent من الواجهة إلى قاعدة البيانات المحلية.\n" +
+                            "الصفوف الموجودة ستُحدَّث والجديدة ستُضاف.\n" +
+                            "هل تريد المتابعة؟",
+                    onConfirm = {
+                        pendingAction = null
+                        coroutineScope.launch {
+                            vm.active_Datas.list_M8bon?.let { bons ->
+                                vm.setter_LongOperations.insertAll(bons)
+                            }
+                            onDismiss()
                         }
-                        onDismiss()
-                    }
-                },
-                onDismiss = { pendingAction = null }
-            )
-            PendingAction.UpdateLocalTimestamps -> AvertissementDialog(
-                title = "Mettre à jour dates locales",
-                message = "La date de modification de chaque fichier image local sera " +
-                        "remplacée par l'heure actuelle. Cela forcera un re-téléchargement " +
-                        "lors de la prochaine synchronisation. Continuer ?",
-                confirmLabel = "Mettre à jour",
-                onConfirm = {
-                    pendingAction = null
-                    coroutineScope.launch {
-                        updateTimestampsProgress = 0f
-                        Local_Organizer.updateLocalTimestampsToNow(
-                            list_m3 = list_m3,
-                            onProgress = { p -> updateTimestampsProgress = p }
-                        )
-                        updateTimestampsProgress = null
-                        onDismiss()
-                    }
-                },
-                onDismiss = { pendingAction = null }
-            )
+                    },
+                    onDismiss = { pendingAction = null },
+                )
+            }
+            else -> {}
         }
     }
 
-    val anyRunning = organizeDropBoxProgress != null
-            || organizeLocalProgress != null
-            || syncImages2Progress != null
-            || updateTimestampsProgress != null
 
     DropdownMenu(
         expanded = expanded,
@@ -353,16 +363,69 @@ fun B_FragMap_DropdownMenu(
             },
             text = {
                 Text(
-                    text = "تصدير البيانات إلى CSV محلي",
+                    text = "But1_Export_M8_Room_To_Csv",
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
             onClick = {
-                pendingAction = PendingAction.ExportM8BonsToLocalCsv
+                pendingAction = PendingAction.But1_Export_M8_Room_To_Csv
+            }
+        )
+        DropdownMenuItem(
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.CloudUpload,
+                    contentDescription = null,
+                    tint = Color(0xFFE65100)
+                )
+            },
+            text = {
+                Text(
+                    text = PendingAction.But2_Export_M8_Csv_To_FireBase.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            onClick = {
+                pendingAction = PendingAction.But2_Export_M8_Csv_To_FireBase
+            }
+        )
+        DropdownMenuItem(
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Download,
+                    contentDescription = null,
+                    tint = Color(0xFF6A1B9A)
+                )
+            },
+            text = {
+                Text(
+                    text = PendingAction.But3_Import_M8Csv_To_Room.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            onClick = {
+                pendingAction = PendingAction.But3_Import_M8Csv_To_Room
+            }
+        )
+
+        DropdownMenuItem(
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Save,
+                    contentDescription = null,
+                    tint = Color(0xFF6A1B9A)
+                )
+            },
+            text = {
+                Text(
+                    text = PendingAction.But5_Import_M8_Ui_To_Room.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            onClick = {
+                pendingAction = PendingAction.But5_Import_M8_Ui_To_Room
             }
         )
         HorizontalDivider()
-        ButID_3_ImportFromCSV(appDatabase = appDatabase, enabled = true)
-        ButID_4_upload_datas_fireBase_au_csv(enabled = true)
     }
 }
