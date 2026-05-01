@@ -8,6 +8,7 @@ import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.A
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 private const val TAG = "But2_CsvToFireBase"
 
@@ -26,6 +27,7 @@ fun But2_Export_M8_Csv_To_FireBase(
                 "هل تريد المتابعة؟",
         confirmLabel = "رفع",
         onConfirm = {
+            onPendingClear() // FIX: clear pending before launching (was missing)
             Log.d(TAG, "▶ click confirmé | ref=${M8BonVent.ref_Test} | csv=${M8BonVent.csv_test.absolutePath}")
             coroutineScope.launch(Dispatchers.IO) {
                 runCatching {
@@ -38,6 +40,7 @@ fun But2_Export_M8_Csv_To_FireBase(
                 }.onSuccess {
                     Log.d(TAG, "CSV envoyé avec succès vers Firebase.")
                 }
+                withContext(Dispatchers.Main) { onDismiss() } // FIX: dismiss after operation (was missing)
             }
         },
         onDismiss = onPendingClear,

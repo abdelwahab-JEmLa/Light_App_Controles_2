@@ -205,6 +205,16 @@ fun B_FragMap_DropdownMenu(
     var csvNewCount by remember { mutableStateOf<Int?>(null) }
     var csvUpdateCount by remember { mutableStateOf<Int?>(null) }
 
+    var firebaseRowCount by remember { mutableStateOf<Int?>(null) }
+
+    LaunchedEffect(Unit) {
+        runCatching {
+            firebaseRowCount = vm.setter_LongOperations.get_Firebase_M8_Count(M8BonVent.ref_Test)
+        }.onFailure {
+            firebaseRowCount = -1
+        }
+    }
+
     LaunchedEffect(vm.active_Datas.list_M8bon) {
         withContext(Dispatchers.IO) {
             val csv = M8BonVent.csv_test
@@ -454,10 +464,23 @@ fun B_FragMap_DropdownMenu(
                 )
             },
             text = {
-                Text(
-                    text = PendingAction.But6_Import_M8_FireBase_To_Csv.name,
-                    style = MaterialTheme.typography.bodyMedium,
-                )
+                val fbStatsLine = when {
+                    firebaseRowCount == null -> "..."
+                    firebaseRowCount == -1   -> "Firebase: خطأ في الاتصال"
+                    firebaseRowCount == 0    -> "Firebase: فارغ"
+                    else -> "Firebase: $firebaseRowCount | CSV: ${csvRowCount ?: "..."}"
+                }
+                Column {
+                    Text(
+                        text = PendingAction.But6_Import_M8_FireBase_To_Csv.name,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Text(
+                        text = fbStatsLine,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             },
             onClick = {
                 pendingAction = PendingAction.But6_Import_M8_FireBase_To_Csv

@@ -58,6 +58,25 @@ class Setter_LongOperations(
         }
     }
 
+    // FIX: new helper — fetches only the child count from Firebase without parsing full objects.
+    // Used by the dropdown menu to display a "Firebase: N | CSV: M" stats line for But6.
+    suspend fun get_Firebase_M8_Count(refDataBase: DatabaseReference): Int =
+        withContext(Dispatchers.IO) {
+            val snapshot = suspendCancellableCoroutine<DataSnapshot> { cont ->
+                val listener = object : ValueEventListener {
+                    override fun onDataChange(snap: DataSnapshot) {
+                        if (cont.isActive) cont.resume(snap)
+                    }
+                    override fun onCancelled(error: DatabaseError) {
+                        if (cont.isActive) cont.resumeWithException(error.toException())
+                    }
+                }
+                refDataBase.addListenerForSingleValueEvent(listener)
+                cont.invokeOnCancellation { refDataBase.removeEventListener(listener) }
+            }
+            snapshot.childrenCount.toInt()
+        }
+
     suspend fun export_M8_Room_To_Csv(csv: File) = withContext(Dispatchers.IO) {
         val datas = appDatabase.dao_M8BonVent().getAll()
         if (datas.isEmpty()) return@withContext

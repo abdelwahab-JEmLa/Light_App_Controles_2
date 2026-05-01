@@ -26,14 +26,11 @@ fun But1_Export_M8_Room_To_Csv(
         onConfirm    = {
             onPendingClear()
             coroutineScope.launch(Dispatchers.IO) {
-                val bons = vm.active_Datas.list_M8bon ?: emptyList()
-
-                if (bons.isNotEmpty()) {
-                    vm.setter_LongOperations.export_M8_Room_To_Csv(
-                        csv = M8BonVent.csv_test,
-                    )
-                }
-
+                // FIX: removed dead `bons` cache check — export_M8_Room_To_Csv
+                // already reads directly from Room and guards against empty data internally.
+                vm.setter_LongOperations.export_M8_Room_To_Csv(
+                    csv = M8BonVent.csv_test,
+                )
                 withContext(Dispatchers.Main) { onDismiss() }
             }
         },
