@@ -383,7 +383,6 @@ fun B_FragMap_DropdownMenu(
         }
 
         val relative_M2Client = FAKE_CLIENT_KEY
-
         DropdownMenuItem(
             leadingIcon = {
                 Icon(
