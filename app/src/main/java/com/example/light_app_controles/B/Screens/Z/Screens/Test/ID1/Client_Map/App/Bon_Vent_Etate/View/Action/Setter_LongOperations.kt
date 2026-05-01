@@ -1,30 +1,24 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action
 
+import android.util.Log
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import com.google.firebase.database.DatabaseReference
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileWriter
+import kotlin.collections.forEachIndexed
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-sealed class FirebaseUploadState {
-    object Idle : FirebaseUploadState()
-    data class InProgress(val done: Int, val total: Int) : FirebaseUploadState()
-    object Success : FirebaseUploadState()
-    data class Error(val message: String) : FirebaseUploadState()
-}
+
+private const val TAG = "Setter_LongOperations"
 
 class Setter_LongOperations(
     private val appDatabase: AppDatabase,
 ) {
-    private val _uploadState = MutableStateFlow<FirebaseUploadState>(FirebaseUploadState.Idle)
-    val uploadState: StateFlow<FirebaseUploadState> = _uploadState.asStateFlow()
 
     suspend fun update_M8(bon: M8BonVent) = withContext(Dispatchers.IO) {
         appDatabase.dao_M8BonVent().upsert(bon)
@@ -38,8 +32,7 @@ class Setter_LongOperations(
         bons: List<M8BonVent>,
         refDataBase: DatabaseReference,
     ) = withContext(Dispatchers.IO) {
-        val total = bons.size
-        _uploadState.value = FirebaseUploadState.InProgress(0, total)
+        Log.d(TAG, "bach_update_FireBase_M8: ref=${refDataBase} | bons=${bons.size}")
         bons.forEachIndexed { index, bon ->
             runCatching {
                 suspendCancellableCoroutine { cont ->
@@ -47,13 +40,16 @@ class Setter_LongOperations(
                         .addOnSuccessListener { cont.resume(Unit) }
                         .addOnFailureListener { cont.resumeWithException(it) }
                 }
-            }.onFailure {
-                _uploadState.value = FirebaseUploadState.Error(it.message ?: "Unknown error")
+            }.onFailure { err ->
+                Log.e(
+                    TAG,
+                    "bach_update_FireBase_M8: échec à l'index $index | keyID=${bon.keyID} | " +
+                            "raison=${err.message ?: "inconnue"}",
+                    err,
+                )
                 return@withContext
             }
-            _uploadState.value = FirebaseUploadState.InProgress(index + 1, total)
         }
-        _uploadState.value = FirebaseUploadState.Success
     }
 
     suspend fun export_M8_Room_To_Csv(csv: File) = withContext(Dispatchers.IO) {
@@ -92,13 +88,23 @@ class Setter_LongOperations(
         csvFile: File,
         refDataBase: DatabaseReference,
     ) = withContext(Dispatchers.IO) {
-        if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
+        Log.d(TAG, "set_scv_m8_au_fireBase: ref=${refDataBase} | csv=${csvFile.absolutePath}")
+        if (!csvFile.exists() || csvFile.length() == 0L) {
+            Log.w(TAG, "set_scv_m8_au_fireBase: fichier absent ou vide → ${csvFile.absolutePath}")
+            return@withContext
+        }
         val lines = csvFile.readLines().filter { it.isNotBlank() }
-        if (lines.size < 2) return@withContext
+        if (lines.size < 2) {
+            Log.w(TAG, "set_scv_m8_au_fireBase: fichier sans données (lignes=${lines.size})")
+            return@withContext
+        }
 
         val headers = lines[0].split(",")
         val keyIdx = headers.indexOf("keyID")
-        if (keyIdx == -1) return@withContext
+        if (keyIdx == -1) {
+            Log.e(TAG, "set_scv_m8_au_fireBase: colonne 'keyID' introuvable dans les entêtes → $headers")
+            return@withContext
+        }
 
         val bons = lines.drop(1).mapNotNull { line ->
             val cells = line.split(",")
@@ -107,10 +113,17 @@ class Setter_LongOperations(
             val map = headers.zip(cells).associate { (h, v) ->
                 h to v.trim().removeSurrounding("\"").ifEmpty { null }
             }
-            runCatching { M8BonVent.to_Map(map) }.getOrNull()
+            runCatching { M8BonVent.to_Map(map) }.onFailure { err ->
+                Log.e(TAG, "set_scv_m8_au_fireBase: impossible de parser la ligne keyID=$keyID | ${err.message}", err)
+            }.getOrNull()
         }
 
-        if (bons.isEmpty()) return@withContext
+        if (bons.isEmpty()) {
+            Log.w(TAG, "set_scv_m8_au_fireBase: aucun bon valide extrait du CSV → abandon")
+            return@withContext
+        }
+
+        Log.d(TAG, "set_scv_m8_au_fireBase: envoi de ${bons.size} bons vers Firebase…")
         bach_update_FireBase_M8(bons, refDataBase)
     }
 

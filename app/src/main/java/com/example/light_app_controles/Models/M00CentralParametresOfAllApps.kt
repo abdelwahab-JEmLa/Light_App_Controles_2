@@ -78,8 +78,8 @@ data class M00CentralParametresOfAllApps(
         val central_All_References_Production = Firebase.database
             .getReference("00_DataBase_06_06")
 
-        val central_Developing_Test = Firebase.database
-            .getReference("Developing_Test")
+        val central_Developing_Test = central_All_References_Production
+            .child("Developing_Test")
 
         val central_MainDataBases_RefProduction = central_All_References_Production
             .child("A_Main_DataBases")

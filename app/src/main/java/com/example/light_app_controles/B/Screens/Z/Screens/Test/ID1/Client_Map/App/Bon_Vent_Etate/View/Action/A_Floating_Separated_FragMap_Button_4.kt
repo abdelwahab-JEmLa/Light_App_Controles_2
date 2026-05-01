@@ -380,6 +380,8 @@ fun B_FragMap_DropdownMenu(
                 )
             },
             text = {
+                // Progress/error display is handled by But2_Export_M8_Csv_To_FireBase
+                // (shown via the pendingAction when-block above), driven by uploadState.
                 Text(
                     text = PendingAction.But2_Export_M8_Csv_To_FireBase.name,
                     style = MaterialTheme.typography.bodyMedium,
