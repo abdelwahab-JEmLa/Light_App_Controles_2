@@ -231,7 +231,7 @@ fun B_FragMap_DropdownMenu(
                 coroutineScope = coroutineScope,
                 onDismiss = onDismiss,
                 onPendingClear = { pendingAction = null },
-                action_definition= PendingAction.But2_Export_M8_Csv_To_FireBase,
+                action_definition = PendingAction.But2_Export_M8_Csv_To_FireBase,
             )
 
             PendingAction.But1_Export_M8_Room_To_Csv -> But1_Export_M8_Room_To_Csv(
@@ -239,8 +239,9 @@ fun B_FragMap_DropdownMenu(
                 coroutineScope = coroutineScope,
                 onDismiss = onDismiss,
                 onPendingClear = { pendingAction = null },
-                action_definition= PendingAction.But1_Export_M8_Room_To_Csv,
+                action_definition = PendingAction.But1_Export_M8_Room_To_Csv,
             )
+
             PendingAction.But6_Import_M8_FireBase_To_Csv -> But6_Import_M8_FireBase_To_Csv(
                 vm = vm,
                 coroutineScope = coroutineScope,
@@ -248,6 +249,7 @@ fun B_FragMap_DropdownMenu(
                 onPendingClear = { pendingAction = null },
                 action_definition = PendingAction.But6_Import_M8_FireBase_To_Csv,
             )
+
             PendingAction.But5_Import_M8_Ui_To_Room -> {
                 AvertissementDialog(
                     title = action.name,
@@ -266,6 +268,7 @@ fun B_FragMap_DropdownMenu(
                     onDismiss = { pendingAction = null },
                 )
             }
+
             else -> {}
         }
     }
@@ -326,10 +329,13 @@ fun B_FragMap_DropdownMenu(
                             onDone = {
                                 val parsed = out_val.toIntOrNull()
                                 val montant = parsed?.toDouble() ?: 0.0
-                                val diff = (fake_init_val_du_ancien_credits_situation ?: 0) - (parsed ?: 0)
+                                val diff =
+                                    (fake_init_val_du_ancien_credits_situation ?: 0) - (parsed ?: 0)
 
-                                if (parsed != null) fake_init_val_du_ancien_credits_situation = parsed
-                                out_val = fake_init_val_du_ancien_credits_situation?.toString() ?: ""
+                                if (parsed != null) fake_init_val_du_ancien_credits_situation =
+                                    parsed
+                                out_val =
+                                    fake_init_val_du_ancien_credits_situation?.toString() ?: ""
                                 isEditingCredits = false
                                 vm.ajoute_credit_et_affiche_compos_image(
                                     montant = montant,
@@ -338,7 +344,8 @@ fun B_FragMap_DropdownMenu(
                             }
                         ),
                         label = {
-                            val diff = (fake_init_val_du_ancien_credits_situation ?: 0) - (out_val.toIntOrNull() ?: 0)
+                            val diff = (fake_init_val_du_ancien_credits_situation
+                                ?: 0) - (out_val.toIntOrNull() ?: 0)
                             Text(
                                 text = "الرصيد السابق — $diff",
                                 style = MaterialTheme.typography.labelSmall,
