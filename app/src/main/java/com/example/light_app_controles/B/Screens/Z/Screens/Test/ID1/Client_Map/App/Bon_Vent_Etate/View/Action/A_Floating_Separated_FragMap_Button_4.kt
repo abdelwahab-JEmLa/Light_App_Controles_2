@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.AllInbox
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.Details
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FilterList
@@ -55,6 +56,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntOffset
@@ -163,6 +165,9 @@ enum class PendingAction() {
     But5_Import_M8_Ui_To_Room,
     But6_Import_M8_FireBase_To_Csv,
     But7_DeleteImport_M8Csv_To_Room,
+    But8_DeleteAll_M8_Room,
+    ;
+
 }
 
 @Composable
@@ -252,6 +257,22 @@ fun B_FragMap_DropdownMenu(
 
     pendingAction?.let { action ->
         when (action) {
+            PendingAction.But8_DeleteAll_M8_Room -> AvertissementDialog(
+                title = PendingAction.But8_DeleteAll_M8_Room.name,
+                message =
+                        "هل تريد المتابعة؟",
+                confirmLabel = "yes",
+                onConfirm = {
+                    pendingAction = null
+                    coroutineScope.launch(Dispatchers.IO) {
+                        vm.setter_LongOperations.delete_All_M8()
+                        vm.reload()
+                        onDismiss()
+                    }
+                },
+                onDismiss = { pendingAction = null },
+            )
+
             PendingAction.But3_Import_M8Csv_To_Room -> AvertissementDialog(
                 title = PendingAction.But3_Import_M8Csv_To_Room.name,
                 message = "سيتم استيراد بيانات M8BonVent.csv إلى قاعدة البيانات المحلية.\n" +
@@ -536,8 +557,28 @@ fun B_FragMap_DropdownMenu(
                 pendingAction = PendingAction.But7_DeleteImport_M8Csv_To_Room
             }
         )
-
-        DropdownMenuItem(
+        HorizontalDivider()
+        DropdownMenuItem(      //<--
+            //TODO(1): extract don un separated fichie
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Default.Details,
+                    contentDescription = null,
+                    tint = Color(0xFF6A1B9A)
+                )
+            },
+            text = {
+                Text(
+                    text = PendingAction.But8_DeleteAll_M8_Room.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            onClick = {
+                pendingAction = PendingAction.But8_DeleteAll_M8_Room
+            }
+        )
+        DropdownMenuItem(       //<--
+        //TODO(1): extract don un separated fichie
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Download,
@@ -555,6 +596,7 @@ fun B_FragMap_DropdownMenu(
                 pendingAction = PendingAction.But3_Import_M8Csv_To_Room
             }
         )
+        HorizontalDivider()
 
         DropdownMenuItem(
             leadingIcon = {

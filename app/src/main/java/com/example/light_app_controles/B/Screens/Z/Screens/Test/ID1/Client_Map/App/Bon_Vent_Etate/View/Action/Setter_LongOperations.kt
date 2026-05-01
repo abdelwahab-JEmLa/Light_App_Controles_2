@@ -58,8 +58,6 @@ class Setter_LongOperations(
         }
     }
 
-    // FIX: new helper — fetches only the child count from Firebase without parsing full objects.
-    // Used by the dropdown menu to display a "Firebase: N | CSV: M" stats line for But6.
     suspend fun get_Firebase_M8_Count(refDataBase: DatabaseReference): Int =
         withContext(Dispatchers.IO) {
             val snapshot = suspendCancellableCoroutine<DataSnapshot> { cont ->
