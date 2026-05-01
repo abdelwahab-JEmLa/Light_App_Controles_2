@@ -75,7 +75,7 @@ fun A_FastAdd_FloatingSeparated_Button_1(
     ),
     vm: A_ViewModel,
     on_vent_key: String = "",
-    bons: List<M8BonVent>?,
+    bons: List<M8BonVent>? = vm.active_Datas.list_M8bon,
 ) {
     val updatedButtonState = buttonState.copy(its_Active = true)
 
