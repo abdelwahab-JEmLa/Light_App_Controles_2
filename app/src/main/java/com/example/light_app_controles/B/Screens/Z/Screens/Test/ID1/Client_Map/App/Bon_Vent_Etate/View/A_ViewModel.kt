@@ -34,7 +34,9 @@ class A_ViewModel(
     init {
 
         viewModelScope.launch {
-            active_Datas.list_M8bon = appDatabase.dao_M8BonVent().getAll()
+            active_Datas.list_M8bon = (appDatabase.dao_M8BonVent().getAll()
+                 //   + fake_new_sit
+                    )
         }
     }
 

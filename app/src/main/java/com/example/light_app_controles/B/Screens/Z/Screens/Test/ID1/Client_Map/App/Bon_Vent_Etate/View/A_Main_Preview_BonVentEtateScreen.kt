@@ -45,6 +45,14 @@ import java.util.Locale
 const val FAKE_CLIENT_KEY = "-OWI8JQlhGjA_HzMCGFD"
 const val Targted_Bon = "-OrVHbH6u_C6TT153tUR"
 
+val fake_new_sit = M8BonVent(         //<--
+//TODO(1): pk ca ne s affiche pas 
+    parent_M2Client_KeyID = FAKE_CLIENT_KEY,
+    montant_principale_du_type = 10890.00,
+    creationTimestamps = System.currentTimeMillis() + 1_000L,
+    etateActuellementEst = M8BonVent.EtateActuellementEst.New_Situation_Credit
+)
+
 private val CREDIT_VERSEMENT_STATES = setOf(
     M8BonVent.EtateActuellementEst.COMMANDE_LIVRAI,
 
@@ -52,6 +60,7 @@ private val CREDIT_VERSEMENT_STATES = setOf(
     M8BonVent.EtateActuellementEst.Credit,
     M8BonVent.EtateActuellementEst.Cette_Transaction_Type_Est_Credit,
     M8BonVent.EtateActuellementEst.Demande_Versemet,
+    M8BonVent.EtateActuellementEst.New_Situation_Credit,
 )
 
 @Composable
