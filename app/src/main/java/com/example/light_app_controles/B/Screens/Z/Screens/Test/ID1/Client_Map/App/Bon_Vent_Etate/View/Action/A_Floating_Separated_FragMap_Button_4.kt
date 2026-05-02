@@ -68,6 +68,28 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.roundToInt
 
+/** RFC-4180-aware CSV line splitter – handles quoted commas and escaped double-quotes (""). */
+private fun String.splitCsvLine(): List<String> {
+    val result = mutableListOf<String>()
+    val current = StringBuilder()
+    var inQuotes = false
+    var i = 0
+    while (i < length) {
+        val c = this[i]
+        when {
+            c == '"' && inQuotes && i + 1 < length && this[i + 1] == '"' -> {
+                current.append('"'); i += 2; continue
+            }
+            c == '"' -> inQuotes = !inQuotes
+            c == ',' && !inQuotes -> { result.add(current.toString()); current.clear() }
+            else -> current.append(c)
+        }
+        i++
+    }
+    result.add(current.toString())
+    return result
+}
+
 data class Button_State(
     val showLabels: Boolean = true,
     val its_Active: Boolean = false,
@@ -221,7 +243,7 @@ fun B_FragMap_DropdownMenu(
             if (csv.exists() && csv.length() > 0L) {
                 val lines = csv.readLines().filter { it.isNotBlank() }
                 if (lines.size >= 2) {
-                    val headers  = lines[0].split(",")
+                    val headers  = lines[0].splitCsvLine()
                     val keyIdx   = headers.indexOf("keyID")
                     val etatIdx  = headers.indexOf("etateActuellementEst")
                     val creditNames = M8BonVent.EtateActuellementEst.values()
@@ -231,7 +253,7 @@ fun B_FragMap_DropdownMenu(
 
                     val dataLines = lines.drop(1)
                     val csvKeys = dataLines.mapNotNull { line ->
-                        line.split(",").getOrNull(keyIdx)
+                        line.splitCsvLine().getOrNull(keyIdx)
                             ?.trim()?.removeSurrounding("\"")
                             ?.takeIf { it.isNotBlank() }
                     }.toSet()
@@ -242,7 +264,7 @@ fun B_FragMap_DropdownMenu(
                     csvNewCount    = (csvKeys - roomKeys).size
                     csvUpdateCount = (csvKeys intersect roomKeys).size
                     csvCreditCount = dataLines.count { line ->
-                        val cells = line.split(",")
+                        val cells = line.splitCsvLine()
                         val etat  = cells.getOrNull(etatIdx)
                             ?.trim()?.removeSurrounding("\"")
                         etat != null && etat in creditNames

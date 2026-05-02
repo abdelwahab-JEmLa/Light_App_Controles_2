@@ -1,6 +1,5 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action
 
-import android.util.Log
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import com.google.firebase.database.DataSnapshot
@@ -12,19 +11,16 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileWriter
-import kotlin.collections.forEachIndexed
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-
-
-private const val TAG = "Setter_LongOperations"
 
 class Setter_LongOperations(
     private val appDatabase: AppDatabase,
 ) {
-    suspend fun add_New_M8BonVent(bon: M8BonVent)  {
+    suspend fun add_New_M8BonVent(bon: M8BonVent) {
         appDatabase.dao_M8BonVent().insert(bon)
     }
+
     suspend fun update_M8(bon: M8BonVent) = withContext(Dispatchers.IO) {
         appDatabase.dao_M8BonVent().upsert(bon)
     }
@@ -37,7 +33,6 @@ class Setter_LongOperations(
         bons: List<M8BonVent>,
         refDataBase: DatabaseReference,
     ) = withContext(Dispatchers.IO) {
-        Log.d(TAG, "bach_update_FireBase_M8: ref=${refDataBase} | bons=${bons.size}")
         bons.forEachIndexed { index, bon ->
             runCatching {
                 suspendCancellableCoroutine { cont ->
@@ -45,42 +40,16 @@ class Setter_LongOperations(
                         .addOnSuccessListener { cont.resume(Unit) }
                         .addOnFailureListener { cont.resumeWithException(it) }
                 }
-            }.onFailure { err ->
-                Log.e(
-                    TAG,
-                    "bach_update_FireBase_M8: échec à l'index $index | keyID=${bon.keyID} | " +
-                            "raison=${err.message ?: "inconnue"}",
-                    err,
-                )
-                return@withContext
-            }
+            }.onFailure { return@withContext }
         }
     }
 
-    /**
-     * Returns (totalCount, creditCount) in a single Firebase fetch.
-     * creditCount = bons whose etateActuellementEst has credit_type == true.
-     */
     suspend fun get_Firebase_M8_Counts(refDataBase: DatabaseReference): Pair<Int, Int> =
         withContext(Dispatchers.IO) {
             val creditNames = M8BonVent.EtateActuellementEst.values()
-                .filter { it.credit_type }
-                .map { it.name }
-                .toSet()
+                .filter { it.credit_type }.map { it.name }.toSet()
 
-            val snapshot = suspendCancellableCoroutine<DataSnapshot> { cont ->
-                val listener = object : ValueEventListener {
-                    override fun onDataChange(snap: DataSnapshot) {
-                        if (cont.isActive) cont.resume(snap)
-                    }
-                    override fun onCancelled(error: DatabaseError) {
-                        if (cont.isActive) cont.resumeWithException(error.toException())
-                    }
-                }
-                refDataBase.addListenerForSingleValueEvent(listener)
-                cont.invokeOnCancellation { refDataBase.removeEventListener(listener) }
-            }
-
+            val snapshot = suspendFirebaseSnapshot(refDataBase)
             val total = snapshot.childrenCount.toInt()
             val creditCount = snapshot.children.count { child ->
                 val raw = child.value
@@ -89,28 +58,12 @@ class Setter_LongOperations(
                 val etat = (raw as Map<String, Any?>)["etateActuellementEst"]?.toString()
                 etat != null && etat in creditNames
             }
-            Log.d(TAG, "get_Firebase_M8_Counts: ref=$refDataBase | total=$total | credit=$creditCount")
             Pair(total, creditCount)
         }
 
     suspend fun get_Firebase_M8_Count(refDataBase: DatabaseReference): Int =
         withContext(Dispatchers.IO) {
-            Log.d(TAG, "get_Firebase_M8_Count: envoi vers ref=${refDataBase}")
-            val snapshot = suspendCancellableCoroutine<DataSnapshot> { cont ->
-                val listener = object : ValueEventListener {
-                    override fun onDataChange(snap: DataSnapshot) {
-                        if (cont.isActive) cont.resume(snap)
-                    }
-                    override fun onCancelled(error: DatabaseError) {
-                        if (cont.isActive) cont.resumeWithException(error.toException())
-                    }
-                }
-                refDataBase.addListenerForSingleValueEvent(listener)
-                cont.invokeOnCancellation { refDataBase.removeEventListener(listener) }
-            }
-            val count = snapshot.childrenCount.toInt()
-            Log.d(TAG, "get_Firebase_M8_Count: ref=${refDataBase} | count=$count")
-            count
+            suspendFirebaseSnapshot(refDataBase).childrenCount.toInt()
         }
 
     suspend fun export_M8_Room_To_Csv(csv: File) = withContext(Dispatchers.IO) {
@@ -125,15 +78,14 @@ class Setter_LongOperations(
         if (csv.exists()) {
             val lines = csv.readLines()
             if (lines.size > 1) {
-                val fileHeaders = lines[0].split(",")
+                val fileHeaders = lines[0].splitCsvLine()
                 val keyIdx = fileHeaders.indexOf("keyID")
                 lines.drop(1).forEach { line ->
-                    val cells = line.split(",")
+                    val cells = line.splitCsvLine()
                     val id = cells.getOrNull(keyIdx) ?: ""
                     if (id.isNotEmpty()) existingRows[id] = cells
                 }
-            }         //<--
-            //TODO(1): asscre ici que le                  "etateActuellementEst" to etateActuellementEst.name, 
+            }
         }
 
         datas.forEach { bon ->
@@ -142,7 +94,9 @@ class Setter_LongOperations(
 
         FileWriter(csv, false).use { w ->
             w.write(headers.joinToString(",") + "\n")
-            existingRows.values.forEach { w.write(it.joinToString(",") + "\n") }
+            existingRows.values.forEach { cells ->
+                w.write(cells.map { it.escapeCsv() }.joinToString(",") + "\n")
+            }
         }
     }
 
@@ -150,42 +104,25 @@ class Setter_LongOperations(
         csvFile: File,
         refDataBase: DatabaseReference,
     ) = withContext(Dispatchers.IO) {
-        Log.d(TAG, "set_scv_m8_au_fireBase: ref=${refDataBase} | csv=${csvFile.absolutePath}")
-        if (!csvFile.exists() || csvFile.length() == 0L) {
-            Log.w(TAG, "set_scv_m8_au_fireBase: fichier absent ou vide → ${csvFile.absolutePath}")
-            return@withContext
-        }
+        if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
         val lines = csvFile.readLines().filter { it.isNotBlank() }
-        if (lines.size < 2) {
-            Log.w(TAG, "set_scv_m8_au_fireBase: fichier sans données (lignes=${lines.size})")
-            return@withContext
-        }
+        if (lines.size < 2) return@withContext
 
-        val headers = lines[0].split(",")
+        val headers = lines[0].splitCsvLine()
         val keyIdx = headers.indexOf("keyID")
-        if (keyIdx == -1) {
-            Log.e(TAG, "set_scv_m8_au_fireBase: colonne 'keyID' introuvable dans les entêtes → $headers")
-            return@withContext
-        }
+        if (keyIdx == -1) return@withContext
 
         val bons = lines.drop(1).mapNotNull { line ->
-            val cells = line.split(",")
+            val cells = line.splitCsvLine()
             val keyID = cells.getOrNull(keyIdx)?.trim()?.removeSurrounding("\"")
             if (keyID.isNullOrBlank()) return@mapNotNull null
             val map = headers.zip(cells).associate { (h, v) ->
                 h to v.trim().removeSurrounding("\"").ifEmpty { null }
             }
-            runCatching { M8BonVent.to_Map(map) }.onFailure { err ->
-                Log.e(TAG, "set_scv_m8_au_fireBase: impossible de parser la ligne keyID=$keyID | ${err.message}", err)
-            }.getOrNull()
+            runCatching { M8BonVent.to_Map(map) }.getOrNull()
         }
 
-        if (bons.isEmpty()) {
-            Log.w(TAG, "set_scv_m8_au_fireBase: aucun bon valide extrait du CSV → abandon")
-            return@withContext
-        }
-
-        Log.d(TAG, "set_scv_m8_au_fireBase: envoi de ${bons.size} bons vers Firebase…")
+        if (bons.isEmpty()) return@withContext
         bach_update_FireBase_M8(bons, refDataBase)
     }
 
@@ -193,58 +130,17 @@ class Setter_LongOperations(
         refDataBase: DatabaseReference,
         csvFile: File,
     ) = withContext(Dispatchers.IO) {
-        Log.d(TAG, "import_M8_FireBase_To_Csv: ref=$refDataBase | csv=${csvFile.absolutePath}")
-
-        val snapshot = suspendCancellableCoroutine<DataSnapshot> { cont ->
-            val listener = object : ValueEventListener {
-                override fun onDataChange(snap: DataSnapshot) {
-                    if (cont.isActive) cont.resume(snap)
-                }
-                override fun onCancelled(error: DatabaseError) {
-                    if (cont.isActive) cont.resumeWithException(error.toException())
-                }
-            }
-            refDataBase.addListenerForSingleValueEvent(listener)
-            cont.invokeOnCancellation { refDataBase.removeEventListener(listener) }
-        }
+        val snapshot = suspendFirebaseSnapshot(refDataBase)
 
         val bons = snapshot.children.mapNotNull { child ->
             val raw = child.value
             if (raw !is Map<*, *>) return@mapNotNull null
             @Suppress("UNCHECKED_CAST")
             val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
-
-            // Diagnostic: log raw etateActuellementEst before to_Map() swallows parse errors.
-            // If valueOf() fails silently, every bon falls back to ON_MODE_COMMEND_ACTUELLEMENT.
-            val rawEtat = map["etateActuellementEst"]
-            val parsedEtat = rawEtat?.let {
-                runCatching { M8BonVent.EtateActuellementEst.valueOf(it) }
-                    .onFailure { err ->
-                        Log.w(
-                            TAG,
-                            "import_M8_FireBase_To_Csv: valueOf échoué pour etateActuellementEst='$rawEtat'" +
-                                    " | keyID=${child.key} → fallback ON_MODE_COMMEND_ACTUELLEMENT | ${err.message}",
-                        )
-                    }
-                    .getOrNull()
-            }
-            Log.d(
-                TAG,
-                "import_M8_FireBase_To_Csv: keyID=${child.key}" +
-                        " | etateRaw=$rawEtat | etatParsed=$parsedEtat",
-            )
-
-            runCatching { M8BonVent.to_Map(map) }.onFailure { err ->
-                Log.e(TAG, "import_M8_FireBase_To_Csv: parse échoué | keyID=${child.key} | ${err.message}", err)
-            }.getOrNull()
+            runCatching { M8BonVent.to_Map(map) }.getOrNull()
         }
 
-        if (bons.isEmpty()) {
-            Log.w(TAG, "import_M8_FireBase_To_Csv: aucun bon valide extrait de Firebase → abandon")
-            return@withContext
-        }
-
-        Log.d(TAG, "import_M8_FireBase_To_Csv: ${bons.size} bons récupérés, écriture CSV…")
+        if (bons.isEmpty()) return@withContext
 
         csvFile.parentFile?.mkdirs()
 
@@ -254,10 +150,10 @@ class Setter_LongOperations(
         if (csvFile.exists()) {
             val lines = csvFile.readLines()
             if (lines.size > 1) {
-                val fileHeaders = lines[0].split(",")
+                val fileHeaders = lines[0].splitCsvLine()
                 val keyIdx = fileHeaders.indexOf("keyID")
                 lines.drop(1).forEach { line ->
-                    val cells = line.split(",")
+                    val cells = line.splitCsvLine()
                     val id = cells.getOrNull(keyIdx) ?: ""
                     if (id.isNotEmpty()) existingRows[id] = cells
                 }
@@ -270,10 +166,10 @@ class Setter_LongOperations(
 
         FileWriter(csvFile, false).use { w ->
             w.write(headers.joinToString(",") + "\n")
-            existingRows.values.forEach { w.write(it.joinToString(",") + "\n") }
+            existingRows.values.forEach { cells ->
+                w.write(cells.map { it.escapeCsv() }.joinToString(",") + "\n")
+            }
         }
-
-        Log.d(TAG, "import_M8_FireBase_To_Csv: CSV mis à jour avec ${bons.size} bons.")
     }
 
     suspend fun import_M8Csv_To_Room(csvFile: File) = withContext(Dispatchers.IO) {
@@ -281,9 +177,9 @@ class Setter_LongOperations(
         val lines = csvFile.readLines().filter { it.isNotBlank() }
         if (lines.size < 2) return@withContext
 
-        val headers = lines[0].split(",")
+        val headers = lines[0].splitCsvLine()
         val bons = lines.drop(1).mapNotNull { line ->
-            val cells = line.split(",")
+            val cells = line.splitCsvLine()
             val map = headers.zip(cells).associate { (h, v) ->
                 h to v.trim().removeSurrounding("\"").ifEmpty { null }
             }
@@ -296,9 +192,26 @@ class Setter_LongOperations(
     suspend fun import_M8_FireBase_To_Room(
         refDataBase: DatabaseReference,
     ) = withContext(Dispatchers.IO) {
-        Log.d(TAG, "import_M8_FireBase_To_Room: ref=$refDataBase")
+        val snapshot = suspendFirebaseSnapshot(refDataBase)
 
-        val snapshot = suspendCancellableCoroutine<DataSnapshot> { cont ->
+        val bons = snapshot.children.mapNotNull { child ->
+            val raw = child.value
+            if (raw !is Map<*, *>) return@mapNotNull null
+            @Suppress("UNCHECKED_CAST")
+            val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
+            runCatching { M8BonVent.to_Map(map) }.getOrNull()
+        }
+
+        if (bons.isEmpty()) return@withContext
+        bons.forEach { appDatabase.dao_M8BonVent().upsert(it) }
+    }
+
+    suspend fun delete_All_M8() {
+        appDatabase.dao_M8BonVent().deleteAll()
+    }
+
+    private suspend fun suspendFirebaseSnapshot(ref: DatabaseReference): DataSnapshot =
+        suspendCancellableCoroutine { cont ->
             val listener = object : ValueEventListener {
                 override fun onDataChange(snap: DataSnapshot) {
                     if (cont.isActive) cont.resume(snap)
@@ -307,34 +220,35 @@ class Setter_LongOperations(
                     if (cont.isActive) cont.resumeWithException(error.toException())
                 }
             }
-            refDataBase.addListenerForSingleValueEvent(listener)
-            cont.invokeOnCancellation { refDataBase.removeEventListener(listener) }
+            ref.addListenerForSingleValueEvent(listener)
+            cont.invokeOnCancellation { ref.removeEventListener(listener) }
         }
-
-        val bons = snapshot.children.mapNotNull { child ->
-            val raw = child.value
-            if (raw !is Map<*, *>) return@mapNotNull null
-            @Suppress("UNCHECKED_CAST")
-            val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
-            runCatching { M8BonVent.to_Map(map) }.onFailure { err ->
-                Log.e(TAG, "import_M8_FireBase_To_Room: parse échoué | keyID=${child.key} | ${err.message}", err)
-            }.getOrNull()
-        }
-
-        if (bons.isEmpty()) {
-            Log.w(TAG, "import_M8_FireBase_To_Room: aucun bon valide extrait de Firebase → abandon")
-            return@withContext
-        }
-
-        Log.d(TAG, "import_M8_FireBase_To_Room: ${bons.size} bons récupérés, insertion en Room…")
-        bons.forEach { appDatabase.dao_M8BonVent().upsert(it) }
-        Log.d(TAG, "import_M8_FireBase_To_Room: Room mis à jour avec ${bons.size} bons.")
-    }
-
-    suspend fun delete_All_M8() {
-        appDatabase.dao_M8BonVent().deleteAll()
-    }
 }
 
-private fun String.escapeCsv() =
-    if (contains(',') || contains('"') || contains('\n')) "\"${replace("\"", "\"\"")}\"" else this
+private fun String.escapeCsv(): String {
+    val sanitized = replace("\r\n", " ").replace("\n", " ").replace("\r", " ")
+    return if (sanitized.contains(',') || sanitized.contains('"')) {
+        "\"${sanitized.replace("\"", "\"\"")}\""
+    } else sanitized
+}
+
+private fun String.splitCsvLine(): List<String> {
+    val result = mutableListOf<String>()
+    val current = StringBuilder()
+    var inQuotes = false
+    var i = 0
+    while (i < length) {
+        val c = this[i]
+        when {
+            c == '"' && inQuotes && i + 1 < length && this[i + 1] == '"' -> {
+                current.append('"'); i += 2; continue
+            }
+            c == '"' -> inQuotes = !inQuotes
+            c == ',' && !inQuotes -> { result.add(current.toString()); current.clear() }
+            else -> current.append(c)
+        }
+        i++
+    }
+    result.add(current.toString())
+    return result
+}
