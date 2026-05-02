@@ -1,5 +1,6 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
 
+import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
 import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,12 +49,14 @@ private val CREDIT_VERSEMENT_STATES = setOf(
 
 @Composable
 fun Main_Preview_BonVentEtateScreen(
+    modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
     appDatabase: AppDatabase = AppDatabase.DatabaseModule.getDatabase(context),
-    fake_allBonVentList: List<M8BonVent> = FAKE_ALL_BONS,
-    modifier: Modifier = Modifier,
     onClick_Lence_Capture: () -> Unit = {},
     lenceTestActive: Boolean = false,
+    relative_M2Client: M2Client?= M2Client.get_default().copy(
+        keyID = FAKE_CLIENT_KEY
+    )
 ) {
     val vm: A_ViewModel = viewModel(
         factory = viewModelFactory {
@@ -64,7 +67,7 @@ fun Main_Preview_BonVentEtateScreen(
     val active_Datas = vm.active_Datas
 
     val allBonVentList: List<M8BonVent> =
-        active_Datas.list_M8bon ?: fake_allBonVentList
+        active_Datas.list_M8bon ?: emptyList()
 
     var lenceCaptureActive by remember { mutableStateOf(false) }
     val onLenceCapture: () -> Unit = { lenceCaptureActive = !lenceCaptureActive }
@@ -100,24 +103,19 @@ fun Main_Preview_BonVentEtateScreen(
         runCapture()
         vm.captureRequested = false
     }
-    // ─────────────────────────────────────────────────────────────────────────
 
     val sameClientPeriod: (M8BonVent) -> Boolean = { b ->
-        b.parent_M2Client_KeyID == active_Datas.focused_M2Client?.keyID &&
-                b.parent_M14VentPeriod_KeyId == active_Datas.focused_period_Key
+        b.parent_M2Client_KeyID == relative_M2Client?.keyID
     }
 
-    // Situation bons (New_Situation_Credit) shown first
     val sitBons = allBonVentList
         .filter { sameClientPeriod(it) && it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit }
         .sortedByDescending { it.creationTimestamps }
 
-    // Credit/versement bons shown second
     val cvBons = allBonVentList
         .filter { sameClientPeriod(it) && it.etateActuellementEst in CREDIT_VERSEMENT_STATES }
         .sortedByDescending { it.creationTimestamps }
 
-    // Non-credit-type bons (e.g. COMMANDE_LIVRAI, A_COMMANDE_CONFIRME, …) shown last
     val nonCreditBons = allBonVentList
         .filter { sameClientPeriod(it) && !it.etateActuellementEst.credit_type }
         .sortedByDescending { it.creationTimestamps }
@@ -209,11 +207,13 @@ fun Main_Preview_BonVentEtateScreen(
         }
 
         Floating_Separated_Button(
+
             onClick_Lence_Capture = onLenceCapture,
             vm = vm,
         )
 
         A_FastAdd_FloatingSeparated_Button_1(
+            relative_M2Client=relative_M2Client,
             vm = vm,
         )
     }
@@ -227,7 +227,7 @@ fun Main_Preview_BonVentEtateScreen(
                 onClick_Lence_Capture()
             },
             onSave = { bmpList ->
-                active_Datas.focused_M2Client?.let {
+                relative_M2Client?.let {
                     saveAllToMediaStore(
                         bitmaps = bmpList,
                         context = context,

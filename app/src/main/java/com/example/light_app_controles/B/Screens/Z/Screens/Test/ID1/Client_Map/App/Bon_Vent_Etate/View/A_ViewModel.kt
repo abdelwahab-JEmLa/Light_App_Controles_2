@@ -1,7 +1,6 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
 
 import EntreApps.Shared.Models.M09AppCompt
-import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.runtime.Stable
@@ -17,9 +16,7 @@ import kotlinx.coroutines.launch
 @Stable
 class ActiveDatas {
     var active_M9Compt: M09AppCompt? by mutableStateOf(null)
-
     var list_M8bon: List<M8BonVent>? by mutableStateOf(null)
-    var focused_M2Client: M2Client? by mutableStateOf(null)
     var focused_period_Key: String? by mutableStateOf(null)
 }
 
@@ -36,9 +33,6 @@ class A_ViewModel(
     var captureRequested by mutableStateOf(false)
 
     init {
-        active_Datas.focused_M2Client = M2Client.get_default().copy(
-            keyID = FAKE_CLIENT_KEY
-        )
         active_Datas.focused_period_Key = FAKE_PERIOD_KEY
 
         viewModelScope.launch {
@@ -57,49 +51,6 @@ class A_ViewModel(
         }
     }
 
-    fun ajoute_credit_et_affiche_compos_image(
-        montant: Double,
-        clientKey: String = FAKE_CLIENT_KEY,
-        periodKey: String = FAKE_PERIOD_KEY,
-    ) {
-        val baseTs = System.currentTimeMillis()
-        val currentList = active_Datas.list_M8bon?.toMutableList() ?: mutableListOf()
-        val versementBon = M8BonVent(
-            parent_M2Client_KeyID = clientKey,
-            parent_M14VentPeriod_KeyId = periodKey,
-            etateActuellementEst = M8BonVent.EtateActuellementEst.Versemment,
-            creationTimestamps = baseTs,
-            versement_fait = montant,
-        )
-        currentList.add(versementBon)
-
-        val latestSit = currentList
-            .filter {
-                it.parent_M2Client_KeyID == clientKey &&
-                        it.parent_M14VentPeriod_KeyId == periodKey &&
-                        it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit
-            }
-            .maxByOrNull { it.creationTimestamps }
-
-        val newMontant = (latestSit?.montant_principale_du_type ?: 0.0) - montant
-
-        val newSituationBon = M8BonVent(
-            parent_M2Client_KeyID = clientKey,
-            parent_M14VentPeriod_KeyId = periodKey,
-            etateActuellementEst = M8BonVent.EtateActuellementEst.New_Situation_Credit,
-            creationTimestamps = baseTs + 1_000L,
-            montant_principale_du_type = newMontant,
-        )
-
-        currentList.add(newSituationBon)
-        active_Datas.list_M8bon = currentList
-        captureRequested = true
-
-        viewModelScope.launch {
-            setter_LongOperations.add_New_M8BonVent(versementBon)
-            setter_LongOperations.add_New_M8BonVent(newSituationBon)
-        }
-    }
 
     fun update_M8(it: M8BonVent) {
         active_Datas.list_M8bon = active_Datas.list_M8bon
@@ -107,6 +58,12 @@ class A_ViewModel(
 
         viewModelScope.launch {
             setter_LongOperations.update_M8(it)
+        }
+    }
+
+    fun add_New_M8BonVent(bon: M8BonVent) {
+        viewModelScope.launch {
+            setter_LongOperations.add_New_M8BonVent(bon)
         }
     }
 }

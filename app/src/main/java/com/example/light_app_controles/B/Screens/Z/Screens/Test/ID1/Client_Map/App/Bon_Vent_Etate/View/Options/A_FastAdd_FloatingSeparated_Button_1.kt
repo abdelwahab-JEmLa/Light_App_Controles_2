@@ -1,5 +1,6 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Options
 
+import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -48,9 +49,12 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.A_ViewModel
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.FAKE_CLIENT_KEY
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.FAKE_PERIOD_KEY
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
+import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 data class Button_State(
@@ -74,8 +78,8 @@ fun A_FastAdd_FloatingSeparated_Button_1(
         colors = Pair(Color.Red, Color.Blue)
     ),
     vm: A_ViewModel,
-    on_vent_key: String = "",
     bons: List<M8BonVent>? = vm.active_Datas.list_M8bon,
+    relative_M2Client: M2Client?,
 ) {
     val updatedButtonState = buttonState.copy(its_Active = true)
 
@@ -92,12 +96,13 @@ fun A_FastAdd_FloatingSeparated_Button_1(
         bons
             ?.filter {
                 it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit &&
-                        (on_vent_key.isEmpty() || it.parent_M2Client_KeyID == on_vent_key)
+                        it.parent_M2Client_KeyID == relative_M2Client?.keyID
             }
             ?.maxByOrNull { it.creationTimestamps }
             ?.montant_principale_du_type
             ?.toInt()
     }
+
     var fake_init_val_du_ancien_credits_situation by remember(latestSituationMontant) {
         mutableStateOf<Int?>(latestSituationMontant)
     }
@@ -108,6 +113,45 @@ fun A_FastAdd_FloatingSeparated_Button_1(
 
     LaunchedEffect(isEditingCredits) {
         if (isEditingCredits) creditsFocusRequester.requestFocus()
+    }
+    fun ajoute_credit_et_affiche_compos_image(
+        montant: Double,
+        clientKey: String = FAKE_CLIENT_KEY,
+        periodKey: String = FAKE_PERIOD_KEY,
+    ) {
+        val baseTs = System.currentTimeMillis()
+        val currentList = vm.active_Datas.list_M8bon?.toMutableList() ?: mutableListOf()
+        val versementBon = M8BonVent(
+            parent_M2Client_KeyID = clientKey,
+            parent_M14VentPeriod_KeyId = periodKey,
+            etateActuellementEst = M8BonVent.EtateActuellementEst.Versemment,
+            creationTimestamps = baseTs,
+            versement_fait = montant,
+        )
+        currentList.add(versementBon)
+
+        val latestSit = currentList
+            .filter {
+                it.parent_M2Client_KeyID == clientKey &&
+                        it.parent_M14VentPeriod_KeyId == periodKey &&
+                        it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit
+            }
+            .maxByOrNull { it.creationTimestamps }
+
+        val newMontant = (latestSit?.montant_principale_du_type ?: 0.0) - montant
+
+        val newSituationBon = M8BonVent(
+            parent_M2Client_KeyID = clientKey,
+            parent_M14VentPeriod_KeyId = periodKey,
+            etateActuellementEst = M8BonVent.EtateActuellementEst.New_Situation_Credit,
+            creationTimestamps = baseTs + 1_000L,
+            montant_principale_du_type = newMontant,
+        )
+
+        currentList.add(newSituationBon)
+        vm.active_Datas.list_M8bon = currentList
+        vm.add_New_M8BonVent(versementBon)
+        vm.add_New_M8BonVent(newSituationBon)
     }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -178,9 +222,10 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                                             if (parsed != null) fake_init_val_du_ancien_credits_situation =
                                                 parsed
                                             out_val =
-                                                fake_init_val_du_ancien_credits_situation?.toString() ?: ""
+                                                fake_init_val_du_ancien_credits_situation?.toString()
+                                                    ?: ""
                                             isEditingCredits = false
-                                            vm.ajoute_credit_et_affiche_compos_image(
+                                            ajoute_credit_et_affiche_compos_image(
                                                 clientKey = relative_M2Client,
                                                 montant = montant,
                                             )
