@@ -18,6 +18,7 @@ fun But6_Import_M8_FireBase_To_Csv(
     coroutineScope: CoroutineScope,
     onDismiss: () -> Unit,
     onPendingClear: () -> Unit,
+    onCsvWritten: () -> Unit,
     action_definition: PendingAction,
 ) {
     AvertissementDialog(
@@ -38,6 +39,7 @@ fun But6_Import_M8_FireBase_To_Csv(
                     Log.e(TAG, "Échec Firebase → CSV | raison=${err.message ?: "inconnue"}", err)
                 }.onSuccess {
                     Log.d(TAG, "Données Firebase importées avec succès vers CSV.")
+                    withContext(Dispatchers.Main) { onCsvWritten() }
                 }
                 withContext(Dispatchers.Main) { onDismiss() }
             }

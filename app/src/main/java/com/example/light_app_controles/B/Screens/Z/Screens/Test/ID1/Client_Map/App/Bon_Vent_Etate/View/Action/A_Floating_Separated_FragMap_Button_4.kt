@@ -1,6 +1,7 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action
 
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.AvertissementDialog
+import android.graphics.drawable.Icon
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +26,8 @@ import androidx.compose.material.icons.filled.Details
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.LocalFireDepartment
+import androidx.compose.material.icons.filled.Numbers
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.DropdownMenu
@@ -145,12 +148,16 @@ fun Floating_Separated_Button(
     }
 }
 
-enum class PendingAction() {
+enum class PendingAction(
+    val color: Color=Color(0xFFF8F8F8),
+    val imageVector: ImageVector =Icons.Default.Numbers
+) {
     But1_Export_M8_Room_To_Csv,
     But2_Export_M8_Csv_To_FireBase,
     But3_Import_M8Csv_To_Room,
     But5_Import_M8_Ui_To_Room,
     But6_Import_M8_FireBase_To_Csv,
+    But_9_Import_M8_FireBase_To_Room(Color(0xFFE91E63),Icons.Default.LocalFireDepartment),
     But7_DeleteImport_M8Csv_To_Room,
     But8_DeleteAll_M8_Room, ;
 }
@@ -190,40 +197,62 @@ fun B_FragMap_DropdownMenu(
     var csvRowCount by remember { mutableStateOf<Int?>(null) }
     var csvNewCount by remember { mutableStateOf<Int?>(null) }
     var csvUpdateCount by remember { mutableStateOf<Int?>(null) }
+    var csvCreditCount by remember { mutableStateOf<Int?>(null) }
+    // Bumped after any operation that writes to the CSV file, so stats always reflect the real file.
+    var csvRefreshTrigger by remember { mutableStateOf(0) }
 
     var firebaseRowCount by remember { mutableStateOf<Int?>(null) }
+    var firebaseCreditCount by remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(Unit) {
         runCatching {
-            firebaseRowCount = vm.setter_LongOperations.get_Firebase_M8_Count(M8BonVent.ref_Test)
+            val (total, credit) = vm.setter_LongOperations.get_Firebase_M8_Counts(M8BonVent.ref_Test)
+            firebaseRowCount    = total
+            firebaseCreditCount = credit
         }.onFailure {
-            firebaseRowCount = -1
+            firebaseRowCount    = -1
+            firebaseCreditCount = -1
         }
     }
 
-    LaunchedEffect(vm.active_Datas.list_M8bon) {
+    LaunchedEffect(vm.active_Datas.list_M8bon, csvRefreshTrigger) {
         withContext(Dispatchers.IO) {
             val csv = M8BonVent.csv_test
             if (csv.exists() && csv.length() > 0L) {
                 val lines = csv.readLines().filter { it.isNotBlank() }
                 if (lines.size >= 2) {
-                    val headers = lines[0].split(",")
-                    val keyIdx = headers.indexOf("keyID")
-                    val csvKeys = lines.drop(1).mapNotNull { line ->
+                    val headers  = lines[0].split(",")
+                    val keyIdx   = headers.indexOf("keyID")
+                    val etatIdx  = headers.indexOf("etateActuellementEst")
+                    val creditNames = M8BonVent.EtateActuellementEst.values()
+                        .filter { it.credit_type }
+                        .map { it.name }
+                        .toSet()
+
+                    val dataLines = lines.drop(1)
+                    val csvKeys = dataLines.mapNotNull { line ->
                         line.split(",").getOrNull(keyIdx)
                             ?.trim()?.removeSurrounding("\"")
                             ?.takeIf { it.isNotBlank() }
                     }.toSet()
                     val roomKeys = vm.active_Datas.list_M8bon
                         ?.map { it.keyID }?.toSet() ?: emptySet()
-                    csvRowCount = csvKeys.size
-                    csvNewCount = (csvKeys - roomKeys).size
+
+                    csvRowCount    = csvKeys.size
+                    csvNewCount    = (csvKeys - roomKeys).size
                     csvUpdateCount = (csvKeys intersect roomKeys).size
+                    csvCreditCount = dataLines.count { line ->
+                        val cells = line.split(",")
+                        val etat  = cells.getOrNull(etatIdx)
+                            ?.trim()?.removeSurrounding("\"")
+                        etat != null && etat in creditNames
+                    }
                 }
             } else {
-                csvRowCount = 0
-                csvNewCount = 0
+                csvRowCount    = 0
+                csvNewCount    = 0
                 csvUpdateCount = 0
+                csvCreditCount = 0
             }
         }
     }
@@ -238,40 +267,20 @@ fun B_FragMap_DropdownMenu(
 
     pendingAction?.let { action ->
         when (action) {
-            PendingAction.But8_DeleteAll_M8_Room -> AvertissementDialog(
-                title = PendingAction.But8_DeleteAll_M8_Room.name,
-                message =
-                        "هل تريد المتابعة؟",
-                confirmLabel = "yes",
-                onConfirm = {
-                    pendingAction = null
-                    coroutineScope.launch(Dispatchers.IO) {
-                        vm.setter_LongOperations.delete_All_M8()
-                        vm.reload()
-                        onDismiss()
-                    }
-                },
-                onDismiss = { pendingAction = null },
+            PendingAction.But8_DeleteAll_M8_Room -> But8_DeleteAll_M8_Room(
+                vm               = vm,
+                coroutineScope   = coroutineScope,
+                onDismiss        = onDismiss,
+                onPendingClear   = { pendingAction = null },
+                action_definition = PendingAction.But8_DeleteAll_M8_Room,
             )
 
-            PendingAction.But3_Import_M8Csv_To_Room -> AvertissementDialog(
-                title = PendingAction.But3_Import_M8Csv_To_Room.name,
-                message = "سيتم استيراد بيانات M8BonVent.csv إلى قاعدة البيانات المحلية.\n" +
-                        "الصفوف الموجودة ستُحدَّث والجديدة ستُضاف.\n" +
-                        "هل تريد المتابعة؟",
-                confirmLabel = "استيراد",
-                onConfirm = {
-                    pendingAction = null
-                    coroutineScope.launch(Dispatchers.IO) {
-                        vm.setter_LongOperations.import_M8Csv_To_Room(
-                            M8BonVent.csv_test
-                        )
-                        vm.reload()
-
-                        onDismiss()
-                    }
-                },
-                onDismiss = { pendingAction = null },
+            PendingAction.But3_Import_M8Csv_To_Room -> But3_Import_M8Csv_To_Room(
+                vm               = vm,
+                coroutineScope   = coroutineScope,
+                onDismiss        = onDismiss,
+                onPendingClear   = { pendingAction = null },
+                action_definition = PendingAction.But3_Import_M8Csv_To_Room,
             )
 
             PendingAction.But2_Export_M8_Csv_To_FireBase -> But2_Export_M8_Csv_To_FireBase(
@@ -283,18 +292,20 @@ fun B_FragMap_DropdownMenu(
             )
 
             PendingAction.But1_Export_M8_Room_To_Csv -> But1_Export_M8_Room_To_Csv(
-                vm = vm,
-                coroutineScope = coroutineScope,
-                onDismiss = onDismiss,
-                onPendingClear = { pendingAction = null },
+                vm               = vm,
+                coroutineScope   = coroutineScope,
+                onDismiss        = onDismiss,
+                onPendingClear   = { pendingAction = null },
+                onCsvWritten     = { csvRefreshTrigger++ },
                 action_definition = PendingAction.But1_Export_M8_Room_To_Csv,
             )
 
             PendingAction.But6_Import_M8_FireBase_To_Csv -> But6_Import_M8_FireBase_To_Csv(
-                vm = vm,
-                coroutineScope = coroutineScope,
-                onDismiss = onDismiss,
-                onPendingClear = { pendingAction = null },
+                vm               = vm,
+                coroutineScope   = coroutineScope,
+                onDismiss        = onDismiss,
+                onPendingClear   = { pendingAction = null },
+                onCsvWritten     = { csvRefreshTrigger++ },
                 action_definition = PendingAction.But6_Import_M8_FireBase_To_Csv,
             )
 
@@ -337,7 +348,13 @@ fun B_FragMap_DropdownMenu(
                 )
             }
 
-            else -> {}
+            PendingAction.But_9_Import_M8_FireBase_To_Room -> But9_Import_M8_FireBase_To_Room(
+                vm               = vm,
+                coroutineScope   = coroutineScope,
+                onDismiss        = onDismiss,
+                onPendingClear   = { pendingAction = null },
+                action_definition = PendingAction.But_9_Import_M8_FireBase_To_Room,
+            )
         }
     }
 
@@ -436,6 +453,25 @@ fun B_FragMap_DropdownMenu(
         HorizontalDivider(thickness = 3.dp, color = Color.Red)
         HorizontalDivider()
         Text("FireBase")
+        val action =PendingAction.But_9_Import_M8_FireBase_To_Room
+        DropdownMenuItem(
+            leadingIcon = {
+                Icon(
+                    imageVector = action.imageVector,
+                    contentDescription = null,
+                    tint = action.color
+                )
+            },
+            text = {
+                Text(
+                    text = action.name,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            onClick = {
+                pendingAction = action
+            }
+        )
         DropdownMenuItem(
             leadingIcon = {
                 Icon(
@@ -467,7 +503,7 @@ fun B_FragMap_DropdownMenu(
                     firebaseRowCount == null -> "..."
                     firebaseRowCount == -1   -> "Firebase: خطأ في الاتصال"
                     firebaseRowCount == 0    -> "Firebase: فارغ"
-                    else -> "Firebase: $firebaseRowCount | CSV: ${csvRowCount ?: "..."}"
+                    else -> "Firebase: $firebaseRowCount (دين: ${firebaseCreditCount ?: "..."}) | CSV: ${csvRowCount ?: "..."} (دين: ${csvCreditCount ?: "..."})"
                 }
                 Column {
                     Text(
@@ -536,8 +572,7 @@ fun B_FragMap_DropdownMenu(
             }
         )
         HorizontalDivider()
-        DropdownMenuItem(      //<--
-            //TODO(1): extract don un separated fichie
+        DropdownMenuItem(
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Details,
@@ -555,8 +590,7 @@ fun B_FragMap_DropdownMenu(
                 pendingAction = PendingAction.But8_DeleteAll_M8_Room
             }
         )
-        DropdownMenuItem(       //<--
-        //TODO(1): extract don un separated fichie
+        DropdownMenuItem(
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Download,

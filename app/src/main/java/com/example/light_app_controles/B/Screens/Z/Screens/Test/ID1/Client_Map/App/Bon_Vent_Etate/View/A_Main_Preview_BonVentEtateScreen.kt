@@ -23,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -40,7 +42,12 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+const val FAKE_CLIENT_KEY = "-OWI8JQlhGjA_HzMCGFD"
+const val Targted_Bon = "-OrVHbH6u_C6TT153tUR"
+
 private val CREDIT_VERSEMENT_STATES = setOf(
+    M8BonVent.EtateActuellementEst.COMMANDE_LIVRAI,
+
     M8BonVent.EtateActuellementEst.Versemment,
     M8BonVent.EtateActuellementEst.Credit,
     M8BonVent.EtateActuellementEst.Cette_Transaction_Type_Est_Credit,
@@ -54,7 +61,7 @@ fun Main_Preview_BonVentEtateScreen(
     appDatabase: AppDatabase = AppDatabase.DatabaseModule.getDatabase(context),
     onClick_Lence_Capture: () -> Unit = {},
     lenceTestActive: Boolean = false,
-    relative_M2Client: M2Client?= M2Client.get_default().copy(
+    relative_M2Client: M2Client? = M2Client.get_default().copy(
         keyID = FAKE_CLIENT_KEY
     )
 ) {
@@ -107,26 +114,27 @@ fun Main_Preview_BonVentEtateScreen(
     val sameClientPeriod: (M8BonVent) -> Boolean = { b ->
         b.parent_M2Client_KeyID == relative_M2Client?.keyID
     }
-
-    val sitBons = allBonVentList
-        .filter { sameClientPeriod(it) && it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit }
-        .sortedByDescending { it.creationTimestamps }
-
-    val cvBons = allBonVentList
+    val credit_affichage = allBonVentList
         .filter { sameClientPeriod(it) && it.etateActuellementEst in CREDIT_VERSEMENT_STATES }
         .sortedByDescending { it.creationTimestamps }
 
-    val nonCreditBons = allBonVentList
-        .filter { sameClientPeriod(it) && !it.etateActuellementEst.credit_type }
+    val allBons: List<M8BonVent> = (credit_affichage)
         .sortedByDescending { it.creationTimestamps }
-
-    val allBons: List<M8BonVent> = (sitBons + cvBons + nonCreditBons)
-        .sortedByDescending { it.creationTimestamps }
-    val latestSit = sitBons.maxByOrNull { it.creationTimestamps }
 
     Box() {
-        Column(modifier = modifier.fillMaxSize()) {
-            if (latestSit == null) {
+        Column(
+            modifier = modifier
+                .semantics(mergeDescendants = true) {
+                    set(value = allBons, key = SemanticsPropertyKey("allBons"))
+                    set(value = allBonVentList.filter {
+                        it.keyID == Targted_Bon
+                    }, key = SemanticsPropertyKey("Targted_Bon"))
+                    set(value = allBonVentList.filter {
+                        it.parent_M2Client_KeyID == FAKE_CLIENT_KEY
+                    }, key = SemanticsPropertyKey("FAKE_CLIENT_KEY"))
+                }
+                .fillMaxSize()) {
+            if (allBons.isEmpty()) {
                 Text(
                     "لا توجد حالة دين جديدة",
                     color = Color.Gray,
@@ -213,7 +221,7 @@ fun Main_Preview_BonVentEtateScreen(
         )
 
         A_FastAdd_FloatingSeparated_Button_1(
-            relative_M2Client=relative_M2Client,
+            relative_M2Client = relative_M2Client,
             vm = vm,
         )
     }

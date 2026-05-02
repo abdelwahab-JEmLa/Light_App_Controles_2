@@ -51,7 +51,6 @@ class A_ViewModel(
         }
     }
 
-
     fun update_M8(it: M8BonVent) {
         active_Datas.list_M8bon = active_Datas.list_M8bon
             ?.map { bon -> if (bon.keyID == it.keyID) it else bon }
@@ -68,7 +67,6 @@ class A_ViewModel(
     }
 }
 
-const val FAKE_CLIENT_KEY = "-OWI8JQlhGjA_HzMCGFD"
 const val FAKE_PERIOD_KEY = "fake_period_key_001"
 
 private fun fakeBon(

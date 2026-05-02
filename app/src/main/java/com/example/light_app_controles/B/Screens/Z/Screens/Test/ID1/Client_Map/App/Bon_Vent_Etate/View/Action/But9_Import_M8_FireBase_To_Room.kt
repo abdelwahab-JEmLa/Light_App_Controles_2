@@ -1,6 +1,7 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action
 
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.AvertissementDialog
+import android.util.Log
 import androidx.compose.runtime.Composable
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.A_ViewModel
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
@@ -9,31 +10,36 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+private const val TAG = "But6_FireBaseToRoom"
+
 @Composable
-fun But1_Export_M8_Room_To_Csv(
+fun But9_Import_M8_FireBase_To_Room(
     vm: A_ViewModel,
     coroutineScope: CoroutineScope,
     onDismiss: () -> Unit,
     onPendingClear: () -> Unit,
-    onCsvWritten: () -> Unit,
     action_definition: PendingAction,
 ) {
     AvertissementDialog(
         title        = action_definition.name,
-        message      = "سيتم تصدير جميع بيانات M8BonVent إلى\nM8BonVent.csv\n" +
-                "إذا كان الملف موجوداً سيتم تحديث الصفوف الموجودة وإضافة الجديدة.\n" +
+        message      = "سيتم استيراد بيانات M8BonVent من Firebase Realtime Database مباشرةً إلى قاعدة البيانات المحلية.\n" +
+                "الصفوف الموجودة ستُحدَّث والجديدة ستُضاف.\n" +
                 "هل تريد المتابعة؟",
-        confirmLabel = "تصدير",
+        confirmLabel = "استيراد",
         onConfirm    = {
             onPendingClear()
             coroutineScope.launch(Dispatchers.IO) {
-                vm.setter_LongOperations.export_M8_Room_To_Csv(
-                    csv = M8BonVent.csv_test,
-                )
-                withContext(Dispatchers.Main) {
-                    onCsvWritten()
-                    onDismiss()
+                runCatching {
+                    vm.setter_LongOperations.import_M8_FireBase_To_Room(
+                        refDataBase = M8BonVent.ref_Test,
+                    )
+                    vm.reload()
+                }.onFailure { err ->
+                    Log.e(TAG, "Échec Firebase → Room | raison=${err.message ?: "inconnue"}", err)
+                }.onSuccess {
+                    Log.d(TAG, "Données Firebase importées avec succès vers Room.")
                 }
+                withContext(Dispatchers.Main) { onDismiss() }
             }
         },
         onDismiss    = onPendingClear,

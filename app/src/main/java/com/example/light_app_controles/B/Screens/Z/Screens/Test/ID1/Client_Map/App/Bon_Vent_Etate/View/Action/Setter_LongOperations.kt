@@ -57,6 +57,42 @@ class Setter_LongOperations(
         }
     }
 
+    /**
+     * Returns (totalCount, creditCount) in a single Firebase fetch.
+     * creditCount = bons whose etateActuellementEst has credit_type == true.
+     */
+    suspend fun get_Firebase_M8_Counts(refDataBase: DatabaseReference): Pair<Int, Int> =
+        withContext(Dispatchers.IO) {
+            val creditNames = M8BonVent.EtateActuellementEst.values()
+                .filter { it.credit_type }
+                .map { it.name }
+                .toSet()
+
+            val snapshot = suspendCancellableCoroutine<DataSnapshot> { cont ->
+                val listener = object : ValueEventListener {
+                    override fun onDataChange(snap: DataSnapshot) {
+                        if (cont.isActive) cont.resume(snap)
+                    }
+                    override fun onCancelled(error: DatabaseError) {
+                        if (cont.isActive) cont.resumeWithException(error.toException())
+                    }
+                }
+                refDataBase.addListenerForSingleValueEvent(listener)
+                cont.invokeOnCancellation { refDataBase.removeEventListener(listener) }
+            }
+
+            val total = snapshot.childrenCount.toInt()
+            val creditCount = snapshot.children.count { child ->
+                val raw = child.value
+                if (raw !is Map<*, *>) return@count false
+                @Suppress("UNCHECKED_CAST")
+                val etat = (raw as Map<String, Any?>)["etateActuellementEst"]?.toString()
+                etat != null && etat in creditNames
+            }
+            Log.d(TAG, "get_Firebase_M8_Counts: ref=$refDataBase | total=$total | credit=$creditCount")
+            Pair(total, creditCount)
+        }
+
     suspend fun get_Firebase_M8_Count(refDataBase: DatabaseReference): Int =
         withContext(Dispatchers.IO) {
             Log.d(TAG, "get_Firebase_M8_Count: envoi vers ref=${refDataBase}")
@@ -96,7 +132,8 @@ class Setter_LongOperations(
                     val id = cells.getOrNull(keyIdx) ?: ""
                     if (id.isNotEmpty()) existingRows[id] = cells
                 }
-            }
+            }         //<--
+            //TODO(1): asscre ici que le                  "etateActuellementEst" to etateActuellementEst.name, 
         }
 
         datas.forEach { bon ->
@@ -176,6 +213,27 @@ class Setter_LongOperations(
             if (raw !is Map<*, *>) return@mapNotNull null
             @Suppress("UNCHECKED_CAST")
             val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
+
+            // Diagnostic: log raw etateActuellementEst before to_Map() swallows parse errors.
+            // If valueOf() fails silently, every bon falls back to ON_MODE_COMMEND_ACTUELLEMENT.
+            val rawEtat = map["etateActuellementEst"]
+            val parsedEtat = rawEtat?.let {
+                runCatching { M8BonVent.EtateActuellementEst.valueOf(it) }
+                    .onFailure { err ->
+                        Log.w(
+                            TAG,
+                            "import_M8_FireBase_To_Csv: valueOf échoué pour etateActuellementEst='$rawEtat'" +
+                                    " | keyID=${child.key} → fallback ON_MODE_COMMEND_ACTUELLEMENT | ${err.message}",
+                        )
+                    }
+                    .getOrNull()
+            }
+            Log.d(
+                TAG,
+                "import_M8_FireBase_To_Csv: keyID=${child.key}" +
+                        " | etateRaw=$rawEtat | etatParsed=$parsedEtat",
+            )
+
             runCatching { M8BonVent.to_Map(map) }.onFailure { err ->
                 Log.e(TAG, "import_M8_FireBase_To_Csv: parse échoué | keyID=${child.key} | ${err.message}", err)
             }.getOrNull()
@@ -233,6 +291,44 @@ class Setter_LongOperations(
         }
 
         if (bons.isNotEmpty()) bons.forEach { appDatabase.dao_M8BonVent().upsert(it) }
+    }
+
+    suspend fun import_M8_FireBase_To_Room(
+        refDataBase: DatabaseReference,
+    ) = withContext(Dispatchers.IO) {
+        Log.d(TAG, "import_M8_FireBase_To_Room: ref=$refDataBase")
+
+        val snapshot = suspendCancellableCoroutine<DataSnapshot> { cont ->
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snap: DataSnapshot) {
+                    if (cont.isActive) cont.resume(snap)
+                }
+                override fun onCancelled(error: DatabaseError) {
+                    if (cont.isActive) cont.resumeWithException(error.toException())
+                }
+            }
+            refDataBase.addListenerForSingleValueEvent(listener)
+            cont.invokeOnCancellation { refDataBase.removeEventListener(listener) }
+        }
+
+        val bons = snapshot.children.mapNotNull { child ->
+            val raw = child.value
+            if (raw !is Map<*, *>) return@mapNotNull null
+            @Suppress("UNCHECKED_CAST")
+            val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
+            runCatching { M8BonVent.to_Map(map) }.onFailure { err ->
+                Log.e(TAG, "import_M8_FireBase_To_Room: parse échoué | keyID=${child.key} | ${err.message}", err)
+            }.getOrNull()
+        }
+
+        if (bons.isEmpty()) {
+            Log.w(TAG, "import_M8_FireBase_To_Room: aucun bon valide extrait de Firebase → abandon")
+            return@withContext
+        }
+
+        Log.d(TAG, "import_M8_FireBase_To_Room: ${bons.size} bons récupérés, insertion en Room…")
+        bons.forEach { appDatabase.dao_M8BonVent().upsert(it) }
+        Log.d(TAG, "import_M8_FireBase_To_Room: Room mis à jour avec ${bons.size} bons.")
     }
 
     suspend fun delete_All_M8() {

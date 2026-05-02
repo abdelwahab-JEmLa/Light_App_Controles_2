@@ -101,7 +101,9 @@ data class M8BonVent(
             "heurDebutInString" to heurDebutInString,
             "heurFinInString" to heurFinInString,
             "its_working_for_wholesaler" to its_working_for_wholesaler,
+
             "etateActuellementEst" to etateActuellementEst.name,
+
             "vocaleKeyID" to vocaleKeyID,
             "sonVocaleEstEcoute" to sonVocaleEstEcoute,
             "sonEcoutementEstFaitAutimestamps" to sonEcoutementEstFaitAutimestamps,
