@@ -5,6 +5,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.TextIncrease
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -74,7 +75,7 @@ fun DropdownItem_Versement(
     DropdownMenuItem(
         leadingIcon = {
             Icon(
-                imageVector = Icons.Default.Edit,
+                imageVector = Icons.Default.TextIncrease,
                 contentDescription = null,
                 tint = Color(0xFF43A047),
             )
@@ -116,7 +117,7 @@ fun DropdownItem_Versement(
                 )
             } else {
                 Text(
-                    text = "الرصيد السابق: ${displayedMontant ?: "-"} دج",
+                    text = "New Versement: ${displayedMontant ?: "-"} دج",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
