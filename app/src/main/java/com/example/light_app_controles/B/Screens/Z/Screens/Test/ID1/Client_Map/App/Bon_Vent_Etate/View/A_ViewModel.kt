@@ -68,7 +68,7 @@ class A_ViewModel(
     }
 }
 
-const val FAKE_CLIENT_KEY = "fake_client_key_001"
+const val FAKE_CLIENT_KEY = "-OWI8JQlhGjA_HzMCGFD"
 const val FAKE_PERIOD_KEY = "fake_period_key_001"
 
 private fun fakeBon(

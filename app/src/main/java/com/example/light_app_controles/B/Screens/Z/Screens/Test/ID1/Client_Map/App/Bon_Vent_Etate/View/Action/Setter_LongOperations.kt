@@ -59,6 +59,7 @@ class Setter_LongOperations(
 
     suspend fun get_Firebase_M8_Count(refDataBase: DatabaseReference): Int =
         withContext(Dispatchers.IO) {
+            Log.d(TAG, "get_Firebase_M8_Count: envoi vers ref=${refDataBase}")
             val snapshot = suspendCancellableCoroutine<DataSnapshot> { cont ->
                 val listener = object : ValueEventListener {
                     override fun onDataChange(snap: DataSnapshot) {
@@ -71,7 +72,9 @@ class Setter_LongOperations(
                 refDataBase.addListenerForSingleValueEvent(listener)
                 cont.invokeOnCancellation { refDataBase.removeEventListener(listener) }
             }
-            snapshot.childrenCount.toInt()
+            val count = snapshot.childrenCount.toInt()
+            Log.d(TAG, "get_Firebase_M8_Count: ref=${refDataBase} | count=$count")
+            count
         }
 
     suspend fun export_M8_Room_To_Csv(csv: File) = withContext(Dispatchers.IO) {

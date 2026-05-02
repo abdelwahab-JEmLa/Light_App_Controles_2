@@ -199,13 +199,8 @@ data class M2Client(
 
     companion object {
         const val pathString = "M02Client"
-
-        val ref = central_MainDataBases_RefProduction
-            .child(pathString)
-
-        val ref_Non_Active_Datas =
-            M00CentralParametresOfAllApps.centralRef_Non_Active_Datas_PourLightApp
-                .child(pathString)
+        val ref = central_MainDataBases_RefProduction.child(pathString)
+        val ref_Non_Active_Datas = M00CentralParametresOfAllApps.centralRef_Non_Active_Datas_PourLightApp.child(pathString)
 //
 //        val parent = Firebase.database.getReference(
 //            "00_DataPrototype-04-02" +

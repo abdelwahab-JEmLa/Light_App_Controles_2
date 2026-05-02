@@ -8,9 +8,7 @@ import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
 import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.google.firebase.Firebase
 import com.google.firebase.database.IgnoreExtraProperties
-import com.google.firebase.database.database
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -238,26 +236,23 @@ data class M8BonVent(
     )
 
     companion object {
-        const val keyModel = "ID8"
+        const val nam_Model_Str = "M08BonVent"
+        val ref = central_MainDataBases_RefProduction.child(nam_Model_Str)
+        val ref_Non_Active_Datas = M00CentralParametresOfAllApps.centralRef_Non_Active_Datas_PourLightApp.child(nam_Model_Str)
+        val ref_Test = central_Developing_Test.child(nam_Model_Str)
 
         fun remove_ref() {
             ref.removeValue()
         }
 
-        val ref = Firebase.database.getReference(
-            "/00_DataPrototype-04-02/_1_developingRef/C_InfosSqlDataBases"
-        ).child("Datas08BonVent")
-
-
-        val ref_Test = central_Developing_Test
-            .child("M8BonVent")
-
         val csv_test = File(
             M00CentralParametresOfAllApps.central_Local_Csv,
-            "TestDatas/M8BonVent.csv"
+            "TestDatas/$nam_Model_Str.csv"
         )
 
-        fun generePushKey() = M00CentralParametresOfAllApps.genereUnPushKeyFireBase(ref)
+        fun generePushKey() = M00CentralParametresOfAllApps.genereUnPushKeyFireBase(
+            if (M00CentralParametresOfAllApps.get_Default().chose_ref_test_For_Datas_Car_C_DevMode) ref_Test else ref
+        )
 
         fun get_default2(): M8BonVent {
             return M8BonVent()

@@ -403,10 +403,7 @@ fun B_FragMap_DropdownMenu(
                                 out_val =
                                     fake_init_val_du_ancien_credits_situation?.toString() ?: ""
                                 isEditingCredits = false
-                                vm.ajoute_credit_et_affiche_compos_image(
-                                    clientKey = relative_M2Client,
-                                    montant = montant,
-                                )
+
                             }
                         ),
                         label = {
