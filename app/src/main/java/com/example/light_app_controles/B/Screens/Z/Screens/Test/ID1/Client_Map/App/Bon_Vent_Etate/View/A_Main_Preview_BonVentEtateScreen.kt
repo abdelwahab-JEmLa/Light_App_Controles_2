@@ -209,9 +209,8 @@ fun Main_Preview_BonVentEtateScreen(
         }
 
         Floating_Separated_Button(
-            vm = vm,
-            appDatabase = appDatabase,
             onClick_Lence_Capture = onLenceCapture,
+            vm = vm,
         )
 
         A_FastAdd_FloatingSeparated_Button_1(
