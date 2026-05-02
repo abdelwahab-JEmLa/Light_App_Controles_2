@@ -52,7 +52,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.A_ViewModel
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.FAKE_CLIENT_KEY
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import kotlin.math.roundToInt
 
@@ -92,9 +91,9 @@ fun A_FastAdd_FloatingSeparated_Button_1(
     var showDropdown by remember { mutableStateOf(false) }
     val clientKey = relative_M2Client?.keyID ?: ""
 
-    val latestSituationMontant: Int? = remember(vm.active_Datas.list_M8bon) {
+    val latestSituationMontant: Int? = remember(bons) {
         val targetClientKey = relative_M2Client?.keyID ?: ""
-        val clientBons = vm.active_Datas.list_M8bon
+        val clientBons = bons
             ?.filter { it.parent_M2Client_KeyID == targetClientKey }
 
         val latestSituation = clientBons
@@ -116,43 +115,74 @@ fun A_FastAdd_FloatingSeparated_Button_1(
         mutableStateOf<Int?>(latestSituationMontant)
     }
 
-    var isEditingCredits by remember { mutableStateOf(false) }
-    var out_val by remember { mutableStateOf("") }
-    val creditsFocusRequester = remember { FocusRequester() }
+    // FIX TODO(1): Each dropdown item has its own editing flag, input value, and FocusRequester
+    // so they never bleed into each other.
 
-    LaunchedEffect(isEditingCredits) {
-        if (isEditingCredits) creditsFocusRequester.requestFocus()
+    // ── Credit item state ────────────────────────────────────────────────────
+    var isEditingCredit by remember { mutableStateOf(false) }
+    var out_val_credit by remember { mutableStateOf("") }
+    val creditFocusRequester = remember { FocusRequester() }
+
+    // ── Versement item state ─────────────────────────────────────────────────
+    var isEditingVersement by remember { mutableStateOf(false) }
+    var out_val_versement by remember { mutableStateOf("") }
+    val versementFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(isEditingCredit) {
+        if (isEditingCredit) creditFocusRequester.requestFocus()
+    }
+    LaunchedEffect(isEditingVersement) {
+        if (isEditingVersement) versementFocusRequester.requestFocus()
     }
 
     val baseTs = System.currentTimeMillis()
-    val currentList = vm.active_Datas.list_M8bon?.toMutableList() ?: mutableListOf()
+    val currentList = bons?.toMutableList() ?: mutableListOf()
 
-    val test_montant = 890.00
-    var montant by remember { mutableStateOf(test_montant) }
+    var montant by remember { mutableStateOf(0.0) }
 
+    // ── Versement: client pays back a portion of their debt ──────────────────
     val versementBon = M8BonVent(
         parent_M2Client_KeyID = clientKey,
         etateActuellementEst = M8BonVent.EtateActuellementEst.Versemment,
         creationTimestamps = baseTs,
         versement_fait = montant,
     )
-
-    val newMontant = (latestSituationMontant?.toDouble() ?: 0.0) - montant
-
-    val newSituationBon = M8BonVent(
+    val newMontantAfterVersement = (latestSituationMontant?.toDouble() ?: 0.0) - montant
+    val newSituationAfterVersement = M8BonVent(
         parent_M2Client_KeyID = clientKey,
         etateActuellementEst = M8BonVent.EtateActuellementEst.New_Situation_Credit,
         creationTimestamps = baseTs + 1_000L,
-        montant_principale_du_type = newMontant,
+        montant_principale_du_type = newMontantAfterVersement,
     )
 
-    fun ajoute_credit_et_affiche_compos_image(
-    ) {
+    val creditBon = M8BonVent(
+        parent_M2Client_KeyID = clientKey,
+        etateActuellementEst = M8BonVent.EtateActuellementEst.Credit,
+        creationTimestamps = baseTs,
+        credit_fait = montant,
+    )
+    val newMontantAfterCredit = (latestSituationMontant?.toDouble() ?: 0.0) + montant
+    val newSituationAfterCredit = M8BonVent(
+        parent_M2Client_KeyID = clientKey,
+        etateActuellementEst = M8BonVent.EtateActuellementEst.New_Situation_Credit,
+        creationTimestamps = baseTs + 1_000L,
+        montant_principale_du_type = newMontantAfterCredit,
+    )
+
+    fun ajoute_versement_et_new_sit() {
         currentList.add(versementBon)
-        currentList.add(newSituationBon)
+        currentList.add(newSituationAfterVersement)
         vm.active_Datas.list_M8bon = currentList
         /* vm.add_New_M8BonVent(versementBon)
-         vm.add_New_M8BonVent(newSituationBon)   */
+           vm.add_New_M8BonVent(newSituationAfterVersement) */
+    }
+
+    fun ajoute_credit_et_new_sit() {
+        currentList.add(creditBon)
+        currentList.add(newSituationAfterCredit)
+        vm.active_Datas.list_M8bon = currentList
+        /* vm.add_New_M8BonVent(creditBon)
+           vm.add_New_M8BonVent(newSituationAfterCredit) */
     }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -176,7 +206,10 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                     modifier = Modifier
                         .semantics(mergeDescendants = true) {
                             set(value = versementBon, key = SemanticsPropertyKey("versementBon"))
-                            set(value = newSituationBon, key = SemanticsPropertyKey("newSituationBon"))
+                            set(value = newSituationAfterVersement, key = SemanticsPropertyKey("newSituationBon"))
+
+                            set(value = creditBon, key = SemanticsPropertyKey("creditBon"))
+                            set(value = newSituationAfterCredit, key = SemanticsPropertyKey("newSituationAfterCredit"))
                         }
                         .size(48.dp),
                     onClick = {
@@ -198,7 +231,72 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                     onDismissRequest = { showDropdown = false },
                     modifier = Modifier.background(Color.White, RoundedCornerShape(8.dp))
                 ) {
-                    val relative_M2Client = FAKE_CLIENT_KEY
+
+                    // ── Credit item ──────────────────────────────────────────────────────────
+                    DropdownMenuItem(
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null,
+                                tint = Color(0xFFE53935)
+                            )
+                        },
+                        text = {
+                            if (isEditingCredit) {
+                                OutlinedTextField(
+                                    value = out_val_credit,
+                                    onValueChange = { input ->
+                                        if (input.all { it.isDigit() }) out_val_credit = input
+                                    },
+                                    singleLine = true,
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Number,
+                                        imeAction = ImeAction.Done,
+                                    ),
+                                    keyboardActions = KeyboardActions(
+                                        onDone = {
+                                            val parsed = out_val_credit.toIntOrNull()
+                                            if (parsed != null) {
+                                                montant = parsed.toDouble()
+                                                fake_init_val_du_ancien_credits_situation = parsed
+                                            }
+                                            out_val_credit =
+                                                fake_init_val_du_ancien_credits_situation?.toString()
+                                                    ?: ""
+                                            isEditingCredit = false
+                                            ajoute_credit_et_new_sit()
+                                        }
+                                    ),
+                                    label = {
+                                        val diff = (out_val_credit.toIntOrNull() ?: 0) +
+                                                (fake_init_val_du_ancien_credits_situation ?: 0)
+                                        Text(
+                                            text = "الرصيد الجديد — $diff",
+                                            style = MaterialTheme.typography.labelSmall,
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .focusRequester(creditFocusRequester),
+                                )
+                            } else {
+                                Text(
+                                    text = "دين جديد: ${fake_init_val_du_ancien_credits_situation ?: "-"} دج",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                )
+                            }
+                        },
+                        onClick = {
+                            if (!isEditingCredit) {
+                                out_val_credit = ""
+                                isEditingVersement = false  // close the other field if open
+                                isEditingCredit = true
+                            }
+                        }
+                    )
+
+                    // ── Versement item ───────────────────────────────────────────────────────
                     DropdownMenuItem(
                         leadingIcon = {
                             Icon(
@@ -208,12 +306,11 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                             )
                         },
                         text = {
-                            if (isEditingCredits) {
+                            if (isEditingVersement) {
                                 OutlinedTextField(
-                                    value = out_val,
+                                    value = out_val_versement,
                                     onValueChange = { input ->
-                                        val accepted = input.all { it.isDigit() }
-                                        if (accepted) out_val = input
+                                        if (input.all { it.isDigit() }) out_val_versement = input
                                     },
                                     singleLine = true,
                                     keyboardOptions = KeyboardOptions(
@@ -222,24 +319,21 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                                     ),
                                     keyboardActions = KeyboardActions(
                                         onDone = {
-                                            val parsed = out_val.toIntOrNull()
-                                            // Bug fix: update the state var (not a local shadow)
-                                            // so versementBon and newSituationBon recompose
-                                            // with the correct montant before we call ajoute_*
+                                            val parsed = out_val_versement.toIntOrNull()
                                             if (parsed != null) {
                                                 montant = parsed.toDouble()
                                                 fake_init_val_du_ancien_credits_situation = parsed
                                             }
-                                            out_val =
+                                            out_val_versement =
                                                 fake_init_val_du_ancien_credits_situation?.toString()
                                                     ?: ""
-                                            isEditingCredits = false
-                                            ajoute_credit_et_affiche_compos_image()
+                                            isEditingVersement = false
+                                            ajoute_versement_et_new_sit()
                                         }
                                     ),
                                     label = {
                                         val diff = (fake_init_val_du_ancien_credits_situation
-                                            ?: 0) - (out_val.toIntOrNull() ?: 0)
+                                            ?: 0) - (out_val_versement.toIntOrNull() ?: 0)
                                         Text(
                                             text = "الرصيد السابق — $diff",
                                             style = MaterialTheme.typography.labelSmall,
@@ -247,7 +341,7 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                                     },
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .focusRequester(creditsFocusRequester),
+                                        .focusRequester(versementFocusRequester),
                                 )
                             } else {
                                 Text(
@@ -258,9 +352,10 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                             }
                         },
                         onClick = {
-                            if (!isEditingCredits) {
-                                out_val = ""
-                                isEditingCredits = true
+                            if (!isEditingVersement) {
+                                out_val_versement = ""
+                                isEditingCredit = false  // close the other field if open
+                                isEditingVersement = true
                             }
                         }
                     )

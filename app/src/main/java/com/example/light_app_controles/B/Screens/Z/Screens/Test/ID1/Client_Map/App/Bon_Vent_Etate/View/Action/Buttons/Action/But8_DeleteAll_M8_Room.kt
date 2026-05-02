@@ -1,16 +1,16 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.Buttons.Action
 
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.AvertissementDialog
 import androidx.compose.runtime.Composable
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.A_ViewModel
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.PendingAction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun But3_Import_M8Csv_To_Room(
+fun But8_DeleteAll_M8_Room(
     vm: A_ViewModel,
     coroutineScope: CoroutineScope,
     onDismiss: () -> Unit,
@@ -19,14 +19,14 @@ fun But3_Import_M8Csv_To_Room(
 ) {
     AvertissementDialog(
         title        = action_definition.name,
-        message      = "سيتم استيراد بيانات M8BonVent.csv إلى قاعدة البيانات المحلية.\n" +
-                "الصفوف الموجودة ستُحدَّث والجديدة ستُضاف.\n" +
+        message      = "سيتم حذف جميع بيانات M8BonVent من قاعدة البيانات المحلية.\n" +
+                "هذا الإجراء لا يمكن التراجع عنه.\n" +
                 "هل تريد المتابعة؟",
-        confirmLabel = "استيراد",
+        confirmLabel = "حذف",
         onConfirm    = {
             onPendingClear()
             coroutineScope.launch(Dispatchers.IO) {
-                vm.setter_LongOperations.import_M8Csv_To_Room(M8BonVent.csv_test)
+                vm.setter_LongOperations.delete_All_M8()
                 vm.reload()
                 withContext(Dispatchers.Main) { onDismiss() }
             }

@@ -32,11 +32,9 @@ class A_ViewModel(
     var captureRequested by mutableStateOf(false)
 
     init {
-
         viewModelScope.launch {
-            active_Datas.list_M8bon = (appDatabase.dao_M8BonVent().getAll()
-                 //   + fake_new_sit
-                    )
+            // FIX TODO(1): fake_new_sit is now included so it displays in the list.
+            active_Datas.list_M8bon = (appDatabase.dao_M8BonVent().getAll() + fake_new_sit)
         }
     }
 

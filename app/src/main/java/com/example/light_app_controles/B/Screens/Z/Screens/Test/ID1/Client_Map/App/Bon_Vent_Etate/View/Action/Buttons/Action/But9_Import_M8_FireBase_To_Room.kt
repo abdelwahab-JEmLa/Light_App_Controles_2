@@ -1,29 +1,29 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.Buttons.Action
 
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.AvertissementDialog
 import android.util.Log
 import androidx.compose.runtime.Composable
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.A_ViewModel
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.PendingAction
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private const val TAG = "But6_FireBaseToCsv"
+private const val TAG = "But6_FireBaseToRoom"
 
 @Composable
-fun But6_Import_M8_FireBase_To_Csv(
+fun But9_Import_M8_FireBase_To_Room(
     vm: A_ViewModel,
     coroutineScope: CoroutineScope,
     onDismiss: () -> Unit,
     onPendingClear: () -> Unit,
-    onCsvWritten: () -> Unit,
     action_definition: PendingAction,
 ) {
     AvertissementDialog(
         title        = action_definition.name,
-        message      = "سيتم استيراد بيانات M8BonVent من Firebase Realtime Database إلى\nM8BonVent.csv\n" +
+        message      = "سيتم استيراد بيانات M8BonVent من Firebase Realtime Database مباشرةً إلى قاعدة البيانات المحلية.\n" +
                 "الصفوف الموجودة ستُحدَّث والجديدة ستُضاف.\n" +
                 "هل تريد المتابعة؟",
         confirmLabel = "استيراد",
@@ -31,15 +31,14 @@ fun But6_Import_M8_FireBase_To_Csv(
             onPendingClear()
             coroutineScope.launch(Dispatchers.IO) {
                 runCatching {
-                    vm.setter_LongOperations.import_M8_FireBase_To_Csv(
+                    vm.setter_LongOperations.import_M8_FireBase_To_Room(
                         refDataBase = M8BonVent.ref_Test,
-                        csvFile     = M8BonVent.csv_test,
                     )
+                    vm.reload()
                 }.onFailure { err ->
-                    Log.e(TAG, "Échec Firebase → CSV | raison=${err.message ?: "inconnue"}", err)
+                    Log.e(TAG, "Échec Firebase → Room | raison=${err.message ?: "inconnue"}", err)
                 }.onSuccess {
-                    Log.d(TAG, "Données Firebase importées avec succès vers CSV.")
-                    withContext(Dispatchers.Main) { onCsvWritten() }
+                    Log.d(TAG, "Données Firebase importées avec succès vers Room.")
                 }
                 withContext(Dispatchers.Main) { onDismiss() }
             }

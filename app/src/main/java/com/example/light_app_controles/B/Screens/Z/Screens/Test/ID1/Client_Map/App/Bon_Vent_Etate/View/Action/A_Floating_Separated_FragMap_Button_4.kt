@@ -1,7 +1,6 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action
 
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.AvertissementDialog
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -61,6 +60,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.A_ViewModel
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.Buttons.Action.But1_Export_M8_Room_To_Csv
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.Buttons.Action.But2_Export_M8_Csv_To_FireBase
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.Buttons.Action.But3_Import_M8Csv_To_Room
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.Buttons.Action.But6_Import_M8_FireBase_To_Csv
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.Buttons.Action.But8_DeleteAll_M8_Room
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.Buttons.Action.But9_Import_M8_FireBase_To_Room
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.FAKE_CLIENT_KEY
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import kotlinx.coroutines.Dispatchers
@@ -290,18 +295,18 @@ fun B_FragMap_DropdownMenu(
     pendingAction?.let { action ->
         when (action) {
             PendingAction.But8_DeleteAll_M8_Room -> But8_DeleteAll_M8_Room(
-                vm               = vm,
-                coroutineScope   = coroutineScope,
-                onDismiss        = onDismiss,
-                onPendingClear   = { pendingAction = null },
+                vm = vm,
+                coroutineScope = coroutineScope,
+                onDismiss = onDismiss,
+                onPendingClear = { pendingAction = null },
                 action_definition = PendingAction.But8_DeleteAll_M8_Room,
             )
 
             PendingAction.But3_Import_M8Csv_To_Room -> But3_Import_M8Csv_To_Room(
-                vm               = vm,
-                coroutineScope   = coroutineScope,
-                onDismiss        = onDismiss,
-                onPendingClear   = { pendingAction = null },
+                vm = vm,
+                coroutineScope = coroutineScope,
+                onDismiss = onDismiss,
+                onPendingClear = { pendingAction = null },
                 action_definition = PendingAction.But3_Import_M8Csv_To_Room,
             )
 
@@ -314,20 +319,20 @@ fun B_FragMap_DropdownMenu(
             )
 
             PendingAction.But1_Export_M8_Room_To_Csv -> But1_Export_M8_Room_To_Csv(
-                vm               = vm,
-                coroutineScope   = coroutineScope,
-                onDismiss        = onDismiss,
-                onPendingClear   = { pendingAction = null },
-                onCsvWritten     = { csvRefreshTrigger++ },
+                vm = vm,
+                coroutineScope = coroutineScope,
+                onDismiss = onDismiss,
+                onPendingClear = { pendingAction = null },
+                onCsvWritten = { csvRefreshTrigger++ },
                 action_definition = PendingAction.But1_Export_M8_Room_To_Csv,
             )
 
             PendingAction.But6_Import_M8_FireBase_To_Csv -> But6_Import_M8_FireBase_To_Csv(
-                vm               = vm,
-                coroutineScope   = coroutineScope,
-                onDismiss        = onDismiss,
-                onPendingClear   = { pendingAction = null },
-                onCsvWritten     = { csvRefreshTrigger++ },
+                vm = vm,
+                coroutineScope = coroutineScope,
+                onDismiss = onDismiss,
+                onPendingClear = { pendingAction = null },
+                onCsvWritten = { csvRefreshTrigger++ },
                 action_definition = PendingAction.But6_Import_M8_FireBase_To_Csv,
             )
 
@@ -371,10 +376,10 @@ fun B_FragMap_DropdownMenu(
             }
 
             PendingAction.But_9_Import_M8_FireBase_To_Room -> But9_Import_M8_FireBase_To_Room(
-                vm               = vm,
-                coroutineScope   = coroutineScope,
-                onDismiss        = onDismiss,
-                onPendingClear   = { pendingAction = null },
+                vm = vm,
+                coroutineScope = coroutineScope,
+                onDismiss = onDismiss,
+                onPendingClear = { pendingAction = null },
                 action_definition = PendingAction.But_9_Import_M8_FireBase_To_Room,
             )
         }
