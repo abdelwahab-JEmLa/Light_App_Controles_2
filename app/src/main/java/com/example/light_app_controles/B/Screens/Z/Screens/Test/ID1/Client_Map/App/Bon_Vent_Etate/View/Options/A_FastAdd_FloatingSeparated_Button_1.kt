@@ -93,14 +93,23 @@ fun A_FastAdd_FloatingSeparated_Button_1(
     var showDropdown by remember { mutableStateOf(false) }
 
     val latestSituationMontant: Int? = remember(bons) {
-        bons
-            ?.filter {
-                it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit &&
-                        it.parent_M2Client_KeyID == relative_M2Client?.keyID
-            }
+        val clientBons = bons?.filter { it.parent_M2Client_KeyID == relative_M2Client?.keyID }
+
+        // Primary: latest situation snapshot
+        val latestSituation = clientBons
+            ?.filter { it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit }
             ?.maxByOrNull { it.creationTimestamps }
-            ?.montant_principale_du_type
-            ?.toInt()
+
+        latestSituation?.montant_principale_du_type?.toInt()
+            ?: // Fallback: latest credit entry — use credit_fait as the principal amount
+            clientBons
+                ?.filter {
+                    it.etateActuellementEst == M8BonVent.EtateActuellementEst.Credit ||
+                            it.etateActuellementEst == M8BonVent.EtateActuellementEst.Cette_Transaction_Type_Est_Credit
+                }
+                ?.maxByOrNull { it.creationTimestamps }
+                ?.credit_fait
+                ?.toInt()
     }
 
     var fake_init_val_du_ancien_credits_situation by remember(latestSituationMontant) {
@@ -146,7 +155,8 @@ fun A_FastAdd_FloatingSeparated_Button_1(
             etateActuellementEst = M8BonVent.EtateActuellementEst.New_Situation_Credit,
             creationTimestamps = baseTs + 1_000L,
             montant_principale_du_type = newMontant,
-        )
+        )            //<--
+        //TODO(1): pk  la new si ne ce add pas ici 
 
         currentList.add(newSituationBon)
         vm.active_Datas.list_M8bon = currentList
