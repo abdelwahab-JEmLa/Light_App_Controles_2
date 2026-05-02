@@ -52,7 +52,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewModelScope
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.A_ViewModel
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.FAKE_CLIENT_KEY
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.FAKE_PERIOD_KEY
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
@@ -92,17 +91,17 @@ fun A_FastAdd_FloatingSeparated_Button_1(
     var offsetY by remember { mutableFloatStateOf(screenHeightDp.value - 300f) }
     var showDropdown by remember { mutableStateOf(false) }
 
-    val latestSituationMontant: Int? = remember(bons) {
-        val clientBons = bons?.filter { it.parent_M2Client_KeyID == relative_M2Client?.keyID }
+    val latestSituationMontant: Int? = remember(vm.active_Datas.list_M8bon) {
+        val targetClientKey = relative_M2Client?.keyID ?: ""
+        val clientBons = vm.active_Datas.list_M8bon
+            ?.filter { it.parent_M2Client_KeyID == targetClientKey }
 
-        // Primary: latest situation snapshot
         val latestSituation = clientBons
             ?.filter { it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit }
             ?.maxByOrNull { it.creationTimestamps }
 
         latestSituation?.montant_principale_du_type?.toInt()
-            ?: // Fallback: latest credit entry — use credit_fait as the principal amount
-            clientBons
+            ?: clientBons
                 ?.filter {
                     it.etateActuellementEst == M8BonVent.EtateActuellementEst.Credit ||
                             it.etateActuellementEst == M8BonVent.EtateActuellementEst.Cette_Transaction_Type_Est_Credit
@@ -125,14 +124,12 @@ fun A_FastAdd_FloatingSeparated_Button_1(
     }
     fun ajoute_credit_et_affiche_compos_image(
         montant: Double,
-        clientKey: String = FAKE_CLIENT_KEY,
-        periodKey: String = FAKE_PERIOD_KEY,
+        clientKey: String = relative_M2Client?.keyID ?: "",
     ) {
         val baseTs = System.currentTimeMillis()
         val currentList = vm.active_Datas.list_M8bon?.toMutableList() ?: mutableListOf()
         val versementBon = M8BonVent(
             parent_M2Client_KeyID = clientKey,
-            parent_M14VentPeriod_KeyId = periodKey,
             etateActuellementEst = M8BonVent.EtateActuellementEst.Versemment,
             creationTimestamps = baseTs,
             versement_fait = montant,
@@ -142,7 +139,6 @@ fun A_FastAdd_FloatingSeparated_Button_1(
         val latestSit = currentList
             .filter {
                 it.parent_M2Client_KeyID == clientKey &&
-                        it.parent_M14VentPeriod_KeyId == periodKey &&
                         it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit
             }
             .maxByOrNull { it.creationTimestamps }
@@ -151,12 +147,10 @@ fun A_FastAdd_FloatingSeparated_Button_1(
 
         val newSituationBon = M8BonVent(
             parent_M2Client_KeyID = clientKey,
-            parent_M14VentPeriod_KeyId = periodKey,
             etateActuellementEst = M8BonVent.EtateActuellementEst.New_Situation_Credit,
             creationTimestamps = baseTs + 1_000L,
             montant_principale_du_type = newMontant,
-        )            //<--
-        //TODO(1): pk  la new si ne ce add pas ici 
+        )
 
         currentList.add(newSituationBon)
         vm.active_Datas.list_M8bon = currentList

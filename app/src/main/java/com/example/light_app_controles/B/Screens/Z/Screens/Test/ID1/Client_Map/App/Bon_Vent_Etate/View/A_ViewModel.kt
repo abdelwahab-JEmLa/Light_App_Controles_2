@@ -17,7 +17,6 @@ import kotlinx.coroutines.launch
 class ActiveDatas {
     var active_M9Compt: M09AppCompt? by mutableStateOf(null)
     var list_M8bon: List<M8BonVent>? by mutableStateOf(null)
-    var focused_period_Key: String? by mutableStateOf(null)
 }
 
 @SuppressLint("StaticFieldLeak")
@@ -33,7 +32,6 @@ class A_ViewModel(
     var captureRequested by mutableStateOf(false)
 
     init {
-        active_Datas.focused_period_Key = FAKE_PERIOD_KEY
 
         viewModelScope.launch {
             active_Datas.list_M8bon = appDatabase.dao_M8BonVent().getAll()
@@ -67,7 +65,6 @@ class A_ViewModel(
     }
 }
 
-const val FAKE_PERIOD_KEY = "fake_period_key_001"
 
 private fun fakeBon(
     keySuffix: String,
@@ -81,7 +78,6 @@ private fun fakeBon(
 ): M8BonVent = M8BonVent(
     keyID = "fake_key_$keySuffix",
     parent_M2Client_KeyID = FAKE_CLIENT_KEY,
-    parent_M14VentPeriod_KeyId = FAKE_PERIOD_KEY,
     etateActuellementEst = etat,
     creationTimestamps = System.currentTimeMillis() - creationOffset,
     versement_fait = versementFait,
