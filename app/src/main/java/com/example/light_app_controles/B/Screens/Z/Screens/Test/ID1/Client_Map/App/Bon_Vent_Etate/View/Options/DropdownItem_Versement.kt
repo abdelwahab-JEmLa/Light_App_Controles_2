@@ -25,14 +25,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 
-/**
- * Dropdown item — "الرصيد السابق" (versement / client repayment).
- *
- * @param isActive       true when this item is in editing mode (controlled by parent)
- * @param onActivate     called when the user taps the item; parent should set isActive = true
- *                       and close any other active item
- * @param onCommit       called with the two new bons once the user presses Done
- */
 @Composable
 fun DropdownItem_Versement(
     clientKey: String,
