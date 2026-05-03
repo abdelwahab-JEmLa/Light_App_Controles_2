@@ -1,0 +1,10 @@
+PS C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles>
+
+android screen resolve --screenshot=ui.png --string="input tap #76"
+android screen resolve --screenshot=ui.png --string="input tap #53"
+
+
+adb shell input tap   731 1618
+adb shell input tap   451 1149
+
+ android screen capture --output=ui.png --annotate

@@ -166,13 +166,18 @@ fun Main_Preview_BonVentEtateScreen(
 
             val packageName = if (isWhatsAppBusiness) "com.whatsapp.w4b" else "com.whatsapp"
 
-            // Build an ACTION_SEND / ACTION_SEND_MULTIPLE intent that carries the image
-            // URIs so WhatsApp actually receives the files.
-            // FLAG_GRANT_READ_URI_PERMISSION is required for content:// MediaStore URIs.
+            // FIX TODO(1): FLAG_GRANT_READ_URI_PERMISSION is only honoured for URIs that
+            // are declared inside ClipData — URIs placed solely in EXTRA_STREAM are NOT
+            // covered by the flag, so WhatsApp receives the URI but the OS never grants it
+            // read access, making the attachment appear empty.
+            // Solution: mirror every URI in ClipData AND call grantUriPermission explicitly.
             val shareIntent = if (savedUris.size == 1) {
+                val uri = savedUris.first()
                 android.content.Intent(android.content.Intent.ACTION_SEND).apply {
                     type = "image/webp"
-                    putExtra(android.content.Intent.EXTRA_STREAM, savedUris.first())
+                    putExtra(android.content.Intent.EXTRA_STREAM, uri)
+                    // ClipData is mandatory for the flag to propagate to the target package.
+                    clipData = android.content.ClipData.newRawUri("", uri)
                     addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     setPackage(packageName)
                 }
@@ -183,9 +188,27 @@ fun Main_Preview_BonVentEtateScreen(
                         android.content.Intent.EXTRA_STREAM,
                         ArrayList(savedUris),
                     )
+                    // Build a ClipData that contains ALL URIs so the flag covers every one.
+                    val clip = android.content.ClipData.newRawUri("", savedUris.first())
+                    savedUris.drop(1).forEach { uri ->
+                        clip.addItem(android.content.ClipData.Item(uri))
+                    }
+                    clipData = clip
                     addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     setPackage(packageName)
                 }
+            }
+
+            // Explicit grant as a belt-and-suspenders measure: some OEM launchers and
+            // WhatsApp versions still rely on this even when ClipData is present.
+            savedUris.forEach { uri ->
+                try {
+                    context.grantUriPermission(
+                        packageName,
+                        uri,
+                        android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION,
+                    )
+                } catch (_: Exception) { /* ignore — not fatal */ }
             }
 
             try {
