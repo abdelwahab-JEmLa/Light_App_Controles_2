@@ -34,20 +34,15 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.semantics.SemanticsPropertyKey
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import kotlin.math.roundToInt
 
-// ── Active item tracker ───────────────────────────────────────────────────────
- enum class ActiveDropdownItem {
-    None, Credit, Versement,
-    WorkerPhone,   // editing worker num_worker / nom_worker
+enum class ActiveDropdownItem {
+    None, Credit, Versement, WorkerPhone,
 }
 
-// ── Button appearance model ───────────────────────────────────────────────────
 data class Button_State(
     val showLabels: Boolean = true,
     val its_Active: Boolean = false,
@@ -61,21 +56,7 @@ data class Button_State(
     }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Private helpers
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Normalises any Algerian phone number to the digits-only international format
- * required by wa.me URLs (no leading "+", country code 213).
- *
- * Examples:
- *   "+213553885037" → "213553885037"
- *   "0553885037"    → "213553885037"
- *   "553885037"     → "213553885037"
- *   "213553885037"  → "213553885037"  (already correct)
- */
- fun normaliseToWaMeNumber(raw: String): String {
+fun normaliseToWaMeNumber(raw: String): String {
     val digits = raw.filter { it.isDigit() }
     return when {
         digits.startsWith("213") -> digits
@@ -84,35 +65,8 @@ data class Button_State(
     }
 }
 
-/**
- * Fixed Abdelwahab Osstad number in wa.me format (digits only, no "+").
- * Pre-normalised so it is safe to embed directly in "https://wa.me/<number>".
- */
- const val ABDELWAHAB_WA_ME_NUMBER = "213553885037"
+const val ABDELWAHAB_WA_ME_NUMBER = "213553885037"
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Private composable helpers
-// ─────────────────────────────────────────────────────────────────────────────
-       //<--
-       //TODO(1): enleve les commantaire et logs et les sementics pour but de consise le max possible  tallie du code sans change le foctionemen
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Main composable
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * Floating, draggable action button that opens a dropdown with:
- *
- * - **Credit** / **Versement** quick-add items (persist new [M8BonVent] records via [onCommit]).
- * - **Abdelwahab WhatsApp** — sends captured images to Abdelwahab's fixed number (not editable).
- * - **Abdelwahab WhatsApp Business** — same number, but targets com.whatsapp.w4b.
- * - **Worker WhatsApp** — sends to [M2Client.num_worker]; nom/num are editable inline.
- *
- * @param onCommit         Called with the two new bons (operation + new_situation).
- * @param onSendWhatsApp   Called when the user taps a WhatsApp item.
- *                         Receives (phoneNumber, isWhatsAppBusiness).
- * @param onUpdateClient   Called whenever the user saves edited worker info.
- */
 @Composable
 fun A_FastAdd_FloatingSeparated_Button_1(
     buttonState: Button_State = Button_State.get_Default().copy(
@@ -139,7 +93,6 @@ fun A_FastAdd_FloatingSeparated_Button_1(
 
     val clientKey = relative_M2Client?.keyID ?: ""
 
-    // ── Resolve latest situation montant ──────────────────────────────────────
     val latestSituationMontant: Int? = remember(bons) {
         val clientBons = bons?.filter { it.parent_M2Client_KeyID == clientKey }
         clientBons
@@ -155,12 +108,10 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                 ?.credit_fait?.toInt()
     }
 
-    // ── Which item is currently in edit mode ──────────────────────────────────
     var activeItem by remember { mutableStateOf(ActiveDropdownItem.None) }
 
     val showWhatsAppItems = bons?.isNotEmpty() == true
 
-    // ─────────────────────────────────────────────────────────────────────────
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier
@@ -179,12 +130,7 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 FloatingActionButton(
-                    modifier = Modifier
-                        .semantics(mergeDescendants = true) {
-                            set(SemanticsPropertyKey<String>("clientKey"), clientKey)
-                            set(SemanticsPropertyKey<Int?>("latestSituationMontant"), latestSituationMontant)
-                        }
-                        .size(48.dp),
+                    modifier = Modifier.size(48.dp),
                     onClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         showDropdown = true
@@ -207,7 +153,6 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                     },
                     modifier = Modifier.background(Color.White, RoundedCornerShape(8.dp)),
                 ) {
-                    // ── Credit / Versement ────────────────────────────────────
                     HorizontalDivider(thickness = 3.dp, color = Color.Red)
 
                     DropdownItem_Credit(
@@ -234,30 +179,23 @@ fun A_FastAdd_FloatingSeparated_Button_1(
 
                     HorizontalDivider(thickness = 3.dp, color = Color.Red)
 
-                    // ── WhatsApp items ────────────────────────────────────────
                     if (showWhatsAppItems) {
-
-                        // 1 — Abdelwahab regular WhatsApp
                         DropdownItem_WhatsApp_FixedAbdelwahab(
                             isWhatsAppBusiness = false,
                             iconTint = Color(0xFF25D366),
                             labelPrefix = "WhatsApp",
                             onSend = { phone, isBusiness ->
-                                // FIX: dismiss *before* mutating state so there is no
-                                // recomposition frame where the dropdown is still visible
                                 showDropdown = false
                                 activeItem = ActiveDropdownItem.None
                                 onSendWhatsApp(phone, isBusiness)
                             },
                         )
 
-                        // 2 — Abdelwahab WhatsApp Business
                         DropdownItem_WhatsApp_FixedAbdelwahab(
                             isWhatsAppBusiness = true,
                             iconTint = Color(0xFF00897B),
                             labelPrefix = "WhatsApp Business",
                             onSend = { phone, isBusiness ->
-                                // FIX: dismiss *before* mutating state (same reason)
                                 showDropdown = false
                                 activeItem = ActiveDropdownItem.None
                                 onSendWhatsApp(phone, isBusiness)
@@ -266,7 +204,6 @@ fun A_FastAdd_FloatingSeparated_Button_1(
 
                         HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
 
-                        // 3 — Worker WhatsApp (editable)
                         if (relative_M2Client != null) {
                             DropdownItem_WhatsApp_Worker(
                                 currentNomWorker = relative_M2Client.nom_worker,
@@ -280,7 +217,6 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                                     activeItem = ActiveDropdownItem.None
                                 },
                                 onSend = { phone ->
-                                    // FIX: dismiss *before* mutating state (same reason)
                                     showDropdown = false
                                     activeItem = ActiveDropdownItem.None
                                     onSendWhatsApp(phone, false)

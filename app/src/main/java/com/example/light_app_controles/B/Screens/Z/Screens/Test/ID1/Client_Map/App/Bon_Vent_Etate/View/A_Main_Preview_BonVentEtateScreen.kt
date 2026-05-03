@@ -2,7 +2,6 @@ package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.
 
 import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -48,8 +47,6 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
-private const val TAG = "MainPreviewScreen"
 
 private val CREDIT_VERSEMENT_STATES = setOf(
     M8BonVent.EtateActuellementEst.COMMANDE_LIVRAI,
@@ -144,24 +141,9 @@ fun Main_Preview_BonVentEtateScreen(
         if (captured.isNotEmpty()) showDlg = true
     }
 
-    // ── FIX TODO(1) ──────────────────────────────────────────────────────────
-    // BUG: saveAllToMediaStore faisait du IO lourd (Bitmap.compress WEBP_LOSSLESS)
-    // sur Dispatchers.Main. startActivity() était appelé immédiatement après, avant
-    // que le IS_PENDING=0 ait eu le temps de se propager via le ContentProvider de
-    // MediaStore aux autres processus → WhatsApp recevait un URI valide mais dont
-    // le fichier était encore invisible (pending) ou non-flushé.
-    //
-    // FIX 1: withContext(Dispatchers.IO) pour le save → IO thread dédié, écriture réelle.
-    // FIX 2: delay(250) après le save → laisse MediaStore propager IS_PENDING=0
-    //         avant que WhatsApp ouvre le file descriptor.
-    // FIX 3: guard savedUris.isEmpty() → évite le crash silencieux sur savedUris.first()
-    //         qui avalait l'exception dans le scope de la coroutine et n'envoyait rien.
-    // ─────────────────────────────────────────────────────────────────────────
     LaunchedEffect(whatsappSendRequest) {
         val request = whatsappSendRequest ?: return@LaunchedEffect
         val (phoneNumber, isWhatsAppBusiness) = request
-
-        Log.d(TAG, "WhatsApp flow start — phone=$phoneNumber business=$isWhatsAppBusiness")
 
         val raw = ctrl.captureAllWithScroll(
             state          = listState,
@@ -173,13 +155,10 @@ fun Main_Preview_BonVentEtateScreen(
         val namedImages = mapRawToNamed(raw)
 
         if (namedImages.isEmpty()) {
-            Log.w(TAG, "WhatsApp flow: no images captured — aborting")
             whatsappSendRequest = null
             return@LaunchedEffect
         }
 
-        // FIX 1: withContext(IO) — le compress WEBP_LOSSLESS ne bloque plus le Main thread,
-        // et le flush disque + IS_PENDING=0 sont garantis terminés avant de continuer.
         val savedUris: List<android.net.Uri> = withContext(Dispatchers.IO) {
             relative_M2Client?.let {
                 saveAllToMediaStore(
@@ -189,30 +168,17 @@ fun Main_Preview_BonVentEtateScreen(
                 )
             } ?: emptyList()
         }
-        Log.d(TAG, "WhatsApp flow: saved ${savedUris.size} URIs via MediaStore")
 
-        // FIX 3: guard — si aucun URI (client null ou insert échoué), ne pas construire l'intent.
         if (savedUris.isEmpty()) {
-            Log.e(TAG, "WhatsApp flow: savedUris empty — intent annulé")
             whatsappSendRequest = null
             return@LaunchedEffect
         }
 
-        // FIX 2: délai de propagation — MediaStore notifie les observers via binder asynchrone.
-        // Sans ce délai, WhatsApp peut ouvrir le URI pendant la fenêtre où le fichier
-        // est encore marqué IS_PENDING ou son file descriptor pas encore visible cross-process.
         kotlinx.coroutines.delay(250)
-        Log.d(TAG, "WhatsApp flow: propagation delay done — building intent")
 
         val packageName = if (isWhatsAppBusiness) "com.whatsapp.w4b" else "com.whatsapp"
         val pm = context.packageManager
 
-        // FIX ActivityNotFoundException:
-        // setPackage() + ACTION_SEND_MULTIPLE échoue car WhatsApp n'expose pas cette
-        // combinaison dans son manifest. Il faut résoudre le composant exact via
-        // queryIntentActivities() SANS setPackage, puis cibler avec setComponent().
-        // Ainsi Android route directement vers la bonne Activity de WhatsApp sans
-        // passer par le resolver — et le FLAG_GRANT_READ_URI_PERMISSION est honoré.
         fun buildBaseIntent(): android.content.Intent =
             if (savedUris.size == 1) {
                 android.content.Intent(android.content.Intent.ACTION_SEND).apply {
@@ -232,59 +198,54 @@ fun Main_Preview_BonVentEtateScreen(
                 }
             }
 
-        // Résolution du composant WhatsApp exact pour cet intent.
+        // FIX TODO(1): WhatsApp never declares ACTION_SEND_MULTIPLE in its intent-filters,
+        // so queryIntentActivities(SEND_MULTIPLE) always returns empty → component = null.
+        // Solution: probe with ACTION_SEND (which WhatsApp always declares) to resolve the
+        // component, then apply that component to the real SEND_MULTIPLE intent.
+        val probeIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+            type = "image/*"
+        }
         @Suppress("DEPRECATION")
         val resolvedComponent = pm
-            .queryIntentActivities(buildBaseIntent(), android.content.pm.PackageManager.MATCH_DEFAULT_ONLY)
+            .queryIntentActivities(probeIntent, android.content.pm.PackageManager.MATCH_DEFAULT_ONLY)
             .firstOrNull { it.activityInfo.packageName == packageName }
             ?.activityInfo
             ?.let { android.content.ComponentName(it.packageName, it.name) }
-
-        Log.d(TAG, "WhatsApp flow: resolved component = $resolvedComponent")
-
-        val shareIntent = buildBaseIntent().apply {
-            if (resolvedComponent != null) {
-                // Ciblage exact → pas d'ActivityNotFoundException, flag URI propagé.
-                setComponent(resolvedComponent)
-            } else {
-                // WhatsApp pas installé ou intent non supporté → on laisse le chooser décider.
-                Log.w(TAG, "WhatsApp flow: composant introuvable pour $packageName — chooser fallback")
-            }
-        }
 
         savedUris.forEach { uri ->
             try { context.grantUriPermission(packageName, uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }
             catch (_: Exception) { }
         }
 
-        Log.i(TAG, "WhatsApp flow: startActivity — pkg=$packageName uris=${savedUris.size} component=$resolvedComponent")
-        try {
-            if (resolvedComponent != null) {
-                context.startActivity(shareIntent)
-            } else {
-                // WhatsApp introuvable → fallback wa.me
-                throw android.content.ActivityNotFoundException("$packageName non résolu")
+        if (resolvedComponent != null) {
+            try {
+                context.startActivity(buildBaseIntent().apply { setComponent(resolvedComponent) })
+            } catch (e: Exception) {
+                android.widget.Toast.makeText(context, "Erreur WhatsApp", android.widget.Toast.LENGTH_SHORT).show()
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "WhatsApp non résolu — fallback wa.me", e)
+        } else {
             try {
                 context.startActivity(
-                    android.content.Intent(
-                        android.content.Intent.ACTION_VIEW,
-                        android.net.Uri.parse("https://wa.me/$phoneNumber"),
-                    )
+                    android.content.Intent.createChooser(buildBaseIntent(), "Partager via WhatsApp")
+                        .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
                 )
-            } catch (e2: Exception) {
-                Log.e(TAG, "Fallback aussi échoué", e2)
-                android.widget.Toast.makeText(context, "WhatsApp non installé", android.widget.Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                try {
+                    context.startActivity(
+                        android.content.Intent(
+                            android.content.Intent.ACTION_VIEW,
+                            android.net.Uri.parse("https://wa.me/$phoneNumber"),
+                        )
+                    )
+                } catch (e2: Exception) {
+                    android.widget.Toast.makeText(context, "WhatsApp non installé", android.widget.Toast.LENGTH_SHORT).show()
+                }
             }
         }
 
         whatsappSendRequest = null
         onClick_Lence_Capture()
-        Log.i(TAG, "TODO(1) FIX COMPLETE — WhatsApp flow terminé proprement")
     }
-    // ─────────────────────────────────────────────────────────────────────────
 
     Box {
         Column(modifier = modifier.fillMaxSize()) {
