@@ -1,4 +1,4 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b_FastAdd_FloatingSeparated_Button_1.Actions
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Work_IN
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Work_IN.ABDELWAHAB_WA_ME_NUMBER
 
 @Composable
 fun DropdownItem_WhatsApp_FixedAbdelwahab(
@@ -39,7 +40,7 @@ fun DropdownItem_WhatsApp_FixedAbdelwahab(
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Text(
-                    text = "+$ABDELWAHAB_WA_ME_NUMBER",
+                    text = "+${ABDELWAHAB_WA_ME_NUMBER}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

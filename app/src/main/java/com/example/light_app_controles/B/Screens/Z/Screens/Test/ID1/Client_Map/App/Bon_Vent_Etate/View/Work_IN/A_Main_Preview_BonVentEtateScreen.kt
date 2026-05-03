@@ -1,7 +1,14 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Work_IN
 
 import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
+import android.content.ClipData
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,8 +37,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.A_ViewModel
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Options.Floating_Separated_Button
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b_FastAdd_FloatingSeparated_Button_1.Actions.A_FastAdd_FloatingSeparated_Button_1
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Work_IN.A_FastAdd_FloatingSeparated_Button_1
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Views.Affiche_NonCredit_Etate
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Views.Situation_Card_ItemView
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Views.Y_Credit_And_Versement_ItemView
@@ -42,6 +51,7 @@ import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.A
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Z.preview.FAKE_CLIENT_KEY
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
@@ -56,6 +66,8 @@ private val CREDIT_VERSEMENT_STATES = setOf(
     M8BonVent.EtateActuellementEst.Demande_Versemet,
     M8BonVent.EtateActuellementEst.New_Situation_Credit,
 )
+
+private const val WA_LOG = "WA_SHARE_FLOW"
 
 @Composable
 fun Main_Preview_BonVentEtateScreen(
@@ -105,7 +117,7 @@ fun Main_Preview_BonVentEtateScreen(
         allBons.map { b -> "${b.creationTimestamps}|${b.keyID}|${b.etateActuellementEst.name}" }
 
     suspend fun runCapture() {
-        kotlinx.coroutines.delay(200)
+        delay(200)
         val raw = ctrl.captureAllWithScroll(
             state          = listState,
             totalItemCount = allBons.size,
@@ -142,9 +154,20 @@ fun Main_Preview_BonVentEtateScreen(
     }
 
     LaunchedEffect(whatsappSendRequest) {
-        val request = whatsappSendRequest ?: return@LaunchedEffect
+        // ─────────────────────────────────────────────────────────
+        // STEP 0 — request guard
+        // ─────────────────────────────────────────────────────────
+        val request = whatsappSendRequest ?: run {
+            Log.d(WA_LOG, "[0] whatsappSendRequest est null → skip")
+            return@LaunchedEffect
+        }
         val (phoneNumber, isWhatsAppBusiness) = request
+        Log.i(WA_LOG, "[0] ▶ flow démarré | phone=$phoneNumber | business=$isWhatsAppBusiness")
 
+        // ─────────────────────────────────────────────────────────
+        // STEP 1 — capture des items visibles via scroll
+        // ─────────────────────────────────────────────────────────
+        Log.d(WA_LOG, "[1] capture → allBons.size=${allBons.size} | orderedKeys=${buildOrderedKeys()}")
         val raw = ctrl.captureAllWithScroll(
             state          = listState,
             totalItemCount = allBons.size,
@@ -152,99 +175,168 @@ fun Main_Preview_BonVentEtateScreen(
             restoreIndex   = 0,
             orderedKeys    = buildOrderedKeys(),
         )
+        Log.d(WA_LOG, "[1] captureAllWithScroll terminé → ${raw.size} bitmaps bruts")
+
         val namedImages = mapRawToNamed(raw)
+        Log.d(WA_LOG, "[1] namedImages → ${namedImages.map { it.second }}")
 
         if (namedImages.isEmpty()) {
+            Log.w(WA_LOG, "[1] ✗ aucune image capturée → abandon")
             whatsappSendRequest = null
             return@LaunchedEffect
         }
 
-        val savedUris: List<android.net.Uri> = withContext(Dispatchers.IO) {
+        // ─────────────────────────────────────────────────────────
+        // STEP 2 — sauvegarde MediaStore
+        // ─────────────────────────────────────────────────────────
+        Log.d(WA_LOG, "[2] saveAllToMediaStore | clientKeyID=${relative_M2Client?.keyID}")
+        val savedUris: List<Uri> = withContext(Dispatchers.IO) {
             relative_M2Client?.let {
                 saveAllToMediaStore(
                     bitmaps     = namedImages.map { (img, lbl) -> img.asAndroidBitmap() to lbl },
                     context     = context,
                     clientKeyID = it.keyID,
                 )
-            } ?: emptyList()
+            } ?: emptyList<Uri>().also {
+                Log.w(WA_LOG, "[2] ✗ relative_M2Client est null → pas de sauvegarde")
+            }
         }
+        Log.d(WA_LOG, "[2] savedUris (${savedUris.size}) → ${savedUris.joinToString()}")
 
         if (savedUris.isEmpty()) {
+            Log.w(WA_LOG, "[2] ✗ aucun URI sauvegardé → abandon")
             whatsappSendRequest = null
             return@LaunchedEffect
         }
 
-        kotlinx.coroutines.delay(250)
-
+        // ─────────────────────────────────────────────────────────
+        // STEP 3 — résolution du composant WhatsApp
+        // ─────────────────────────────────────────────────────────
+        // setPackage() échoue pour ACTION_SEND_MULTIPLE car WhatsApp n'expose pas ce
+        // handler comme activité résolvable via package filter. On résout donc le
+        // ComponentName exact en interrogeant queryIntentActivities avec la bonne action.
+        delay(250)
         val packageName = if (isWhatsAppBusiness) "com.whatsapp.w4b" else "com.whatsapp"
+        val intentAction = if (savedUris.size == 1) Intent.ACTION_SEND else Intent.ACTION_SEND_MULTIPLE
+        Log.d(WA_LOG, "[3] résolution | package=$packageName | action=${intentAction.substringAfterLast('.')} | uris=${savedUris.size}")
+
         val pm = context.packageManager
 
-        fun buildBaseIntent(): android.content.Intent =
+        // Android 11+ (API 30) Package Visibility : queryIntentActivities retourne vide
+        // pour les packages non déclarés dans <queries> du manifest, même avec flag 0.
+        // Fix manifest requis (voir commentaire en bas de ce bloc).
+        // On tente avec flag 0 (plus large que MATCH_DEFAULT_ONLY qui exige CATEGORY_DEFAULT
+        // dans le filtre — WhatsApp ne le déclare pas pour SEND_MULTIPLE).
+        @Suppress("DEPRECATION")
+        val allCandidates = pm.queryIntentActivities(
+            Intent(intentAction).apply { type = "image/*" },
+            0,
+        )
+        Log.d(WA_LOG, "[3] queryIntentActivities → ${allCandidates.size} candidats" +
+                " | packages=${allCandidates.map { it.activityInfo.packageName }}")
+
+        // Cherche d'abord le package demandé, puis le variant alternatif si absent.
+        // com.whatsapp ne déclare pas toujours ACTION_SEND_MULTIPLE selon la version
+        // installée ; com.whatsapp.w4b peut le faire à sa place et vice-versa.
+        val alternativePackage = if (packageName == "com.whatsapp") "com.whatsapp.w4b" else "com.whatsapp"
+
+        val resolvedInfo = allCandidates.firstOrNull { it.activityInfo.packageName == packageName }
+            ?: allCandidates.firstOrNull { it.activityInfo.packageName == alternativePackage }
+                ?.also { Log.w(WA_LOG, "[3] $packageName absent des candidats → fallback vers $alternativePackage") }
+
+        val resolvedComponent: ComponentName? = resolvedInfo
+            ?.activityInfo
+            ?.let { ComponentName(it.packageName, it.name) }
+
+        if (resolvedComponent == null) {
+            Log.w(WA_LOG, "[3] resolvedComponent=null — ni $packageName ni $alternativePackage" +
+                    " ne déclarent ACTION_SEND_MULTIPLE sur ce device." +
+                    " Candidats présents : ${allCandidates.map { it.activityInfo.packageName }.distinct()}")
+        } else {
+            Log.d(WA_LOG, "[3] resolvedComponent=$resolvedComponent")
+        }
+
+        // Intent de base sans binding package/composant — on applique l'un ou l'autre ensuite.
+        fun buildBaseIntent(): Intent =
             if (savedUris.size == 1) {
-                android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                    type = "image/webp"
-                    putExtra(android.content.Intent.EXTRA_STREAM, savedUris.first())
-                    clipData = android.content.ClipData.newRawUri("", savedUris.first())
-                    addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "image/*"
+                    putExtra(Intent.EXTRA_STREAM, savedUris.first())
+                    clipData = ClipData.newRawUri("", savedUris.first())
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
             } else {
-                android.content.Intent(android.content.Intent.ACTION_SEND_MULTIPLE).apply {
+                Intent(Intent.ACTION_SEND_MULTIPLE).apply {
                     type = "image/*"
-                    putParcelableArrayListExtra(android.content.Intent.EXTRA_STREAM, ArrayList(savedUris))
-                    val clip = android.content.ClipData.newRawUri("", savedUris.first())
-                    savedUris.drop(1).forEach { clip.addItem(android.content.ClipData.Item(it)) }
+                    putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(savedUris))
+                    val clip = ClipData.newRawUri("", savedUris.first())
+                    savedUris.drop(1).forEach { clip.addItem(ClipData.Item(it)) }
                     clipData = clip
-                    addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
                 }
             }
 
-        // FIX TODO(1): WhatsApp never declares ACTION_SEND_MULTIPLE in its intent-filters,
-        // so queryIntentActivities(SEND_MULTIPLE) always returns empty → component = null.
-        // Solution: probe with ACTION_SEND (which WhatsApp always declares) to resolve the
-        // component, then apply that component to the real SEND_MULTIPLE intent.
-        val probeIntent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-            type = "image/*"
-        }
-        @Suppress("DEPRECATION")
-        val resolvedComponent = pm
-            .queryIntentActivities(probeIntent, android.content.pm.PackageManager.MATCH_DEFAULT_ONLY)
-            .firstOrNull { it.activityInfo.packageName == packageName }
-            ?.activityInfo
-            ?.let { android.content.ComponentName(it.packageName, it.name) }
-
-        savedUris.forEach { uri ->
-            try { context.grantUriPermission(packageName, uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION) }
-            catch (_: Exception) { }
-        }
-
-        if (resolvedComponent != null) {
+        // ─────────────────────────────────────────────────────────
+        // STEP 4 — grant URI permissions
+        // ─────────────────────────────────────────────────────────
+        savedUris.forEachIndexed { i, uri ->
             try {
-                context.startActivity(buildBaseIntent().apply { setComponent(resolvedComponent) })
+                context.grantUriPermission(packageName, uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                Log.d(WA_LOG, "[4] grantUriPermission ✓ [$i] $uri")
             } catch (e: Exception) {
-                android.widget.Toast.makeText(context, "Erreur WhatsApp", android.widget.Toast.LENGTH_SHORT).show()
+                Log.w(WA_LOG, "[4] grantUriPermission ✗ [$i] $uri | ${e.message}")
             }
-        } else {
+        }
+
+        // ─────────────────────────────────────────────────────────
+        // STEP 5 — lancement de l'intent
+        // ─────────────────────────────────────────────────────────
+        val directIntent = buildBaseIntent().apply {
+            if (resolvedComponent != null) component = resolvedComponent
+            else setPackage(packageName) // setPackage seul — marche pour ACTION_SEND
+        }
+        Log.d(WA_LOG, "[5] lancement | component=$resolvedComponent | hasPackage=${directIntent.`package`}")
+
+        try {
+            context.startActivity(directIntent)
+            Log.i(WA_LOG, "[5] ✓ startActivity direct réussi")
+        } catch (e: Exception) {
+            Log.e(WA_LOG, "[5] ✗ startActivity direct échoué | ${e.message}")
+
+            // Fallback B — chooser système (images restent attachées, contrairement à wa.me)
             try {
+                Log.d(WA_LOG, "[5] fallback chooser (images conservées)")
                 context.startActivity(
-                    android.content.Intent.createChooser(buildBaseIntent(), "Partager via WhatsApp")
-                        .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                    Intent.createChooser(buildBaseIntent(), null)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 )
-            } catch (e: Exception) {
+                Log.i(WA_LOG, "[5] ✓ fallback chooser lancé")
+            } catch (e2: Exception) {
+                Log.e(WA_LOG, "[5] ✗ fallback chooser échoué | ${e2.message}")
+
+                // Fallback C — wa.me (perd les images, dernier recours)
                 try {
+                    val waUrl = "https://wa.me/$phoneNumber"
+                    Log.d(WA_LOG, "[5] fallback wa.me → $waUrl")
                     context.startActivity(
-                        android.content.Intent(
-                            android.content.Intent.ACTION_VIEW,
-                            android.net.Uri.parse("https://wa.me/$phoneNumber"),
-                        )
+                        Intent(Intent.ACTION_VIEW, Uri.parse(waUrl))
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     )
-                } catch (e2: Exception) {
-                    android.widget.Toast.makeText(context, "WhatsApp non installé", android.widget.Toast.LENGTH_SHORT).show()
+                    Log.i(WA_LOG, "[5] ✓ fallback wa.me lancé")
+                } catch (e3: Exception) {
+                    Log.e(WA_LOG, "[5] ✗ tous les fallbacks échoués | ${e3.message}")
+                    Toast.makeText(context, "WhatsApp non installé", Toast.LENGTH_SHORT).show()
                 }
             }
         }
 
+        // ─────────────────────────────────────────────────────────
+        // STEP 6 — nettoyage
+        // ─────────────────────────────────────────────────────────
+        Log.d(WA_LOG, "[6] reset whatsappSendRequest + callback onClick_Lence_Capture")
         whatsappSendRequest = null
         onClick_Lence_Capture()
+        Log.i(WA_LOG, "[6] ■ flow terminé")
     }
 
     Box {
