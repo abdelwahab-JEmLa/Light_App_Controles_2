@@ -1,4 +1,4 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Views
 
 import android.annotation.SuppressLint
 import android.widget.Toast
@@ -38,19 +38,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Z.Components.DatesHandler
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Z.Components.EditableAmountField
 
 @SuppressLint("AutoboxingStateCreation")
 @Composable
-fun Situation_Card_ItemView(
+fun Y_Credit_And_Versement_ItemView(
     allBonVentList: List<M8BonVent>,
     relative_M8BonVent: M8BonVent,
     onUpdate: (M8BonVent) -> Unit,
     onDelete: (M8BonVent) -> Unit,
 ) {
+    val calculatedMainVal = relative_M8BonVent.fun_calculative_du_main_val(allBonVentList)
 
-    val colore_text = relative_M8BonVent.etateActuellementEst.text_color
     val isNewSituationCredit =
         relative_M8BonVent.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit
 
@@ -77,6 +78,7 @@ fun Situation_Card_ItemView(
         }
         .maxByOrNull { it.creationTimestamps }
 
+    val colore_text = relative_M8BonVent.etateActuellementEst.text_color
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -131,8 +133,8 @@ fun Situation_Card_ItemView(
             when {
                 isNewSituationCredit -> {
                     @SuppressLint("DefaultLocale")
-                    val formattedVal = String.format("%.2f", relative_M8BonVent.montant_principale_du_type)
-                    val (label, color) = if (relative_M8BonVent.montant_principale_du_type >= 0)
+                    val formattedVal = String.format("%.2f", calculatedMainVal)
+                    val (label, color) = if (calculatedMainVal >= 0)
                         "الرصيد المتبقي (دين)" to Color.White
                     else
                         "رصيد سالب (زيادة دفع)" to Color.Yellow
@@ -172,7 +174,7 @@ fun Situation_Card_ItemView(
                                 Toast.LENGTH_SHORT
                             ).show()
                         },
-                        color =colore_text
+                        color = Color.White
                     )
                 }
 

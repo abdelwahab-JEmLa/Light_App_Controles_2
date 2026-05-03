@@ -1,4 +1,4 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Options
 
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.AvertissementDialog
 import androidx.compose.foundation.background
@@ -60,14 +60,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.A_ViewModel
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.Buttons.Action.But1_Export_M8_Room_To_Csv
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.Buttons.Action.But2_Export_M8_Csv_To_FireBase
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.Buttons.Action.But3_Import_M8Csv_To_Room
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.Buttons.Action.But6_Import_M8_FireBase_To_Csv
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.Buttons.Action.But8_DeleteAll_M8_Room
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.Buttons.Action.But9_Import_M8_FireBase_To_Room
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Options.Buttons.Action.But1_Export_M8_Room_To_Csv
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Options.Buttons.Action.But2_Export_M8_Csv_To_FireBase
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Options.Buttons.Action.But3_Import_M8Csv_To_Room
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Options.Buttons.Action.But6_Import_M8_FireBase_To_Csv
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Options.Buttons.Action.But8_DeleteAll_M8_Room
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Options.Buttons.Action.But9_Import_M8_FireBase_To_Room
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Z.preview.FAKE_CLIENT_KEY
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -200,24 +199,6 @@ fun B_FragMap_DropdownMenu(
 ) {
     val coroutineScope = rememberCoroutineScope()
 
-    val latestSituationMontant: Int? = remember(vm.active_Datas.list_M8bon) {
-        vm.active_Datas.list_M8bon
-            ?.filter {
-                it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit &&
-                        (on_vent_key.isEmpty() || it.parent_M2Client_KeyID == on_vent_key)
-            }
-            ?.maxByOrNull { it.creationTimestamps }
-            ?.montant_principale_du_type
-            ?.toInt()
-    }
-    var fake_init_val_du_ancien_credits_situation by remember(latestSituationMontant) {
-        mutableStateOf<Int?>(latestSituationMontant)
-    }
-
-    var organizeDropBoxProgress by remember { mutableStateOf<Float?>(null) }
-    var organizeLocalProgress by remember { mutableStateOf<Float?>(null) }
-    var syncImages2Progress by remember { mutableStateOf<Float?>(null) }
-    var updateTimestampsProgress by remember { mutableStateOf<Float?>(null) }
     var pendingAction by remember { mutableStateOf<PendingAction?>(null) }
 
     // CSV stats for But7 label: total rows, new (not in Room), updates (already in Room)
@@ -385,8 +366,6 @@ fun B_FragMap_DropdownMenu(
         }
     }
 
-
-
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismiss,
@@ -415,67 +394,6 @@ fun B_FragMap_DropdownMenu(
             HorizontalDivider()
         }
 
-        DropdownMenuItem(
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = null,
-                    tint = Color(0xFF43A047)
-                )
-            },
-            text = {
-                if (isEditingCredits) {
-                    OutlinedTextField(
-                        value = out_val,
-                        onValueChange = { input ->
-                            val accepted = input.all { it.isDigit() }
-                            if (accepted) out_val = input
-                        },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done,
-                        ),
-                        keyboardActions = KeyboardActions(
-                            onDone = {
-                                val parsed = out_val.toIntOrNull()
-                                val montant = parsed?.toDouble() ?: 0.0
-
-                                if (parsed != null) fake_init_val_du_ancien_credits_situation =
-                                    parsed
-                                out_val =
-                                    fake_init_val_du_ancien_credits_situation?.toString() ?: ""
-                                isEditingCredits = false
-
-                            }
-                        ),
-                        label = {
-                            val diff = (fake_init_val_du_ancien_credits_situation
-                                ?: 0) - (out_val.toIntOrNull() ?: 0)
-                            Text(
-                                text = "الرصيد السابق — $diff",
-                                style = MaterialTheme.typography.labelSmall,
-                            )
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .focusRequester(creditsFocusRequester),
-                    )
-                } else {
-                    Text(
-                        text = "الرصيد السابق: ${fake_init_val_du_ancien_credits_situation ?: "-"} دج",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-            },
-            onClick = {
-                if (!isEditingCredits) {
-                    out_val = ""
-                    isEditingCredits = true
-                }
-            }
-        )
         HorizontalDivider(thickness = 3.dp, color = Color.Red)
         HorizontalDivider()
         Text("FireBase")

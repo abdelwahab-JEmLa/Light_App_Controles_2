@@ -1,4 +1,4 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Views
 
 import android.widget.Toast
 import androidx.compose.foundation.background
@@ -39,10 +39,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Z.Components.DatesHandler
 
 /**
- * Card for non-credit-type [M8BonVent] states (e.g. COMMANDE_LIVRAI, A_COMMANDE_CONFIRME, …).
+ * Card for non-credit-type [com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent] states (e.g. COMMANDE_LIVRAI, A_COMMANDE_CONFIRME, …).
  * Mirrors the visual style of [Situation_Card_ItemView] / [Y_Credit_And_Versement_ItemView] so
  * all item types feel consistent in the list.
  */

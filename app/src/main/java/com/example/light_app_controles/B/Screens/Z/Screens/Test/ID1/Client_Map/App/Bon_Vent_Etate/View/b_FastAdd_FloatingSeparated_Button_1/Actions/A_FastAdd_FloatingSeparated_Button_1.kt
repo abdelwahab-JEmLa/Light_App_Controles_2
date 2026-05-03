@@ -1,4 +1,4 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Options
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b_FastAdd_FloatingSeparated_Button_1.Actions
 
 import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
 import androidx.compose.foundation.background
@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
 import kotlin.math.roundToInt
 
-// ── Which dropdown item is currently in edit mode ────────────────────────────
 private enum class ActiveDropdownItem { None, Credit, Versement }
 
 data class Button_State(
