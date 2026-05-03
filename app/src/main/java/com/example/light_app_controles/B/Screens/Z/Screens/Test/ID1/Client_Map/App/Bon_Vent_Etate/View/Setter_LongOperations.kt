@@ -94,7 +94,7 @@ class Setter_LongOperations(
         FileWriter(csv, false).use { w ->
             w.write(headers.joinToString(",") + "\n")
             existingRows.values.forEach { cells ->
-                w.write(cells.map { it.escapeCsv() }.joinToString(",") + "\n")
+                w.write(cells.joinToString(",") { it.escapeCsv() } + "\n")
             }
         }
     }

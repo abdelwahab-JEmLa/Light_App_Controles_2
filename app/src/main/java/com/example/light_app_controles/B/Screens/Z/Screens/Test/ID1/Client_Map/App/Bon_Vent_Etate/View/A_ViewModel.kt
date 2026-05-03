@@ -38,7 +38,6 @@ class A_ViewModel(
         super.onCleared()
     }
 
-    /** Re-fetch list_M8bon from Room — call after any bulk DB mutation. */
     fun reload() {
         viewModelScope.launch {
             active_Datas.list_M8bon = appDatabase.dao_M8BonVent().getAll()

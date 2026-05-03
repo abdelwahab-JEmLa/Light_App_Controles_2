@@ -1,9 +1,10 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Z.Modules.Capture
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
 
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.util.Log
 import android.os.Build
 import android.provider.MediaStore
 import androidx.annotation.DrawableRes
@@ -20,30 +21,15 @@ import androidx.compose.ui.graphics.rememberGraphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.delay
 
-// ---------------------------------------------------------------------------
-// Plain (non-State) holder — safe to write inside drawWithContent's draw phase.
-// ---------------------------------------------------------------------------
 private class DrawnHolder {
     var value: Boolean = false
 }
-
-// ---------------------------------------------------------------------------
-// CapturableLayerState
-// ---------------------------------------------------------------------------
-
-/**
- * @param modifier     Apply to the target composable so its content is recorded.
- * @param capture      Suspends briefly then returns the recorded [ImageBitmap].
- * @param hasBeenDrawn Returns true once [modifier] has gone through at least one draw pass.
- *                     Used by [MultiCaptureController] to skip LazyColumn items that are
- *                     pre-composed in the composition buffer but have never been painted
- *                     on screen (fixes TODO(1)).
- */
 class CapturableLayerState(
     val modifier: Modifier,
     val capture: suspend () -> ImageBitmap,
     val hasBeenDrawn: () -> Boolean,
 )
+private const val TAG = "CapturableLayer"
 
 @Composable
 fun rememberCapturableLayer(
@@ -68,6 +54,7 @@ fun rememberCapturableLayer(
             delay(100)
             val hw = gLayer.toImageBitmap()
             val sw = hw.asAndroidBitmap().copy(Bitmap.Config.ARGB_8888, false)
+            Log.d(TAG, "Captured bitmap size: ${sw.width}x${sw.height} px")
 
             if (backgroundRes == null) return@CapturableLayerState sw.asImageBitmap()
 
@@ -78,6 +65,7 @@ fun rememberCapturableLayer(
                 drw.draw(cvs)
             }
             cvs.drawBitmap(sw, 0f, 0f, null)
+            Log.d(TAG, "Captured bitmap size (with bg): ${out.width}x${out.height} px")
             out.asImageBitmap()
         },
     )
@@ -88,7 +76,13 @@ fun rememberCapturableLayer(
 // ---------------------------------------------------------------------------
 
 private data class CaptureEntry(
-    /** Position of the item inside the LazyColumn — used for scroll-based capture. */
+    /**
+     * Position of the item inside the LazyColumn at the time of registration.
+     * ⚠️  This value goes STALE after FastAdd: new items prepend to allBons and
+     * shift every existing item's index by +N — but DisposableEffect re-registers
+     * AFTER LaunchedEffect fires the capture.  Do NOT rely on this field for final
+     * sorting; pass [orderedKeys] to [captureAllWithScroll] instead.
+     */
     val index: Int,
     /** True once the composable has gone through at least one draw pass. */
     val hasBeenDrawn: () -> Boolean,
@@ -128,54 +122,111 @@ class MultiCaptureController {
      * Prefer [captureAllVisible] or [captureAllWithScroll] instead.
      */
     suspend fun captureAll(): List<Pair<String, ImageBitmap>> =
-        entries.entries.toList().map { (k, e) -> k to e.capture() }
+        entries.entries.toList().map { (k, e) -> k to e.capture() }.also { results ->
+            Log.d(TAG, "captureAll: ${results.size} items captured → " +
+                results.joinToString { (k, bmp) -> "$k(${bmp.width}x${bmp.height})" })
+        }
 
     /**
-     * **FIX for TODO(1)** — Only capture items whose composable has actually been
-     * drawn on screen at least once.  Items pre-composed by LazyColumn's look-ahead
-     * buffer but never scrolled into view are silently skipped, preventing blank
-     * bitmaps from polluting the result.
+     * Only capture items whose composable has actually been drawn on screen at least once.
+     * Items pre-composed by LazyColumn's look-ahead buffer but never scrolled into view
+     * are silently skipped, preventing blank bitmaps from polluting the result.
      */
     suspend fun captureAllVisible(): List<Pair<String, ImageBitmap>> =
         entries.entries.toList()
             .filter { (_, e) -> e.hasBeenDrawn() }
-            .map { (k, e) -> k to e.capture() }
+            .map { (k, e) -> k to e.capture() }.also { results ->
+                Log.d(TAG, "captureAllVisible: ${results.size}/${entries.size} items captured → " +
+                    results.joinToString { (k, bmp) -> "$k(${bmp.width}x${bmp.height})" })
+            }
 
     /**
      * **Full capture of every item, including those off-screen.**
-     * Iterates entries in list order, scrolls [state] to each item's index,
-     * waits [scrollSettleMs] for the composition to re-render, then captures.
-     * After all captures the list is scrolled back to [restoreIndex] (default 0).
      *
-     * Use this when you need a complete record of all items, not just the
-     * currently visible portion of the LazyColumn.
+     * Iterates indices 0..[totalItemCount-1], scrolling to each position and
+     * harvesting any newly-drawn items that appear.  This is the correct approach
+     * when items unregister themselves as they scroll off-screen (LazyColumn
+     * disposal).
+     *
+     * ### Ordering — why [orderedKeys] is required after FastAdd
+     *
+     * When FastAdd fires:
+     * 1. `allBons` recomposes → new items land at index 0, 1 (sortedByDescending).
+     * 2. `LaunchedEffect(fastAddCaptureVersion)` starts the coroutine **immediately**.
+     * 3. `DisposableEffect` re-registers existing items with their new indices **later**,
+     *    during the next composition frame.
+     * 4. The stale `e.index` values in [entries] (e.g. 0,1,2 instead of 2,3,4) make
+     *    `sortedBy { it.listIndex }` produce the wrong order → `Credit(Apr30)` at `[0]`.
+     *
+     * Fix: pass [orderedKeys] = the canonical key list derived from `allBons` **at the
+     * moment the coroutine starts** (post-recomposition).  We sort by position in that
+     * list — never by the potentially-stale stored index.
      *
      * @param state           The [LazyListState] of the target LazyColumn.
-     * @param scrollSettleMs  Milliseconds to wait after each scroll for Compose
-     *                        to lay out and draw the newly visible items.
+     * @param totalItemCount  Total number of items in the LazyColumn for this list.
+     *                        Pass the filtered count for this client/period, NOT
+     *                        the global list size.
+     * @param scrollSettleMs  Milliseconds to wait after each scroll for Compose to lay
+     *                        out and draw newly visible items. Increase to 300+ on slow
+     *                        devices.
      * @param restoreIndex    List index to scroll back to after capture is done.
+     * @param orderedKeys     **Pass this always.**  The authoritative list of keys in
+     *                        the exact order they should appear in the output — built
+     *                        from `allBons.map { capKey(it) }` right before calling
+     *                        this function.  When non-null this replaces the fallback
+     *                        sort-by-[CaptureEntry.index] which is unreliable after
+     *                        FastAdd shifts all indices before DisposableEffect runs.
      */
     suspend fun captureAllWithScroll(
         state: LazyListState,
-        scrollSettleMs: Long = 150,
+        totalItemCount: Int,
+        scrollSettleMs: Long = 300,
         restoreIndex: Int = 0,
+        // ── FIX: authoritative order from allBons, immune to stale e.index ──
+        orderedKeys: List<String>? = null,
     ): List<Pair<String, ImageBitmap>> {
-        val sorted = entries.entries.toList().sortedBy { (_, e) -> e.index }
-        val results = sorted.map { (k, e) ->
-            state.scrollToItem(e.index)
-            delay(scrollSettleMs)           // wait for draw pass
-            k to e.capture()
+        data class R(val key: String, val listIndex: Int, val bmp: ImageBitmap)
+        val results = mutableListOf<R>()
+        val capturedKeys = mutableSetOf<String>()
+
+        for (index in 0 until totalItemCount) {
+            state.scrollToItem(index)
+            delay(scrollSettleMs)
+            // Harvest any newly drawn entries not yet captured at this scroll position.
+            for ((k, e) in entries.entries.toList()) {
+                if (k !in capturedKeys && e.hasBeenDrawn()) {
+                    results.add(R(k, e.index, e.capture()))
+                    capturedKeys.add(k)
+                }
+            }
         }
-        // Restore scroll position so the UI feels natural after capture.
-        if (sorted.isNotEmpty()) {
-            state.scrollToItem(restoreIndex)
-        }
-        return results
+
+        // ── Sort ───────────────────────────────────────────────────────────────
+        // Prefer orderedKeys (authoritative allBons snapshot passed by the caller).
+        // Fall back to e.index only when orderedKeys is not provided — e.g. for the
+        // simple runCapture() path where FastAdd is not involved.
+        val sorted = if (orderedKeys != null) {
+            results.sortedBy { r ->
+                val pos = orderedKeys.indexOf(r.key)
+                if (pos >= 0) pos else Int.MAX_VALUE   // unknown keys go to the end
+            }
+        } else {
+            results.sortedBy { it.listIndex }
+        }.map { it.key to it.bmp }
+
+        state.scrollToItem(restoreIndex)
+        Log.d(TAG, "captureAllWithScroll: ${sorted.size}/$totalItemCount items captured → " +
+            sorted.mapIndexed { i, (k, bmp) -> "[$i]$k(${bmp.width}x${bmp.height})" }
+                .joinToString())
+        return sorted
     }
 
     /** Capture only the [n] most-recently-registered entries (last N items in the list). */
     suspend fun captureLastN(n: Int): List<Pair<String, ImageBitmap>> =
-        entries.entries.toList().takeLast(n).map { (k, e) -> k to e.capture() }
+        entries.entries.toList().takeLast(n).map { (k, e) -> k to e.capture() }.also { results ->
+            Log.d(TAG, "captureLastN($n): ${results.size} items captured → " +
+                results.joinToString { (k, bmp) -> "$k(${bmp.width}x${bmp.height})" })
+        }
 }
 
 @Composable

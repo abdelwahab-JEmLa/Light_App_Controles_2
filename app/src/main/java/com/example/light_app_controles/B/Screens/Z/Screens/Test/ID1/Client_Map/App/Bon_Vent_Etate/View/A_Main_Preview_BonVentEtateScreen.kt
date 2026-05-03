@@ -35,9 +35,6 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Action.Floating_Separated_Button
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Options.A_FastAdd_FloatingSeparated_Button_1
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Z.Modules.Capture.Afficheur_locale_Image_Captured
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Z.Modules.Capture.rememberCapturableLayer
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Z.Modules.Capture.rememberMultiCaptureController
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Z.Modules.Capture.saveAllToMediaStore
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Z.preview.FAKE_CLIENT_KEY
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Z.preview.Targted_Bon
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
@@ -94,25 +91,64 @@ fun Main_Preview_BonVentEtateScreen(
     var fastAddCaptureVersion by remember { mutableStateOf(0) }
     val listState = rememberLazyListState()
 
+    // ── Image-name helpers ────────────────────────────────────────────────────
+    //
+    // Key format : "${creationTimestamps}|${keyID}|${etatName}"
+    // Image name : "{idx}_{MM-ss-SSS}_{etatName}_{MMdd_HHmmss}"
+    //   idx          = position in allBons (0 = newest, sortedByDescending)
+    //   MM-ss-SSS    = creation-time minutes-seconds-millis (readable, no colons)
+    //   etatName     = bon state label
+    //   MMdd_HHmmss  = full date stamp for unique file names
+    //
+    // The "MM:SS:SSS" the user sees in logs is emitted by buildImageName below so
+    // creation timestamps appear directly in image file names for easy correlation.
+
+    val sdfFull  = SimpleDateFormat("MMdd_HHmmss", Locale.getDefault())
+    val sdfShort = SimpleDateFormat("mm-ss-SSS",   Locale.getDefault())   // MM:SS:SSS → safe chars
+
+    fun buildImageName(idx: Int, key: String): String {
+        val pts  = key.split("|")
+        val ts   = pts.getOrNull(0)?.toLongOrNull() ?: System.currentTimeMillis()
+        val etat = pts.getOrNull(2) ?: key
+        val date = Date(ts)
+        val name = "${idx}_${sdfShort.format(date)}_${etat}_${sdfFull.format(date)}"
+        Log.d(CAPTURE_TAG, "  image[$idx] name=$name  creationTs=$ts")
+        return name
+    }
+
+    fun mapRawToNamed(raw: List<Pair<String, ImageBitmap>>): List<Pair<ImageBitmap, String>> =
+        raw.mapIndexed { idx, (k, bmp) -> bmp to buildImageName(idx, k) }
+
+    // ── Canonical key builder ─────────────────────────────────────────────────
+    //
+    // Returns the ordered key list derived from `allBons` **at the instant it is
+    // called** — i.e. after Compose has already applied FastAdd's state update.
+    // Passing this snapshot to captureAllWithScroll() makes sorting immune to the
+    // stale e.index problem: new items are at positions 0,1 in allBons (newest
+    // first), so they will be at positions [0] and [1] in the output regardless
+    // of what index values DisposableEffect happened to register.
+
+    fun buildOrderedKeys(): List<String> =
+        allBons.map { b -> "${b.creationTimestamps}|${b.keyID}|${b.etateActuellementEst.name}" }
+
     // ── Shared capture logic ──────────────────────────────────────────────────
-    // Uses captureAllWithScroll so that every item — including those outside the
-    // current viewport — is scrolled into view before its GraphicsLayer is read.
-    // This eliminates the blank-bitmap problem described in TODO(1).
+    //
+    // Used by lenceTestActive and vm.captureRequested paths — no FastAdd involved,
+    // so orderedKeys still ensures correct ordering even if the list changed since
+    // the last composition.
+
     suspend fun runCapture() {
         kotlinx.coroutines.delay(200)
+        val orderedKeys = buildOrderedKeys()   // snapshot the authoritative order
         val raw: List<Pair<String, ImageBitmap>> = ctrl.captureAllWithScroll(
-            state = listState,
+            state          = listState,
+            totalItemCount = allBons.size,
             scrollSettleMs = 150,
-            restoreIndex = 0,
+            restoreIndex   = 0,
+            orderedKeys    = orderedKeys,
         )
-        val sdf = SimpleDateFormat("MMdd_HHmmss_SSS", Locale.getDefault())
-        captured = raw.map { (k, bmp) ->
-            val pts = k.split("|")
-            val ts = pts.getOrNull(0)?.toLongOrNull()
-            val st = pts.getOrNull(2) ?: k
-            val ds = sdf.format(Date(ts ?: System.currentTimeMillis()))
-            bmp to "${ds}_${st}"
-        }
+        Log.d(CAPTURE_TAG, "runCapture: ${raw.size} images")
+        captured = mapRawToNamed(raw)
         if (captured.isNotEmpty()) showDlg = true
     }
 
@@ -127,45 +163,47 @@ fun Main_Preview_BonVentEtateScreen(
         vm.captureRequested = false
     }
 
+    // ── FastAdd capture ───────────────────────────────────────────────────────
+    //
+    // Root cause of the ordering bug (see CapturableLayer_FINAL.kt for full
+    // analysis):
+    //   • allBons recomposes → new items at index 0,1 (sortedByDescending).
+    //   • This LaunchedEffect fires BEFORE DisposableEffect re-registers existing
+    //     items with their shifted indices (2,3,4 …).
+    //   • Therefore e.index in entries is stale (still 0,1,2 for old items).
+    //   • Sorting by e.index puts old items first → Credit(Apr30) lands at [0].
+    //
+    // Fix: snapshot orderedKeys from allBons RIGHT HERE, at the start of the
+    // coroutine body.  At this point Compose has already updated allBons (new items
+    // are at positions 0 and 1).  captureAllWithScroll sorts by orderedKeys position,
+    // not by the stale e.index — new items are guaranteed to appear at [0] and [1].
+
     LaunchedEffect(fastAddCaptureVersion) {
         if (fastAddCaptureVersion == 0) return@LaunchedEffect
 
+        // ── Snapshot the authoritative order BEFORE any scroll ─────────────────
+        val orderedKeys = buildOrderedKeys()
+
         Log.d(CAPTURE_TAG, "=== FastAdd capture triggered (version=$fastAddCaptureVersion) ===")
         Log.d(CAPTURE_TAG, "allBons.size (expected) = ${allBons.size}")
-        Log.d(CAPTURE_TAG, "ctrl registered BEFORE scroll = ${ctrl.registeredKeys().size}")
+        Log.d(CAPTURE_TAG, "ctrl registered BEFORE capture = ${ctrl.registeredKeys().size}")
+        Log.d(CAPTURE_TAG, "orderedKeys = $orderedKeys")
 
-        // Scroll to index 0 so the 2 new bons (newest-first) enter the viewport.
-        listState.scrollToItem(0)
-        Log.d(CAPTURE_TAG, "scrollToItem(0) done — waiting for composition…")
-        kotlinx.coroutines.delay(300)
+        // captureAllWithScroll handles all scrolling internally — do NOT call
+        // scrollToItem(0) here.  Doing so before the capture causes items that
+        // were visible at the bottom to unregister (LazyColumn disposes off-screen
+        // composables), leaving the controller with only the top-N visible items
+        // and producing the 4/10 bug observed in the logs.
+        val raw: List<Pair<String, ImageBitmap>> = ctrl.captureAllWithScroll(
+            state          = listState,
+            totalItemCount = allBons.size,
+            scrollSettleMs = 300,
+            restoreIndex   = 0,
+            orderedKeys    = orderedKeys,   // ← THE FIX
+        )
 
-        val registeredAfter = ctrl.registeredKeys()
-        Log.d(CAPTURE_TAG, "ctrl registered AFTER scroll+delay = ${registeredAfter.size}")
-        registeredAfter.forEachIndexed { i, k -> Log.d(CAPTURE_TAG, "  [after][$i] key=$k") }
-
-        val registeredKeyIds = registeredAfter.map { it.split("|").getOrNull(1) ?: "" }.toSet()
-        val newBonIds = listOf(allBons.getOrNull(0)?.keyID, allBons.getOrNull(1)?.keyID)
-        newBonIds.forEach { id ->
-            if (id != null && id in registeredKeyIds)
-                Log.d(CAPTURE_TAG, "✅ new bon $id IS registered — will be captured")
-            else
-                Log.w(CAPTURE_TAG, "⚠️ new bon $id NOT registered even after scroll")
-        }
-
-        // Capture only the top-2 new bons using captureAllVisible so items that
-        // haven't been drawn (LazyColumn look-ahead buffer) are excluded.
-        val sdf = SimpleDateFormat("MMdd_HHmmss_SSS", Locale.getDefault())
-        val raw: List<Pair<String, ImageBitmap>> = ctrl.captureAllVisible()
-
-        Log.d(CAPTURE_TAG, "captureAllVisible() returned ${raw.size} image(s)")
-
-        captured = raw.map { (k, bmp) ->
-            val pts = k.split("|")
-            val ts  = pts.getOrNull(0)?.toLongOrNull()
-            val st  = pts.getOrNull(2) ?: k
-            val ds  = sdf.format(Date(ts ?: System.currentTimeMillis()))
-            bmp to "${ds}_${st}"
-        }
+        Log.d(CAPTURE_TAG, "captureAllWithScroll() returned ${raw.size} image(s)")
+        captured = mapRawToNamed(raw)
         if (captured.isNotEmpty()) showDlg = true
     }
 
@@ -197,8 +235,10 @@ fun Main_Preview_BonVentEtateScreen(
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                // ── itemsIndexed replaces items() so each item knows its position.
-                // The index is passed to ctrl.register() to enable captureAllWithScroll().
+                // itemsIndexed so each item knows its position.
+                // index is registered in ctrl to enable captureAllWithScroll scrolling.
+                // NOTE: after FastAdd, index shifts — do not rely on it for output
+                //       ordering; orderedKeys is the source of truth.
                 itemsIndexed(allBons, key = { _, b -> b.keyID }) { index, b ->
                     val cap = rememberCapturableLayer()
                     val capKey = "${b.creationTimestamps}|${b.keyID}|${b.etateActuellementEst.name}"
@@ -206,10 +246,10 @@ fun Main_Preview_BonVentEtateScreen(
                     DisposableEffect(capKey) {
                         Log.d(CAPTURE_TAG, "REGISTER   key=$capKey  index=$index  (ctrl.size=${ctrl.registeredKeys().size + 1})")
                         ctrl.register(
-                            key = capKey,
-                            index = index,
+                            key        = capKey,
+                            index      = index,
                             hasBeenDrawn = cap.hasBeenDrawn,
-                            capture = { cap.capture() },
+                            capture    = { cap.capture() },
                         )
                         onDispose {
                             Log.d(CAPTURE_TAG, "UNREGISTER key=$capKey  (ctrl.size=${ctrl.registeredKeys().size - 1})")
@@ -276,13 +316,13 @@ fun Main_Preview_BonVentEtateScreen(
             Log.d(CAPTURE_TAG, "FastAdd commit: bon2.keyID=${bon2.keyID} etat=${bon2.etateActuellementEst.name}")
             Log.d(CAPTURE_TAG, "allBonVentList.size before add = ${allBons.size}")
             val updated = allBons.toMutableList().also {
-                it.add(bon1)
-                it.add(bon2)
+                it.add(0, bon2)   // versement  → index 1 (second newest)
+                it.add(0, bon1)   // new credit → index 0 (newest)
             }
             vm.active_Datas.list_M8bon = updated
             Log.d(CAPTURE_TAG, "allBonVentList.size after add = ${updated.size}  — triggering fastAddCaptureVersion++")
-            vm.add_New_M8BonVent(bon1)
-            vm.add_New_M8BonVent(bon2)
+            /* vm.add_New_M8BonVent(bon1)
+               vm.add_New_M8BonVent(bon2)      */
             fastAddCaptureVersion++
         }
     }
@@ -298,8 +338,8 @@ fun Main_Preview_BonVentEtateScreen(
             onSave = { bmpList ->
                 relative_M2Client?.let {
                     saveAllToMediaStore(
-                        bitmaps = bmpList,
-                        context = context,
+                        bitmaps   = bmpList,
+                        context   = context,
                         clientKeyID = it.keyID,
                     )
                 }
