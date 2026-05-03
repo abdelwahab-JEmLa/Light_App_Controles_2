@@ -68,8 +68,15 @@ class MultiCaptureController {
         entries.remove(key)
     }
 
+    /** Returns a snapshot of all currently-registered keys (for diagnostic logging). */
+    fun registeredKeys(): List<String> = entries.keys.toList()
+
     suspend fun captureAll(): List<Pair<String, ImageBitmap>> =
         entries.entries.toList().map { (k, cap) -> k to cap() }
+
+    /** Capture only the [n] most-recently-registered entries (last N items in the list). */
+    suspend fun captureLastN(n: Int): List<Pair<String, ImageBitmap>> =
+        entries.entries.toList().takeLast(n).map { (k, cap) -> k to cap() }
 }
 
 @Composable
