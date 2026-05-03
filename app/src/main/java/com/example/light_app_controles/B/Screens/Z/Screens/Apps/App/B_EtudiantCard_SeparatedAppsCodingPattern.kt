@@ -10,6 +10,7 @@ import Application5.App.Repository.M19Etudiant
 import Application5.App.View.DropDownItems.View.But2.convertSingleCardToJpg
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.ParentCommunicationCardData_2
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.generateHistoryImage
+import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.generateMokarrarImage
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.generatePdfDocument
 import Application5.App.View.DropDownItems.View.But2.getStoredCardUriForStudent
 import EntreApps.Shared.Models.Components.Ousstad_Tahfid
@@ -362,8 +363,89 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                             }
                         }
                     }
-                    //<--
-                    //TODO(1): ajout un button qui n affiche que moukarrare tabeelaeu
+                    // ── Mokarrar-only image share button ─────────────────────
+                    // Generates header + student name + Hifd table + Istedrak
+                    // table as a compact JPEG — no history, no footer.
+                    var isSharingMokarrar by remember(etudiantId) { mutableStateOf(false) }
+                    OutlinedButton(
+                        onClick = {
+                            if (!isSharingMokarrar) {
+                                val rawPhone = etudiant.num_telephone_parent.trim()
+                                val phone = rawPhone.ifBlank { "0553885037" }
+                                isSharingMokarrar = true
+                                scope.launch {
+                                    try {
+                                        val mokarrarCardData = ParentCommunicationCardData_2.fromEtudiant(etudiant)
+                                        val imageUri = withContext(Dispatchers.IO) {
+                                            generateMokarrarImage(context, mokarrarCardData, viewModel)
+                                        }
+                                        if (imageUri == null) {
+                                            withContext(Dispatchers.Main) {
+                                                Toast.makeText(
+                                                    context,
+                                                    "❌ فشل إنشاء صورة المقرر",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                            return@launch
+                                        }
+                                        withContext(Dispatchers.Main) {
+                                            var n = phone.replace(Regex("[^0-9]"), "")
+                                            if (!n.startsWith("213")) {
+                                                if (n.startsWith("0")) n = n.drop(1)
+                                                n = "213$n"
+                                            }
+                                            val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                                                type = "image/jpeg"
+                                                setPackage("com.whatsapp.w4b")
+                                                putExtra(android.content.Intent.EXTRA_STREAM, imageUri)
+                                                putExtra("jid", "$n@s.whatsapp.net")
+                                                addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                            }
+                                            context.startActivity(intent)
+                                        }
+                                    } catch (e: Exception) {
+                                        withContext(Dispatchers.Main) {
+                                            Toast.makeText(context, "❌ خطأ: ${e.message}", Toast.LENGTH_LONG).show()
+                                        }
+                                    } finally {
+                                        isSharingMokarrar = false
+                                    }
+                                }
+                            }
+                        },
+                        enabled  = !isSharingMokarrar,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        if (isSharingMokarrar) {
+                            CircularProgressIndicator(
+                                modifier    = Modifier.size(16.dp),
+                                strokeWidth = 2.dp
+                            )
+                            Spacer(modifier = Modifier.size(6.dp))
+                            Text(
+                                text  = "جاري الإرسال…",
+                                style = MaterialTheme.typography.labelSmall
+                            )
+                        } else {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                Icon(
+                                    imageVector        = Icons.Default.Share,
+                                    contentDescription = null,
+                                    modifier           = Modifier.size(18.dp),
+                                    tint               = Color(0xFFF57C00)   // amber — distinct from green/teal/violet
+                                )
+                                Text(
+                                    text  = "إرسال المقرر فقط",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = Color(0xFFF57C00)
+                                )
+                            }
+                        }
+                    }
 
 
                     var isSharingSchema by remember(etudiantId) { mutableStateOf(false) }
