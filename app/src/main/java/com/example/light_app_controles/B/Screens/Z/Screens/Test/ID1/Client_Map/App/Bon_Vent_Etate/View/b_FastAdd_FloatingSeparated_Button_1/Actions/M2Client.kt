@@ -62,6 +62,10 @@ data class M2Client(
     var parentComptCreateurKEyID: String = "",
     // Section Etates Mutable
     var numTelephone: String = "",
+
+    var nom_worker: String = "",
+    var num_worker: String = "",
+
     var couleur: String = "#FFFFFF",
     var bonDuClientsSu: String = "",
     var currentCreditBalance: Double = 0.0,
@@ -93,6 +97,9 @@ data class M2Client(
 ) {
     fun toFirebaseMap(): Map<String, Any?> = mapOf(
         "keyID" to keyID,
+        "c_un_admin_client" to c_un_admin_client,
+        "nom_worker" to nom_worker,
+        "num_worker" to num_worker,
         "dernierTimeTampsSynchronisationAvecFireBase" to dernierTimeTampsSynchronisationAvecFireBase,
         "creationTimestamps" to creationTimestamps,
         "nom" to nom,

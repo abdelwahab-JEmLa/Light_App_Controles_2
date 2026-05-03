@@ -26,12 +26,13 @@ import java.util.Date
 @Database(
     entities = [
         M01Produit::class,
+        M2Client::class,
+
         M8BonVent::class,
 
         //Sorted ID
         M3CouleurProduitInfos::class,
         M13TarificationInfos::class,
-        M2Client::class,
         M10OperationVentCouleur::class,
         M14VentPeriode::class,
         M15Grossist::class,
@@ -50,6 +51,8 @@ import java.util.Date
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun dao_M1Produit(): Dao_M1Produit
+    abstract fun dao_M2Client(): Dao_M2Client
+
     abstract fun dao_M03CouleurProduitInfos(): Dao_M03CouleurProduitInfos
     abstract fun dao_M8BonVent(): Dao_M8BonVent
     abstract fun dao_16CategorieProduit(): Dao_M16CategorieProduit

@@ -127,9 +127,14 @@ class MultiCaptureController {
 @Composable
 fun rememberMultiCaptureController() = remember { MultiCaptureController() }
 
-fun saveAllToMediaStore(bitmaps: List<Pair<Bitmap, String>>, context: Context, clientKeyID: String) {
-    if (bitmaps.isEmpty()) return
+fun saveAllToMediaStore(
+    bitmaps: List<Pair<Bitmap, String>>,
+    context: Context,
+    clientKeyID: String,
+): List<android.net.Uri> {
+    if (bitmaps.isEmpty()) return emptyList()
 
+    val savedUris = mutableListOf<android.net.Uri>()
     val safeKey = clientKeyID.replace(Regex("[^a-zA-Z0-9_\\-]"), "_")
     val folderPath = "Download/Image_Compose_Screen/$safeKey"
     val resolver = context.contentResolver
@@ -161,5 +166,7 @@ fun saveAllToMediaStore(bitmaps: List<Pair<Bitmap, String>>, context: Context, c
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             resolver.update(uri, ContentValues().apply { put(MediaStore.Images.Media.IS_PENDING, 0) }, null, null)
         }
+        savedUris.add(uri)
     }
+    return savedUris
 }

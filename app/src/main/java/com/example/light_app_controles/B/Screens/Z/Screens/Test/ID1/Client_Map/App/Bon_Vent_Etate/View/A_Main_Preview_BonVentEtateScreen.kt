@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -81,6 +82,7 @@ fun Main_Preview_BonVentEtateScreen(
     var captured by remember { mutableStateOf<List<Pair<ImageBitmap, String>>>(emptyList()) }
     var showDlg by remember { mutableStateOf(false) }
     var fastAddCaptureVersion by remember { mutableStateOf(0) }
+    var whatsappSendRequest by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
     val listState = rememberLazyListState()
 
     val sdfFull  = SimpleDateFormat("MMdd_HHmmss", Locale.getDefault())
@@ -135,6 +137,79 @@ fun Main_Preview_BonVentEtateScreen(
         )
         captured = mapRawToNamed(raw)
         if (captured.isNotEmpty()) showDlg = true
+    }
+
+    LaunchedEffect(whatsappSendRequest) {
+        val request = whatsappSendRequest ?: return@LaunchedEffect
+        val (phoneNumber, isWhatsAppBusiness) = request
+
+        // Capture without showing dialog
+        val raw = ctrl.captureAllWithScroll(
+            state          = listState,
+            totalItemCount = allBons.size,
+            scrollSettleMs = 300,
+            restoreIndex   = 0,
+            orderedKeys    = buildOrderedKeys(),
+        )
+        val namedImages = mapRawToNamed(raw)
+
+        if (namedImages.isNotEmpty()) {
+            // Save to MediaStore and collect the content:// URIs that were just written.
+            // We need those URIs to attach the images to the WhatsApp share intent.
+            val savedUris: List<android.net.Uri> = relative_M2Client?.let {
+                saveAllToMediaStore(
+                    bitmaps = namedImages.map { (img, lbl) -> img.asAndroidBitmap() to lbl },
+                    context = context,
+                    clientKeyID = it.keyID,
+                )
+            } ?: emptyList()
+
+            val packageName = if (isWhatsAppBusiness) "com.whatsapp.w4b" else "com.whatsapp"
+
+            // Build an ACTION_SEND / ACTION_SEND_MULTIPLE intent that carries the image
+            // URIs so WhatsApp actually receives the files.
+            // FLAG_GRANT_READ_URI_PERMISSION is required for content:// MediaStore URIs.
+            val shareIntent = if (savedUris.size == 1) {
+                android.content.Intent(android.content.Intent.ACTION_SEND).apply {
+                    type = "image/webp"
+                    putExtra(android.content.Intent.EXTRA_STREAM, savedUris.first())
+                    addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    setPackage(packageName)
+                }
+            } else {
+                android.content.Intent(android.content.Intent.ACTION_SEND_MULTIPLE).apply {
+                    type = "image/*"
+                    putParcelableArrayListExtra(
+                        android.content.Intent.EXTRA_STREAM,
+                        ArrayList(savedUris),
+                    )
+                    addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    setPackage(packageName)
+                }
+            }
+
+            try {
+                context.startActivity(shareIntent)
+            } catch (e: Exception) {
+                // WhatsApp not installed — open wa.me in the browser as a last resort
+                val fallbackIntent = android.content.Intent(
+                    android.content.Intent.ACTION_VIEW,
+                    android.net.Uri.parse("https://wa.me/$phoneNumber"),
+                )
+                try {
+                    context.startActivity(fallbackIntent)
+                } catch (e2: Exception) {
+                    android.widget.Toast.makeText(
+                        context,
+                        "WhatsApp non installé",
+                        android.widget.Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            }
+        }
+
+        whatsappSendRequest = null
+        onClick_Lence_Capture()
     }
 
     Box {
@@ -206,6 +281,15 @@ fun Main_Preview_BonVentEtateScreen(
         A_FastAdd_FloatingSeparated_Button_1(
             relative_M2Client = relative_M2Client,
             bons = allBons,
+            onSendWhatsApp = { phoneNumber, isWhatsAppBusiness ->       //<--
+                //TODO(1): pk le partage ce lence mais qand arrive au compt c comme si aucn image n au dispo au uri
+                whatsappSendRequest = Pair(phoneNumber, isWhatsAppBusiness)
+            },
+            onUpdateClient = { updatedClient ->
+                scope.launch {
+                    appDatabase.dao_M2Client().upsert(updatedClient)
+                }
+            }
         ) { bon1, bon2 ->
             val updated = allBons.toMutableList().also {
                 it.add(0, bon2)
