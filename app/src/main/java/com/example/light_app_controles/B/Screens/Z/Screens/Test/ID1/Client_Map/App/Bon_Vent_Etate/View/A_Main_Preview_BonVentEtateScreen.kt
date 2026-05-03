@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -48,7 +48,6 @@ import java.util.Locale
 
 private val CREDIT_VERSEMENT_STATES = setOf(
     M8BonVent.EtateActuellementEst.COMMANDE_LIVRAI,
-
     M8BonVent.EtateActuellementEst.Versemment,
     M8BonVent.EtateActuellementEst.Credit,
     M8BonVent.EtateActuellementEst.Cette_Transaction_Type_Est_Credit,
@@ -77,7 +76,6 @@ fun Main_Preview_BonVentEtateScreen(
 
     val active_Datas = vm.active_Datas
 
-
     val sameClientPeriod: (M8BonVent) -> Boolean = { b ->
         b.parent_M2Client_KeyID == relative_M2Client?.keyID
     }
@@ -93,15 +91,20 @@ fun Main_Preview_BonVentEtateScreen(
 
     var captured by remember { mutableStateOf<List<Pair<ImageBitmap, String>>>(emptyList()) }
     var showDlg by remember { mutableStateOf(false) }
-    // Incremented each time the fast-add button commits, triggering a last-8 capture.
     var fastAddCaptureVersion by remember { mutableStateOf(0) }
-    // Controls the LazyColumn scroll position — used to scroll to top before capture.
     val listState = rememberLazyListState()
 
     // ── Shared capture logic ──────────────────────────────────────────────────
+    // Uses captureAllWithScroll so that every item — including those outside the
+    // current viewport — is scrolled into view before its GraphicsLayer is read.
+    // This eliminates the blank-bitmap problem described in TODO(1).
     suspend fun runCapture() {
         kotlinx.coroutines.delay(200)
-        val raw: List<Pair<String, ImageBitmap>> = ctrl.captureAll()
+        val raw: List<Pair<String, ImageBitmap>> = ctrl.captureAllWithScroll(
+            state = listState,
+            scrollSettleMs = 150,
+            restoreIndex = 0,
+        )
         val sdf = SimpleDateFormat("MMdd_HHmmss_SSS", Locale.getDefault())
         captured = raw.map { (k, bmp) ->
             val pts = k.split("|")
@@ -131,18 +134,15 @@ fun Main_Preview_BonVentEtateScreen(
         Log.d(CAPTURE_TAG, "allBons.size (expected) = ${allBons.size}")
         Log.d(CAPTURE_TAG, "ctrl registered BEFORE scroll = ${ctrl.registeredKeys().size}")
 
-        // Scroll to index 0 — the 2 new bons are at the top (newest-first sort).
+        // Scroll to index 0 so the 2 new bons (newest-first) enter the viewport.
         listState.scrollToItem(0)
         Log.d(CAPTURE_TAG, "scrollToItem(0) done — waiting for composition…")
-
-        // Wait for LazyColumn to compose the newly visible items and run their DisposableEffect.
         kotlinx.coroutines.delay(300)
 
         val registeredAfter = ctrl.registeredKeys()
         Log.d(CAPTURE_TAG, "ctrl registered AFTER scroll+delay = ${registeredAfter.size}")
         registeredAfter.forEachIndexed { i, k -> Log.d(CAPTURE_TAG, "  [after][$i] key=$k") }
 
-        // Confirm the 2 new bons are now present.
         val registeredKeyIds = registeredAfter.map { it.split("|").getOrNull(1) ?: "" }.toSet()
         val newBonIds = listOf(allBons.getOrNull(0)?.keyID, allBons.getOrNull(1)?.keyID)
         newBonIds.forEach { id ->
@@ -152,10 +152,12 @@ fun Main_Preview_BonVentEtateScreen(
                 Log.w(CAPTURE_TAG, "⚠️ new bon $id NOT registered even after scroll")
         }
 
+        // Capture only the top-2 new bons using captureAllVisible so items that
+        // haven't been drawn (LazyColumn look-ahead buffer) are excluded.
         val sdf = SimpleDateFormat("MMdd_HHmmss_SSS", Locale.getDefault())
-        val raw: List<Pair<String, ImageBitmap>> = ctrl.captureAll()
+        val raw: List<Pair<String, ImageBitmap>> = ctrl.captureAllVisible()
 
-        Log.d(CAPTURE_TAG, "captureAll() returned ${raw.size} image(s) (registered ${registeredAfter.size})")
+        Log.d(CAPTURE_TAG, "captureAllVisible() returned ${raw.size} image(s)")
 
         captured = raw.map { (k, bmp) ->
             val pts = k.split("|")
@@ -167,10 +169,7 @@ fun Main_Preview_BonVentEtateScreen(
         if (captured.isNotEmpty()) showDlg = true
     }
 
-
-
-
-    Box() {
+    Box {
         Column(
             modifier = modifier
                 .semantics(mergeDescendants = true) {
@@ -182,7 +181,8 @@ fun Main_Preview_BonVentEtateScreen(
                         it.parent_M2Client_KeyID == FAKE_CLIENT_KEY
                     }, key = SemanticsPropertyKey("FAKE_CLIENT_KEY"))
                 }
-                .fillMaxSize()) {
+                .fillMaxSize()
+        ) {
             if (allBons.isEmpty()) {
                 Text(
                     "لا توجد حالة دين جديدة",
@@ -197,13 +197,20 @@ fun Main_Preview_BonVentEtateScreen(
                     .padding(horizontal = 8.dp, vertical = 4.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                items(allBons, key = { it.keyID }) { b ->
+                // ── itemsIndexed replaces items() so each item knows its position.
+                // The index is passed to ctrl.register() to enable captureAllWithScroll().
+                itemsIndexed(allBons, key = { _, b -> b.keyID }) { index, b ->
                     val cap = rememberCapturableLayer()
                     val capKey = "${b.creationTimestamps}|${b.keyID}|${b.etateActuellementEst.name}"
 
                     DisposableEffect(capKey) {
-                        Log.d(CAPTURE_TAG, "REGISTER   key=$capKey  (ctrl.size=${ctrl.registeredKeys().size + 1})")
-                        ctrl.register(capKey) { cap.capture() }
+                        Log.d(CAPTURE_TAG, "REGISTER   key=$capKey  index=$index  (ctrl.size=${ctrl.registeredKeys().size + 1})")
+                        ctrl.register(
+                            key = capKey,
+                            index = index,
+                            hasBeenDrawn = cap.hasBeenDrawn,
+                            capture = { cap.capture() },
+                        )
                         onDispose {
                             Log.d(CAPTURE_TAG, "UNREGISTER key=$capKey  (ctrl.size=${ctrl.registeredKeys().size - 1})")
                             ctrl.unregister(capKey)
@@ -216,11 +223,7 @@ fun Main_Preview_BonVentEtateScreen(
                                 Situation_Card_ItemView(
                                     allBonVentList = allBons,
                                     relative_M8BonVent = b,
-                                    onUpdate = {
-                                        scope.launch {
-                                            vm.update_M8(it)
-                                        }
-                                    },
+                                    onUpdate = { scope.launch { vm.update_M8(it) } },
                                     onDelete = {
                                         scope.launch {
                                             appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID)
@@ -233,11 +236,7 @@ fun Main_Preview_BonVentEtateScreen(
                                 Y_Credit_And_Versement_ItemView(
                                     allBonVentList = allBons,
                                     relative_M8BonVent = b,
-                                    onUpdate = {
-                                        scope.launch {
-                                            vm.update_M8(it)
-                                        }
-                                    },
+                                    onUpdate = { scope.launch { vm.update_M8(it) } },
                                     onDelete = {
                                         scope.launch {
                                             appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID)
@@ -250,11 +249,7 @@ fun Main_Preview_BonVentEtateScreen(
                                 Affiche_NonCredit_Etate(
                                     allBonVentList = allBons,
                                     relative_M8BonVent = b,
-                                    onUpdate = {
-                                        scope.launch {
-                                            vm.update_M8(it)
-                                        }
-                                    },
+                                    onUpdate = { scope.launch { vm.update_M8(it) } },
                                     onDelete = {
                                         scope.launch {
                                             appDatabase.dao_M8BonVent().deleteByKeyId(it.keyID)
@@ -269,7 +264,6 @@ fun Main_Preview_BonVentEtateScreen(
         }
 
         Floating_Separated_Button(
-
             onClick_Lence_Capture = onLenceCapture,
             vm = vm,
         )
@@ -287,10 +281,8 @@ fun Main_Preview_BonVentEtateScreen(
             }
             vm.active_Datas.list_M8bon = updated
             Log.d(CAPTURE_TAG, "allBonVentList.size after add = ${updated.size}  — triggering fastAddCaptureVersion++")
-            // Persist both bons to Room
             vm.add_New_M8BonVent(bon1)
             vm.add_New_M8BonVent(bon2)
-            // Trigger a capture of the last 8 items once Compose re-renders
             fastAddCaptureVersion++
         }
     }
