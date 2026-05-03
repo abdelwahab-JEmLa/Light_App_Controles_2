@@ -3,17 +3,18 @@ package com.example.light_app_controles.B.Screens.Z.Screens.Apps.App.Modules
 import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
 import Application5.App.Repository.M20ObsarvationEtudion
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.ParentCommunicationCardData_2
+import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.Table.drawHeaderSection
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.Table.drawRTLText
+import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.Table.drawStudentHeader
+import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
-import android.graphics.Shader
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
@@ -65,7 +66,7 @@ fun generateHistorySchemaImage(
         }
 
         val paints = buildSchemaPaints()
-        val measuredH = measureSchemaHeight(rows, imgWidth, marginH, contentWidth, paints)
+        val measuredH = measureSchemaHeight(context, rows, cardData, imgWidth, marginH, contentWidth, paints)
         Log.d(TAG, "  hauteur mesurée: $measuredH px")
 
         val totalHeight = (measuredH + 24f).toInt()
@@ -76,7 +77,7 @@ fun generateHistorySchemaImage(
             drawColor(Color.parseColor("#FAFAFA"))
             scale(scale.toFloat(), scale.toFloat())
         }
-        renderSchema(canvas, rows, cardData, imgWidth, marginH, contentWidth, paints)
+        renderSchema(canvas, rows, context, cardData, imgWidth, marginH, contentWidth, paints)
 
         val fileName = "schema_${studentId.trim()}_${System.currentTimeMillis()}.jpg"
         val uri = saveSchemaJpg(context, bitmap, fileName).also { bitmap.recycle() }
@@ -118,14 +119,16 @@ private fun resolveObservations(
         }
 
 private fun measureSchemaHeight(
+    context: Context,
     rows: List<ObsRow>,
+    cardData: ParentCommunicationCardData_2,
     imgWidth: Int,
     marginH: Float,
     contentWidth: Float,
     paints: SchemaPaints
 ): Float {
     val dummy = Bitmap.createBitmap(imgWidth, 8000, Bitmap.Config.ARGB_8888)
-    val y = renderSchema(Canvas(dummy), rows, null, imgWidth, marginH, contentWidth, paints)
+    val y = renderSchema(Canvas(dummy), rows, context, cardData, imgWidth, marginH, contentWidth, paints)
     dummy.recycle()
     return y
 }
@@ -133,6 +136,7 @@ private fun measureSchemaHeight(
 private fun renderSchema(
     canvas: Canvas,
     rows: List<ObsRow>,
+    context: Context?,
     cardData: ParentCommunicationCardData_2?,
     imgWidth: Int,
     marginH: Float,
@@ -141,22 +145,34 @@ private fun renderSchema(
 ): Float {
     var y = 0f
 
-    val headerH = 52f
-    canvas.drawRect(
-        0f, y, imgWidth.toFloat(), y + headerH,
-        Paint().apply {
-            shader = LinearGradient(
-                0f, y, imgWidth.toFloat(), y + headerH,
-                Color.parseColor("#1565C0"), Color.parseColor("#1E88E5"),
-                Shader.TileMode.CLAMP
-            )
-        }
-    )
-    drawRTLText(canvas, "سجل تقدم الحفظ", marginH, y + 8f, contentWidth.toInt(), TextPaint(paints.titleWhite), Layout.Alignment.ALIGN_CENTER)
-    if (cardData != null) {
-        drawRTLText(canvas, cardData.studentInfo.fullName, marginH, y + 28f, contentWidth.toInt(), paints.subWhite, Layout.Alignment.ALIGN_CENTER)
+    // ── Standard logo header (matches mokarrar layout) ────────────────────────
+    if (context != null && cardData != null) {
+        y = drawHeaderSection(
+            canvas           = canvas,
+            context          = context,
+            marginLeft       = marginH,
+            marginTop        = y,
+            pageWidth        = imgWidth,
+            marginRight      = marginH,
+            contentWidth     = contentWidth.toInt(),
+            paintHeaderLarge = paints.headerLarge,
+            paintSmall       = paints.small,
+            paintVerySmall   = paints.verySmall,
+            compactMode      = true
+        )
+        y = drawStudentHeader(
+            canvas           = canvas,
+            cardData         = cardData,
+            marginLeft       = marginH,
+            yPosition        = y,
+            pageWidth        = imgWidth,
+            marginRight      = marginH,
+            contentWidth     = contentWidth.toInt(),
+            paintArabicBold  = paints.bold,
+            paintBorder      = paints.border
+        )
+        y += 8f
     }
-    y += headerH + 16f
 
     y = drawChart(canvas, rows, marginH, y, contentWidth, paints)
     y += 16f
@@ -309,11 +325,54 @@ private fun drawChart(
 
 // ── Save ──────────────────────────────────────────────────────────────────────
 
-private fun saveSchemaJpg(context: Context, bitmap: Bitmap, fileName: String): Uri? =
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+private fun saveSchemaJpg(context: Context, bitmap: Bitmap, fileName: String): Uri? {
+    // Extract keyID from "schema_{keyID}_{timestamp}.jpg"
+    val keyID = fileName.removePrefix("schema_").substringBeforeLast("_")
+    deleteSameDaySchemaImages(context, keyID)
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
         saveSchemaViaMediaStore(context, bitmap, fileName)
     else
         saveSchemaToPublicPictures(context, bitmap, fileName)
+}
+
+/** Deletes all schema images for [keyID] that were saved today. */
+private fun deleteSameDaySchemaImages(context: Context, keyID: String) {
+    val relPath = "${Environment.DIRECTORY_PICTURES}/whatsapp_cards/schema/"
+    val prefix  = "schema_${keyID.trim()}_"
+    val todayStartSec = java.util.Calendar.getInstance().apply {
+        set(java.util.Calendar.HOUR_OF_DAY, 0)
+        set(java.util.Calendar.MINUTE, 0)
+        set(java.util.Calendar.SECOND, 0)
+        set(java.util.Calendar.MILLISECOND, 0)
+    }.timeInMillis / 1000L
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val resolver   = context.contentResolver
+        val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val selection  = "${MediaStore.Images.Media.RELATIVE_PATH} = ? AND " +
+                         "${MediaStore.Images.Media.DISPLAY_NAME} LIKE ? AND " +
+                         "${MediaStore.Images.Media.DATE_ADDED} >= ?"
+        val args = arrayOf(relPath, "$prefix%", todayStartSec.toString())
+        resolver.query(collection, arrayOf(MediaStore.Images.Media._ID), selection, args, null)
+            ?.use { cursor ->
+                val col = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+                while (cursor.moveToNext()) {
+                    val uri = ContentUris.withAppendedId(collection, cursor.getLong(col))
+                    resolver.delete(uri, null, null)
+                    Log.d(TAG, "🗑 deleted old schema image: $uri")
+                }
+            }
+    } else {
+        @Suppress("DEPRECATION")
+        val dir = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+            "whatsapp_cards/schema"
+        )
+        val todayStartMs = todayStartSec * 1000L
+        dir.listFiles { f -> f.name.startsWith(prefix) && f.lastModified() >= todayStartMs }
+            ?.forEach { f -> if (f.delete()) Log.d(TAG, "🗑 deleted old schema file: ${f.name}") }
+    }
+}
 
 private fun saveSchemaViaMediaStore(context: Context, bitmap: Bitmap, fileName: String): Uri? {
     val resolver   = context.contentResolver
@@ -355,13 +414,19 @@ private fun saveSchemaToPublicPictures(context: Context, bitmap: Bitmap, fileNam
 // ── Paints ────────────────────────────────────────────────────────────────────
 
 private data class SchemaPaints(
-    val titleWhite: TextPaint,
-    val subWhite:   TextPaint,
-    val legendText: TextPaint,
-    val dateText:   TextPaint,
-    val badgeText:  TextPaint,
-    val rangeText:  Paint,       // kept for any future rotated use
-    val rangeTP:    TextPaint,   // horizontal range label below the date
+    val titleWhite:  TextPaint,
+    val subWhite:    TextPaint,
+    val legendText:  TextPaint,
+    val dateText:    TextPaint,
+    val badgeText:   TextPaint,
+    val rangeText:   Paint,       // kept for any future rotated use
+    val rangeTP:     TextPaint,   // horizontal range label below the date
+    // ── Extra paints required by drawHeaderSection / drawStudentHeader ────────
+    val bold:        TextPaint,
+    val headerLarge: TextPaint,
+    val small:       TextPaint,
+    val verySmall:   TextPaint,
+    val border:      Paint,
 )
 
 private fun buildSchemaPaints() = SchemaPaints(
@@ -372,6 +437,36 @@ private fun buildSchemaPaints() = SchemaPaints(
     badgeText  = TextPaint().apply { textSize =  8f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD);   isAntiAlias = true; color = Color.WHITE },
     rangeText  = Paint(Paint.ANTI_ALIAS_FLAG).apply { textSize = 7f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL); color = Color.parseColor("#546E7A"); alpha = 200 },
     rangeTP    = TextPaint().apply { textSize =  7f; typeface = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL); isAntiAlias = true; color = Color.parseColor("#546E7A"); alpha = 200 },
+    // ── Extra paints for drawHeaderSection / drawStudentHeader ────────────────
+    bold = TextPaint().apply {
+        textSize    = 17f
+        typeface    = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        isAntiAlias = true
+        color       = Color.BLACK
+    },
+    headerLarge = TextPaint().apply {
+        textSize    = 14f
+        typeface    = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+        isAntiAlias = true
+        color       = Color.BLACK
+    },
+    small = TextPaint().apply {
+        textSize    = 11f
+        typeface    = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
+        isAntiAlias = true
+        color       = Color.BLACK
+    },
+    verySmall = TextPaint().apply {
+        textSize    = 9f
+        typeface    = Typeface.create(Typeface.DEFAULT, Typeface.NORMAL)
+        isAntiAlias = true
+        color       = Color.BLACK
+    },
+    border = Paint().apply {
+        color       = Color.BLACK
+        style       = Paint.Style.STROKE
+        strokeWidth = 1f
+    },
 )
 
 // ── Utilities ─────────────────────────────────────────────────────────────────

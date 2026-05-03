@@ -1,10 +1,12 @@
-package Application5.App.View.DropDownItems.View.But2.generatePdfDocument
+package com.example.light_app_controles.B.Screens.Z.Screens.Apps.App
 
 import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
+import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.ParentCommunicationCardData_2
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.Table.A.drawHifdTable
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.Table.A.drawIstedrakMokarrarTable
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.Table.drawHeaderSection
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.Table.drawStudentHeader
+import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
@@ -213,11 +215,51 @@ private fun saveMokarrarBitmap(
     bitmap: Bitmap,
     keyID: String
 ): Uri? {
+    deleteSameDayMokarrarImages(context, keyID)
     val fileName = "mokarrar_${keyID.trim()}_${System.currentTimeMillis()}.jpg"
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
         saveMokarrarViaMediaStore(context, bitmap, fileName)
     else
         saveMokarrarToPublicPictures(context, bitmap, fileName)
+}
+
+/** Deletes all mokarrar images for [keyID] that were saved today. */
+private fun deleteSameDayMokarrarImages(context: Context, keyID: String) {
+    val relPath = "${Environment.DIRECTORY_PICTURES}/whatsapp_cards/mokarrar/"
+    val prefix  = "mokarrar_${keyID.trim()}_"
+    val todayStartSec = java.util.Calendar.getInstance().apply {
+        set(java.util.Calendar.HOUR_OF_DAY, 0)
+        set(java.util.Calendar.MINUTE, 0)
+        set(java.util.Calendar.SECOND, 0)
+        set(java.util.Calendar.MILLISECOND, 0)
+    }.timeInMillis / 1000L
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val resolver   = context.contentResolver
+        val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val selection  = "${MediaStore.Images.Media.RELATIVE_PATH} = ? AND " +
+                         "${MediaStore.Images.Media.DISPLAY_NAME} LIKE ? AND " +
+                         "${MediaStore.Images.Media.DATE_ADDED} >= ?"
+        val args = arrayOf(relPath, "$prefix%", todayStartSec.toString())
+        resolver.query(collection, arrayOf(MediaStore.Images.Media._ID), selection, args, null)
+            ?.use { cursor ->
+                val col = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+                while (cursor.moveToNext()) {
+                    val uri = ContentUris.withAppendedId(collection, cursor.getLong(col))
+                    resolver.delete(uri, null, null)
+                    Log.d(TAG, "🗑 deleted old mokarrar image: $uri")
+                }
+            }
+    } else {
+        @Suppress("DEPRECATION")
+        val dir = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+            "whatsapp_cards/mokarrar"
+        )
+        val todayStartMs = todayStartSec * 1000L
+        dir.listFiles { f -> f.name.startsWith(prefix) && f.lastModified() >= todayStartMs }
+            ?.forEach { f -> if (f.delete()) Log.d(TAG, "🗑 deleted old mokarrar file: ${f.name}") }
+    }
 }
 
 private fun saveMokarrarViaMediaStore(

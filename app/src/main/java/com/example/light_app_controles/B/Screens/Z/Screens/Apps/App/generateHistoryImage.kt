@@ -3,6 +3,7 @@ package Application5.App.View.DropDownItems.View.But2.generatePdfDocument
 import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.Table.drawStudentHeader
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.Table.A.drawObservationHistoryTable
+import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
@@ -131,11 +132,51 @@ private fun saveHistoryBitmap(
     bitmap: Bitmap,
     keyID: String
 ): Uri? {
+    deleteSameDayHistoryImages(context, keyID)
     val fileName = "history_${keyID.trim()}_${System.currentTimeMillis()}.jpg"
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
         saveViaMediaStore(context, bitmap, fileName)
     else
         saveToPublicPictures(context, bitmap, fileName)
+}
+
+/** Deletes all history images for [keyID] that were saved today. */
+private fun deleteSameDayHistoryImages(context: Context, keyID: String) {
+    val relPath = "${Environment.DIRECTORY_PICTURES}/whatsapp_cards/history/"
+    val prefix  = "history_${keyID.trim()}_"
+    val todayStartSec = java.util.Calendar.getInstance().apply {
+        set(java.util.Calendar.HOUR_OF_DAY, 0)
+        set(java.util.Calendar.MINUTE, 0)
+        set(java.util.Calendar.SECOND, 0)
+        set(java.util.Calendar.MILLISECOND, 0)
+    }.timeInMillis / 1000L
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        val resolver   = context.contentResolver
+        val collection = MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+        val selection  = "${MediaStore.Images.Media.RELATIVE_PATH} = ? AND " +
+                         "${MediaStore.Images.Media.DISPLAY_NAME} LIKE ? AND " +
+                         "${MediaStore.Images.Media.DATE_ADDED} >= ?"
+        val args = arrayOf(relPath, "$prefix%", todayStartSec.toString())
+        resolver.query(collection, arrayOf(MediaStore.Images.Media._ID), selection, args, null)
+            ?.use { cursor ->
+                val col = cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID)
+                while (cursor.moveToNext()) {
+                    val uri = ContentUris.withAppendedId(collection, cursor.getLong(col))
+                    resolver.delete(uri, null, null)
+                    Log.d(TAG, "🗑 deleted old history image: $uri")
+                }
+            }
+    } else {
+        @Suppress("DEPRECATION")
+        val dir = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+            "whatsapp_cards/history"
+        )
+        val todayStartMs = todayStartSec * 1000L
+        dir.listFiles { f -> f.name.startsWith(prefix) && f.lastModified() >= todayStartMs }
+            ?.forEach { f -> if (f.delete()) Log.d(TAG, "🗑 deleted old history file: ${f.name}") }
+    }
 }
 
 private fun saveViaMediaStore(

@@ -10,7 +10,6 @@ import Application5.App.Repository.M19Etudiant
 import Application5.App.View.DropDownItems.View.But2.convertSingleCardToJpg
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.ParentCommunicationCardData_2
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.generateHistoryImage
-import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.generateMokarrarImage
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.generatePdfDocument
 import Application5.App.View.DropDownItems.View.But2.getStoredCardUriForStudent
 import EntreApps.Shared.Models.Components.Ousstad_Tahfid
@@ -399,6 +398,11 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                                 type = "image/jpeg"
                                                 setPackage("com.whatsapp.w4b")
                                                 putExtra(android.content.Intent.EXTRA_STREAM, imageUri)
+                                                putExtra(android.content.Intent.EXTRA_TEXT,
+                                                    "السلام عليكم و رحمة الله و بركاته\n\n" +
+                                                            "هذا مقرر ابنكم للجلسة القادمة\n" +
+                                                            "يرجى سماع عرضه ليترسخ للمرة القادمة\n" +
+                                                            "يرجى متابعة ووضع علامة إن أمكن، جزاكم الله خيرًا 🌿")
                                                 putExtra("jid", "$n@s.whatsapp.net")
                                                 addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                             }
@@ -481,6 +485,10 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                                 type = "image/jpeg"
                                                 setPackage("com.whatsapp.w4b")
                                                 putExtra(android.content.Intent.EXTRA_STREAM, imageUri)
+                                                putExtra(android.content.Intent.EXTRA_TEXT,
+                                                    "السلام عليكم و رحمة الله و بركاته\n\n" +
+                                                            "هذه أداة تواصل لتوضيح مدى تقدم ابنكم في الحفظ\n" +
+                                                            "جزاكم الله خيرًا 🌿")
                                                 putExtra("jid", "$n@s.whatsapp.net")
                                                 addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                             }
@@ -562,6 +570,11 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                                 type = "image/jpeg"
                                                 setPackage("com.whatsapp.w4b")
                                                 putExtra(android.content.Intent.EXTRA_STREAM, imageUri)
+                                                putExtra(android.content.Intent.EXTRA_TEXT,
+                                                    "السلام عليكم و رحمة الله و بركاته\n\n" +
+                                                            "هذا سجل متابعة حفظ ابنكم\n" +
+                                                            "يرجى سماع عرضه ليترسخ للمرة القادمة\n" +
+                                                            "يرجى متابعة ووضع علامة إن أمكن، جزاكم الله خيرًا 🌿")
                                                 putExtra("jid", "$n@s.whatsapp.net")
                                                 addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                             }
@@ -839,5 +852,3 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
         )
     }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
