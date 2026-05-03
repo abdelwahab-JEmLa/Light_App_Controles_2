@@ -2,7 +2,6 @@ package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.
 
 import EntreApps.Shared.Models.M09AppCompt
 import android.annotation.SuppressLint
-import android.content.Context
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,10 +10,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.FAKE_CLIENT_KEY
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.fake_new_sit
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import kotlinx.coroutines.launch
-import kotlin.collections.plus
 
 @Stable
 class ActiveDatas {
@@ -24,7 +21,6 @@ class ActiveDatas {
 
 @SuppressLint("StaticFieldLeak")
 class A_ViewModel(
-    private val context: Context,
     private val appDatabase: AppDatabase,
 ) : ViewModel() {
     val active_Datas = ActiveDatas()
@@ -36,8 +32,7 @@ class A_ViewModel(
 
     init {
         viewModelScope.launch {
-            // FIX TODO(1): fake_new_sit is now included so it displays in the list.
-            active_Datas.list_M8bon = (appDatabase.dao_M8BonVent().getAll() + fake_new_sit)
+            active_Datas.list_M8bon = (appDatabase.dao_M8BonVent().getAll())
         }
     }
 

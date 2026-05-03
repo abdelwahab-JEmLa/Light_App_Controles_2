@@ -64,9 +64,9 @@ fun A_FastAdd_FloatingSeparated_Button_1(
         icons = Pair(Icons.Default.FilterList, Icons.Default.AllInbox),
         colors = Pair(Color.Red, Color.Blue)
     ),
-    vm: A_ViewModel,
-    bons: List<M8BonVent>? = vm.active_Datas.list_M8bon,
+    bons: List<M8BonVent>? = emptyList(),
     relative_M2Client: M2Client?,
+    onCommit: (bon: M8BonVent, newSituation: M8BonVent) -> Unit,
 ) {
     val updatedButtonState = buttonState.copy(its_Active = true)
 
@@ -100,16 +100,6 @@ fun A_FastAdd_FloatingSeparated_Button_1(
     // ── Which item is editing right now ──────────────────────────────────────
     var activeItem by remember { mutableStateOf(ActiveDropdownItem.None) }
 
-    // ── Commit helper ────────────────────────────────────────────────────────
-    fun commitBons(bon1: M8BonVent, bon2: M8BonVent) {
-        val updated = (bons?.toMutableList() ?: mutableListOf()).also {
-            it.add(bon1)
-            it.add(bon2)
-        }
-        vm.active_Datas.list_M8bon = updated
-        activeItem = ActiveDropdownItem.None
-        /* vm.add_New_M8BonVent(bon1); vm.add_New_M8BonVent(bon2) */
-    }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Box(
@@ -132,7 +122,10 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                     modifier = Modifier
                         .semantics(mergeDescendants = true) {
                             set(SemanticsPropertyKey<String>("clientKey"), clientKey)
-                            set(SemanticsPropertyKey<Int?>("latestSituationMontant"), latestSituationMontant)
+                            set(
+                                SemanticsPropertyKey<Int?>("latestSituationMontant"),
+                                latestSituationMontant
+                            )
                         }
                         .size(48.dp),
                     onClick = {
@@ -162,7 +155,10 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                         latestSituationMontant = latestSituationMontant,
                         isActive = activeItem == ActiveDropdownItem.Credit,
                         onActivate = { activeItem = ActiveDropdownItem.Credit },
-                        onCommit = { credit, newSit -> commitBons(credit, newSit) },
+                        onCommit = { versement, newSit ->
+                            onCommit(versement, newSit)
+                            activeItem = ActiveDropdownItem.None
+                        },
                     )
 
                     DropdownItem_Versement(
@@ -170,7 +166,10 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                         latestSituationMontant = latestSituationMontant,
                         isActive = activeItem == ActiveDropdownItem.Versement,
                         onActivate = { activeItem = ActiveDropdownItem.Versement },
-                        onCommit = { versement, newSit -> commitBons(versement, newSit) },
+                        onCommit = { cre, newSit ->
+                            onCommit(cre, newSit)
+                            activeItem = ActiveDropdownItem.None
+                        },
                     )
 
                     HorizontalDivider(thickness = 3.dp, color = Color.Red)

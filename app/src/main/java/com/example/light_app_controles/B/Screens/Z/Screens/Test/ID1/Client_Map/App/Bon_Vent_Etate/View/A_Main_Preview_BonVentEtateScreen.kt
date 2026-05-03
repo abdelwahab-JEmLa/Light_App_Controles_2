@@ -77,7 +77,7 @@ fun Main_Preview_BonVentEtateScreen(
 ) {
     val vm: A_ViewModel = viewModel(
         factory = viewModelFactory {
-            initializer { A_ViewModel(context = context, appDatabase = appDatabase) }
+            initializer { A_ViewModel(appDatabase = appDatabase) }
         }
     )
 
@@ -232,8 +232,15 @@ fun Main_Preview_BonVentEtateScreen(
 
         A_FastAdd_FloatingSeparated_Button_1(
             relative_M2Client = relative_M2Client,
-            vm = vm,
-        )
+            bons = allBonVentList,
+        ) { bon1, bon2 ->
+            val updated = allBonVentList.toMutableList().also {
+                it.add(bon1)
+                it.add(bon2)
+            }
+            vm.active_Datas.list_M8bon = updated
+            /* vm.add_New_M8BonVent(bon1); vm.add_New_M8BonVent(bon2) */
+        }
     }
 
     if (showDlg && captured.isNotEmpty()) {
