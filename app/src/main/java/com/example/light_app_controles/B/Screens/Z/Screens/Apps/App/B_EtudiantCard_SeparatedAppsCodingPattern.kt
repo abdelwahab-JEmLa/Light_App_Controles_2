@@ -64,6 +64,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.light_app_controles.B.Screens.Z.Screens.Apps.App.Modules.generateHistorySchemaImage
+import com.example.light_app_controles.B.Screens.Z.Screens.Apps.App.Modules.generateMokarrarImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -376,7 +377,11 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                     try {
                                         val mokarrarCardData = ParentCommunicationCardData_2.fromEtudiant(etudiant)
                                         val imageUri = withContext(Dispatchers.IO) {
-                                            generateMokarrarImage(context, mokarrarCardData, viewModel)
+                                            generateMokarrarImage(
+                                                context,
+                                                mokarrarCardData,
+                                                viewModel
+                                            )
                                         }
                                         if (imageUri == null) {
                                             withContext(Dispatchers.Main) {
@@ -400,7 +405,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                                 putExtra(android.content.Intent.EXTRA_STREAM, imageUri)
                                                 putExtra(android.content.Intent.EXTRA_TEXT,
                                                     "السلام عليكم و رحمة الله و بركاته\n\n" +
-                                                            "هذا مقرر ابنكم للجلسة القادمة\n" +
+                                                            "هذا مقرر ابنكم للحلقة القادمة\n" +
                                                             "يرجى سماع عرضه ليترسخ للمرة القادمة\n" +
                                                             "يرجى متابعة ووضع علامة إن أمكن، جزاكم الله خيرًا 🌿")
                                                 putExtra("jid", "$n@s.whatsapp.net")

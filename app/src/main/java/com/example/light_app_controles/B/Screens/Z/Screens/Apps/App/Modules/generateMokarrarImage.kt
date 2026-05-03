@@ -1,4 +1,4 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Apps.App
+package com.example.light_app_controles.B.Screens.Z.Screens.Apps.App.Modules
 
 import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.ParentCommunicationCardData_2
@@ -23,6 +23,7 @@ import android.util.Log
 import androidx.core.content.FileProvider
 import java.io.File
 import java.io.FileOutputStream
+import java.util.Calendar
 
 private const val TAG = "MokarrarImage"
 
@@ -227,11 +228,11 @@ private fun saveMokarrarBitmap(
 private fun deleteSameDayMokarrarImages(context: Context, keyID: String) {
     val relPath = "${Environment.DIRECTORY_PICTURES}/whatsapp_cards/mokarrar/"
     val prefix  = "mokarrar_${keyID.trim()}_"
-    val todayStartSec = java.util.Calendar.getInstance().apply {
-        set(java.util.Calendar.HOUR_OF_DAY, 0)
-        set(java.util.Calendar.MINUTE, 0)
-        set(java.util.Calendar.SECOND, 0)
-        set(java.util.Calendar.MILLISECOND, 0)
+    val todayStartSec = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, 0)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
     }.timeInMillis / 1000L
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
