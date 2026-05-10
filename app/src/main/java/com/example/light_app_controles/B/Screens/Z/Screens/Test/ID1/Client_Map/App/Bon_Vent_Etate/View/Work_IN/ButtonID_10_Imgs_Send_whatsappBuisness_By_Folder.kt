@@ -99,7 +99,7 @@ fun ButtonID_10_Imgs_Send_whatsappBuisness_By_Folder(
     modifier: Modifier = Modifier,
     showLabels: Boolean = true,
     central_storage: String = "/storage/emulated/0/Download/",
-    parent_folder: File = File(central_storage, "Image_Compose_Screen"),
+    parent_folder: File = File(central_storage, ""),
     child: String = "",
     extantion_files_a_find: String = "webp",
     num: String = "+213553885037",

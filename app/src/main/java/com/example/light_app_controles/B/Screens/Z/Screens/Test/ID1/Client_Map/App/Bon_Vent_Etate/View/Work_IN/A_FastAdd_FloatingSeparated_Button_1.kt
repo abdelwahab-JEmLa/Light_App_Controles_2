@@ -235,10 +235,13 @@ fun A_FastAdd_FloatingSeparated_Button_1(
 
                         HorizontalDivider(thickness = 3.dp, color = Color.Red)
 
+                        val work = Triple("BonsWhatsApp","05_10","jpg")
+                        val targeted = Cordon_files("Image_Compose_Screen","-OWI8JQlhGjA_HzMCGFD","webp")
+
                         ButtonID_10_Imgs_Send_whatsappBuisness_By_Folder(
-                            parent_folder =  File( "/storage/emulated/0/Download/", "BonsWhatsApp"),
-                            child = "05_10",
-                            extantion_files_a_find="jpg"
+                            parent_folder =  File( "/storage/emulated/0/Download/", targeted.parent_folder),
+                            child = targeted.child,
+                            extantion_files_a_find=targeted.extantion_files_a_find
                         )
 
                         HorizontalDivider(thickness = 3.dp, color = Color.Green)
@@ -248,3 +251,9 @@ fun A_FastAdd_FloatingSeparated_Button_1(
         }
     }
 }
+
+data class Cordon_files (
+    val parent_folder: String,
+    val child: String,
+    val extantion_files_a_find: String,
+)
