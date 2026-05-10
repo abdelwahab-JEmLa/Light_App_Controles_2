@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Work_IN.normaliseToWaMeNumber
 
 @Composable
- fun DropdownItem_WhatsApp_Worker(
+fun DropdownItem_WhatsApp_Worker(
     currentNomWorker: String,
     currentNumWorker: String,
     isActive: Boolean,
