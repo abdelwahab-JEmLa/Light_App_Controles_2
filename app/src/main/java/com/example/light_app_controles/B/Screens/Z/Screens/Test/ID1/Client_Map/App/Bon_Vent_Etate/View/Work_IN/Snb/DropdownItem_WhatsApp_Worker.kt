@@ -1,4 +1,4 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Work_IN
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Work_IN.Snb
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,18 +31,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Work_IN.normaliseToWaMeNumber
 
-/**
- * Dropdown item — WhatsApp for the **worker** (num_worker / nom_worker).
- *
- * - Tap the row    → send immediately to [currentNumWorker] (if non-empty) or enter edit mode.
- * - Tap the ✏️ icon → enter edit mode; both [nom_worker] and [num_worker] fields are shown.
- * - Press Done on  the phone field → save both fields then send.
- *
- * The number is passed through [normaliseToWaMeNumber] before reaching [onSend].
- *
- * @param onWorkerSaved  Persist the updated (nomWorker, numWorker) pair.
- * @param onSend         Trigger the capture-and-share flow.
- */
 @Composable
  fun DropdownItem_WhatsApp_Worker(
     currentNomWorker: String,

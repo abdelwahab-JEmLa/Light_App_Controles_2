@@ -1,6 +1,8 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Work_IN
 
 import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -37,8 +39,8 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Work_IN.DropdownItem_WhatsApp_FixedAbdelwahab
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Work_IN.DropdownItem_WhatsApp_Worker
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Work_IN.Snb.DropdownItem_WhatsApp_FixedAbdelwahab
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Work_IN.Snb.DropdownItem_WhatsApp_Worker
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b_FastAdd_FloatingSeparated_Button_1.Actions.DropdownItem_Credit
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b_FastAdd_FloatingSeparated_Button_1.Actions.DropdownItem_Versement
 import kotlin.math.roundToInt
@@ -71,6 +73,7 @@ fun normaliseToWaMeNumber(raw: String): String {
 
 const val ABDELWAHAB_WA_ME_NUMBER = "213553885037"
 
+@RequiresApi(Build.VERSION_CODES.Q)
 @Composable
 fun A_FastAdd_FloatingSeparated_Button_1(
     buttonState: Button_State = Button_State.get_Default().copy(
@@ -229,6 +232,12 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                         }
 
                         HorizontalDivider(thickness = 3.dp, color = Color.Red)
+
+                        ButtonID_10_Imgs_Send_whatsappBuisness_By_Folder(
+                            child = clientKey,
+                            num         = normaliseToWaMeNumber(relative_M2Client?.numTelephone ?: ""),
+                        )
+                        HorizontalDivider(thickness = 3.dp, color = Color.Green)
                     }
                 }
             }
