@@ -155,9 +155,6 @@ fun Main_Preview_BonVentEtateScreen(
     }
 
     LaunchedEffect(whatsappSendRequest) {
-        // ─────────────────────────────────────────────────────────
-        // STEP 0 — request guard
-        // ─────────────────────────────────────────────────────────
         val request = whatsappSendRequest ?: run {
             Log.d(WA_LOG, "[0] whatsappSendRequest est null → skip")
             return@LaunchedEffect
@@ -165,9 +162,6 @@ fun Main_Preview_BonVentEtateScreen(
         val (phoneNumber, isWhatsAppBusiness) = request
         Log.i(WA_LOG, "[0] ▶ flow démarré | phone=$phoneNumber | business=$isWhatsAppBusiness")
 
-        // ─────────────────────────────────────────────────────────
-        // STEP 1 — capture des items visibles via scroll
-        // ─────────────────────────────────────────────────────────
         Log.d(WA_LOG, "[1] capture → allBons.size=${allBons.size} | orderedKeys=${buildOrderedKeys()}")
         val raw = ctrl.captureAllWithScroll(
             state          = listState,
