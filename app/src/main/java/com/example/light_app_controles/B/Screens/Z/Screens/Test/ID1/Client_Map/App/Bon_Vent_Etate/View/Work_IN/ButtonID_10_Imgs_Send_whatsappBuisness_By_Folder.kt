@@ -1,4 +1,4 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Work_IN
+package P0_MainScreen.Main.Main.Settings.FWinID1.AbdelwahabEBoutiquePressistantsOverAll.Windows.But_4_FloatingSearchFAB.ButtonID_6.Action
 
 import android.content.Context
 import android.content.Intent
@@ -71,7 +71,9 @@ class Send_To_WB_Impl : Send_To_WB_Int {
             } else {
                 Intent(Intent.ACTION_SEND_MULTIPLE).apply {
                     type = "image/jpeg"; setPackage("com.whatsapp.w4b")
-                    putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(imageUris)); putExtra("jid", jid)
+                    putParcelableArrayListExtra(Intent.EXTRA_STREAM,
+                        kotlin.collections.ArrayList(imageUris)
+                    ); putExtra("jid", jid)
                     addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
             }
@@ -96,12 +98,12 @@ class Send_To_WB_Impl : Send_To_WB_Int {
 fun ButtonID_10_Imgs_Send_whatsappBuisness_By_Folder(
     modifier: Modifier = Modifier,
     showLabels: Boolean = true,
-    downold: String = "/storage/emulated/0/Download/",
-    parent_folder: File = File(downold, "Image_Compose_Screen"),
-    num: String = "+213553885037",
+    central_storage: String = "/storage/emulated/0/Download/",
+    parent_folder: File = File(central_storage, "Image_Compose_Screen"),
     child: String = "",
+    extantion_files_a_find: String = "webp",
+    num: String = "+213553885037",
     folder_path: File = File(parent_folder, child),
-    extention_files_a_find: String = "webp",
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
@@ -112,7 +114,12 @@ fun ButtonID_10_Imgs_Send_whatsappBuisness_By_Folder(
     LaunchedEffect(folder_path.absolutePath) {
         withContext(Dispatchers.IO) {
             imagesExist = folder_path.exists() &&
-                    folder_path.listFiles { f -> f.extension.equals(extention_files_a_find, ignoreCase = true) }?.isNotEmpty() == true
+                    folder_path.listFiles { f ->
+                        f.extension.equals(
+                            extantion_files_a_find,
+                            ignoreCase = true
+                        )
+                    }?.isNotEmpty() == true
         }
     }
 
@@ -124,7 +131,7 @@ fun ButtonID_10_Imgs_Send_whatsappBuisness_By_Folder(
                 if (!isSending && imagesExist) {
                     isSending = true
                     scope.launch {
-                        sender.send(context, folder_path, extention_files_a_find, num, folder_path.name) { isSending = false }
+                        sender.send(context, folder_path, extantion_files_a_find, num, folder_path.name) { isSending = false }
                     }
                 }
             },

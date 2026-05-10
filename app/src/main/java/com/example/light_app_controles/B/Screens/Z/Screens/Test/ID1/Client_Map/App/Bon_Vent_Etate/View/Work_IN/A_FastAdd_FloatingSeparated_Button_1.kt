@@ -1,6 +1,7 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Work_IN
 
 import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
+import P0_MainScreen.Main.Main.Settings.FWinID1.AbdelwahabEBoutiquePressistantsOverAll.Windows.But_4_FloatingSearchFAB.ButtonID_6.Action.ButtonID_10_Imgs_Send_whatsappBuisness_By_Folder
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -43,6 +44,7 @@ import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.A
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Work_IN.Snb.DropdownItem_WhatsApp_Worker
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b_FastAdd_FloatingSeparated_Button_1.Actions.DropdownItem_Credit
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b_FastAdd_FloatingSeparated_Button_1.Actions.DropdownItem_Versement
+import java.io.File
 import kotlin.math.roundToInt
 
 enum class ActiveDropdownItem {
@@ -234,9 +236,11 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                         HorizontalDivider(thickness = 3.dp, color = Color.Red)
 
                         ButtonID_10_Imgs_Send_whatsappBuisness_By_Folder(
-                            num         = normaliseToWaMeNumber(relative_M2Client?.numTelephone ?: ""),
-                            child = clientKey,
+                            parent_folder =  File( "/storage/emulated/0/Download/", "BonsWhatsApp"),
+                            child = "05_10",
+                            extantion_files_a_find="jpg"
                         )
+
                         HorizontalDivider(thickness = 3.dp, color = Color.Green)
                     }
                 }
