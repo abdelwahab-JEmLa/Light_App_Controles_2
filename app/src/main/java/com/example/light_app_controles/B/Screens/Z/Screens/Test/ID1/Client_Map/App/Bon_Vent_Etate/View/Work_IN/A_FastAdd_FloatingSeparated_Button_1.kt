@@ -68,8 +68,8 @@ fun normaliseToWaMeNumber(raw: String): String {
     val digits = raw.filter { it.isDigit() }
     return when {
         digits.startsWith("213") -> digits
-        digits.startsWith("0")   -> "213${digits.drop(1)}"
-        else                     -> "213$digits"
+        digits.startsWith("0") -> "213${digits.drop(1)}"
+        else -> "213$digits"
     }
 }
 
@@ -80,7 +80,7 @@ const val ABDELWAHAB_WA_ME_NUMBER = "213553885037"
 fun A_FastAdd_FloatingSeparated_Button_1(
     buttonState: Button_State = Button_State.get_Default().copy(
         text_Label = "",
-        icons  = Pair(Icons.Default.FilterList, Icons.Default.AllInbox),
+        icons = Pair(Icons.Default.FilterList, Icons.Default.AllInbox),
         colors = Pair(Color.Red, Color.Blue),
     ),
     bons: List<M8BonVent>? = emptyList(),
@@ -91,9 +91,9 @@ fun A_FastAdd_FloatingSeparated_Button_1(
 ) {
     val updatedButtonState = buttonState.copy(its_Active = true)
 
-    val haptic         = LocalHapticFeedback.current
-    val configuration  = LocalConfiguration.current
-    val screenWidth    = configuration.screenWidthDp.dp
+    val haptic = LocalHapticFeedback.current
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp.dp
     val screenHeightDp = configuration.screenHeightDp.dp
 
     var offsetX by remember { mutableFloatStateOf(screenWidth.value - 200f) }
@@ -235,13 +235,19 @@ fun A_FastAdd_FloatingSeparated_Button_1(
 
                         HorizontalDivider(thickness = 3.dp, color = Color.Red)
 
-                        val work = Triple("BonsWhatsApp","05_10","jpg")
-                        val targeted = Cordon_files("Image_Compose_Screen","-OWI8JQlhGjA_HzMCGFD","webp")
+
+                        val targeted = Cordon_files(
+                            "Image_Compose_Screen",
+                            relative_M2Client?.keyID ?: "",
+                        )
 
                         ButtonID_10_Imgs_Send_whatsappBuisness_By_Folder(
-                            parent_folder =  File( "/storage/emulated/0/Download/", targeted.parent_folder),
+                            parent_folder = File(
+                                "/storage/emulated/0/Download/",
+                                targeted.parent_folder
+                            ),
                             child = targeted.child,
-                            extantion_files_a_find=targeted.extantion_files_a_find
+                            num = relative_M2Client?.numTelephone ?: ""
                         )
 
                         HorizontalDivider(thickness = 3.dp, color = Color.Green)
@@ -252,8 +258,10 @@ fun A_FastAdd_FloatingSeparated_Button_1(
     }
 }
 
-data class Cordon_files (
+data class Cordon_files(
     val parent_folder: String,
     val child: String,
-    val extantion_files_a_find: String,
 )
+
+val t2 = Cordon_files("BonsWhatsApp", "05_10")
+val work = Triple("BonsWhatsApp", "05_10", "jpg")
