@@ -234,8 +234,8 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                         HorizontalDivider(thickness = 3.dp, color = Color.Red)
 
                         ButtonID_10_Imgs_Send_whatsappBuisness_By_Folder(
-                            child = clientKey,
                             num         = normaliseToWaMeNumber(relative_M2Client?.numTelephone ?: ""),
+                            child = clientKey,
                         )
                         HorizontalDivider(thickness = 3.dp, color = Color.Green)
                     }
