@@ -76,7 +76,10 @@ fun Main_Preview_BonVentEtateScreen(
     appDatabase: AppDatabase = AppDatabase.DatabaseModule.getDatabase(context),
     onClick_Lence_Capture: () -> Unit = {},
     lenceTestActive: Boolean = false,
-    relative_M2Client: M2Client? = M2Client.get_default().copy(keyID = FAKE_CLIENT_KEY),
+    relative_M2Client: M2Client? = M2Client.get_default().copy(
+        keyID = FAKE_CLIENT_KEY,
+        numTelephone = "+213 542 70 05 75"
+    ),
 ) {
     val vm: A_ViewModel = viewModel(
         factory = viewModelFactory { initializer { A_ViewModel(appDatabase = appDatabase) } }

@@ -37,6 +37,8 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
@@ -160,7 +162,11 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                         showDropdown = false
                         activeItem = ActiveDropdownItem.None
                     },
-                    modifier = Modifier.background(Color.White, RoundedCornerShape(8.dp)),
+                    modifier = Modifier
+                        .semantics(mergeDescendants = true) {
+                            set(value = relative_M2Client, key = SemanticsPropertyKey(""))
+                        }
+                        .background(Color.White, RoundedCornerShape(8.dp)),
                 ) {
                     HorizontalDivider(thickness = 3.dp, color = Color.Red)
 
@@ -247,7 +253,7 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                                 targeted.parent_folder
                             ),
                             child = targeted.child,
-                            num = relative_M2Client?.numTelephone ?: ""
+                            num =   relative_M2Client?.numTelephone ?: ""
                         )
 
                         HorizontalDivider(thickness = 3.dp, color = Color.Green)
@@ -264,4 +270,4 @@ data class Cordon_files(
 )
 
 val t2 = Cordon_files("BonsWhatsApp", "05_10")
-val work = Triple("BonsWhatsApp", "05_10", "jpg")
+val work = Triple("BonsWhatsApp", "\"-OWI8JQlhGjA_HzMCGFD\"\"+213 542 70 05 75\"", "jpg")
