@@ -78,6 +78,7 @@ fun Main_Preview_BonVentEtateScreen(
     lenceTestActive: Boolean = false,
     relative_M2Client: M2Client? = M2Client.get_default().copy(
         keyID = FAKE_CLIENT_KEY,
+        nom = "Youcef Zohire",
         numTelephone = "+213 542 70 05 75"
     ),
 ) {
