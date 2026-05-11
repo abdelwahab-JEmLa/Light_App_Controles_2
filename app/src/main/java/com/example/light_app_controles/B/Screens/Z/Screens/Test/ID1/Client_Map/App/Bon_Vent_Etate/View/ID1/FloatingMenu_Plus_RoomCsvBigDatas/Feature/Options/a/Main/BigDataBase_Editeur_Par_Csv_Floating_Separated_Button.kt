@@ -1,5 +1,6 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.a.Main
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -44,37 +45,40 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlin.math.roundToInt
 import com.example.light_app_controles.R
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M3.Actions.M03_Operations_FragMap_DropdownMenu
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M8Bon_Operations_FragMap_DropdownMenu.Actions.Button_State
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M8Bon_Operations_FragMap_DropdownMenu.Actions.M8Bon_Operations_FragMap_DropdownMenu
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.a.BonVents.Screen.ViewModel.A_ViewModel
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M3.Actions.M03_Operations_FragMap_DropdownMenu
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M8Bon_Operations_FragMap_DropdownMenu.Actions.M8Bon_Operations_FragMap_DropdownMenu
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.a.Main.ViewModel.FeatureID1_ViewModel
+import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 
 private enum class DialState { Closed, ChildsVisible, M8Open, M03Open }
 
 @Composable
-fun Floating_Separated_Button(
+fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
     on_vent_key: String = "",
-    buttonState: Button_State = Button_State.Companion.get_Default(),
     onClick_Lence_Capture: (() -> Unit)? = null,
-    viewModel: A_ViewModel,
+    context: Context = LocalContext.current,
+    appDatabase: AppDatabase ,
+    viewModel: FeatureID1_ViewModel = viewModel(
+        factory = viewModelFactory { initializer { FeatureID1_ViewModel(appDatabase = appDatabase) } }
+    )
 ) {
     val haptic = LocalHapticFeedback.current
     var dialState by remember { mutableStateOf(DialState.Closed) }
 
     val configuration  = LocalConfiguration.current
     val density        = LocalDensity.current
-    // FIX(1): detectDragGestures returns px, IntOffset takes px.
-    //         screenWidthDp/screenHeightDp are dp-values — mixing them with px caused
-    //         erratic drag and prevented reaching screen corners.
-    //         Solution: convert to pixels once and use px everywhere.
     val screenWidthPx  = with(density) { configuration.screenWidthDp.dp.toPx() }
     val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
     val fabSizePx      = with(density) { 58.dp.toPx() }
@@ -156,11 +160,11 @@ fun Floating_Separated_Button(
                             }
                             // dropdown ancré sur ce Box
                             M8Bon_Operations_FragMap_DropdownMenu(
-                                expanded              = dialState == DialState.M8Open,
-                                onDismiss             = { dialState = DialState.Closed },
-                                on_vent_key           = on_vent_key,
+                                expanded = dialState == DialState.M8Open,
+                                onDismiss = { dialState = DialState.Closed },
+                                on_vent_key = on_vent_key,
                                 onClick_Lence_Capture = onClick_Lence_Capture,
-                                vm                    = viewModel,
+                                vm = viewModel,
                             )
                         }
                     }
