@@ -1,6 +1,8 @@
-package EntreApps.Shared.Models.Relative_Vents.Models
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.b.M3Couleur.Screen.Working_IN.Feature
 
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
+import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
+import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models.M8BonVent
@@ -41,8 +43,6 @@ data class M14VentPeriode(
 
     var etateActuellementEst: EtateActuellementEst =
         EtateActuellementEst.SoquetteNonDefinie,
-
-    val its_limite_active_couleurs: Boolean = false,
 
     ) {
     fun get_DebugInfos(): String {

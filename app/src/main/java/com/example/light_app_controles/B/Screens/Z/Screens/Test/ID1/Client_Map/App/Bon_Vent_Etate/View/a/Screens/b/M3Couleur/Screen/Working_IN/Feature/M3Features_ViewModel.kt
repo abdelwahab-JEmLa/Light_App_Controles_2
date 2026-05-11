@@ -1,9 +1,7 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.b.M3Couleur.Screen.Working_IN.Feature
 
 import EntreApps.Shared.Models.M09AppCompt
-import EntreApps.Shared.Models.Relative_Produits.Models.Functions.get_filtred_m3_by_limite_period
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
-import EntreApps.Shared.Models.Relative_Vents.Models.M14VentPeriode
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -15,8 +13,6 @@ import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.A
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models.M8BonVent
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import kotlinx.coroutines.launch
-
-private const val LIMITE_PERIOD_MS = 30L * 24 * 60 * 60 * 1_000
 
 @Stable
 class ActiveDatas {
@@ -73,7 +69,7 @@ class M3Features_ViewModel(
                     debugInfos = "outside_limit",
                     dernier_achant_timeTamp = now - 45 * 24 * 60 * 60 * 1_000,  // 45 jours ✗
                 ),
-            ).get_filtred_m3_by_limite_period(FAKE_PERIODS)
+            ).get_filtred_m3_by_limite_active_M9Compt_limite_couleurs_ou_leur_last_achate_est_moin_que_jour(FAKE_M9Compt)
 
             // Random update de 3 M3 depuis la DB : 2 dans la limite, 1 hors
             val dbList = appDatabase.dao_M03CouleurProduitInfos().getAll()
@@ -85,7 +81,7 @@ class M3Features_ViewModel(
                     else -> m3
                 }
             }
-            active_Datas.list_M03 = stamped.get_filtred_m3_by_limite_period(FAKE_PERIODS)
+            active_Datas.list_M03 = stamped.get_filtred_m3_by_limite_active_M9Compt_limite_couleurs_ou_leur_last_achate_est_moin_que_jour(FAKE_M9Compt)
         }
     }
 

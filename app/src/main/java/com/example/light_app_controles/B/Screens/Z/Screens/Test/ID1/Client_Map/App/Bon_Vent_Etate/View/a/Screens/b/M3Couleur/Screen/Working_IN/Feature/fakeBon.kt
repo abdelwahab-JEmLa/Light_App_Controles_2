@@ -1,9 +1,15 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.b.M3Couleur.Screen.Working_IN.Feature
 
+import EntreApps.Shared.Models.M09AppCompt
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models.M8BonVent
 
 const val FAKE_CLIENT_KEY = "-OWI8JQlhGjA_HzMCGFD"
 const val Targted_Bon = "-OrVHbH6u_C6TT153tUR"
+
+val FAKE_M9Compt = M09AppCompt(
+    nom = "fake_compt",
+    limite_couleurs_ou_leur_last_achate_est_moin_que_jour = 25,
+)
 
 val fake_new_sit = M8BonVent(
     parent_M2Client_KeyID = FAKE_CLIENT_KEY,
