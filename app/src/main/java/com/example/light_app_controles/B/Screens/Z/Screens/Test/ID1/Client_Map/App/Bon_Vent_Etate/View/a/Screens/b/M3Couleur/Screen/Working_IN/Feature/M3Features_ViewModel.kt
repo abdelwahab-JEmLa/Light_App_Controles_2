@@ -46,37 +46,11 @@ class M3Features_ViewModel(
     fun reload() {
         viewModelScope.launch {
             active_Datas.list_M8bon = appDatabase.dao_M8BonVent().getAll()
+            val dao_datas = appDatabase.dao_M03CouleurProduitInfos().getAll()
+            val fakeExtras = fake_extra(dao_datas)
+            val all = fakeExtras + fake_created()
 
-            val now = System.currentTimeMillis()
-            val all = appDatabase.dao_M03CouleurProduitInfos().getAll()
-            active_Datas.list_M03 =
-                all + listOf(
-                            M3CouleurProduitInfos(
-                                keyID = "fake_m3_within_1",
-                                debugInfos = "within_limit_1",
-                                nomCouleurStrSiSonImageDispo="within_limit_1",
-                                dernier_achant_timeTamp = now - 1 * 24 * 60 * 60 * 1_000,   // 1 jour  ✓
-                            ),
-                            M3CouleurProduitInfos(
-                                keyID = "fake_m3_within_2",
-                                debugInfos = "within_limit_2",
-                                nomCouleurStrSiSonImageDispo="within_limit_2",
-                                dernier_achant_timeTamp = now - 7 * 24 * 60 * 60 * 1_000,   // 7 jours ✓
-                            ),
-                            M3CouleurProduitInfos(
-                                keyID = "fake_m3_within_3",
-                                debugInfos = "within_limit_3",
-                                nomCouleurStrSiSonImageDispo="within_limit_3",
-                                dernier_achant_timeTamp = now - 20 * 24 * 60 * 60 * 1_000,  // 20 jours ✓
-                            ),
-                            M3CouleurProduitInfos(
-                                keyID = "fake_m3_hors_limite",
-                                debugInfos = "outside_limit",
-                                nomCouleurStrSiSonImageDispo="outside_limit",
-                                dernier_achant_timeTamp = now - 45 * 24 * 60 * 60 * 1_000,  // 45 jours ✗
-                            ),
-                        )
-
+            active_Datas.list_M03 = all.filter_passive_datas(FAKE_M9Compt)
         }
     }
 
@@ -95,3 +69,4 @@ class M3Features_ViewModel(
         }
     }
 }
+

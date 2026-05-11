@@ -3,7 +3,7 @@ package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.
 import EntreApps.Shared.Models.M09AppCompt
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 
-fun List<M3CouleurProduitInfos>.get_filtred_m3_by_limite_active_M9Compt_limite_couleurs_ou_leur_last_achate_est_moin_que_jour(
+fun List<M3CouleurProduitInfos>.filter_passive_datas(
     active_M9Compt: M09AppCompt,
 ): List<M3CouleurProduitInfos> {
     val limitMs =

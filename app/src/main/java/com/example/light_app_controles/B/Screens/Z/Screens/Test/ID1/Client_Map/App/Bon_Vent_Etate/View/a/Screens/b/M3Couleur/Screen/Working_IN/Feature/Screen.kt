@@ -68,27 +68,14 @@ fun M3CouleurList_Screen(
     val focusManager = LocalFocusManager.current
 
     val listM03 = remember(viewModel.active_Datas.list_M03) {
-        val base = viewModel.active_Datas.list_M03 ?: emptyList()
-        val dayMs = 24L * 60L * 60L * 1_000L
-        val now = System.currentTimeMillis()
-        val fakeExtras = base
-            .shuffled()
-            .take(15)
-            .mapIndexed { i, real ->
-                real.copy(
-                    dernier_achant_timeTamp = if (i < 8)
-                        now - (i + 1) * 3 * dayMs
-                    else
-                        now - (31 + (i + 1)) * dayMs,
-                )
-            }
-        base + fakeExtras
+        viewModel.active_Datas.list_M03 ?: emptyList()
     }
 
-    val list_filtred_by_limite_jours by remember { derivedStateOf {
-        listM03
-            ?.get_filtred_m3_by_limite_active_M9Compt_limite_couleurs_ou_leur_last_achate_est_moin_que_jour(FAKE_M9Compt)
-            ?: emptyList() } }
+    val list_filtred_by_limite_jours by remember {
+        derivedStateOf {
+            listM03
+        }
+    }
 
     // ── Texte de recherche ───────────────────────────────────────────────────
     var query by remember { mutableStateOf("") }
@@ -109,11 +96,12 @@ fun M3CouleurList_Screen(
 
     Box(modifier = modifier.fillMaxSize()) {
 
-        Column(modifier = Modifier
-            .semantics(mergeDescendants = true) {
-                set(value = listM03, key = SemanticsPropertyKey("listM03"))
-            }
-            .fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .semantics(mergeDescendants = true) {
+                    set(value = listM03, key = SemanticsPropertyKey("listM03"))
+                }
+                .fillMaxSize()) {
 
             // ── Header violet ────────────────────────────────────────────────
             Row(
@@ -168,9 +156,9 @@ fun M3CouleurList_Screen(
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = { focusManager.clearFocus() }),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor   = Color(0xFF6A1B9A),
+                    focusedBorderColor = Color(0xFF6A1B9A),
                     unfocusedBorderColor = Color(0xFFCE93D8),
-                    cursorColor          = Color(0xFF6A1B9A),
+                    cursorColor = Color(0xFF6A1B9A),
                 ),
             )
 
@@ -306,10 +294,10 @@ private fun M3CouleurItem(
                     },
                     style = MaterialTheme.typography.labelSmall,
                     color = when {
-                        daysSinceAchat == null  -> Color(0xFF9E9E9E)
-                        daysSinceAchat <= 7     -> Color(0xFF2E7D32)  // vert  — récent
-                        daysSinceAchat <= 30    -> Color(0xFFE65100)  // orange — limite proche
-                        else                    -> Color(0xFFC62828)  // rouge — dépassé
+                        daysSinceAchat == null -> Color(0xFF9E9E9E)
+                        daysSinceAchat <= 7 -> Color(0xFF2E7D32)  // vert  — récent
+                        daysSinceAchat <= 30 -> Color(0xFFE65100)  // orange — limite proche
+                        else -> Color(0xFFC62828)  // rouge — dépassé
                     },
                     fontWeight = FontWeight.Medium,
                 )
