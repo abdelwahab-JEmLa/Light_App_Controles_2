@@ -57,7 +57,8 @@ fun Floating_Separated_Button(
     buttonState: Button_State = Button_State.Companion.get_Default(),
     onClick_Lence_Capture: (() -> Unit)? = null,
     viewModel: A_ViewModel,
-) {
+) {        //<--
+//TODO(1): fait que ca soit dragable comme au  A_FastAdd_FloatingSeparated_Button_1
     val haptic = LocalHapticFeedback.current
     var dialState by remember { mutableStateOf(DialState.Closed) }
 
