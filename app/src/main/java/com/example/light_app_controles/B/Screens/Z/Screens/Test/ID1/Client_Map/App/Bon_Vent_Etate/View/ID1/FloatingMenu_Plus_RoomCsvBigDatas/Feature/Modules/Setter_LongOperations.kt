@@ -19,9 +19,7 @@ import kotlin.coroutines.resumeWithException
 class Setter_LongOperations(
     val appDatabase: AppDatabase,
 ) {
-
     // ──────────────────────────── M03 ────────────────────────────────────────
-
     suspend fun delete_All_M03() {
         appDatabase.dao_M03CouleurProduitInfos().deleteAll()
     }
