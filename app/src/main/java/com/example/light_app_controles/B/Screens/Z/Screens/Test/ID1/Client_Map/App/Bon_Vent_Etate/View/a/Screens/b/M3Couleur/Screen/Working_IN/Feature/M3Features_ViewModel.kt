@@ -48,40 +48,35 @@ class M3Features_ViewModel(
             active_Datas.list_M8bon = appDatabase.dao_M8BonVent().getAll()
 
             val now = System.currentTimeMillis()
-            active_Datas.list_M03 = listOf(
-                M3CouleurProduitInfos(
-                    keyID = "fake_m3_within_1",
-                    debugInfos = "within_limit_1",
-                    dernier_achant_timeTamp = now - 1 * 24 * 60 * 60 * 1_000,   // 1 jour  ✓
-                ),
-                M3CouleurProduitInfos(
-                    keyID = "fake_m3_within_2",
-                    debugInfos = "within_limit_2",
-                    dernier_achant_timeTamp = now - 7 * 24 * 60 * 60 * 1_000,   // 7 jours ✓
-                ),
-                M3CouleurProduitInfos(
-                    keyID = "fake_m3_within_3",
-                    debugInfos = "within_limit_3",
-                    dernier_achant_timeTamp = now - 20 * 24 * 60 * 60 * 1_000,  // 20 jours ✓
-                ),
-                M3CouleurProduitInfos(
-                    keyID = "fake_m3_hors_limite",
-                    debugInfos = "outside_limit",
-                    dernier_achant_timeTamp = now - 45 * 24 * 60 * 60 * 1_000,  // 45 jours ✗
-                ),
-            ).get_filtred_m3_by_limite_active_M9Compt_limite_couleurs_ou_leur_last_achate_est_moin_que_jour(FAKE_M9Compt)
+            val all = appDatabase.dao_M03CouleurProduitInfos().getAll()
+            active_Datas.list_M03 =
+                all + listOf(
+                            M3CouleurProduitInfos(
+                                keyID = "fake_m3_within_1",
+                                debugInfos = "within_limit_1",
+                                nomCouleurStrSiSonImageDispo="within_limit_1",
+                                dernier_achant_timeTamp = now - 1 * 24 * 60 * 60 * 1_000,   // 1 jour  ✓
+                            ),
+                            M3CouleurProduitInfos(
+                                keyID = "fake_m3_within_2",
+                                debugInfos = "within_limit_2",
+                                nomCouleurStrSiSonImageDispo="within_limit_2",
+                                dernier_achant_timeTamp = now - 7 * 24 * 60 * 60 * 1_000,   // 7 jours ✓
+                            ),
+                            M3CouleurProduitInfos(
+                                keyID = "fake_m3_within_3",
+                                debugInfos = "within_limit_3",
+                                nomCouleurStrSiSonImageDispo="within_limit_3",
+                                dernier_achant_timeTamp = now - 20 * 24 * 60 * 60 * 1_000,  // 20 jours ✓
+                            ),
+                            M3CouleurProduitInfos(
+                                keyID = "fake_m3_hors_limite",
+                                debugInfos = "outside_limit",
+                                nomCouleurStrSiSonImageDispo="outside_limit",
+                                dernier_achant_timeTamp = now - 45 * 24 * 60 * 60 * 1_000,  // 45 jours ✗
+                            ),
+                        )
 
-            // Random update de 3 M3 depuis la DB : 2 dans la limite, 1 hors
-            val dbList = appDatabase.dao_M03CouleurProduitInfos().getAll()
-            val stamped = dbList.shuffled().mapIndexed { index, m3 ->
-                when (index) {
-                    0 -> m3.copy(dernier_achant_timeTamp = now - 5 * 24 * 60 * 60 * 1_000)   // dans  ✓
-                    1 -> m3.copy(dernier_achant_timeTamp = now - 15 * 24 * 60 * 60 * 1_000)  // dans  ✓
-                    2 -> m3.copy(dernier_achant_timeTamp = now - 60 * 24 * 60 * 60 * 1_000)  // hors  ✗
-                    else -> m3
-                }
-            }
-            active_Datas.list_M03 = stamped.get_filtred_m3_by_limite_active_M9Compt_limite_couleurs_ou_leur_last_achate_est_moin_que_jour(FAKE_M9Compt)
         }
     }
 

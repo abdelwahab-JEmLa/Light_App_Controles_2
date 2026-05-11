@@ -44,6 +44,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
@@ -66,7 +68,30 @@ fun M3CouleurList_Screen(
     val focusManager = LocalFocusManager.current
 
     // ── État réactif sur list_M03 ────────────────────────────────────────────
-    val fullList by remember { derivedStateOf { viewModel.active_Datas.list_M03 ?: emptyList() } }
+    // 15 fake M3 items overlaid on the VM list: indices 1-8 are within the 30-day limit ✓,
+    // indices 9-15 exceed it ✗ — so exactly 8 pass the filter.
+    val listM03 = remember(viewModel.active_Datas.list_M03) {
+        val base = viewModel.active_Datas.list_M03 ?: emptyList()
+        val dayMs = 24L * 60L * 60L * 1_000L
+        val now = System.currentTimeMillis()
+        val fakeExtras = base
+            .shuffled()
+            .take(15)
+            .mapIndexed { i, real ->
+                real.copy(
+                    dernier_achant_timeTamp = if (i < 8)
+                        now - (i + 1) * 3 * dayMs       // 3, 6 … 24 days ✓
+                    else
+                        now - (31 + (i + 1)) * dayMs,   // 40, 41 … 46 days ✗
+                )
+            }
+        base + fakeExtras
+    }
+
+    val list_filtred_by_limite_jours by remember { derivedStateOf {
+        listM03
+            ?.get_filtred_m3_by_limite_active_M9Compt_limite_couleurs_ou_leur_last_achate_est_moin_que_jour(FAKE_M9Compt)
+            ?: emptyList() } }
 
     // ── Texte de recherche ───────────────────────────────────────────────────
     var query by remember { mutableStateOf("") }
@@ -75,8 +100,8 @@ fun M3CouleurList_Screen(
     val filteredList by remember {
         derivedStateOf {
             val q = query.trim().lowercase()
-            if (q.isEmpty()) fullList
-            else fullList.filter { item ->
+            if (q.isEmpty()) list_filtred_by_limite_jours
+            else list_filtred_by_limite_jours.filter { item ->
                 item.nomCouleurStrSiSonImageDispo.lowercase().contains(q) ||
                         item.keyID.lowercase().contains(q) ||
                         item.parentBProduitInfosKeyID.lowercase().contains(q) ||
@@ -87,7 +112,11 @@ fun M3CouleurList_Screen(
 
     Box(modifier = modifier.fillMaxSize()) {
 
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier
+            .semantics(mergeDescendants = true) {
+                set(value = listM03, key = SemanticsPropertyKey("listM03"))
+            }
+            .fillMaxSize()) {
 
             // ── Header violet ────────────────────────────────────────────────
             Row(
@@ -98,7 +127,7 @@ fun M3CouleurList_Screen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "M3Couleur — ${filteredList.size} / ${fullList.size}",
+                    text = "M3Couleur — ${filteredList.size} / ${list_filtred_by_limite_jours.size}",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -265,6 +294,30 @@ private fun M3CouleurItem(
 
                 Spacer(Modifier.height(6.dp))
 
+                // Days since last purchase
+                val daysSinceAchat = remember(item.dernier_achant_timeTamp) {
+                    if (item.dernier_achant_timeTamp <= 0L) null
+                    else ((System.currentTimeMillis() - item.dernier_achant_timeTamp) /
+                            (24L * 60L * 60L * 1_000L)).toInt()
+                }
+                Text(
+                    text = when (daysSinceAchat) {
+                        null -> "🛒 jamais acheté"
+                        0 -> "🛒 acheté aujourd'hui"
+                        1 -> "🛒 acheté il y a 1 jour"
+                        else -> "🛒 acheté il y a $daysSinceAchat jours"
+                    },
+                    style = MaterialTheme.typography.labelSmall,
+                    color = when {
+                        daysSinceAchat == null  -> Color(0xFF9E9E9E)
+                        daysSinceAchat <= 7     -> Color(0xFF2E7D32)  // vert  — récent
+                        daysSinceAchat <= 30    -> Color(0xFFE65100)  // orange — limite proche
+                        else                    -> Color(0xFFC62828)  // rouge — dépassé
+                    },
+                    fontWeight = FontWeight.Medium,
+                )
+
+                Spacer(Modifier.height(4.dp))
                 // Chips IDs
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),

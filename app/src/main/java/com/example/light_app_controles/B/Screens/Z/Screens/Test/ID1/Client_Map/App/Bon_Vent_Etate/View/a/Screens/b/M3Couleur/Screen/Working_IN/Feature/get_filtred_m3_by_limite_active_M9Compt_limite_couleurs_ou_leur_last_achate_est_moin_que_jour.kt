@@ -3,20 +3,22 @@ package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.
 import EntreApps.Shared.Models.M09AppCompt
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 
-
+/**
+ * Filters a list of [M3CouleurProduitInfos] keeping only items whose last-purchase timestamp
+ * falls within the day-limit defined on [active_M9Compt].
+ *
+ * An item is kept when:
+ *   - [M3CouleurProduitInfos.dernier_achant_timeTamp] > 0  (i.e. ever purchased)
+ *   - (now − dernier_achant_timeTamp) < limite_couleurs_ou_leur_last_achate_est_moin_que_jour days
+ */
 fun List<M3CouleurProduitInfos>.get_filtred_m3_by_limite_active_M9Compt_limite_couleurs_ou_leur_last_achate_est_moin_que_jour(
-    activeCompt: M09AppCompt?,
+    active_M9Compt: M09AppCompt,
 ): List<M3CouleurProduitInfos> {
-    activeCompt ?: return this   // no active compt → all colours pass
-
-    val thresholdMs =
-        activeCompt.limite_couleurs_ou_leur_last_achate_est_moin_que_jour.toLong() *
-        24L * 60L * 60L * 1_000L
-
+    val limitMs =
+        active_M9Compt.limite_couleurs_ou_leur_last_achate_est_moin_que_jour * 24L * 60L * 60L * 1_000L
     val now = System.currentTimeMillis()
-
     return filter { m3 ->
         m3.dernier_achant_timeTamp > 0L &&
-        (now - m3.dernier_achant_timeTamp) <= thresholdMs
+                (now - m3.dernier_achant_timeTamp) < limitMs
     }
 }

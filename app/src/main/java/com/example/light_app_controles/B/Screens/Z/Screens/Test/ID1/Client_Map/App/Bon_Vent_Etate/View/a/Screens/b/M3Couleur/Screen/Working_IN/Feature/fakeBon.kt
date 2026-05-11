@@ -6,9 +6,11 @@ import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.A
 const val FAKE_CLIENT_KEY = "-OWI8JQlhGjA_HzMCGFD"
 const val Targted_Bon = "-OrVHbH6u_C6TT153tUR"
 
+const val limiteCouleursOuLeurLastAchateEstMoinQueJour = 30
+
 val FAKE_M9Compt = M09AppCompt(
     nom = "fake_compt",
-    limite_couleurs_ou_leur_last_achate_est_moin_que_jour = 25,
+    limite_couleurs_ou_leur_last_achate_est_moin_que_jour = limiteCouleursOuLeurLastAchateEstMoinQueJour,
 )
 
 val fake_new_sit = M8BonVent(
