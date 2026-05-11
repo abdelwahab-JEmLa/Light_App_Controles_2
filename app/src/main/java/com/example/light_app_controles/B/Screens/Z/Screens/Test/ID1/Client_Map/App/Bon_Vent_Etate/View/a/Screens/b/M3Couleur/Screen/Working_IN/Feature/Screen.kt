@@ -67,9 +67,6 @@ fun M3CouleurList_Screen(
 ) {
     val focusManager = LocalFocusManager.current
 
-    // ── État réactif sur list_M03 ────────────────────────────────────────────
-    // 15 fake M3 items overlaid on the VM list: indices 1-8 are within the 30-day limit ✓,
-    // indices 9-15 exceed it ✗ — so exactly 8 pass the filter.
     val listM03 = remember(viewModel.active_Datas.list_M03) {
         val base = viewModel.active_Datas.list_M03 ?: emptyList()
         val dayMs = 24L * 60L * 60L * 1_000L
@@ -80,9 +77,9 @@ fun M3CouleurList_Screen(
             .mapIndexed { i, real ->
                 real.copy(
                     dernier_achant_timeTamp = if (i < 8)
-                        now - (i + 1) * 3 * dayMs       // 3, 6 … 24 days ✓
+                        now - (i + 1) * 3 * dayMs
                     else
-                        now - (31 + (i + 1)) * dayMs,   // 40, 41 … 46 days ✗
+                        now - (31 + (i + 1)) * dayMs,
                 )
             }
         base + fakeExtras
