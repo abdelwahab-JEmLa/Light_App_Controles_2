@@ -1,19 +1,26 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.b.M3Couleur.Screen.Working_IN.Feature
+package EntreApps.Shared.Models.Relative_Produits.Models.Functions
 
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
-
-/** 30-day sliding window used to decide whether a couleur is still "active". */
-private const val LIMITE_PERIOD_MS = 30L * 24 * 60 * 60 * 1_000
+import EntreApps.Shared.Models.Relative_Vents.Models.M14VentPeriode
 
 /**
- * Keeps only [M3CouleurProduitInfos] whose [M3CouleurProduitInfos.dernier_achant_timeTamp]
- * falls inside the last [LIMITE_PERIOD_MS] milliseconds.
- * Items with a zero timestamp (never purchased) are excluded.
+ * Garde uniquement les [M3CouleurProduitInfos] dont le [M3CouleurProduitInfos.dernier_achant_timeTamp]
+ * est postérieur au début de la période la plus récente ayant
+ * [M14VentPeriode.its_limite_active_couleurs] == true ET [M14VentPeriode.EtateActuellementEst.CONFIRME].
+ *
+ * Si aucune telle période n'existe, la liste est retournée intacte.
  */
-fun List<M3CouleurProduitInfos>.get_filtred_m3_by_limite_period(): List<M3CouleurProduitInfos> {
-    val now = System.currentTimeMillis()
+fun List<M3CouleurProduitInfos>.get_filtred_m3_by_limite_period(
+    periods: List<M14VentPeriode>,
+): List<M3CouleurProduitInfos> {
+    val limitePeriod = periods
+        .filter {
+            it.its_limite_active_couleurs
+        }
+        .maxByOrNull { it.creationTimestamp }
+        ?: return this
+
     return filter { m3 ->
-        m3.dernier_achant_timeTamp > 0 &&
-                (now - m3.dernier_achant_timeTamp) <= LIMITE_PERIOD_MS
+        m3.dernier_achant_timeTamp >= limitePeriod.creationTimestamp
     }
 }
