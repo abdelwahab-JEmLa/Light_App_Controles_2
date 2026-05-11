@@ -79,8 +79,9 @@ fun M3CouleurList_Screen(
             if (q.isEmpty()) fullList
             else fullList.filter { item ->
                 item.nomCouleurStrSiSonImageDispo.lowercase().contains(q) ||
-                        item.keyID.lowercase().contains(q)                        ||
-                        item.parentBProduitInfosKeyID.lowercase().contains(q)
+                        item.keyID.lowercase().contains(q) ||
+                        item.parentBProduitInfosKeyID.lowercase().contains(q) ||
+                        item.parentId1ProduitInfosDebugName.lowercase().contains(q) // ← was missing
             }
         }
     }
@@ -112,8 +113,7 @@ fun M3CouleurList_Screen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp, vertical = 8.dp),
-                placeholder = {                 //<--
-                //TODO(1): pk ca ne searche pas le debug parent produit name si entred
+                placeholder = {
                     Text(
                         text = "بحث بالاسم / keyID / parent M1 key",
                         style = MaterialTheme.typography.bodySmall,
