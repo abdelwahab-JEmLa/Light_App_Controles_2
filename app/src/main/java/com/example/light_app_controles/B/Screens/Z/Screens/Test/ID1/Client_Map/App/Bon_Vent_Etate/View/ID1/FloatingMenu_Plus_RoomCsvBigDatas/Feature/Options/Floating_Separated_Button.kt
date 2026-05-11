@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AllInbox
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -28,6 +29,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M3.Actions.M03_Operations_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M8Bon_Operations_FragMap_DropdownMenu.Actions.Button_State
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M8Bon_Operations_FragMap_DropdownMenu.Actions.M8Bon_Operations_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.a.BonVents.Screen.ViewModel.A_ViewModel
@@ -53,7 +55,10 @@ fun Floating_Separated_Button(
 
     var offsetX by remember { mutableFloatStateOf(screenWidth.value - 200f) }
     var offsetY by remember { mutableFloatStateOf(screenHeightDp.value - 300f) }
-    var showDropdown by remember { mutableStateOf(false) }
+
+    // separate expanded flags so each FAB controls its own dropdown
+    var showM8Dropdown  by remember { mutableStateOf(false) }
+    var showM03Dropdown by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier.Companion.fillMaxSize(),
@@ -75,25 +80,52 @@ fun Floating_Separated_Button(
                 verticalAlignment = Alignment.Companion.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+
+                // ── FAB 1 — M8 BonVent operations ────────────────────────────
                 FloatingActionButton(
                     modifier = Modifier.Companion.size(48.dp),
                     onClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.Companion.LongPress)
-                        showDropdown = true
+                        showM8Dropdown = true
                     },
                     containerColor = updatedButtonState.colors.second
                 ) {
                     Icon(
                         imageVector = updatedButtonState.icons.second,
-                        contentDescription = null,
+                        contentDescription = "M8 BonVent",
                         tint = Color.Companion.White,
                         modifier = Modifier.Companion.size(24.dp)
                     )
                 }
 
                 M8Bon_Operations_FragMap_DropdownMenu(
-                    expanded = showDropdown,
-                    onDismiss = { showDropdown = false },
+                    expanded = showM8Dropdown,
+                    onDismiss = { showM8Dropdown = false },
+                    on_vent_key = on_vent_key,
+                    onClick_Lence_Capture = onClick_Lence_Capture,
+                    vm = viewModel,
+                )
+
+                // ── FAB 2 — M03 CouleurProduitInfos operations ───────────────
+                FloatingActionButton(
+                    modifier = Modifier.Companion.size(48.dp),
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.Companion.LongPress)
+                        showM03Dropdown = true
+                    },
+                    containerColor = Color(0xFF6A1B9A)          // distinct purple
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Palette,
+                        contentDescription = "M03 CouleurProduitInfos",
+                        tint = Color.Companion.White,
+                        modifier = Modifier.Companion.size(24.dp)
+                    )
+                }
+
+                M03_Operations_FragMap_DropdownMenu(
+                    expanded = showM03Dropdown,
+                    onDismiss = { showM03Dropdown = false },
                     on_vent_key = on_vent_key,
                     onClick_Lence_Capture = onClick_Lence_Capture,
                     vm = viewModel,

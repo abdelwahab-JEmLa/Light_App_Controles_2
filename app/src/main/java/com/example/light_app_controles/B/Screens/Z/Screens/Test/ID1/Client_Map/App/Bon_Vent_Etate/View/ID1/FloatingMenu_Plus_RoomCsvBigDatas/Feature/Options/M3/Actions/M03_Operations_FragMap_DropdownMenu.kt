@@ -1,6 +1,7 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M3.Actions
 
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.AvertissementDialog
+import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,7 +43,6 @@ import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.A
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M3.Actions.Action.But8_DeleteAll_M03_Room
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M3.Actions.Action.But9_Import_M03_FireBase_To_Room
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.a.BonVents.Screen.ViewModel.A_ViewModel
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models.M8BonVent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -88,29 +88,24 @@ fun M03_Operations_FragMap_DropdownMenu(
 
     var pendingAction by remember { mutableStateOf<PendingAction_M03?>(null) }
 
-    // CSV stats for But7 label: total rows, new (not in Room), updates (already in Room)
     var csvRowCount by remember { mutableStateOf<Int?>(null) }
     var csvNewCount by remember { mutableStateOf<Int?>(null) }
     var csvUpdateCount by remember { mutableStateOf<Int?>(null) }
     var csvCreditCount by remember { mutableStateOf<Int?>(null) }
-    // Bumped after any operation that writes to the CSV file, so stats always reflect the real file.
     var csvRefreshTrigger by remember { mutableStateOf(0) }
 
     var firebaseRowCount by remember { mutableStateOf<Int?>(null) }
     var firebaseCreditCount by remember { mutableStateOf<Int?>(null) }
 
+    // FIX: use M3CouleurProduitInfos.ref_Test (not M8BonVent.ref_Test)
+    // FIX: avoid ambiguous destructuring by using .first / .second
     LaunchedEffect(Unit) {
         runCatching {
-            val (total, credit) = vm.setter_LongOperations.get_Firebase_M03_Counts(M8BonVent.ref_Test)     //->
-            //TODO(FIXME):Fix erreur unction 'component1()' is ambiguous for this expression:
-            //fun <T> Array<out T>.component1(): T
-            //fun BooleanArray.component1(): Boolean
-            //fun ByteArray.component1(): Byte
-            //fun CharArray.component1(): Char
-            //fun DoubleArray.component1(): Double
-            //fun FloatArray.c
-            firebaseRowCount = total
-            firebaseCreditCount = credit
+            val counts = vm.setter_LongOperations.get_Firebase_M03_Counts(
+                M3CouleurProduitInfos.ref_Test
+            )
+            firebaseRowCount = counts.first
+            firebaseCreditCount = counts.second
         }.onFailure {
             firebaseRowCount = -1
             firebaseCreditCount = -1
@@ -119,17 +114,12 @@ fun M03_Operations_FragMap_DropdownMenu(
 
     LaunchedEffect(vm.active_Datas.list_M03, csvRefreshTrigger) {
         withContext(Dispatchers.IO) {
-            val csv = M8BonVent.csv_test
+            val csv = M3CouleurProduitInfos.csv_test
             if (csv.exists() && csv.length() > 0L) {
                 val lines = csv.readLines().filter { it.isNotBlank() }
                 if (lines.size >= 2) {
                     val headers = lines[0].splitCsvLine()
                     val keyIdx = headers.indexOf("keyID")
-                    val etatIdx = headers.indexOf("etateActuellementEst")
-                    val creditNames = M8BonVent.EtateActuellementEst.entries
-                        .filter { it.credit_type }
-                        .map { it.name }
-                        .toSet()
 
                     val dataLines = lines.drop(1)
                     val csvKeys = dataLines.mapNotNull { line ->
@@ -143,12 +133,7 @@ fun M03_Operations_FragMap_DropdownMenu(
                     csvRowCount = csvKeys.size
                     csvNewCount = (csvKeys - roomKeys).size
                     csvUpdateCount = (csvKeys intersect roomKeys).size
-                    csvCreditCount = dataLines.count { line ->
-                        val cells = line.splitCsvLine()
-                        val etat = cells.getOrNull(etatIdx)
-                            ?.trim()?.removeSurrounding("\"")
-                        etat != null && etat in creditNames
-                    }
+                    csvCreditCount = 0  // M03 has no credit concept
                 }
             } else {
                 csvRowCount = 0
@@ -211,17 +196,18 @@ fun M03_Operations_FragMap_DropdownMenu(
                 action_definition = PendingAction_M03.But6_Import_M03_FireBase_To_Csv_Entries,
             )
 
+            // FIX: use insertAll_M03 (not insertAll which targets M8BonVent)
             PendingAction_M03.But5_Import_M03_Ui_To_Room_Entries -> {
                 AvertissementDialog(
                     title = action.name,
-                    message = "سيتم حفظ بيانات M8BonVent من الواجهة إلى قاعدة البيانات المحلية.\n" +
+                    message = "سيتم حفظ بيانات M3CouleurProduitInfos من الواجهة إلى قاعدة البيانات المحلية.\n" +
                             "الصفوف الموجودة ستُحدَّث والجديدة ستُضاف.\n" +
                             "هل تريد المتابعة؟",
                     onConfirm = {
                         pendingAction = null
                         coroutineScope.launch {
-                            vm.active_Datas.list_M03?.let { bons ->
-                                vm.setter_LongOperations.insertAll(bons)
+                            vm.active_Datas.list_M03?.let { items ->
+                                vm.setter_LongOperations.insertAll_M03(items)
                             }
                             onDismiss()
                         }
@@ -230,17 +216,17 @@ fun M03_Operations_FragMap_DropdownMenu(
                 )
             }
 
+            // FIX: use insertAll_M03 (not insertAll which targets M8BonVent)
             PendingAction_M03.But7_DeleteImport_M03Csv_To_Room_Entries -> {
                 AvertissementDialog(
                     title = action.name,
-                    message =
-                        "هل تريد المتابعة؟",
+                    message = "هل تريد المتابعة؟",
                     onConfirm = {
                         pendingAction = null
                         coroutineScope.launch {
-                            vm.active_Datas.list_M03?.let { bons ->
+                            vm.active_Datas.list_M03?.let { items ->
                                 vm.setter_LongOperations.delete_All_M03()
-                                vm.setter_LongOperations.insertAll(bons)
+                                vm.setter_LongOperations.insertAll_M03(items)
                             }
                             vm.reload()
                             onDismiss()
@@ -257,7 +243,6 @@ fun M03_Operations_FragMap_DropdownMenu(
                 onPendingClear = { pendingAction = null },
                 action_definition = PendingAction_M03.But_9_Import_M03_FireBase_To_Room_Entries,
             )
-
         }
     }
 
@@ -307,9 +292,7 @@ fun M03_Operations_FragMap_DropdownMenu(
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
-            onClick = {
-                pendingAction = action
-            }
+            onClick = { pendingAction = action }
         )
         DropdownMenuItem(
             leadingIcon = {
@@ -325,9 +308,7 @@ fun M03_Operations_FragMap_DropdownMenu(
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
-            onClick = {
-                pendingAction = PendingAction_M03.But2_Export_M03_Csv_To_FireBase_Entries
-            }
+            onClick = { pendingAction = PendingAction_M03.But2_Export_M03_Csv_To_FireBase_Entries }
         )
         DropdownMenuItem(
             leadingIcon = {
@@ -340,9 +321,9 @@ fun M03_Operations_FragMap_DropdownMenu(
             text = {
                 val fbStatsLine = when {
                     firebaseRowCount == null -> "..."
-                    firebaseRowCount == -1 -> "Firebase: خطأ في الاتصال"
-                    firebaseRowCount == 0 -> "Firebase: فارغ"
-                    else -> "Firebase: $firebaseRowCount (دين: ${firebaseCreditCount ?: "..."}) | CSV: ${csvRowCount ?: "..."} (دين: ${csvCreditCount ?: "..."})"
+                    firebaseRowCount == -1   -> "Firebase: خطأ في الاتصال"
+                    firebaseRowCount == 0    -> "Firebase: فارغ"
+                    else -> "Firebase: $firebaseRowCount | CSV: ${csvRowCount ?: "..."}"
                 }
                 Column {
                     Text(
@@ -356,9 +337,7 @@ fun M03_Operations_FragMap_DropdownMenu(
                     )
                 }
             },
-            onClick = {
-                pendingAction = PendingAction_M03.But6_Import_M03_FireBase_To_Csv_Entries
-            }
+            onClick = { pendingAction = PendingAction_M03.But6_Import_M03_FireBase_To_Csv_Entries }
         )
         HorizontalDivider(thickness = 3.dp, color = Color.Red)
         DropdownMenuItem(
@@ -375,9 +354,7 @@ fun M03_Operations_FragMap_DropdownMenu(
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
-            onClick = {
-                pendingAction = PendingAction_M03.But1_Export_M03_Room_To_Csv_Entries
-            }
+            onClick = { pendingAction = PendingAction_M03.But1_Export_M03_Room_To_Csv_Entries }
         )
 
         DropdownMenuItem(
@@ -391,7 +368,7 @@ fun M03_Operations_FragMap_DropdownMenu(
             text = {
                 val statsLine = when {
                     csvRowCount == null -> "..."
-                    csvRowCount == 0 -> "CSV فارغ"
+                    csvRowCount == 0   -> "CSV فارغ"
                     else -> "CSV: $csvRowCount | +${csvNewCount} جديد | ↺${csvUpdateCount} تحديث"
                 }
                 Column {
@@ -406,9 +383,7 @@ fun M03_Operations_FragMap_DropdownMenu(
                     )
                 }
             },
-            onClick = {
-                pendingAction = PendingAction_M03.But7_DeleteImport_M03Csv_To_Room_Entries
-            }
+            onClick = { pendingAction = PendingAction_M03.But7_DeleteImport_M03Csv_To_Room_Entries }
         )
         HorizontalDivider()
         DropdownMenuItem(
@@ -425,9 +400,7 @@ fun M03_Operations_FragMap_DropdownMenu(
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
-            onClick = {
-                pendingAction = PendingAction_M03.But8_DeleteAll_M03_Room_Entries
-            }
+            onClick = { pendingAction = PendingAction_M03.But8_DeleteAll_M03_Room_Entries }
         )
         DropdownMenuItem(
             leadingIcon = {
@@ -443,9 +416,7 @@ fun M03_Operations_FragMap_DropdownMenu(
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
-            onClick = {
-                pendingAction = PendingAction_M03.But3_Import_M03Csv_To_Room_Entries
-            }
+            onClick = { pendingAction = PendingAction_M03.But3_Import_M03Csv_To_Room_Entries }
         )
         HorizontalDivider()
 
@@ -463,12 +434,9 @@ fun M03_Operations_FragMap_DropdownMenu(
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
-            onClick = {
-                pendingAction = PendingAction_M03.But5_Import_M03_Ui_To_Room_Entries
-            }
+            onClick = { pendingAction = PendingAction_M03.But5_Import_M03_Ui_To_Room_Entries }
         )
 
         HorizontalDivider()
     }
 }
-

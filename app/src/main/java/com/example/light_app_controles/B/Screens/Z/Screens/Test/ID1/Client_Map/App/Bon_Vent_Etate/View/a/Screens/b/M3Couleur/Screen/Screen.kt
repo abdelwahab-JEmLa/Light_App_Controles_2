@@ -2,6 +2,7 @@ package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.
 
 import android.content.Context
 import androidx.compose.foundation.layout.Box
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -19,7 +20,10 @@ fun M3CouleurList_Screen(
     appDatabase: AppDatabase = AppDatabase.DatabaseModule.getDatabase(context),
     viewModel: A_ViewModel = viewModel(factory = viewModelFactory { initializer { A_ViewModel(appDatabase = appDatabase) } })
 ) {
+    val size = viewModel.active_Datas.list_M03?.size
+
     Box {
+        Text(size.toString())
         Floating_Separated_Button(viewModel = viewModel)
     }
 }

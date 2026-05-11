@@ -1,13 +1,11 @@
 package EntreApps.Shared.Models.Relative_Produits.Models
 
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
-import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_Developing_Test
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_Local_storageLink
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_MainDataBases_RefProduction
 import EntreApps.Shared.Models.Relative_Vents.Models.AbdelwahabJomla_Client_Speciale
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models.M8BonVent.Companion.nam_Model_Str
 import java.io.File
 
 @Entity
@@ -47,7 +45,7 @@ data class M3CouleurProduitInfos(
     val extensionDisponible: String = "webp", // Default extension
 ) {
 
-    fun toFirebaseMap(): Map<String, Any?> = mapOf(
+    fun to_Map(): Map<String, Any?> = mapOf(
         "keyID" to keyID,
         "debugInfos" to debugInfos,
         "creationTimestamp" to creationTimestamp,
