@@ -27,8 +27,11 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -38,11 +41,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import kotlin.math.roundToInt
 import com.example.light_app_controles.R
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M3.Actions.M03_Operations_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M8Bon_Operations_FragMap_DropdownMenu.Actions.Button_State
@@ -58,9 +66,16 @@ fun Floating_Separated_Button(
     onClick_Lence_Capture: (() -> Unit)? = null,
     viewModel: A_ViewModel,
 ) {        //<--
-//TODO(1): fait que ca soit dragable comme au  A_FastAdd_FloatingSeparated_Button_1
     val haptic = LocalHapticFeedback.current
     var dialState by remember { mutableStateOf(DialState.Closed) }
+
+    val configuration  = LocalConfiguration.current
+    val screenWidthDp  = configuration.screenWidthDp.toFloat()
+    val screenHeightDp = configuration.screenHeightDp.toFloat()
+
+    // Initial position: bottom-right corner (mirrors A_FastAdd_FloatingSeparated_Button_1)
+    var offsetX by remember { mutableFloatStateOf(screenWidthDp  - 200f) }
+    var offsetY by remember { mutableFloatStateOf(screenHeightDp - 300f) }
 
     val logoRotation by animateFloatAsState(
         targetValue   = if (dialState != DialState.Closed) 45f else 0f,
@@ -68,15 +83,24 @@ fun Floating_Separated_Button(
         label         = "logoRot",
     )
 
-    // ── Overlay plein écran, FAB collé en bas à droite ────────────────────────
+    // ── Overlay plein écran, FAB draggable ───────────────────────────────────
     Box(
         modifier         = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomEnd,
+        contentAlignment = Alignment.TopStart,
     ) {
         Column(
-            modifier              = Modifier.padding(end = 16.dp, bottom = 24.dp),
-            horizontalAlignment   = Alignment.End,
-            verticalArrangement   = Arrangement.spacedBy(12.dp),
+            modifier = Modifier
+                .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
+                .pointerInput(Unit) {
+                    detectDragGestures { change, dragAmount ->
+                        change.consume()
+                        offsetX = (offsetX + dragAmount.x).coerceIn(0f, screenWidthDp  - 100f)
+                        offsetY = (offsetY + dragAmount.y).coerceIn(0f, screenHeightDp - 100f)
+                    }
+                }
+                .padding(end = 16.dp, bottom = 16.dp),
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
 
             // ── Boutons enfants — apparaissent au-dessus du FAB principal ─────
