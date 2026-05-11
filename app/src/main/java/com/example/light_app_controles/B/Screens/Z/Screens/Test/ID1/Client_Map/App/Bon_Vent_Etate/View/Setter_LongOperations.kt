@@ -13,6 +13,7 @@ import java.io.FileWriter
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
+@Suppress("unused")
 class Setter_LongOperations(
     private val appDatabase: AppDatabase,
 ) {
@@ -32,7 +33,7 @@ class Setter_LongOperations(
         bons: List<M8BonVent>,
         refDataBase: DatabaseReference,
     ) = withContext(Dispatchers.IO) {
-        bons.forEachIndexed { index, bon ->
+        bons.forEachIndexed { _, bon ->
             runCatching {
                 suspendCancellableCoroutine { cont ->
                     refDataBase.child(bon.keyID).setValue(bon.to_Map())
@@ -45,7 +46,7 @@ class Setter_LongOperations(
 
     suspend fun get_Firebase_M8_Counts(refDataBase: DatabaseReference): Pair<Int, Int> =
         withContext(Dispatchers.IO) {
-            val creditNames = M8BonVent.EtateActuellementEst.values()
+            val creditNames = M8BonVent.EtateActuellementEst.entries
                 .filter { it.credit_type }.map { it.name }.toSet()
 
             val snapshot = suspendFirebaseSnapshot(refDataBase)
