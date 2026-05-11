@@ -1,4 +1,4 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.b.M3Couleur.Screen
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.b.M3Couleur.Screen.Working_IN.Feature
 
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import android.content.Context
@@ -52,7 +52,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.a.Main.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.a.BonVents.Screen.ViewModel.A_ViewModel
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 
 @Composable
@@ -60,8 +59,8 @@ fun M3CouleurList_Screen(
     modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
     appDatabase: AppDatabase = AppDatabase.DatabaseModule.getDatabase(context),
-    viewModel: A_ViewModel = viewModel(
-        factory = viewModelFactory { initializer { A_ViewModel(appDatabase = appDatabase) } }
+    viewModel: M3Features_ViewModel = viewModel(
+        factory = viewModelFactory { initializer { M3Features_ViewModel(appDatabase = appDatabase) } }
     )
 ) {
     val focusManager = LocalFocusManager.current

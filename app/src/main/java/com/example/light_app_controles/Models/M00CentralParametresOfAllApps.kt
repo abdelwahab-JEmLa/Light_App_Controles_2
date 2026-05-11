@@ -96,6 +96,8 @@ data class M00CentralParametresOfAllApps(
 
         val central_Local_Csv= File(central_Local_storageLink, "CSV_Export")
 
+//─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
         fun genereUnPushKeyFireBase(ref: DatabaseReference): String {
             return ref.push().key ?: throw IllegalStateException("Failed to generate Firebase key")
         }

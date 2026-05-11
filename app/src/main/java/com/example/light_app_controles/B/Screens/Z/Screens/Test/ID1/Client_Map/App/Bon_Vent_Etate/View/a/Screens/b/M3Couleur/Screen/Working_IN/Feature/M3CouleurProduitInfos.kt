@@ -43,8 +43,9 @@ data class M3CouleurProduitInfos(
 
 
     val extensionDisponible: String = "webp", // Default extension
-) {
 
+    var dernier_achant_timeTamp: Long = 0,
+) {
     fun to_Map(): Map<String, Any?> = mapOf(
         "keyID" to keyID,
         "debugInfos" to debugInfos,
@@ -67,6 +68,8 @@ data class M3CouleurProduitInfos(
         "parentId1ProduitInfosDebugName" to parentId1ProduitInfosDebugName,
         "indexCouleurDansAncienProto" to indexCouleurDansAncienProto,
         "extensionDisponible" to extensionDisponible,
+
+        "dernier_achant_timeTamp" to dernier_achant_timeTamp,
     )
 
     fun get_DebugsInfos(): String {

@@ -41,7 +41,10 @@ data class M14VentPeriode(
 
     var etateActuellementEst: EtateActuellementEst =
         EtateActuellementEst.SoquetteNonDefinie,
-) {
+
+    val its_limite_active_couleurs: Boolean = false,
+
+    ) {
     fun get_DebugInfos(): String {
         return buildString {
             append(keyID.takeLast(3))
