@@ -1,135 +1,225 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options
 
-import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AllInbox
-import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.light_app_controles.R
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M3.Actions.M03_Operations_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M8Bon_Operations_FragMap_DropdownMenu.Actions.Button_State
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M8Bon_Operations_FragMap_DropdownMenu.Actions.M8Bon_Operations_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.a.BonVents.Screen.ViewModel.A_ViewModel
-import kotlin.math.roundToInt
+
+private enum class DialState { Closed, ChildsVisible, M8Open, M03Open }
 
 @Composable
 fun Floating_Separated_Button(
     on_vent_key: String = "",
-    buttonState: Button_State = Button_State.Companion.get_Default().copy(
-        text_Label = "",
-        icons = Pair(Icons.Default.FilterList, Icons.Default.AllInbox),
-        colors = Pair(Color.Companion.Red, Color.Companion.Blue)
-    ),
+    buttonState: Button_State = Button_State.Companion.get_Default(),
     onClick_Lence_Capture: (() -> Unit)? = null,
     viewModel: A_ViewModel,
 ) {
-    val updatedButtonState = buttonState.copy(its_Active = true)
-
     val haptic = LocalHapticFeedback.current
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
-    val screenHeightDp = configuration.screenHeightDp.dp
+    var dialState by remember { mutableStateOf(DialState.Closed) }
 
-    var offsetX by remember { mutableFloatStateOf(screenWidth.value - 200f) }
-    var offsetY by remember { mutableFloatStateOf(screenHeightDp.value - 300f) }
+    val logoRotation by animateFloatAsState(
+        targetValue   = if (dialState != DialState.Closed) 45f else 0f,
+        animationSpec = tween(250),
+        label         = "logoRot",
+    )
 
-    // separate expanded flags so each FAB controls its own dropdown
-    var showM8Dropdown  by remember { mutableStateOf(false) }
-    var showM03Dropdown by remember { mutableStateOf(false) }
-
+    // ── Overlay plein écran, FAB collé en bas à droite ────────────────────────
     Box(
-        modifier = Modifier.Companion.fillMaxSize(),
-        contentAlignment = Alignment.Companion.Center
+        modifier         = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.BottomEnd,
     ) {
-        Box(
-            modifier = Modifier.Companion
-                .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
-                .pointerInput(Unit) {
-                    detectDragGestures { change, dragAmount ->
-                        change.consume()
-                        offsetX = (offsetX + dragAmount.x).coerceIn(0f, screenWidth.value - 100f)
-                        offsetY = (offsetY + dragAmount.y).coerceIn(0f, screenHeightDp.value - 100f)
+        Column(
+            modifier              = Modifier.padding(end = 16.dp, bottom = 24.dp),
+            horizontalAlignment   = Alignment.End,
+            verticalArrangement   = Arrangement.spacedBy(12.dp),
+        ) {
+
+            // ── Boutons enfants — apparaissent au-dessus du FAB principal ─────
+            AnimatedVisibility(
+                visible = dialState != DialState.Closed,
+                enter   = fadeIn(tween(200)) + slideInVertically(tween(220)) { it },
+                exit    = fadeOut(tween(150)) + slideOutVertically(tween(150)) { it },
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+
+                    // ── M8 BonVent ────────────────────────────────────────────
+                    Row(
+                        verticalAlignment     = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            text       = "M8 BonVent",
+                            style      = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color      = Color.White,
+                            modifier   = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFF1565C0).copy(alpha = 0.92f))
+                                .padding(horizontal = 10.dp, vertical = 5.dp),
+                        )
+                        Box {
+                            FloatingActionButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    dialState = DialState.M8Open
+                                },
+                                modifier       = Modifier.size(46.dp),
+                                containerColor = Color(0xFF1565C0),
+                                shape          = CircleShape,
+                                elevation      = FloatingActionButtonDefaults.elevation(4.dp),
+                            ) {
+                                Icon(
+                                    imageVector        = Icons.Default.AllInbox,
+                                    contentDescription = "M8",
+                                    tint               = Color.White,
+                                    modifier           = Modifier.size(22.dp),
+                                )
+                            }
+                            // dropdown ancré sur ce Box
+                            M8Bon_Operations_FragMap_DropdownMenu(
+                                expanded              = dialState == DialState.M8Open,
+                                onDismiss             = { dialState = DialState.Closed },
+                                on_vent_key           = on_vent_key,
+                                onClick_Lence_Capture = onClick_Lence_Capture,
+                                vm                    = viewModel,
+                            )
+                        }
+                    }
+
+                    // ── M03 Couleur ───────────────────────────────────────────
+                    Row(
+                        verticalAlignment     = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            text       = "M03 Couleur",
+                            style      = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color      = Color.White,
+                            modifier   = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFF6A1B9A).copy(alpha = 0.92f))
+                                .padding(horizontal = 10.dp, vertical = 5.dp),
+                        )
+                        Box {
+                            FloatingActionButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    dialState = DialState.M03Open
+                                },
+                                modifier       = Modifier.size(46.dp),
+                                containerColor = Color(0xFF6A1B9A),
+                                shape          = CircleShape,
+                                elevation      = FloatingActionButtonDefaults.elevation(4.dp),
+                            ) {
+                                Icon(
+                                    imageVector        = Icons.Default.Palette,
+                                    contentDescription = "M03",
+                                    tint               = Color.White,
+                                    modifier           = Modifier.size(22.dp),
+                                )
+                            }
+                            // dropdown ancré sur ce Box
+                            M03_Operations_FragMap_DropdownMenu(
+                                expanded              = dialState == DialState.M03Open,
+                                onDismiss             = { dialState = DialState.Closed },
+                                on_vent_key           = on_vent_key,
+                                onClick_Lence_Capture = onClick_Lence_Capture,
+                                vm                    = viewModel,
+                            )
+                        }
                     }
                 }
-                .padding(16.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.Companion.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            }
+
+            // ── FAB principal — logo / × ──────────────────────────────────────
+            FloatingActionButton(
+                onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    dialState = if (dialState == DialState.Closed)
+                        DialState.ChildsVisible
+                    else
+                        DialState.Closed
+                },
+                modifier       = Modifier.size(58.dp),
+                containerColor = Color.Transparent,
+                elevation      = FloatingActionButtonDefaults.elevation(6.dp, 6.dp),
+                shape          = CircleShape,
             ) {
-
-                // ── FAB 1 — M8 BonVent operations ────────────────────────────
-                FloatingActionButton(
-                    modifier = Modifier.Companion.size(48.dp),
-                    onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.Companion.LongPress)
-                        showM8Dropdown = true
-                    },
-                    containerColor = updatedButtonState.colors.second
-                ) {
-                    Icon(
-                        imageVector = updatedButtonState.icons.second,
-                        contentDescription = "M8 BonVent",
-                        tint = Color.Companion.White,
-                        modifier = Modifier.Companion.size(24.dp)
+                if (dialState != DialState.Closed) {
+                    Box(
+                        modifier         = Modifier
+                            .size(58.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF37474F)),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector        = Icons.Default.Close,
+                            contentDescription = "Fermer",
+                            tint               = Color.White,
+                            modifier           = Modifier
+                                .size(26.dp)
+                                .rotate(logoRotation),
+                        )
+                    }
+                } else {
+                    Image(
+                        painter            = painterResource(id = R.drawable.logo),
+                        contentDescription = "Menu",
+                        contentScale       = ContentScale.Crop,
+                        modifier           = Modifier
+                            .size(58.dp)
+                            .clip(CircleShape),
                     )
                 }
-
-                M8Bon_Operations_FragMap_DropdownMenu(
-                    expanded = showM8Dropdown,
-                    onDismiss = { showM8Dropdown = false },
-                    on_vent_key = on_vent_key,
-                    onClick_Lence_Capture = onClick_Lence_Capture,
-                    vm = viewModel,
-                )
-
-                // ── FAB 2 — M03 CouleurProduitInfos operations ───────────────
-                FloatingActionButton(
-                    modifier = Modifier.Companion.size(48.dp),
-                    onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.Companion.LongPress)
-                        showM03Dropdown = true
-                    },
-                    containerColor = Color(0xFF6A1B9A)          // distinct purple
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Palette,
-                        contentDescription = "M03 CouleurProduitInfos",
-                        tint = Color.Companion.White,
-                        modifier = Modifier.Companion.size(24.dp)
-                    )
-                }
-
-                M03_Operations_FragMap_DropdownMenu(
-                    expanded = showM03Dropdown,
-                    onDismiss = { showM03Dropdown = false },
-                    on_vent_key = on_vent_key,
-                    onClick_Lence_Capture = onClick_Lence_Capture,
-                    vm = viewModel,
-                )
             }
         }
     }
