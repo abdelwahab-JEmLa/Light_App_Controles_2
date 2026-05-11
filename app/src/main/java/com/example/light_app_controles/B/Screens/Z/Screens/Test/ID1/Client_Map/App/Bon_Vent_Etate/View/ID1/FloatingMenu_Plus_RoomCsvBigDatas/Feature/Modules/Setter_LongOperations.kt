@@ -16,8 +16,14 @@ import kotlin.coroutines.resumeWithException
 
 @Suppress("unused")
 class Setter_LongOperations(
-    private val appDatabase: AppDatabase,
+     val appDatabase: AppDatabase,
 ) {
+
+    //--------------------------M03------------------------------
+    //<--
+//TODO(1): creee les operation de m03 manquant
+
+    //--------------------------M8------------------------------
     suspend fun add_New_M8BonVent(bon: M8BonVent) {
         appDatabase.dao_M8BonVent().insert(bon)
     }
@@ -211,7 +217,7 @@ class Setter_LongOperations(
         appDatabase.dao_M8BonVent().deleteAll()
     }
 
-    private suspend fun suspendFirebaseSnapshot(ref: DatabaseReference): DataSnapshot =
+     suspend fun suspendFirebaseSnapshot(ref: DatabaseReference): DataSnapshot =
         suspendCancellableCoroutine { cont ->
             val listener = object : ValueEventListener {
                 override fun onDataChange(snap: DataSnapshot) {
@@ -226,14 +232,15 @@ class Setter_LongOperations(
         }
 }
 
-private fun String.escapeCsv(): String {
+
+ fun String.escapeCsv(): String {
     val sanitized = replace("\r\n", " ").replace("\n", " ").replace("\r", " ")
     return if (sanitized.contains(',') || sanitized.contains('"')) {
         "\"${sanitized.replace("\"", "\"\"")}\""
     } else sanitized
 }
 
-private fun String.splitCsvLine(): List<String> {
+ fun String.splitCsvLine(): List<String> {
     val result = mutableListOf<String>()
     val current = StringBuilder()
     var inQuotes = false

@@ -1,20 +1,11 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M3.Actions
 
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.AvertissementDialog
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AllInbox
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.CloudDownload
 import androidx.compose.material.icons.filled.CloudUpload
@@ -27,7 +18,6 @@ import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,56 +25,28 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Modules.splitCsvLine
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M3.Actions.Action.But1_Export_M03_Room_To_Csv
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M3.Actions.Action.But2_Export_M03_Csv_To_FireBase
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M3.Actions.Action.But3_Import_M03Csv_To_Room
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M3.Actions.Action.But6_Import_M03_FireBase_To_Csv
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M3.Actions.Action.But8_DeleteAll_M03_Room
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.M3.Actions.Action.But9_Import_M03_FireBase_To_Room
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.a.BonVents.Screen.ViewModel.A_ViewModel
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.Buttons.Action.But1_Export_M8_Room_To_Csv
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.Buttons.Action.But2_Export_M8_Csv_To_FireBase
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.Buttons.Action.But3_Import_M8Csv_To_Room
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.Buttons.Action.But6_Import_M8_FireBase_To_Csv
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.Buttons.Action.But8_DeleteAll_M8_Room
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FloatingMenu_Plus_RoomCsvBigDatas.Feature.Options.Buttons.Action.But9_Import_M8_FireBase_To_Room
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models.M8BonVent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.math.roundToInt
 
-/** RFC-4180-aware CSV line splitter – handles quoted commas and escaped double-quotes (""). */
-private fun String.splitCsvLine(): List<String> {
-    val result = mutableListOf<String>()
-    val current = StringBuilder()
-    var inQuotes = false
-    var i = 0
-    while (i < length) {
-        val c = this[i]
-        when {
-            c == '"' && inQuotes && i + 1 < length && this[i + 1] == '"' -> {
-                current.append('"'); i += 2; continue
-            }
-            c == '"' -> inQuotes = !inQuotes
-            c == ',' && !inQuotes -> { result.add(current.toString()); current.clear() }
-            else -> current.append(c)
-        }
-        i++
-    }
-    result.add(current.toString())
-    return result
-}
 
 data class Button_State(
     val showLabels: Boolean = true,
@@ -99,89 +61,22 @@ data class Button_State(
     }
 }
 
-@Composable
-fun Floating_Separated_Button(
-    on_vent_key: String = "",
-    buttonState: Button_State = Button_State.get_Default().copy(
-        text_Label = "",
-        icons = Pair(Icons.Default.FilterList, Icons.Default.AllInbox),
-        colors = Pair(Color.Red, Color.Blue)
-    ),
-    onClick_Lence_Capture: (() -> Unit)? = null,
-    viewModel: A_ViewModel,
+enum class PendingAction_M03(
+    val color: Color = Color(0xFFF8F8F8),
+    val imageVector: ImageVector = Icons.Default.Numbers
 ) {
-    val updatedButtonState = buttonState.copy(its_Active = true)
-
-    val haptic = LocalHapticFeedback.current
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
-    val screenHeightDp = configuration.screenHeightDp.dp
-
-    var offsetX by remember { mutableFloatStateOf(screenWidth.value - 200f) }
-    var offsetY by remember { mutableFloatStateOf(screenHeightDp.value - 300f) }
-    var showDropdown by remember { mutableStateOf(false) }
-
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Box(
-            modifier = Modifier
-                .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
-                .pointerInput(Unit) {
-                    detectDragGestures { change, dragAmount ->
-                        change.consume()
-                        offsetX = (offsetX + dragAmount.x).coerceIn(0f, screenWidth.value - 100f)
-                        offsetY = (offsetY + dragAmount.y).coerceIn(0f, screenHeightDp.value - 100f)
-                    }
-                }
-                .padding(16.dp)
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                FloatingActionButton(
-                    modifier = Modifier.size(48.dp),
-                    onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        showDropdown = true
-                    },
-                    containerColor = updatedButtonState.colors.second
-                ) {
-                    Icon(
-                        imageVector = updatedButtonState.icons.second,
-                        contentDescription = null,
-                        tint = Color.White,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-
-                B_FragMap_DropdownMenu(
-                    expanded = showDropdown,
-                    onDismiss = { showDropdown = false },
-                    on_vent_key = on_vent_key,
-                    onClick_Lence_Capture = onClick_Lence_Capture,
-                    vm = viewModel,
-                )
-            }
-        }
-    }
-}
-
-enum class PendingAction(
-    val color: Color=Color(0xFFF8F8F8),
-    val imageVector: ImageVector =Icons.Default.Numbers
-) {
-    But1_Export_M8_Room_To_Csv,
-    But2_Export_M8_Csv_To_FireBase,
-    But3_Import_M8Csv_To_Room,
-    But5_Import_M8_Ui_To_Room,
-    But6_Import_M8_FireBase_To_Csv,
-    But_9_Import_M8_FireBase_To_Room(Color(0xFFE91E63),Icons.Default.LocalFireDepartment),
-    But7_DeleteImport_M8Csv_To_Room,
-    But8_DeleteAll_M8_Room, ;
+    But1_Export_M03_Room_To_Csv_Entries,
+    But2_Export_M03_Csv_To_FireBase_Entries,
+    But3_Import_M03Csv_To_Room_Entries,
+    But5_Import_M03_Ui_To_Room_Entries,
+    But6_Import_M03_FireBase_To_Csv_Entries,
+    But_9_Import_M03_FireBase_To_Room_Entries(Color(0xFFE91E63), Icons.Default.LocalFireDepartment),
+    But7_DeleteImport_M03Csv_To_Room_Entries,
+    But8_DeleteAll_M03_Room_Entries, ;
 }
 
 @Composable
-fun B_FragMap_DropdownMenu(
+fun M03_Operations_FragMap_DropdownMenu(
     modifier: Modifier = Modifier,
     vm: A_ViewModel,
     expanded: Boolean,
@@ -191,7 +86,7 @@ fun B_FragMap_DropdownMenu(
 ) {
     val coroutineScope = rememberCoroutineScope()
 
-    var pendingAction by remember { mutableStateOf<PendingAction?>(null) }
+    var pendingAction by remember { mutableStateOf<PendingAction_M03?>(null) }
 
     // CSV stats for But7 label: total rows, new (not in Room), updates (already in Room)
     var csvRowCount by remember { mutableStateOf<Int?>(null) }
@@ -206,25 +101,32 @@ fun B_FragMap_DropdownMenu(
 
     LaunchedEffect(Unit) {
         runCatching {
-            val (total, credit) = vm.setter_LongOperations.get_Firebase_M8_Counts(M8BonVent.ref_Test)
-            firebaseRowCount    = total
+            val (total, credit) = vm.setter_LongOperations.get_Firebase_M03_Counts(M8BonVent.ref_Test)     //->
+            //TODO(FIXME):Fix erreur unction 'component1()' is ambiguous for this expression:
+            //fun <T> Array<out T>.component1(): T
+            //fun BooleanArray.component1(): Boolean
+            //fun ByteArray.component1(): Byte
+            //fun CharArray.component1(): Char
+            //fun DoubleArray.component1(): Double
+            //fun FloatArray.c
+            firebaseRowCount = total
             firebaseCreditCount = credit
         }.onFailure {
-            firebaseRowCount    = -1
+            firebaseRowCount = -1
             firebaseCreditCount = -1
         }
     }
 
-    LaunchedEffect(vm.active_Datas.list_M8bon, csvRefreshTrigger) {
+    LaunchedEffect(vm.active_Datas.list_M03, csvRefreshTrigger) {
         withContext(Dispatchers.IO) {
             val csv = M8BonVent.csv_test
             if (csv.exists() && csv.length() > 0L) {
                 val lines = csv.readLines().filter { it.isNotBlank() }
                 if (lines.size >= 2) {
-                    val headers  = lines[0].splitCsvLine()
-                    val keyIdx   = headers.indexOf("keyID")
-                    val etatIdx  = headers.indexOf("etateActuellementEst")
-                    val creditNames = M8BonVent.EtateActuellementEst.values()
+                    val headers = lines[0].splitCsvLine()
+                    val keyIdx = headers.indexOf("keyID")
+                    val etatIdx = headers.indexOf("etateActuellementEst")
+                    val creditNames = M8BonVent.EtateActuellementEst.entries
                         .filter { it.credit_type }
                         .map { it.name }
                         .toSet()
@@ -235,22 +137,22 @@ fun B_FragMap_DropdownMenu(
                             ?.trim()?.removeSurrounding("\"")
                             ?.takeIf { it.isNotBlank() }
                     }.toSet()
-                    val roomKeys = vm.active_Datas.list_M8bon
+                    val roomKeys = vm.active_Datas.list_M03
                         ?.map { it.keyID }?.toSet() ?: emptySet()
 
-                    csvRowCount    = csvKeys.size
-                    csvNewCount    = (csvKeys - roomKeys).size
+                    csvRowCount = csvKeys.size
+                    csvNewCount = (csvKeys - roomKeys).size
                     csvUpdateCount = (csvKeys intersect roomKeys).size
                     csvCreditCount = dataLines.count { line ->
                         val cells = line.splitCsvLine()
-                        val etat  = cells.getOrNull(etatIdx)
+                        val etat = cells.getOrNull(etatIdx)
                             ?.trim()?.removeSurrounding("\"")
                         etat != null && etat in creditNames
                     }
                 }
             } else {
-                csvRowCount    = 0
-                csvNewCount    = 0
+                csvRowCount = 0
+                csvNewCount = 0
                 csvUpdateCount = 0
                 csvCreditCount = 0
             }
@@ -267,49 +169,49 @@ fun B_FragMap_DropdownMenu(
 
     pendingAction?.let { action ->
         when (action) {
-            PendingAction.But8_DeleteAll_M8_Room -> But8_DeleteAll_M8_Room(
+            PendingAction_M03.But8_DeleteAll_M03_Room_Entries -> But8_DeleteAll_M03_Room(
                 vm = vm,
                 coroutineScope = coroutineScope,
                 onDismiss = onDismiss,
                 onPendingClear = { pendingAction = null },
-                action_definition = PendingAction.But8_DeleteAll_M8_Room,
+                action_definition = PendingAction_M03.But8_DeleteAll_M03_Room_Entries,
             )
 
-            PendingAction.But3_Import_M8Csv_To_Room -> But3_Import_M8Csv_To_Room(
+            PendingAction_M03.But3_Import_M03Csv_To_Room_Entries -> But3_Import_M03Csv_To_Room(
                 vm = vm,
                 coroutineScope = coroutineScope,
                 onDismiss = onDismiss,
                 onPendingClear = { pendingAction = null },
-                action_definition = PendingAction.But3_Import_M8Csv_To_Room,
+                action_definition = PendingAction_M03.But3_Import_M03Csv_To_Room_Entries,
             )
 
-            PendingAction.But2_Export_M8_Csv_To_FireBase -> But2_Export_M8_Csv_To_FireBase(
+            PendingAction_M03.But2_Export_M03_Csv_To_FireBase_Entries -> But2_Export_M03_Csv_To_FireBase(
                 vm = vm,
                 coroutineScope = coroutineScope,
                 onDismiss = onDismiss,
                 onPendingClear = { pendingAction = null },
-                action_definition = PendingAction.But2_Export_M8_Csv_To_FireBase,
+                action_definition = PendingAction_M03.But2_Export_M03_Csv_To_FireBase_Entries,
             )
 
-            PendingAction.But1_Export_M8_Room_To_Csv -> But1_Export_M8_Room_To_Csv(
-                vm = vm,
-                coroutineScope = coroutineScope,
-                onDismiss = onDismiss,
-                onPendingClear = { pendingAction = null },
-                onCsvWritten = { csvRefreshTrigger++ },
-                action_definition = PendingAction.But1_Export_M8_Room_To_Csv,
-            )
-
-            PendingAction.But6_Import_M8_FireBase_To_Csv -> But6_Import_M8_FireBase_To_Csv(
+            PendingAction_M03.But1_Export_M03_Room_To_Csv_Entries -> But1_Export_M03_Room_To_Csv(
                 vm = vm,
                 coroutineScope = coroutineScope,
                 onDismiss = onDismiss,
                 onPendingClear = { pendingAction = null },
                 onCsvWritten = { csvRefreshTrigger++ },
-                action_definition = PendingAction.But6_Import_M8_FireBase_To_Csv,
+                action_definition = PendingAction_M03.But1_Export_M03_Room_To_Csv_Entries,
             )
 
-            PendingAction.But5_Import_M8_Ui_To_Room -> {
+            PendingAction_M03.But6_Import_M03_FireBase_To_Csv_Entries -> But6_Import_M03_FireBase_To_Csv(
+                vm = vm,
+                coroutineScope = coroutineScope,
+                onDismiss = onDismiss,
+                onPendingClear = { pendingAction = null },
+                onCsvWritten = { csvRefreshTrigger++ },
+                action_definition = PendingAction_M03.But6_Import_M03_FireBase_To_Csv_Entries,
+            )
+
+            PendingAction_M03.But5_Import_M03_Ui_To_Room_Entries -> {
                 AvertissementDialog(
                     title = action.name,
                     message = "سيتم حفظ بيانات M8BonVent من الواجهة إلى قاعدة البيانات المحلية.\n" +
@@ -318,7 +220,7 @@ fun B_FragMap_DropdownMenu(
                     onConfirm = {
                         pendingAction = null
                         coroutineScope.launch {
-                            vm.active_Datas.list_M8bon?.let { bons ->
+                            vm.active_Datas.list_M03?.let { bons ->
                                 vm.setter_LongOperations.insertAll(bons)
                             }
                             onDismiss()
@@ -328,7 +230,7 @@ fun B_FragMap_DropdownMenu(
                 )
             }
 
-            PendingAction.But7_DeleteImport_M8Csv_To_Room -> {
+            PendingAction_M03.But7_DeleteImport_M03Csv_To_Room_Entries -> {
                 AvertissementDialog(
                     title = action.name,
                     message =
@@ -336,8 +238,8 @@ fun B_FragMap_DropdownMenu(
                     onConfirm = {
                         pendingAction = null
                         coroutineScope.launch {
-                            vm.active_Datas.list_M8bon?.let { bons ->
-                                vm.setter_LongOperations.delete_All_M8()
+                            vm.active_Datas.list_M03?.let { bons ->
+                                vm.setter_LongOperations.delete_All_M03()
                                 vm.setter_LongOperations.insertAll(bons)
                             }
                             vm.reload()
@@ -348,12 +250,12 @@ fun B_FragMap_DropdownMenu(
                 )
             }
 
-            PendingAction.But_9_Import_M8_FireBase_To_Room -> But9_Import_M8_FireBase_To_Room(
+            PendingAction_M03.But_9_Import_M03_FireBase_To_Room_Entries -> But9_Import_M03_FireBase_To_Room(
                 vm = vm,
                 coroutineScope = coroutineScope,
                 onDismiss = onDismiss,
                 onPendingClear = { pendingAction = null },
-                action_definition = PendingAction.But_9_Import_M8_FireBase_To_Room,
+                action_definition = PendingAction_M03.But_9_Import_M03_FireBase_To_Room_Entries,
             )
 
         }
@@ -390,7 +292,7 @@ fun B_FragMap_DropdownMenu(
         HorizontalDivider(thickness = 3.dp, color = Color.Red)
         HorizontalDivider()
         Text("FireBase")
-        val action =PendingAction.But_9_Import_M8_FireBase_To_Room
+        val action = PendingAction_M03.But_9_Import_M03_FireBase_To_Room_Entries
         DropdownMenuItem(
             leadingIcon = {
                 Icon(
@@ -419,12 +321,12 @@ fun B_FragMap_DropdownMenu(
             },
             text = {
                 Text(
-                    text = PendingAction.But2_Export_M8_Csv_To_FireBase.name,
+                    text = PendingAction_M03.But2_Export_M03_Csv_To_FireBase_Entries.name,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
             onClick = {
-                pendingAction = PendingAction.But2_Export_M8_Csv_To_FireBase
+                pendingAction = PendingAction_M03.But2_Export_M03_Csv_To_FireBase_Entries
             }
         )
         DropdownMenuItem(
@@ -438,13 +340,13 @@ fun B_FragMap_DropdownMenu(
             text = {
                 val fbStatsLine = when {
                     firebaseRowCount == null -> "..."
-                    firebaseRowCount == -1   -> "Firebase: خطأ في الاتصال"
-                    firebaseRowCount == 0    -> "Firebase: فارغ"
+                    firebaseRowCount == -1 -> "Firebase: خطأ في الاتصال"
+                    firebaseRowCount == 0 -> "Firebase: فارغ"
                     else -> "Firebase: $firebaseRowCount (دين: ${firebaseCreditCount ?: "..."}) | CSV: ${csvRowCount ?: "..."} (دين: ${csvCreditCount ?: "..."})"
                 }
                 Column {
                     Text(
-                        text = PendingAction.But6_Import_M8_FireBase_To_Csv.name,
+                        text = PendingAction_M03.But6_Import_M03_FireBase_To_Csv_Entries.name,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
@@ -455,7 +357,7 @@ fun B_FragMap_DropdownMenu(
                 }
             },
             onClick = {
-                pendingAction = PendingAction.But6_Import_M8_FireBase_To_Csv
+                pendingAction = PendingAction_M03.But6_Import_M03_FireBase_To_Csv_Entries
             }
         )
         HorizontalDivider(thickness = 3.dp, color = Color.Red)
@@ -469,12 +371,12 @@ fun B_FragMap_DropdownMenu(
             },
             text = {
                 Text(
-                    text = "But1_Export_M8_Room_To_Csv",
+                    text = "But1_Export_M03_Room_To_Csv_Entries",
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
             onClick = {
-                pendingAction = PendingAction.But1_Export_M8_Room_To_Csv
+                pendingAction = PendingAction_M03.But1_Export_M03_Room_To_Csv_Entries
             }
         )
 
@@ -489,12 +391,12 @@ fun B_FragMap_DropdownMenu(
             text = {
                 val statsLine = when {
                     csvRowCount == null -> "..."
-                    csvRowCount == 0    -> "CSV فارغ"
+                    csvRowCount == 0 -> "CSV فارغ"
                     else -> "CSV: $csvRowCount | +${csvNewCount} جديد | ↺${csvUpdateCount} تحديث"
                 }
                 Column {
                     Text(
-                        text = PendingAction.But7_DeleteImport_M8Csv_To_Room.name,
+                        text = PendingAction_M03.But7_DeleteImport_M03Csv_To_Room_Entries.name,
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
@@ -505,7 +407,7 @@ fun B_FragMap_DropdownMenu(
                 }
             },
             onClick = {
-                pendingAction = PendingAction.But7_DeleteImport_M8Csv_To_Room
+                pendingAction = PendingAction_M03.But7_DeleteImport_M03Csv_To_Room_Entries
             }
         )
         HorizontalDivider()
@@ -519,12 +421,12 @@ fun B_FragMap_DropdownMenu(
             },
             text = {
                 Text(
-                    text = PendingAction.But8_DeleteAll_M8_Room.name,
+                    text = PendingAction_M03.But8_DeleteAll_M03_Room_Entries.name,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
             onClick = {
-                pendingAction = PendingAction.But8_DeleteAll_M8_Room
+                pendingAction = PendingAction_M03.But8_DeleteAll_M03_Room_Entries
             }
         )
         DropdownMenuItem(
@@ -537,12 +439,12 @@ fun B_FragMap_DropdownMenu(
             },
             text = {
                 Text(
-                    text = PendingAction.But3_Import_M8Csv_To_Room.name,
+                    text = PendingAction_M03.But3_Import_M03Csv_To_Room_Entries.name,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
             onClick = {
-                pendingAction = PendingAction.But3_Import_M8Csv_To_Room
+                pendingAction = PendingAction_M03.But3_Import_M03Csv_To_Room_Entries
             }
         )
         HorizontalDivider()
@@ -557,12 +459,12 @@ fun B_FragMap_DropdownMenu(
             },
             text = {
                 Text(
-                    text = PendingAction.But5_Import_M8_Ui_To_Room.name,
+                    text = PendingAction_M03.But5_Import_M03_Ui_To_Room_Entries.name,
                     style = MaterialTheme.typography.bodyMedium,
                 )
             },
             onClick = {
-                pendingAction = PendingAction.But5_Import_M8_Ui_To_Room
+                pendingAction = PendingAction_M03.But5_Import_M03_Ui_To_Room_Entries
             }
         )
 

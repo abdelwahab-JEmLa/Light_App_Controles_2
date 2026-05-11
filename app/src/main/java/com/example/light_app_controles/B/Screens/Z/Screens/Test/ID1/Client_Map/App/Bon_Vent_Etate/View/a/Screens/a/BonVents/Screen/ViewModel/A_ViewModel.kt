@@ -1,6 +1,7 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.a.BonVents.Screen.ViewModel
 
 import EntreApps.Shared.Models.M09AppCompt
+import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -17,6 +18,7 @@ import kotlinx.coroutines.launch
 class ActiveDatas {
     var active_M9Compt: M09AppCompt? by mutableStateOf(null)
     var list_M8bon: List<M8BonVent>? by mutableStateOf(null)
+    var list_M03: List<M3CouleurProduitInfos>? by mutableStateOf(null)
 }
 
 @SuppressLint("StaticFieldLeak")
@@ -33,6 +35,7 @@ class A_ViewModel(
     init {
         viewModelScope.launch {
             active_Datas.list_M8bon = (appDatabase.dao_M8BonVent().getAll())
+            active_Datas.list_M03 = (appDatabase.dao_M03CouleurProduitInfos().getAll())
         }
     }
 
@@ -43,6 +46,7 @@ class A_ViewModel(
     fun reload() {
         viewModelScope.launch {
             active_Datas.list_M8bon = appDatabase.dao_M8BonVent().getAll()
+            active_Datas.list_M03 = appDatabase.dao_M03CouleurProduitInfos().getAll()
         }
     }
 

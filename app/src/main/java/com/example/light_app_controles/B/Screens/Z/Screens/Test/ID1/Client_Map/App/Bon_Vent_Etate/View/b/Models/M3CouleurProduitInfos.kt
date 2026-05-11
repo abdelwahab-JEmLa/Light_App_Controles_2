@@ -1,20 +1,19 @@
 package EntreApps.Shared.Models.Relative_Produits.Models
 
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_Developing_Test
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_Local_storageLink
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_MainDataBases_RefProduction
 import EntreApps.Shared.Models.Relative_Vents.Models.AbdelwahabJomla_Client_Speciale
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models.M8BonVent.Companion.nam_Model_Str
 import java.io.File
 
 @Entity
-data class
-
-
-M3CouleurProduitInfos(
+data class M3CouleurProduitInfos(
     @PrimaryKey
-    var keyID: String = M00CentralParametresOfAllApps.getPushFireBase(ref),
+    var keyID: String = generePushKey(),
     var debugInfos: String = "",
     var creationTimestamp: Long = System.currentTimeMillis(),
     var dernierTimeTampsSynchronisationAvecFireBase: Long = System.currentTimeMillis(),
@@ -89,15 +88,24 @@ M3CouleurProduitInfos(
     enum class ProcessPositioningInFactory { CreeDepuitRechercheRapid, CreeAuGeneralHandler }
 
     companion object {
-        val ref = central_MainDataBases_RefProduction
-            .child("M03Couleur")
+        const val nam_Model_Str = "M03Couleur"
+
+        val ref = central_MainDataBases_RefProduction.child(nam_Model_Str)
+        val ref_Test = ref
+
+        fun generePushKey() = M00CentralParametresOfAllApps.genereUnPushKeyFireBase(
+            ref
+        )
+        val csv_test = File(
+            M00CentralParametresOfAllApps.central_Local_Csv,
+            "TestDatas/$nam_Model_Str.csv"
+        )
 
 //        val ref = M00CentralParametresOfAllApps.centralRef
 //            .child("B1CouleurOuGoutProduitDataBase")
 
-        val ref_Non_Active_Datas =
-            M00CentralParametresOfAllApps.centralRef_Non_Active_Datas_PourLightApp
-                .child("M03Couleur")
+        val ref_Non_Active_Datas = M00CentralParametresOfAllApps.Companion.centralRef_Non_Active_Datas_PourLightApp
+            .child("M03Couleur")
 
         //Second Nom Ref_Active_Keys_M03Couleurs
         val ref_listKeys_M3CouleurProduitInfos = ref.child("-00_listKeys_M3CouleurProduitInfos")
@@ -143,7 +151,7 @@ M3CouleurProduitInfos(
                 return null
             }
 
-            buildString {
+            val images_central_Local_storageLink = buildString {
                 append(central_Local_storageLink)
                 append("/IMGs/BaseDonne")
             }
