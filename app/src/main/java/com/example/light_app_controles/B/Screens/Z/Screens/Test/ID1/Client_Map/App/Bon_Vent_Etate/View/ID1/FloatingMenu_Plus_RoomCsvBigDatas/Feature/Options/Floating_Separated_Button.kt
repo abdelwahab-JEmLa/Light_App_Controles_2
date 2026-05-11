@@ -65,7 +65,8 @@ fun Floating_Separated_Button(
     buttonState: Button_State = Button_State.Companion.get_Default(),
     onClick_Lence_Capture: (() -> Unit)? = null,
     viewModel: A_ViewModel,
-) {        //<--
+) {       //<--
+//TODO(1): pk c come je ne peut pas drage au corner bas end comme a A_FastAdd_FloatingSeparated_Button_1 
     val haptic = LocalHapticFeedback.current
     var dialState by remember { mutableStateOf(DialState.Closed) }
 
@@ -74,7 +75,7 @@ fun Floating_Separated_Button(
     val screenHeightDp = configuration.screenHeightDp.toFloat()
 
     // Initial position: bottom-right corner (mirrors A_FastAdd_FloatingSeparated_Button_1)
-    var offsetX by remember { mutableFloatStateOf(screenWidthDp  - 200f) }
+    var offsetX by remember { mutableFloatStateOf(screenWidthDp  - 20f) }
     var offsetY by remember { mutableFloatStateOf(screenHeightDp - 300f) }
 
     val logoRotation by animateFloatAsState(
