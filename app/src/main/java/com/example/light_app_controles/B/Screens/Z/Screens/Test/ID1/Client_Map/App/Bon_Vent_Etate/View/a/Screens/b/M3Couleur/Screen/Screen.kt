@@ -112,7 +112,8 @@ fun M3CouleurList_Screen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp, vertical = 8.dp),
-                placeholder = {
+                placeholder = {                 //<--
+                //TODO(1): pk ca ne searche pas le debug parent produit name si entred
                     Text(
                         text = "بحث بالاسم / keyID / parent M1 key",
                         style = MaterialTheme.typography.bodySmall,
