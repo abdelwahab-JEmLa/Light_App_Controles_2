@@ -1,9 +1,10 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.Z.Modules.Capture
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID2.CaptureListItems.Feature.Capture
 
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import androidx.annotation.DrawableRes
@@ -131,10 +132,10 @@ fun saveAllToMediaStore(
     bitmaps: List<Pair<Bitmap, String>>,
     context: Context,
     clientKeyID: String,
-): List<android.net.Uri> {
+): List<Uri> {
     if (bitmaps.isEmpty()) return emptyList()
 
-    val savedUris = mutableListOf<android.net.Uri>()
+    val savedUris = mutableListOf<Uri>()
     val safeKey = clientKeyID.replace(Regex("[^a-zA-Z0-9_\\-]"), "_")
     val folderPath = "Download/Image_Compose_Screen/$safeKey"
     val resolver = context.contentResolver

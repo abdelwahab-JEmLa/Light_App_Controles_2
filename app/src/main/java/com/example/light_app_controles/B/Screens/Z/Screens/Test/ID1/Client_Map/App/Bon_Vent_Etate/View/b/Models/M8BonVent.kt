@@ -1,4 +1,4 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models
 
 //noinspection SuspiciousImport,SuspiciousImport
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps

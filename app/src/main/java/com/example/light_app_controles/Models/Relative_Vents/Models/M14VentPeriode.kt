@@ -3,8 +3,8 @@ package EntreApps.Shared.Models.Relative_Vents.Models
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.M8BonVent.Companion.sum_totale_et_benifice
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models.M8BonVent
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models.M8BonVent.Companion.sum_totale_et_benifice
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
 
