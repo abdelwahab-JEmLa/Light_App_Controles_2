@@ -108,7 +108,7 @@ fun Floating_Separated_Button(
         colors = Pair(Color.Red, Color.Blue)
     ),
     onClick_Lence_Capture: (() -> Unit)? = null,
-    vm: A_ViewModel,
+    viewModel: A_ViewModel,
 ) {
     val updatedButtonState = buttonState.copy(its_Active = true)
 
@@ -159,7 +159,7 @@ fun Floating_Separated_Button(
                     onDismiss = { showDropdown = false },
                     on_vent_key = on_vent_key,
                     onClick_Lence_Capture = onClick_Lence_Capture,
-                    vm = vm,
+                    vm = viewModel,
                 )
             }
         }
