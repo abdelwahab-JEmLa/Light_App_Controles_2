@@ -65,18 +65,24 @@ fun Floating_Separated_Button(
     buttonState: Button_State = Button_State.Companion.get_Default(),
     onClick_Lence_Capture: (() -> Unit)? = null,
     viewModel: A_ViewModel,
-) {       //<--
-//TODO(1): pk c come je ne peut pas drage au corner bas end comme a
+) {
     val haptic = LocalHapticFeedback.current
     var dialState by remember { mutableStateOf(DialState.Closed) }
 
     val configuration  = LocalConfiguration.current
-    val screenWidthDp  = configuration.screenWidthDp.toFloat()
-    val screenHeightDp = configuration.screenHeightDp.toFloat()
+    val density        = LocalDensity.current
+    // FIX(1): detectDragGestures returns px, IntOffset takes px.
+    //         screenWidthDp/screenHeightDp are dp-values — mixing them with px caused
+    //         erratic drag and prevented reaching screen corners.
+    //         Solution: convert to pixels once and use px everywhere.
+    val screenWidthPx  = with(density) { configuration.screenWidthDp.dp.toPx() }
+    val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
+    val fabSizePx      = with(density) { 58.dp.toPx() }
+    val paddingPx      = with(density) { 16.dp.toPx() }
 
     // Initial position: bottom-right corner (mirrors A_FastAdd_FloatingSeparated_Button_1)
-    var offsetX by remember { mutableFloatStateOf(screenWidthDp  - 20f) }
-    var offsetY by remember { mutableFloatStateOf(screenHeightDp - 300f) }
+    var offsetX by remember { mutableFloatStateOf(screenWidthPx  - fabSizePx - paddingPx) }
+    var offsetY by remember { mutableFloatStateOf(screenHeightPx - fabSizePx * 5f) }
 
     val logoRotation by animateFloatAsState(
         targetValue   = if (dialState != DialState.Closed) 45f else 0f,
@@ -95,8 +101,8 @@ fun Floating_Separated_Button(
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()
-                        offsetX = (offsetX + dragAmount.x).coerceIn(0f, screenWidthDp  - 100f)
-                        offsetY = (offsetY + dragAmount.y).coerceIn(0f, screenHeightDp - 100f)
+                        offsetX = (offsetX + dragAmount.x).coerceIn(0f, screenWidthPx  - fabSizePx - paddingPx)
+                        offsetY = (offsetY + dragAmount.y).coerceIn(0f, screenHeightPx - fabSizePx - paddingPx)
                     }
                 }
                 .padding(end = 16.dp, bottom = 16.dp),
