@@ -66,7 +66,7 @@ fun Floating_Separated_Button(
     onClick_Lence_Capture: (() -> Unit)? = null,
     viewModel: A_ViewModel,
 ) {       //<--
-//TODO(1): pk c come je ne peut pas drage au corner bas end comme a A_FastAdd_FloatingSeparated_Button_1 
+//TODO(1): pk c come je ne peut pas drage au corner bas end comme a
     val haptic = LocalHapticFeedback.current
     var dialState by remember { mutableStateOf(DialState.Closed) }
 
