@@ -2,7 +2,7 @@ package Working_IN.Feature.a.Main
 
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import android.content.Context
-import android.util.Log.i
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -90,15 +91,8 @@ fun M3CouleurList_Screen(
             }
         }
 
-    // Key on relative_listM03 so the derivedStateOf lambda is rebuilt whenever the
-    // list reference changes (e.g. after the coroutine in reload() completes).
     val byQuery by remember(relative_listM03) {
-        derivedStateOf {
-            filterByQuery(
-                query,
-                relative_listM03
-            )
-        }
+        derivedStateOf { filterByQuery(query, relative_listM03) }
     }
     val byDepo by remember { derivedStateOf { filterByDepo(byQuery) } }
     val byMode by remember {
@@ -121,18 +115,14 @@ fun M3CouleurList_Screen(
                         .map { it.parentId1ProduitInfosDebugName to it.count_Don_Depot },
                     key = SemanticsPropertyKey("")
                 )
-
                 set(value = relative_listM03, key = SemanticsPropertyKey("relative_listM03"))
-                set(
-                    value = finale_filtred_list,
-                    key = SemanticsPropertyKey("finale_filtred_list")
-                )
+                set(value = finale_filtred_list, key = SemanticsPropertyKey("finale_filtred_list"))
             }
-            .fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
+            .fillMaxSize()
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+
+            // ── Header ──────────────────────────────────────────────────────
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -148,6 +138,7 @@ fun M3CouleurList_Screen(
                 )
             }
 
+            // ── Search field ─────────────────────────────────────────────────
             OutlinedTextField(
                 value = query,
                 onValueChange = { query = it },
@@ -169,7 +160,7 @@ fun M3CouleurList_Screen(
                         Icon(
                             Icons.Default.Clear,
                             contentDescription = null,
-                            tint = Color(0xFF9E9E9E)
+                            tint = Color(0xFF9E9E9E),
                         )
                     }
                 },
@@ -183,8 +174,19 @@ fun M3CouleurList_Screen(
                     cursorColor = Color(0xFF6A1B9A),
                 ),
             )
-                 //<--
-                 //TODO(1): ici ajout un lignerie loading bar qi rest jusquele data ce load et ou  change de Filter_Affichage_Mode_Proto 
+
+            // ── Loading bar — visible pendant reload() et changement de filtre ──
+            AnimatedVisibility(visible = viewModel.active_Datas.isLoading) {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp),
+                    color = Color(0xFF6A1B9A),
+                    trackColor = Color(0xFFCE93D8),
+                )
+            }
+
+            // ── List ─────────────────────────────────────────────────────────
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)

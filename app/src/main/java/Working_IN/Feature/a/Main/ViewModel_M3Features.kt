@@ -21,13 +21,14 @@ import kotlinx.coroutines.launch
 
 @Stable
 class ActiveDatas {
+    var isLoading: Boolean by mutableStateOf(false)
     var active_M9Compt: M09AppCompt? by mutableStateOf(null)
     var list_M8bon: List<M8BonVent>? by mutableStateOf(null)
     var list_M03: List<M3CouleurProduitInfos>? by mutableStateOf(null)
     var list_M10: List<M10OperationVentCouleur>? by mutableStateOf(null)
     var list_M14: List<M14VentPeriode>? by mutableStateOf(null)
     var tiger_filterID2_Filter_Affichage_Mode_Proto: Filter_Affichage_Mode_Proto by
-        mutableStateOf(Filter_Affichage_Mode_Proto.Tablette_Et_Echants)
+    mutableStateOf(Filter_Affichage_Mode_Proto.Tablette_Et_Echants)
 }
 
 @SuppressLint("StaticFieldLeak")
@@ -38,23 +39,29 @@ class ViewModel_M3Features(private val appDatabase: AppDatabase) : ViewModel() {
 
     init { viewModelScope.launch { reload() } }
 
+
     fun reload() {
         viewModelScope.launch {
-            active_Datas.active_M9Compt =
-                FAKE_M9Compt
+            active_Datas.isLoading = true
+            try {
+                active_Datas.active_M9Compt =
+                    FAKE_M9Compt
 
-            active_Datas.list_M8bon = appDatabase.dao_M8BonVent().getAll()
-            val dao_list_m3 = appDatabase.dao_M03CouleurProduitInfos().getAll()
+                active_Datas.list_M8bon = appDatabase.dao_M8BonVent().getAll()
+                val dao_list_m3 = appDatabase.dao_M03CouleurProduitInfos().getAll()
 
-            active_Datas.list_M10 = FAKE_ON_VENT(dao_list_m3)
+                active_Datas.list_M10 = FAKE_ON_VENT(dao_list_m3)
 
-            val all = fake_extra(dao_list_m3)
+                val all = fake_extra(dao_list_m3)
 
-            active_Datas.list_M03 = fake_update_couleurs_echants(
-                fake_update_couleurs_count_depo(all)
-            ).filter_passive_datas(
-                active_Datas.active_M9Compt!!.limite_couleurs_ou_leur_last_achate_est_moin_que_jour
-            )
+                active_Datas.list_M03 = fake_update_couleurs_echants(
+                    fake_update_couleurs_count_depo(all)
+                ).filter_passive_datas(
+                    active_Datas.active_M9Compt!!.limite_couleurs_ou_leur_last_achate_est_moin_que_jour
+                )
+            } finally {
+                active_Datas.isLoading = false
+            }
         }
     }
 
