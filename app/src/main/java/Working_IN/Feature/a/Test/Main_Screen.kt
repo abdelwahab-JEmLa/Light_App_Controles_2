@@ -130,7 +130,12 @@ fun M3CouleurList_Screen(
                 )
             }
 
-            Main_Filter(viewModel, query, relative_listM03)
+            Main_Filter(
+                relative_listM03,
+                query,
+                viewModel.active_Datas.list_M10,
+                viewModel.active_Datas.tiger_filterID2_Filter_Affichage_Mode_Proto
+            )
         }
 
         FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(appDatabase = appDatabase)

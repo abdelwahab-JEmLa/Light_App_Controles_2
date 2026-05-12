@@ -1,6 +1,7 @@
 package Working_IN.Feature.a.Test
 
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
+import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
 import Working_IN.Feature.Models.Filter_Affichage_Mode_Proto
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -9,9 +10,10 @@ import androidx.compose.runtime.remember
 
 @Composable
 fun Main_Filter(
-    viewModel: ViewModel_M3Features,
+    relative_listM03: List<M3CouleurProduitInfos>,
     query_outline_searcher: String,
-    relative_listM03: List<M3CouleurProduitInfos>
+    relative_m10_vents: List<M10OperationVentCouleur>?,
+    mode: Filter_Affichage_Mode_Proto
 ) {
     fun filterByQuery(q: String, list: List<M3CouleurProduitInfos>): List<M3CouleurProduitInfos> {
         val lq = q.trim().lowercase()
@@ -34,14 +36,12 @@ fun Main_Filter(
             Filter_Affichage_Mode_Proto.Echants_Seulement -> list.filter { it.its_in_echantiallants }
             Filter_Affichage_Mode_Proto.Tablette_Et_Echants -> list
             Filter_Affichage_Mode_Proto.Panie -> {
-                val keys = (viewModel.active_Datas.list_M10 ?: emptyList())
+                val keys = (relative_m10_vents ?: emptyList())
                     .filter { it.quantity > 0 }
                     .map { it.parent_M3CouleurProduit_KeyID }.toSet()
                 list.filter { it.keyID in keys }
             }
         }
-
-    val mode = viewModel.active_Datas.tiger_filterID2_Filter_Affichage_Mode_Proto
 
     val finale_filtred_list by remember {
         derivedStateOf {
