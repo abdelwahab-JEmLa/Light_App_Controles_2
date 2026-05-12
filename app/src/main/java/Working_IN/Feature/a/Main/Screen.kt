@@ -133,7 +133,6 @@ fun M3CouleurList_Screen(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -184,7 +183,8 @@ fun M3CouleurList_Screen(
                     cursorColor = Color(0xFF6A1B9A),
                 ),
             )
-
+                 //<--
+                 //TODO(1): ici ajout un lignerie loading bar qi rest jusquele data ce load et ou  change de Filter_Affichage_Mode_Proto 
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
