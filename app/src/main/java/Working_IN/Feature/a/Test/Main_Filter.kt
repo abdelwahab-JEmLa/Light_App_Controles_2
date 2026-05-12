@@ -19,10 +19,9 @@ fun Main_Filter(
         val lq = q.trim().lowercase()
         return if (lq.isEmpty()) list
         else list.filter {
-            it.nomCouleurStrSiSonImageDispo.lowercase().contains(lq) ||
-                    it.keyID.lowercase().contains(lq) ||
-                    it.parentBProduitInfosKeyID.lowercase().contains(lq) ||
-                    it.parentId1ProduitInfosDebugName.lowercase().contains(lq)
+            it.nomCouleurStrSiSonImageDispo.lowercase().contains(lq) || it.keyID.lowercase()
+                .contains(lq) || it.parentBProduitInfosKeyID.lowercase()
+                .contains(lq) || it.parentId1ProduitInfosDebugName.lowercase().contains(lq)
         }
     }
 
@@ -36,8 +35,7 @@ fun Main_Filter(
             Filter_Affichage_Mode_Proto.Echants_Seulement -> list.filter { it.its_in_echantiallants }
             Filter_Affichage_Mode_Proto.Tablette_Et_Echants -> list
             Filter_Affichage_Mode_Proto.Panie -> {
-                val keys = (relative_m10_vents ?: emptyList())
-                    .filter { it.quantity > 0 }
+                val keys = (relative_m10_vents ?: emptyList()).filter { it.quantity > 0 }
                     .map { it.parent_M3CouleurProduit_KeyID }.toSet()
                 list.filter { it.keyID in keys }
             }
@@ -47,7 +45,11 @@ fun Main_Filter(
         derivedStateOf {
             filterByMode(
                 mode,
-                filterByDepo(filterByQuery(query_outline_searcher, relative_listM03)),
+                filterByDepo(
+                    filterByQuery(
+                        query_outline_searcher, relative_listM03
+                    )
+                ),
             )
         }
     }
