@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun ColumnScope.List(
     viewModel: ViewModel_M3Features,
-    query: String,
+    query_outline_searcher: String,
     relative_listM03: List<M3CouleurProduitInfos>
 ) {
     fun filterByQuery(q: String, list: List<M3CouleurProduitInfos>): List<M3CouleurProduitInfos> {
@@ -52,7 +52,7 @@ fun ColumnScope.List(
         derivedStateOf {
             filterByMode(
                 viewModel.active_Datas.tiger_filterID2_Filter_Affichage_Mode_Proto,
-                filterByDepo(filterByQuery(query, relative_listM03)),
+                filterByDepo(filterByQuery(query_outline_searcher, relative_listM03)),
             )
         }
     }
@@ -66,7 +66,7 @@ fun ColumnScope.List(
         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
     ) {
         items(items = finale_filtred_list) { item ->
-            M3CouleurItem(item = item, highlight = query.trim())
+            M3CouleurItem(item = item, highlight = query_outline_searcher.trim())
         }
     }
 }
