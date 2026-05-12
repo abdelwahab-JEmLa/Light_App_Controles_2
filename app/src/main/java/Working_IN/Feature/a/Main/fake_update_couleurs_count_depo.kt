@@ -10,6 +10,5 @@ fun fake_update_couleurs_count_depo(
     list: List<M3CouleurProduitInfos>,
 ): List<M3CouleurProduitInfos> =
     list.mapIndexed { index, item ->
-        if (index < 8) item.copy(count_Don_Depot = (index + 1) * 3)
-        else item
+        if (index < 8) item.copy(count_Don_Depot = 2) else item
     }

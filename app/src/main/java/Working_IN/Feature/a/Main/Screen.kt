@@ -2,6 +2,7 @@ package Working_IN.Feature.a.Main
 
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import android.content.Context
+import android.util.Log.i
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -67,9 +68,9 @@ fun M3CouleurList_Screen(
         return if (lq.isEmpty()) list
         else list.filter {
             it.nomCouleurStrSiSonImageDispo.lowercase().contains(lq) ||
-            it.keyID.lowercase().contains(lq) ||
-            it.parentBProduitInfosKeyID.lowercase().contains(lq) ||
-            it.parentId1ProduitInfosDebugName.lowercase().contains(lq)
+                    it.keyID.lowercase().contains(lq) ||
+                    it.parentBProduitInfosKeyID.lowercase().contains(lq) ||
+                    it.parentId1ProduitInfosDebugName.lowercase().contains(lq)
         }
     }
 
@@ -80,8 +81,8 @@ fun M3CouleurList_Screen(
     fun filterByMode(mode: Filter_Affichage_Mode_Proto, list: List<M3CouleurProduitInfos>) =
         when (mode) {
             Filter_Affichage_Mode_Proto.Tablette_Produits_Seulement -> list.filter { !it.its_in_echantiallants }
-            Filter_Affichage_Mode_Proto.Echants_Seulement           -> list.filter { it.its_in_echantiallants }
-            Filter_Affichage_Mode_Proto.Tablette_Et_Echants         -> list
+            Filter_Affichage_Mode_Proto.Echants_Seulement -> list.filter { it.its_in_echantiallants }
+            Filter_Affichage_Mode_Proto.Tablette_Et_Echants -> list
             Filter_Affichage_Mode_Proto.Panie -> {
                 val keys = (viewModel.active_Datas.list_M10 ?: emptyList())
                     .map { it.parent_M3CouleurProduit_KeyID }.toSet()
@@ -89,9 +90,18 @@ fun M3CouleurList_Screen(
             }
         }
 
-    val byQuery by remember { derivedStateOf { filterByQuery(query, relative_listM03) } }
-    val byDepo  by remember { derivedStateOf { filterByDepo(byQuery) } }
-    val byMode  by remember {
+    // Key on relative_listM03 so the derivedStateOf lambda is rebuilt whenever the
+    // list reference changes (e.g. after the coroutine in reload() completes).
+    val byQuery by remember(relative_listM03) {
+        derivedStateOf {
+            filterByQuery(
+                query,
+                relative_listM03
+            )
+        }
+    }
+    val byDepo by remember { derivedStateOf { filterByDepo(byQuery) } }
+    val byMode by remember {
         derivedStateOf {
             filterByMode(
                 viewModel.active_Datas.tiger_filterID2_Filter_Affichage_Mode_Proto,
@@ -100,16 +110,29 @@ fun M3CouleurList_Screen(
         }
     }
 
-    val finale_filtred_list  by remember { derivedStateOf { relative_listM03 } }      //<--
-    //TODO(1): pk mem si je mete finale_filtred_list le lazy n affiche rie 
+    val finale_filtred_list by remember { derivedStateOf { byMode } }
 
-    Box(modifier = modifier.fillMaxSize()) {
-        Column(modifier = Modifier
+    Box(
+        modifier = modifier
             .semantics(mergeDescendants = true) {
+                set(
+                    value = byQuery
+                        .filter { it.count_Don_Depot > 0 }
+                        .map { it.parentId1ProduitInfosDebugName to it.count_Don_Depot },
+                    key = SemanticsPropertyKey("")
+                )
+
                 set(value = relative_listM03, key = SemanticsPropertyKey("relative_listM03"))
-                set(value = finale_filtred_list, key = SemanticsPropertyKey("finale_filtred_list"))
+                set(
+                    value = finale_filtred_list,
+                    key = SemanticsPropertyKey("finale_filtred_list")
+                )
             }
             .fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
 
             Row(
                 modifier = Modifier
@@ -144,7 +167,11 @@ fun M3CouleurList_Screen(
                 },
                 trailingIcon = {
                     if (query.isNotEmpty()) IconButton(onClick = { query = "" }) {
-                        Icon(Icons.Default.Clear, contentDescription = null, tint = Color(0xFF9E9E9E))
+                        Icon(
+                            Icons.Default.Clear,
+                            contentDescription = null,
+                            tint = Color(0xFF9E9E9E)
+                        )
                     }
                 },
                 singleLine = true,
@@ -158,34 +185,19 @@ fun M3CouleurList_Screen(
                 ),
             )
 
-            if (finale_filtred_list.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text = if (query.isBlank()) "لا توجد بيانات" else "لا توجد نتائج لـ \"$query\"",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = Color.Gray,
-                    )
-                }
-            } else {
-                LazyColumn(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                    contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
-                ) {
-                    items(items = finale_filtred_list, key = { it.keyID }) { item ->
-                        M3CouleurItem(item = item, highlight = query.trim())
-                    }
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+                contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
+            ) {
+                items(items = finale_filtred_list) { item ->
+                    M3CouleurItem(item = item, highlight = query.trim())
                 }
             }
-
-            FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(appDatabase = appDatabase)
         }
+
+        FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(appDatabase = appDatabase)
     }
 }
