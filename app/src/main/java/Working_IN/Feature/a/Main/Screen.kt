@@ -36,6 +36,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -71,8 +73,9 @@ fun M3CouleurList_Screen(
         }
     }
 
-    fun filterByDepo(list: List<M3CouleurProduitInfos>) =
-        list.filter { it.count_Don_Depot > 0 }
+    fun filterByDepo(list: List<M3CouleurProduitInfos>): List<M3CouleurProduitInfos> {
+        return list.filter { it.count_Don_Depot > 0 }
+    }
 
     fun filterByMode(mode: Filter_Affichage_Mode_Proto, list: List<M3CouleurProduitInfos>) =
         when (mode) {
@@ -86,15 +89,29 @@ fun M3CouleurList_Screen(
             }
         }
 
-    val byQuery  by remember { derivedStateOf { filterByQuery(query, relative_listM03) } }
-    val byDepo   by remember { derivedStateOf { filterByDepo(byQuery) } }
-    val byMode   by remember { derivedStateOf { filterByMode(viewModel.active_Datas.tiger_filterID2_Filter_Affichage_Mode_Proto, byDepo) } }
+    val byQuery by remember { derivedStateOf { filterByQuery(query, relative_listM03) } }
+    val byDepo  by remember { derivedStateOf { filterByDepo(byQuery) } }
+    val byMode  by remember {
+        derivedStateOf {
+            filterByMode(
+                viewModel.active_Datas.tiger_filterID2_Filter_Affichage_Mode_Proto,
+                byDepo,
+            )
+        }
+    }
 
     Box(modifier = modifier.fillMaxSize()) {
-        Column(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier
+            .semantics(mergeDescendants = true) {
+                set(value = byQuery, key = SemanticsPropertyKey(""))
+            }
+            .fillMaxSize()) {
 
             Row(
-                modifier = Modifier.fillMaxWidth().background(Color(0xFF6A1B9A)).padding(horizontal = 12.dp, vertical = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(Color(0xFF6A1B9A))
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
@@ -108,9 +125,19 @@ fun M3CouleurList_Screen(
             OutlinedTextField(
                 value = query,
                 onValueChange = { query = it },
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp, vertical = 8.dp),
-                placeholder = { Text("بحث بالاسم / keyID / parent M1 key", style = MaterialTheme.typography.bodySmall, color = Color(0xFF9E9E9E)) },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color(0xFF6A1B9A)) },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp, vertical = 8.dp),
+                placeholder = {
+                    Text(
+                        "بحث بالاسم / keyID / parent M1 key",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(0xFF9E9E9E),
+                    )
+                },
+                leadingIcon = {
+                    Icon(Icons.Default.Search, contentDescription = null, tint = Color(0xFF6A1B9A))
+                },
                 trailingIcon = {
                     if (query.isNotEmpty()) IconButton(onClick = { query = "" }) {
                         Icon(Icons.Default.Clear, contentDescription = null, tint = Color(0xFF9E9E9E))
@@ -128,7 +155,12 @@ fun M3CouleurList_Screen(
             )
 
             if (byMode.isEmpty()) {
-                Box(modifier = Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.Center,
+                ) {
                     Text(
                         text = if (query.isBlank()) "لا توجد بيانات" else "لا توجد نتائج لـ \"$query\"",
                         style = MaterialTheme.typography.bodyMedium,
@@ -137,7 +169,9 @@ fun M3CouleurList_Screen(
                 }
             } else {
                 LazyColumn(
-                    modifier = Modifier.weight(1f).fillMaxWidth(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(6.dp),
                     contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                 ) {
@@ -146,7 +180,8 @@ fun M3CouleurList_Screen(
                     }
                 }
             }
-            FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button( appDatabase = appDatabase)
+
+            FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(appDatabase = appDatabase)
         }
     }
 }

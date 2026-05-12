@@ -6,7 +6,6 @@ import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos.Co
 import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
 import Working_IN.Feature.M14VentPeriode
 import Working_IN.Feature.z.Preview.FAKE_M9Compt
-import Working_IN.Feature.z.Preview.fake_created
 import Working_IN.Feature.z.Preview.fake_extra
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Stable
@@ -41,20 +40,27 @@ class ViewModel_M3Features(private val appDatabase: AppDatabase) : ViewModel() {
 
     fun reload() {
         viewModelScope.launch {
+            active_Datas.active_M9Compt =
+                FAKE_M9Compt
+
             active_Datas.list_M8bon = appDatabase.dao_M8BonVent().getAll()
-            active_Datas.list_M10   =   FAKE_ON_VENT
+            val dao_list_m3 = appDatabase.dao_M03CouleurProduitInfos().getAll()
 
-            val all = fake_extra(appDatabase.dao_M03CouleurProduitInfos().getAll()) +
-                      fake_created() +
-                      FAKE_ON_VENT_M3
+            active_Datas.list_M10 = FAKE_ON_VENT(dao_list_m3)
 
-            active_Datas.list_M03 = fake_update_couleurs_echants(fake_update_couleurs_count_depo(all))
-                .filter_passive_datas(FAKE_M9Compt.limite_couleurs_ou_leur_last_achate_est_moin_que_jour)
+            val all = fake_extra(dao_list_m3)
+
+            active_Datas.list_M03 = fake_update_couleurs_echants(
+                fake_update_couleurs_count_depo(all)
+            ).filter_passive_datas(
+                active_Datas.active_M9Compt!!.limite_couleurs_ou_leur_last_achate_est_moin_que_jour
+            )
         }
     }
 
     fun update_M8(it: M8BonVent) {
-        active_Datas.list_M8bon = active_Datas.list_M8bon?.map { bon -> if (bon.keyID == it.keyID) it else bon }
+        active_Datas.list_M8bon =
+            active_Datas.list_M8bon?.map { bon -> if (bon.keyID == it.keyID) it else bon }
         viewModelScope.launch { setter_LongOperations.update_M8(it) }
     }
 
