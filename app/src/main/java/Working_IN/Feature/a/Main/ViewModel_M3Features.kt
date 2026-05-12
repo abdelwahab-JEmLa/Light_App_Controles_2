@@ -28,14 +28,15 @@ class ActiveDatas {
     var list_M10: List<M10OperationVentCouleur>? by mutableStateOf(null)
     var list_M14: List<M14VentPeriode>? by mutableStateOf(null)
     var tiger_filterID2_Filter_Affichage_Mode_Proto: Filter_Affichage_Mode_Proto by
-    mutableStateOf(Filter_Affichage_Mode_Proto.Tablette_Et_Echants)
+    mutableStateOf(Filter_Affichage_Mode_Proto.Panie)
 }
+
+
 
 @SuppressLint("StaticFieldLeak")
 class ViewModel_M3Features(private val appDatabase: AppDatabase) : ViewModel() {
     val active_Datas = ActiveDatas()
     val setter_LongOperations = Setter_LongOperations(appDatabase)
-    var captureRequested by mutableStateOf(false)
 
     init { viewModelScope.launch { reload() } }
 

@@ -8,7 +8,9 @@ import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
  * Called by the ViewModel as `FAKE_ON_VENT(dao_list_m3)`.
  */
 fun FAKE_ON_VENT(m3List: List<M3CouleurProduitInfos>): List<M10OperationVentCouleur> =
-    m3List.map { m3 ->
+    m3List
+        .takeLast(3)
+        .map { m3 ->
         M10OperationVentCouleur(
             keyID                              = "fake_m10_${m3.keyID}",
             parent_M3CouleurProduit_KeyID      = m3.keyID,
