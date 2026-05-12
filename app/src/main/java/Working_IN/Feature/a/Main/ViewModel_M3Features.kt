@@ -45,8 +45,7 @@ class ViewModel_M3Features(private val appDatabase: AppDatabase) : ViewModel() {
         viewModelScope.launch {
             active_Datas.isLoading = true
             try {
-                active_Datas.active_M9Compt =
-                    FAKE_M9Compt
+                active_Datas.active_M9Compt = FAKE_M9Compt
 
                 active_Datas.list_M8bon = appDatabase.dao_M8BonVent().getAll()
                 val dao_list_m3 = appDatabase.dao_M03CouleurProduitInfos().getAll()

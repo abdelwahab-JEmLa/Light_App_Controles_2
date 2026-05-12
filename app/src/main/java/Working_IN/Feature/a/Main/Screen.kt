@@ -59,8 +59,7 @@ fun M3CouleurList_Screen(
     )
 ) {
     val focusManager = LocalFocusManager.current
-    // Reads list_M03 as a snapshot-state dependency so any update from reload()
-    // is immediately visible without needing a manual refresh.
+
     val relative_listM03 by remember {
         derivedStateOf { viewModel.active_Datas.list_M03 ?: emptyList() }
     }
