@@ -12,11 +12,17 @@ fun FAKE_ON_VENT(m3List: List<M3CouleurProduitInfos>): List<M10OperationVentCoul
         .take(2)
         .map { m3 ->
             M10OperationVentCouleur(
-                keyID                              = "fake_m10_${m3.keyID}",
-                parent_M3CouleurProduit_KeyID      = m3.keyID,
+                keyID = "fake_m10_${m3.keyID}",
+                parent_M3CouleurProduit_KeyID = m3.keyID,
                 parent_M3CouleurProduit_DebugInfos = m3.debugInfos,
-                etateActuellementEst               = M10OperationVentCouleur.EtateActuellementEst.ParentBonVentConfirme,
-                quantity                           = 3,
+                etateActuellementEst = M10OperationVentCouleur.EtateActuellementEst.ParentBonVentConfirme,
+                quantity = 3,
             )
-        }
+        } + M10OperationVentCouleur(
+        keyID = "fake_m11",
+        parent_M3CouleurProduit_KeyID = m3List[2].keyID,
+        parent_M3CouleurProduit_DebugInfos = m3List[2].debugInfos,
+        etateActuellementEst = M10OperationVentCouleur.EtateActuellementEst.ParentBonVentConfirme,
+        quantity = 4,
+    )
 
