@@ -1,4 +1,4 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.b.M3Couleur.Screen.Working_IN.Feature
+package Working_IN.Feature
 
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 
