@@ -100,10 +100,14 @@ fun M3CouleurList_Screen(
         }
     }
 
+    val finale_filtred_list  by remember { derivedStateOf { relative_listM03 } }      //<--
+    //TODO(1): pk mem si je mete finale_filtred_list le lazy n affiche rie 
+
     Box(modifier = modifier.fillMaxSize()) {
         Column(modifier = Modifier
             .semantics(mergeDescendants = true) {
-                set(value = byQuery, key = SemanticsPropertyKey(""))
+                set(value = relative_listM03, key = SemanticsPropertyKey("relative_listM03"))
+                set(value = finale_filtred_list, key = SemanticsPropertyKey("finale_filtred_list"))
             }
             .fillMaxSize()) {
 
@@ -115,7 +119,7 @@ fun M3CouleurList_Screen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "M3Couleur — ${byMode.size} / ${relative_listM03.size}",
+                    text = "M3Couleur — ${finale_filtred_list.size} / ${relative_listM03.size}",
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Bold,
                     color = Color.White,
@@ -154,7 +158,7 @@ fun M3CouleurList_Screen(
                 ),
             )
 
-            if (byMode.isEmpty()) {
+            if (finale_filtred_list.isEmpty()) {
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -175,7 +179,7 @@ fun M3CouleurList_Screen(
                     verticalArrangement = Arrangement.spacedBy(6.dp),
                     contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
                 ) {
-                    items(items = byMode, key = { it.keyID }) { item ->
+                    items(items = finale_filtred_list, key = { it.keyID }) { item ->
                         M3CouleurItem(item = item, highlight = query.trim())
                     }
                 }
