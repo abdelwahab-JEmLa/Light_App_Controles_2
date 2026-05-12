@@ -2,21 +2,13 @@ package Working_IN.Feature.a.Test
 
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import Working_IN.Feature.Models.Filter_Affichage_Mode_Proto
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 
 @Composable
-fun ColumnScope.List(
+fun Main_Filter(
     viewModel: ViewModel_M3Features,
     query_outline_searcher: String,
     relative_listM03: List<M3CouleurProduitInfos>
@@ -59,15 +51,6 @@ fun ColumnScope.List(
     }
 
     // ── List ─────────────────────────────────────────────────────────
-    LazyColumn(
-        modifier = Modifier.Companion
-            .weight(1f)
-            .fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 4.dp),
-    ) {
-        items(items = finale_filtred_list) { item ->
-            M3CouleurItem(item = item, highlight = query_outline_searcher.trim())
-        }
-    }
+    Main_List(finale_filtred_list)
 }
+
