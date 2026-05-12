@@ -59,8 +59,10 @@ fun M3CouleurList_Screen(
     )
 ) {
     val focusManager = LocalFocusManager.current
-    val relative_listM03 = remember(viewModel.active_Datas.list_M03) {
-        viewModel.active_Datas.list_M03 ?: emptyList()
+    // Reads list_M03 as a snapshot-state dependency so any update from reload()
+    // is immediately visible without needing a manual refresh.
+    val relative_listM03 by remember {
+        derivedStateOf { viewModel.active_Datas.list_M03 ?: emptyList() }
     }
     var query by remember { mutableStateOf("") }
 
@@ -86,31 +88,26 @@ fun M3CouleurList_Screen(
             Filter_Affichage_Mode_Proto.Tablette_Et_Echants -> list
             Filter_Affichage_Mode_Proto.Panie -> {
                 val keys = (viewModel.active_Datas.list_M10 ?: emptyList())
+                    .filter { it.quantity > 0 }
                     .map { it.parent_M3CouleurProduit_KeyID }.toSet()
                 list.filter { it.keyID in keys }
             }
         }
 
-    val byQuery by remember(relative_listM03) {
-        derivedStateOf { filterByQuery(query, relative_listM03) }
-    }
-    val byDepo by remember { derivedStateOf { filterByDepo(byQuery) } }
-    val byMode by remember {
+    val finale_filtred_list by remember {
         derivedStateOf {
             filterByMode(
                 viewModel.active_Datas.tiger_filterID2_Filter_Affichage_Mode_Proto,
-                byDepo,
+                filterByDepo(filterByQuery(query, relative_listM03)),
             )
         }
     }
-
-    val finale_filtred_list by remember { derivedStateOf { byMode } }
 
     Box(
         modifier = modifier
             .semantics(mergeDescendants = true) {
                 set(
-                    value = byQuery
+                    value = filterByQuery(query, relative_listM03)
                         .filter { it.count_Don_Depot > 0 }
                         .map { it.parentId1ProduitInfosDebugName to it.count_Don_Depot },
                     key = SemanticsPropertyKey("")

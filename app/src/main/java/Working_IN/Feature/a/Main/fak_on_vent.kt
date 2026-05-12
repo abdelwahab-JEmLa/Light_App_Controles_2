@@ -9,12 +9,14 @@ import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
  */
 fun FAKE_ON_VENT(m3List: List<M3CouleurProduitInfos>): List<M10OperationVentCouleur> =
     m3List
-        .takeLast(3)
+        .take(2)
         .map { m3 ->
-        M10OperationVentCouleur(
-            keyID                              = "fake_m10_${m3.keyID}",
-            parent_M3CouleurProduit_KeyID      = m3.keyID,
-            parent_M3CouleurProduit_DebugInfos = m3.debugInfos,
-            etateActuellementEst               = M10OperationVentCouleur.EtateActuellementEst.ParentBonVentConfirme,
-        )
-    }
+            M10OperationVentCouleur(
+                keyID                              = "fake_m10_${m3.keyID}",
+                parent_M3CouleurProduit_KeyID      = m3.keyID,
+                parent_M3CouleurProduit_DebugInfos = m3.debugInfos,
+                etateActuellementEst               = M10OperationVentCouleur.EtateActuellementEst.ParentBonVentConfirme,
+                quantity                           = 3,
+            )
+        }
+
