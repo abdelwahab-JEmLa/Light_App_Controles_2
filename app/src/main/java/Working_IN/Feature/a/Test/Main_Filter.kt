@@ -41,10 +41,12 @@ fun Main_Filter(
             }
         }
 
+    val mode = viewModel.active_Datas.tiger_filterID2_Filter_Affichage_Mode_Proto
+
     val finale_filtred_list by remember {
         derivedStateOf {
             filterByMode(
-                viewModel.active_Datas.tiger_filterID2_Filter_Affichage_Mode_Proto,
+                mode,
                 filterByDepo(filterByQuery(query_outline_searcher, relative_listM03)),
             )
         }
