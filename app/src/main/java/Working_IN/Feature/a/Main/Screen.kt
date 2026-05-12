@@ -1,4 +1,4 @@
-package Working_IN.Feature
+package Working_IN.Feature.a.Main
 
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import android.content.Context
@@ -61,8 +61,8 @@ fun M3CouleurList_Screen(
     modifier: Modifier = Modifier,
     context: Context = LocalContext.current,
     appDatabase: AppDatabase = AppDatabase.DatabaseModule.getDatabase(context),
-    viewModel: M3Features_ViewModel = viewModel(
-        factory = viewModelFactory { initializer { M3Features_ViewModel(appDatabase = appDatabase) } }
+    viewModel: ViewModel_M3Features = viewModel(
+        factory = viewModelFactory { initializer { ViewModel_M3Features(appDatabase = appDatabase) } }
     )
 ) {
     val focusManager = LocalFocusManager.current

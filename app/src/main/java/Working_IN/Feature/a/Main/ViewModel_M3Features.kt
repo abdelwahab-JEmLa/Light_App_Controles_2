@@ -1,8 +1,12 @@
-package Working_IN.Feature
+package Working_IN.Feature.a.Main
 
 import EntreApps.Shared.Models.M09AppCompt
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos.Companion.filter_passive_datas
+import Working_IN.Feature.M14VentPeriode
+import Working_IN.Feature.z.Preview.FAKE_M9Compt
+import Working_IN.Feature.z.Preview.fake_created
+import Working_IN.Feature.z.Preview.fake_extra
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -24,7 +28,7 @@ class ActiveDatas {
 }
 
 @SuppressLint("StaticFieldLeak")
-class M3Features_ViewModel(
+class ViewModel_M3Features(
     private val appDatabase: AppDatabase,
 ) : ViewModel() {
     val active_Datas = ActiveDatas()
