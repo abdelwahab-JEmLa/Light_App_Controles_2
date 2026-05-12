@@ -1,6 +1,7 @@
-package Working_IN.Feature.a.Main
+package Working_IN.Feature.a.Test
 
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
+import Working_IN.Feature.Models.Filter_Affichage_Mode_Proto
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues

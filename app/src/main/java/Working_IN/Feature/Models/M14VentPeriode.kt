@@ -1,4 +1,4 @@
-package Working_IN.Feature
+package Working_IN.Feature.Models
 
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur

@@ -1,4 +1,4 @@
-package Working_IN.Feature.a.Main
+package Working_IN.Feature.Models
 
 enum class Filter_Affichage_Mode_Proto {
     /** Normal product grid — echantillants hidden. 2-column layout. */
