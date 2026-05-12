@@ -2,6 +2,7 @@ package Working_IN.Feature
 
 import EntreApps.Shared.Models.M09AppCompt
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
+import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos.Companion.filter_passive_datas
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -50,7 +51,7 @@ class M3Features_ViewModel(
             val fakeExtras = fake_extra(dao_datas)
             val all = fakeExtras + fake_created()
 
-            active_Datas.list_M03 = all.filter_passive_datas(FAKE_M9Compt)
+            active_Datas.list_M03 = all.filter_passive_datas(FAKE_M9Compt.limite_couleurs_ou_leur_last_achate_est_moin_que_jour)
         }
     }
 
