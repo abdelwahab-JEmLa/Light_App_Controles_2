@@ -2,6 +2,7 @@ package EntreApps.Shared.Models.Relative_Vents.Models
 
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
+import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models.M8BonVent
@@ -10,7 +11,7 @@ import com.google.firebase.database.database
 
 @Entity
 data class M10OperationVentCouleur(
-    @PrimaryKey var keyID: String = M00CentralParametresOfAllApps.getPushFireBase(ref),
+    @PrimaryKey var keyID: String = M00CentralParametresOfAllApps.Companion.getPushFireBase(ref),
     var creationTimestamps: Long = System.currentTimeMillis(),
     var dernierTimeTampsSynchronisationAvecFireBase: Long = System.currentTimeMillis(),
 

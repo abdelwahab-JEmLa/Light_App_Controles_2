@@ -3,6 +3,7 @@ package Working_IN.Feature.a.Main
 import EntreApps.Shared.Models.M09AppCompt
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos.Companion.filter_passive_datas
+import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
 import Working_IN.Feature.M14VentPeriode
 import Working_IN.Feature.z.Preview.FAKE_M9Compt
 import Working_IN.Feature.z.Preview.fake_created
@@ -24,54 +25,39 @@ class ActiveDatas {
     var active_M9Compt: M09AppCompt? by mutableStateOf(null)
     var list_M8bon: List<M8BonVent>? by mutableStateOf(null)
     var list_M03: List<M3CouleurProduitInfos>? by mutableStateOf(null)
+    var list_M10: List<M10OperationVentCouleur>? by mutableStateOf(null)
     var list_M14: List<M14VentPeriode>? by mutableStateOf(null)
+    var tiger_filterID2_Filter_Affichage_Mode_Proto: Filter_Affichage_Mode_Proto by mutableStateOf(Filter_Affichage_Mode_Proto.Panie)
 }
 
 @SuppressLint("StaticFieldLeak")
-class ViewModel_M3Features(
-    private val appDatabase: AppDatabase,
-) : ViewModel() {
+class ViewModel_M3Features(private val appDatabase: AppDatabase) : ViewModel() {
     val active_Datas = ActiveDatas()
-    val setter_LongOperations = Setter_LongOperations(
-        appDatabase,
-    )
-
+    val setter_LongOperations = Setter_LongOperations(appDatabase)
     var captureRequested by mutableStateOf(false)
 
-    init {
-        viewModelScope.launch {
-            reload()
-        }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-    }
+    init { viewModelScope.launch { reload() } }
 
     fun reload() {
         viewModelScope.launch {
             active_Datas.list_M8bon = appDatabase.dao_M8BonVent().getAll()
-            val dao_datas = appDatabase.dao_M03CouleurProduitInfos().getAll()
-            val fakeExtras = fake_extra(dao_datas)
-            val all = fakeExtras + fake_created()
+            active_Datas.list_M10   =   FAKE_ON_VENT
 
-            active_Datas.list_M03 = all.filter_passive_datas(FAKE_M9Compt.limite_couleurs_ou_leur_last_achate_est_moin_que_jour)
+            val all = fake_extra(appDatabase.dao_M03CouleurProduitInfos().getAll()) +
+                      fake_created() +
+                      FAKE_ON_VENT_M3
+
+            active_Datas.list_M03 = fake_update_couleurs_echants(fake_update_couleurs_count_depo(all))
+                .filter_passive_datas(FAKE_M9Compt.limite_couleurs_ou_leur_last_achate_est_moin_que_jour)
         }
     }
 
     fun update_M8(it: M8BonVent) {
-        active_Datas.list_M8bon = active_Datas.list_M8bon
-            ?.map { bon -> if (bon.keyID == it.keyID) it else bon }
-
-        viewModelScope.launch {
-            setter_LongOperations.update_M8(it)
-        }
+        active_Datas.list_M8bon = active_Datas.list_M8bon?.map { bon -> if (bon.keyID == it.keyID) it else bon }
+        viewModelScope.launch { setter_LongOperations.update_M8(it) }
     }
 
     fun add_New_M8BonVent(bon: M8BonVent) {
-        viewModelScope.launch {
-            setter_LongOperations.add_New_M8BonVent(bon)
-        }
+        viewModelScope.launch { setter_LongOperations.add_New_M8BonVent(bon) }
     }
 }
-

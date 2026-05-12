@@ -1,6 +1,6 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID4.AddCredit_AC_SituationCard.Feature.Action
           /*
-import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
+import com.example.light_app_controles.Models.Relative_Vents.Models.M10OperationVentCouleur
 import V.DiviseParSections.App.Shared.Repository.A.Base.ACentralFacade
 import V.DiviseParSections.App.Shared.Repository.A.Base.FocusedValues.Base.Get.Download.FocusedValuesGetter
 import android.R

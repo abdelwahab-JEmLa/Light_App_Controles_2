@@ -9,10 +9,10 @@ fun fake_extra(
     val now = System.currentTimeMillis()
     val fakeExtras = dao_datas
         .shuffled()
-        .take(15)
+        .take(20)
         .mapIndexed { i, real ->
             real.copy(
-                dernier_achant_timeTamp = if (i < 3)
+                dernier_achant_timeTamp = if (i < 12)
                     now - (i + 1) * 3 * dayMs
                 else
                     now - (31 + (i + 1)) * dayMs,
