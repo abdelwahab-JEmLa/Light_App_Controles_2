@@ -9,7 +9,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 
 @Composable
-fun Main_Filter(
+fun Main_ListFilter(
     relative_listM03: List<M3CouleurProduitInfos>,
     query_outline_searcher: String,
     relative_m10_vents: List<M10OperationVentCouleur>?,
