@@ -41,7 +41,7 @@ import java.util.Date
 
         M09AppCompt::class,
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(

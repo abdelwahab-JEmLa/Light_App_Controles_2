@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -101,12 +102,17 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
     ) {
         Column(
             modifier = Modifier
-                .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
-                .pointerInput(Unit) {
-                    detectDragGestures { change, dragAmount ->
-                        change.consume()
-                        offsetX = (offsetX + dragAmount.x).coerceIn(0f, screenWidthPx  - fabSizePx - paddingPx)
-                        offsetY = (offsetY + dragAmount.y).coerceIn(0f, screenHeightPx - fabSizePx - paddingPx)
+                .layout { measurable, constraints ->
+                    val placeable = measurable.measure(constraints)
+                    val width = placeable.width
+                    val height = placeable.height
+                    val xOffset = offsetX - (width - fabSizePx - paddingPx).coerceAtLeast(0f)
+                    val yOffset = offsetY - (height - fabSizePx - paddingPx).coerceAtLeast(0f)
+                    
+                    android.util.Log.i("BigDataBase_FAB", "layout - width: $width, height: $height, state: $dialState, offsetX: $offsetX, xOffset: $xOffset, offsetY: $offsetY, yOffset: $yOffset")
+                    
+                    layout(width, height) {
+                        placeable.placeRelative(xOffset.roundToInt(), yOffset.roundToInt())
                     }
                 }
                 .padding(end = 16.dp, bottom = 16.dp),
@@ -219,12 +225,22 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
             FloatingActionButton(
                 onClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    dialState = if (dialState == DialState.Closed)
+                    val newState = if (dialState == DialState.Closed)
                         DialState.ChildsVisible
                     else
                         DialState.Closed
+                    dialState = newState
+                    android.util.Log.i("BigDataBase_FAB", "FAB clicked - New state: $newState")
                 },
-                modifier       = Modifier.size(58.dp),
+                modifier       = Modifier
+                    .size(58.dp)
+                    .pointerInput(Unit) {
+                        detectDragGestures { change, dragAmount ->
+                            change.consume()
+                            offsetX = (offsetX + dragAmount.x).coerceIn(0f, screenWidthPx  - fabSizePx - paddingPx)
+                            offsetY = (offsetY + dragAmount.y).coerceIn(0f, screenHeightPx - fabSizePx - paddingPx)
+                        }
+                    },
                 containerColor = Color.Transparent,
                 elevation      = FloatingActionButtonDefaults.elevation(6.dp, 6.dp),
                 shape          = CircleShape,

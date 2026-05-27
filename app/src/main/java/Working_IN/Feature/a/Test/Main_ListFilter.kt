@@ -4,8 +4,6 @@ import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
 import Working_IN.Feature.Models.Filter_Affichage_Mode_Proto
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 
 @Composable
@@ -41,17 +39,15 @@ fun Main_ListFilter(
             }
         }
 
-    val finale_filtred_list by remember {
-        derivedStateOf {
-            filterByMode(
-                mode,
-                filterByDepo(
-                    filterByQuery(
-                        query_outline_searcher, relative_listM03
-                    )
-                ),
-            )
-        }
+    val finale_filtred_list = remember(relative_listM03, query_outline_searcher, relative_m10_vents, mode) {
+        filterByMode(
+            mode,
+            filterByDepo(
+                filterByQuery(
+                    query_outline_searcher, relative_listM03
+                )
+            ),
+        )
     }
 
     // ── List ─────────────────────────────────────────────────────────

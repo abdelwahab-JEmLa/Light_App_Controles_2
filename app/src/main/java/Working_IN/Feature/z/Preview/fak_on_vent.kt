@@ -7,8 +7,8 @@ import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
  * Builds a fake [M10OperationVentCouleur] list from a given M3 list.
  * Called by the ViewModel as `FAKE_ON_VENT(dao_list_m3)`.
  */
-fun FAKE_ON_VENT(m3List: List<M3CouleurProduitInfos>): List<M10OperationVentCouleur> =
-    m3List
+fun FAKE_ON_VENT(m3List: List<M3CouleurProduitInfos>): List<M10OperationVentCouleur> {
+    val operations = m3List
         .take(2)
         .map { m3 ->
             M10OperationVentCouleur(
@@ -18,11 +18,19 @@ fun FAKE_ON_VENT(m3List: List<M3CouleurProduitInfos>): List<M10OperationVentCoul
                 etateActuellementEst = M10OperationVentCouleur.EtateActuellementEst.ParentBonVentConfirme,
                 quantity = 3,
             )
-        } + M10OperationVentCouleur(
-        keyID = "fake_m11",
-        parent_M3CouleurProduit_KeyID = m3List[2].keyID,
-        parent_M3CouleurProduit_DebugInfos = m3List[2].debugInfos,
-        etateActuellementEst = M10OperationVentCouleur.EtateActuellementEst.ParentBonVentConfirme,
-        quantity = 4,
-    )
+        }.toMutableList()
+
+    if (m3List.size > 2) {
+        operations.add(
+            M10OperationVentCouleur(
+                keyID = "fake_m11",
+                parent_M3CouleurProduit_KeyID = m3List[2].keyID,
+                parent_M3CouleurProduit_DebugInfos = m3List[2].debugInfos,
+                etateActuellementEst = M10OperationVentCouleur.EtateActuellementEst.ParentBonVentConfirme,
+                quantity = 4,
+            )
+        )
+    }
+    return operations
+}
 
