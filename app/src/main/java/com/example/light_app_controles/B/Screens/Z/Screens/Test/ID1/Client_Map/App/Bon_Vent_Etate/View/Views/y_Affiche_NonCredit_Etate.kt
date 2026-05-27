@@ -145,7 +145,7 @@ fun Affiche_NonCredit_Etate(
             Text(
                 text = buildString {
                     append(DatesHandler.get_PersonaleDateFormatArab(relative_M8BonVent.creationTimestamps))
-                    append("  |  ")
+                    append(" \u200F| \u200E")
                     append(
                         DatesHandler()
                             .getDateAndTimStringAvecSeconds(relative_M8BonVent.creationTimestamps)

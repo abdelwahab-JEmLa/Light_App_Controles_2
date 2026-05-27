@@ -46,8 +46,8 @@ class DatesHandler {
             val calendar = Calendar.getInstance()
             calendar.timeInMillis = timestamp
 
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
+            val timeFormat = SimpleDateFormat("HH:mm", Locale.US)
 
             val date = dateFormat.format(calendar.time)
             val timeString = timeFormat.format(calendar.time)
@@ -64,9 +64,9 @@ class DatesHandler {
             val calendar = Calendar.getInstance()
             calendar.timeInMillis = timestamp
 
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
             val timeFormat =
-                SimpleDateFormat("HH:mm:ss", Locale.getDefault()) // Added seconds format
+                SimpleDateFormat("HH:mm:ss", Locale.US) // Added seconds format
 
             val date = dateFormat.format(calendar.time)
             val timeString = timeFormat.format(calendar.time)
@@ -96,7 +96,7 @@ class DatesHandler {
     fun getNomJourArabParDateStr(dataStr: String): String {
         try {
             // Parse the input date string (expected format: "yyyy-MM-dd")
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
             val date = dateFormat.parse(dataStr) ?: return "غير معروف"
 
             // RepositorysMainGetter the day of week
@@ -154,15 +154,13 @@ class DatesHandler {
 
             // Calculate week difference
             val weeksDiff = daysDiff / 7
-            val avant = "الفائت"
-
             return when {
-                weeksDiff == 0L -> "هذا"
-                weeksDiff == 1L -> avant
-                weeksDiff == 2L -> "ق.$avant"
-                weeksDiff == 3L -> "ق.3"
-                weeksDiff == 4L -> "ق.4"
-                weeksDiff > 4L -> "ق.+"
+                weeksDiff == 0L -> "هذا الأسبوع"
+                weeksDiff == 1L -> "الأسبوع الماضي"
+                weeksDiff == 2L -> "قبل أسبوعين"
+                weeksDiff == 3L -> "قبل 3 أسابيع"
+                weeksDiff == 4L -> "قبل 4 أسابيع"
+                weeksDiff > 4L -> "قبل أكثر من شهر"
                 else -> "" // For current week or future dates, return empty string
             }
         } catch (e: Exception) {
@@ -172,7 +170,7 @@ class DatesHandler {
 
     fun getDistanceSemainParDateStr(dateString: String): String {
         return try {
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
             val date = dateFormat.parse(dateString)
 
             if (date != null) {
@@ -200,7 +198,7 @@ class DatesHandler {
     fun getDistanceSemainParDateStrs(dataStr: String): String {
         try {
             // Parse the input date string (expected format: "yyyy-MM-dd")
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.US)
             val givenDate = dateFormat.parse(dataStr) ?: return "هذا الأسبوع"
 
             // RepositorysMainGetter current date without time
@@ -353,17 +351,23 @@ class DatesHandler {
                 val weekDistance = datesHandler.getAbrgDistanceSemain(timestamp)
 
                 // Format the final string: "السبت 18 أوت(8) قبل أسبوع"
+                val rlm = "\u200F"
                 return buildString {
+                    append(rlm)
                     append(arabicDayName)
                     append(" ")
+                    append(rlm)
                     append(dayOfMonth)
                     append(" ")
+                    append(rlm)
                     append(arabicMonthName)
-                    append("(")
+                    append(" (")
+                    append(rlm)
                     append(monthNumber)
                     append(")")
                     if (weekDistance.isNotEmpty()) {
                         append(" ")
+                        append(rlm)
                         append(weekDistance)
                     }
                 }

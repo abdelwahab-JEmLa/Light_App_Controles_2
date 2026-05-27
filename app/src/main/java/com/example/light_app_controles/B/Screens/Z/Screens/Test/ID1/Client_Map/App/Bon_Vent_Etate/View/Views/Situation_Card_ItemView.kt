@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -80,8 +81,7 @@ fun Situation_Card_ItemView(
 
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .height(if (isVersement || isDemandeVersement) 220.dp else if (isNewSituationCredit) 160.dp else 140.dp),
+            .fillMaxWidth(),
         colors = CardDefaults.cardColors(
             containerColor = relative_M8BonVent.etateActuellementEst.color
         ),
@@ -291,7 +291,7 @@ fun Situation_Card_ItemView(
             Text(
                 text = buildString {
                     append(DatesHandler.get_PersonaleDateFormatArab(relative_M8BonVent.creationTimestamps))
-                    append("  |  ")
+                    append(" \u200F| \u200E")
                     append(DatesHandler().getDateAndTimStringAvecSeconds(relative_M8BonVent.creationTimestamps).time)
                 },
                 style = MaterialTheme.typography.bodyMedium,
