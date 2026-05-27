@@ -115,9 +115,9 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
 
     // ─── Firebase ────────────────────────────────────────────────────────────
-    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
-    implementation("com.google.firebase:firebase-database:21.0.0")
-    implementation("com.google.firebase:firebase-firestore:25.1.1")
+    implementation(platform("com.google.firebase:firebase-bom:34.13.0"))
+    implementation("com.google.firebase:firebase-database")
+    implementation("com.google.firebase:firebase-firestore")
 
     // ─── Room ────────────────────────────────────────────────────────────────
     implementation("androidx.room:room-runtime:2.6.1")
