@@ -101,7 +101,7 @@ data class M14VentPeriode(
                     M8BonVent.EtateActuellementEst.Cette_Transaction_Type_Est_Credit,
                     M8BonVent.EtateActuellementEst.Credit -> {
                         creditsBons += 1.0
-                        creditSum += bonSums.totale_vents
+                        creditSum += if (bon.credit_fait > 0.0) bon.credit_fait else bonSums.totale_vents
                     }
 
                     M8BonVent.EtateActuellementEst.ON_MODE_COMMEND_ACTUELLEMENT,

@@ -159,6 +159,11 @@ fun M3CouleurItem(
                         value = item.parentBProduitOldID.toString(),
                         bg = Color(0xFF303F9F),
                     )
+                    IdChip(
+                        label = "index",
+                        value = item.indexCouleurDansAncienProto.toString(),
+                        bg = Color(0xFF00897B),
+                    )
                 }
             }
         }
