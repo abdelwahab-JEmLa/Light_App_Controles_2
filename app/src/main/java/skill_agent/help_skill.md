@@ -13,8 +13,9 @@ This skill instructs the assistant on how to automatically display a clean docum
 
 ## Steps to Execute
 
-### 1. Synchronize and Copy Skill Files to Java Folder
-Copy all `.md` files from the CLI skills directory (`C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\`) to the project's main Java `skill_agent` folder (`C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\`). Create this folder if it does not already exist.
+### 1. Synchronize and Copy Skill Files to Java Folder & Restore Root h_.md
+- Copy all `.md` files from the CLI skills directory (`C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\`) to the project's main Java `skill_agent` folder (`C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\`). Create this folder if it does not already exist.
+- **Ensure `h_.md` exists in Root**: Check if `h_.md` is present in the main root folder of the project (`C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\h_.md`). If it is not present, restore or create it using the content from the Help Skill table and the synchronized files.
 
 ### 2. Read Available Skill Files
 Scan the skills directory `C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\` to list all `.md` files.
