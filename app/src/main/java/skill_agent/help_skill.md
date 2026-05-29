@@ -30,6 +30,7 @@ Output a markdown table documenting each custom skill.
 | **Fast Build, Install and Launch** (`launch.md`) | `lance_r`, `l_`, `l_r` | Compile, installe l'application sur le téléphone et lance automatiquement son activité principale (`MainActivity`). |
 | **Commit, Tag and Push** (`push_tagged.md`) | `push_taged`, `push_`, `p_` | Commite proprement les modifications locales, génère/incrémente intelligemment un tag Git, l'applique et pousse le tout sur GitHub. |
 | **Todo Bubelle - UI Bug Hunter** (`todo_bubelle.md`) | `todo_bubelle`, `todo_b`, `fix_ui`, `bubelle` | Capture l'écran, analyse les bulles d'erreur/anomalies UI, identifie le composable responsable, applique un correctif dans le code, relance l'app (`lance_r`) et prend un screenshot de vérification (`scr_s`). |
+| **Context Unique Working_IN** (`context_working_in.md`) | `agy_context_unique_workingIn_active`, `agy_context_unique_workingIn_desactive` | Active (isole) ou Désactive (restaure) le contexte de travail uniquement sur `Working_IN.Feature`. |
 | **Help Skills** (`help_skill.md`) | `help_skill`, `h_`, `help_` | Affiche ce tableau d'aide documentant l'ensemble des Skills disponibles. |
 
 ### 4. Present Clickable Links
