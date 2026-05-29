@@ -33,7 +33,7 @@ Output a markdown table documenting each custom skill.
 | **Context Unique Working_IN** (`context_working_in.md`) | `agy_context_unique_workingIn_active`, `agy_context_unique_workingIn_desactive`, `c_w_a`, `c_w_d`, `c_w_e` | Active (isole), Désactive (restaure), ou vérifie l'état du contexte restreint uniquement sur `Working_IN.Feature`. |
 | **Concise Code** (`consize_comments.md`) | `consize_commants`, `co_` | Enlève les commentaires, les logs et les semantics des fichiers du contexte pour rendre le code le plus concis possible sans en altérer le fonctionnement. |
 | **Fast Launch Preview** (`launch_preview.md`) | `lp_`, `lance_preview` | Compile, installe et lance le preview de l'application de la façon la plus rapide possible. |
-| **Fix TODOs and Launch** (`t_.md`) | `t_`, `fix_todo` | Résout automatiquement les TODOs dans le code, compile et lance l'application (`l_r`), puis affiche le diff du code modifié à la fin. |
+| **Fix TODOs and Launch** (`t_.md`) | `t_`, `t_models`, `fix_todo` | Résout automatiquement les TODOs dans le code, compile et lance l'application (`l_r`), puis affiche le diff du code modifié à la fin. Supporte `t_models` pour inclure automatiquement la base de données et les modèles. |
 | **Help Skills** (`help_skill.md`) | `help_skill`, `h_`, `help_` | Affiche ce tableau d'aide documentant l'ensemble des Skills disponibles. |
 
 ### 4. Present Clickable Links
