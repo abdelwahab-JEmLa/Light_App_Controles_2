@@ -1,6 +1,6 @@
-package Working_IN.Feature.z.Preview
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.b.M3Couleur.Screen.ViewModel.preview
 
-import Working_IN.Feature.Models.M14VentPeriode
+import com.example.light_app_controles.Models.Relative_Vents.Models.M14VentPeriode
 
 private fun fakePeriod(
     keySuffix: String,

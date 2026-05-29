@@ -1,16 +1,16 @@
-package Working_IN.Feature.a.Test
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.b.M3Couleur.Screen
 
 import EntreApps.Shared.Models.M09AppCompt
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos.Companion.filter_passive_datas
 import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
-import Working_IN.Feature.Models.Filter_Affichage_Mode_Proto
-import Working_IN.Feature.Models.M14VentPeriode
-import Working_IN.Feature.z.Preview.FAKE_M9Compt
-import Working_IN.Feature.z.Preview.FAKE_ON_VENT
-import Working_IN.Feature.z.Preview.fake_extra
-import Working_IN.Feature.z.Preview.fake_update_couleurs_count_depo
-import Working_IN.Feature.z.Preview.fake_update_couleurs_echants
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.a.BonVents.Screen.Filter_Affichage_Mode_Proto
+import com.example.light_app_controles.Models.Relative_Vents.Models.M14VentPeriode
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.b.M3Couleur.Screen.ViewModel.preview.FAKE_M9Compt
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.b.M3Couleur.Screen.ViewModel.preview.FAKE_ON_VENT
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.b.M3Couleur.Screen.ViewModel.preview.fake_extra
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.b.M3Couleur.Screen.ViewModel.preview.fake_update_couleurs_count_depo
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.b.M3Couleur.Screen.ViewModel.preview.fake_update_couleurs_echants
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue

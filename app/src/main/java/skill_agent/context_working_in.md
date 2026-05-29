@@ -1,6 +1,6 @@
-# Skill - Context Working_IN.Feature (c_w_a, c_w_d, c_w_e)
+# Skill - Context Working_IN.Feature (c_w_a, c_w_d, c_w_e, cwa_, cwd_, cwe_)
 
-This skill instructs the assistant on how to isolate the AI's working context solely to the `Working_IN.Feature` package (when requested with `c_w_a` or `agy_context_unique_workingIn_active`), restore full workspace context (when requested with `c_w_d` or `agy_context_unique_workingIn_desactive`), or check the current status of the context restriction (when requested with `c_w_e`).
+This skill instructs the assistant on how to isolate the AI's working context solely to the `Working_IN.Feature` package (when requested with `c_w_a`, `cwa_` or `agy_context_unique_workingIn_active`), restore full workspace context (when requested with `c_w_d`, `cwd_` or `agy_context_unique_workingIn_desactive`), or check the current status of the context restriction (when requested with `c_w_e` or `cwe_`).
 
 ---
 
@@ -10,12 +10,15 @@ This skill instructs the assistant on how to isolate the AI's working context so
 - "c_w_a"
 - "c_w_d"
 - "c_w_e"
+- "cwa_"
+- "cwd_"
+- "cwe_"
 
 ---
 
 ## Steps to Execute
 
-### When "c_w_a" or "agy_context_unique_workingIn_active" is triggered:
+### When "c_w_a", "cwa_" or "agy_context_unique_workingIn_active" is triggered:
 
 #### 1. Create .antigravityignore in Project Root
 Create or overwrite the `.antigravityignore` file at the root of the project (`C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\.antigravityignore`) with the following content:
@@ -47,7 +50,7 @@ Provide the user with a detailed confirmation showing:
 
 ---
 
-### When "c_w_d" or "agy_context_unique_workingIn_desactive" is triggered:
+### When "c_w_d", "cwd_" or "agy_context_unique_workingIn_desactive" is triggered:
 
 #### 1. Remove the Context Restrictions
 Delete or clear the contents of `.antigravityignore` and `.geminiignore` files at the root of the project to allow the agent to see all files in the project.
@@ -57,7 +60,7 @@ Provide the user with a clear message stating that the full workspace context is
 
 ---
 
-### When "c_w_e" is triggered:
+### When "c_w_e" or "cwe_" is triggered:
 
 #### 1. Check File Status
 Check if the `.antigravityignore` and/or `.geminiignore` files exist in the project root and read their contents to verify if the restrict rule `*` is active.

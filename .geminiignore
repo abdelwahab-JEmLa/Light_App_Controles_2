@@ -1,15 +1,1 @@
-# Ignore everything by default
-*
-
-# Allow the path to Working_IN/Feature
-!app/
-!app/src/
-!app/src/main/
-!app/src/main/java/
-!app/src/main/java/Working_IN/
-!app/src/main/java/Working_IN/Feature/
-!app/src/main/java/Working_IN/Feature/**
-
-# Allow skill_agent configuration so skills still work
-!app/src/main/java/skill_agent/
-!app/src/main/java/skill_agent/**
+# Context restriction disabled
