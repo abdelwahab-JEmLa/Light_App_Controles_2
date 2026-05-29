@@ -44,21 +44,3 @@ fun CleanupScreen(
         }
     }
 }
-
-@Preview(showBackground = true)
-@Composable
-fun CleanupScreenPreview() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(text = "Total Bon Vents: 42")
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {}) {
-            Text(text = "Cleanup Old Bon Vents")
-        }
-    }
-}
