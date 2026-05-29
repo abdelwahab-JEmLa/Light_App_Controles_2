@@ -6,16 +6,16 @@ import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_D
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_MainDataBases_RefProduction
 import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
 import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
+import androidx.compose.ui.graphics.Color
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.firebase.database.IgnoreExtraProperties
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.Objects
 import kotlin.collections.filter
-import androidx.compose.ui.graphics.Color
-import java.io.File
 
 @Entity
 data class M8BonVent(
@@ -179,6 +179,7 @@ data class M8BonVent(
         val color: Color,
         val nomArabe: String,
         val credit_type: Boolean = false,
+        val nonDeletable: Boolean = false,
         val text_color: Color = Color(0xFFFFFFFF)
     ) {
         CreeMaisNonDefinie(Color(0xFFFFFFFF), "غير محدد"),
@@ -192,7 +193,7 @@ data class M8BonVent(
         ),
         Bloque_Probleme(Color(0xFFCC0000), "حدث مشكل معه"),
         Ordre_Gerant(Color(0xFFCC0000), "توجيه المسير"),
-        A_COMMANDE_CONFIRME(Color(0xFF9933CC), "تم تاكيد الطلبية"),
+        A_COMMANDE_CONFIRME(Color(0xFF9933CC), "تم تاكيد الطلبية",nonDeletable=true),
         COMMANDE_LIVRAI(Color(0xFF0099CC), "تم أيصال منتجاته"),
 
         ACHETEUR_NON_DISPO(Color(0xFFCC0000), "الشاري غائب"),
@@ -211,14 +212,14 @@ data class M8BonVent(
         Passed_Sans_Livre(Color(0xFF444444), "Passed_Sans_Livre"),
 
         //Credits
-        Credit(Color(0xFFFF5722), " ", credit_type = true),
-        Cette_Transaction_Type_Est_Credit(Color(0xFFFF5722), "تم اقراضه  ", credit_type = true),
-        Versemment(Color(0xFF4CAF50), "", credit_type = true),
+        Credit(Color(0xFFFF5722), " ", credit_type = true,nonDeletable=true),
+        Cette_Transaction_Type_Est_Credit(Color(0xFFFF5722), "تم اقراضه  ", credit_type = true,nonDeletable=true),
+        Versemment(Color(0xFF4CAF50), "", credit_type = true,nonDeletable=true),
         Demande_Versemet(
             Color(0xFFCDDC39), "المبلغ المرجو تحظيره", credit_type = true,
-            text_color = Color(0xFF000000)
+            text_color = Color(0xFF000000)     ,nonDeletable=true
         ),
-        New_Situation_Credit(Color(0xFFD2180D), "الحالة الجديدة للدين", credit_type = true),
+        New_Situation_Credit(Color(0xFFD2180D), "الحالة الجديدة للدين", credit_type = true,nonDeletable=true),
         ;
 
         companion object {

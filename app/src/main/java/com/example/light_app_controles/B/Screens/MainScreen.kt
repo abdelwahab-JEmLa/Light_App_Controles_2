@@ -7,17 +7,19 @@ import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.A
 import android.annotation.SuppressLint
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 
+import Working_IN.Feature.a.Test.CleanupScreen
+
 @SuppressLint("SuspiciousIndentation")
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
     appDatabase: AppDatabase,
 ) {
-    val its_dev_bigDatas = true
+    val its_dev_bigDatas = false
     if (its_dev_bigDatas) {
         M3CouleurList_Screen()
     } else
-        Main_Preview_BonVentEtateScreen(
+        CleanupScreen(
             appDatabase = appDatabase,
         )
 }

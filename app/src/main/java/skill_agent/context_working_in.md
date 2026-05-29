@@ -1,6 +1,6 @@
-# Skill - Context Working_IN.Feature (c_w_a, c_w_d, c_w_e, cwa_, cwd_, cwe_)
+# Skill - Context Working_IN.Feature (c_w_a, c_w_d, c_w_e, cwa_, cwd_, cwe_, cwa_add_)
 
-This skill instructs the assistant on how to isolate the AI's working context solely to the `Working_IN.Feature` package (when requested with `c_w_a`, `cwa_` or `agy_context_unique_workingIn_active`), restore full workspace context (when requested with `c_w_d`, `cwd_` or `agy_context_unique_workingIn_desactive`), or check the current status of the context restriction (when requested with `c_w_e` or `cwe_`).
+This skill instructs the assistant on how to isolate the AI's working context solely to specific packages or files, restore full workspace context, check the current status of the context restriction, or dynamically add new packages or files to the active context using full names, stored short-name aliases, or file searches.
 
 ---
 
@@ -13,6 +13,10 @@ This skill instructs the assistant on how to isolate the AI's working context so
 - "cwa_"
 - "cwd_"
 - "cwe_"
+- "cwa_add_package <package>"
+- "cwa_add_<short_name>"
+- "cwa_add_<filename.kt>"
+- "cwa_add_<filename>"
 
 ---
 
@@ -66,6 +70,78 @@ Provide the user with a clear message stating that the full workspace context is
 Check if the `.antigravityignore` and/or `.geminiignore` files exist in the project root and read their contents to verify if the restrict rule `*` is active.
 
 #### 2. Report Current Status
-- **If active**: Confirm that context restriction is **ACTIF** (only `Working_IN.Feature` is visible).
+- **If active**: Confirm that context restriction is **ACTIF** (only `Working_IN.Feature` and other explicitly allowed packages/files are visible). List any individually allowed files along with their full package names or directory paths for clarity.
 - **If inactive**: Confirm that context restriction is **INACTIF / DÉSACTIVÉ** (the full workspace context is visible).
 - Show clickable links to [.antigravityignore](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/.antigravityignore) and [.geminiignore](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/.geminiignore).
+
+---
+
+### When "cwa_add_package <package>" is triggered:
+
+#### 1. Parse and Translate the Package Name
+Convert the dot-separated package name (e.g. `com.example.light_app_controles.Modules.Base.SQL.Daos`) into matching folder directory rules under `app/src/main/java/`.
+For `com.example.light_app_controles.Modules.Base.SQL.Daos`, generate:
+```text
+# Package: com.example.light_app_controles.Modules.Base.SQL.Daos
+!app/
+!app/src/
+!app/src/main/
+!app/src/main/java/
+!app/src/main/java/com/
+!app/src/main/java/com/example/
+!app/src/main/java/com/example/light_app_controles/
+!app/src/main/java/com/example/light_app_controles/Modules/
+!app/src/main/java/com/example/light_app_controles/Modules/Base/
+!app/src/main/java/com/example/light_app_controles/Modules/Base/SQL/
+!app/src/main/java/com/example/light_app_controles/Modules/Base/SQL/Daos/
+!app/src/main/java/com/example/light_app_controles/Modules/Base/SQL/Daos/**
+```
+
+#### 2. Append to Ignore Files
+Open `.antigravityignore` and `.geminiignore` (create them with the base template if they do not exist). Check if these package rules already exist; if not, append them to the bottom of both files.
+
+#### 3. Update Skill Configuration's Mapped Packages List
+Extract the last segment of the package name (e.g. `Daos`). Save the mapping `<short_name> = <package>` under the **Mapped Packages** section at the bottom of the skill files `C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\context_working_in.md` and `C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\context_working_in.md`.
+
+#### 4. Report Success
+Confirm to the user that the package has been added and mapped, and show direct links to [.antigravityignore](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/.antigravityignore) and [.geminiignore](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/.geminiignore).
+
+---
+
+### When "cwa_add_<filename.kt>" or "cwa_add_<filename>" (with file extension) is triggered:
+
+#### 1. Locate the File in the Project
+Search the codebase to find the absolute or relative path of the file matching `<filename.kt>` or `<filename>`.
+
+#### 2. Generate Path Allowance Rules
+Generate the ignore allowance rules for every parent folder leading to that file, plus the file itself.
+For example, for `app/src/main/java/.../M8BonVent.kt`:
+```text
+# File: M8BonVent.kt
+!app/src/main/java/com/
+!app/src/main/java/com/example/
+...
+!app/src/main/java/.../M8BonVent.kt
+```
+
+#### 3. Append to Ignore Files
+Open `.antigravityignore` and `.geminiignore` and append the generated rules to the bottom of both files.
+
+#### 4. Report Success
+Provide the user with a confirmation of addition along with direct links to the file and ignore files.
+
+---
+
+### When "cwa_add_<short_name>" is triggered:
+
+#### 1. Search in Mapped Packages
+Read the **Mapped Packages** list at the bottom of this file. Look for an entry matching `<short_name>` (e.g. `Daos`).
+
+#### 2. Perform Addition
+- **If found**: Retrieve the full package name and run the `cwa_add_package <package>` steps.
+- **If not found**: Report that the short name is unrecognized and prompt the user to register it first via `cwa_add_package <package>`.
+
+---
+
+## Mapped Packages
+- Daos = com.example.light_app_controles.Modules.Base.SQL.Daos

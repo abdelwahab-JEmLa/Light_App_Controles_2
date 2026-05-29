@@ -8,6 +8,7 @@ This skill instructs the assistant on how to automatically commit staged changes
 - "push_taged"
 - "push_"
 - "p_"
+- "p_tag=cleanup"
 
 ---
 
@@ -27,6 +28,7 @@ git tag --list
 
 ### 3. Determine the New Tag Name and Commit Message
 Analyze the current changes relative to the previous tag:
+- **Cleanup Suffix Tag (`p_tag=cleanup`)**: If the command or user input requests `p_tag=cleanup` (or similar cleanup tag), identify the most recent semantic tag (e.g., `v1.0.0` or `v1.0.1-something`). Increment the patch version (e.g., to `v1.0.1`) and append the `+cleanup` suffix using the plus sign `+` (e.g., `v1.0.1+cleanup`). If no previous version tag exists, default to `v1.0.0+cleanup`.
 - **Continuation of the previous bug/feature**: If the changes are a continuation of the work captured by the previous tag (e.g., `v1.0.0-fab-gradle-fix`), increment the patch version or append a suffix (e.g., `v1.0.1-fab-gradle-fix` or `v1.0.0-fab-gradle-fix-v2`).
 - **New bug/feature**: If the changes cover a new scope, choose a new semantic version (e.g., `v1.1.0-<scope>` or increment the minor/major version).
 - Draft a highly descriptive commit message summarizing the changes.
