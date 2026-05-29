@@ -51,5 +51,18 @@
 !app/src/main/java/com/example/light_app_controles/B/Screens/
 !app/src/main/java/com/example/light_app_controles/B/Screens/MainScreen.kt
 
+# Added via cwa_add_package (com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button)
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/App/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/App/Bon_Vent_Etate/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/App/Bon_Vent_Etate/View/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/App/Bon_Vent_Etate/View/ID1/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/App/Bon_Vent_Etate/View/ID1/FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/App/Bon_Vent_Etate/View/ID1/FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button/**
+
 
 

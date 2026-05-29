@@ -17,6 +17,8 @@ This skill instructs the assistant on how to isolate the AI's working context so
 - "cwa_add_<short_name>"
 - "cwa_add_<filename.kt>"
 - "cwa_add_<filename>"
+- "sw_enleve_<short_name>"
+- "sw_enleve_<package>"
 
 ---
 
@@ -143,5 +145,19 @@ Read the **Mapped Packages** list at the bottom of this file. Look for an entry 
 
 ---
 
+### When "sw_enleve_<short_name>" or "sw_enleve_<package>" is triggered:
+
+#### 1. Retrieve the Package Name
+Search in the **Mapped Packages** list at the bottom of this file. If `<short_name>` matches a key, retrieve its associated full package name. If not, treat the argument directly as the full package name.
+
+#### 2. Remove Package Rules from Ignore Files
+Scan `.antigravityignore` and `.geminiignore`. Locate the block of comments and folder rules associated with the package (e.g. lines starting with `# Added via cwa_add_package` or individual rules matching the package directory pattern). Delete these rules and save both files.
+
+#### 3. Report Success
+Confirm to the user that the package has been successfully removed from the active context, and provide direct clickable links to [.antigravityignore](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/.antigravityignore) and [.geminiignore](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/.geminiignore).
+
+---
+
 ## Mapped Packages
 - Daos = com.example.light_app_controles.Modules.Base.SQL.Daos
+- FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button = com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button

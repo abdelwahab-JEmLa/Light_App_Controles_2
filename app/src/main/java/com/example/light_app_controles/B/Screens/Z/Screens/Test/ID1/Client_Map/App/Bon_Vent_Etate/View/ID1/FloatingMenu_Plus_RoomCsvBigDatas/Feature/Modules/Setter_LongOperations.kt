@@ -254,7 +254,9 @@ class Setter_LongOperations(
         }
     }
 
-    suspend fun get_Firebase_M8_Counts(refDataBase: DatabaseReference): Pair<Int, Int> =
+    suspend fun get_Firebase_M8_Counts(
+        refDataBase: DatabaseReference
+    ): Pair<Int, Int> =
         withContext(Dispatchers.IO) {
             val creditNames = M8BonVent.EtateActuellementEst.entries
                 .filter { it.credit_type }.map { it.name }.toSet()
@@ -339,15 +341,20 @@ class Setter_LongOperations(
     suspend fun import_M8_FireBase_To_Csv(
         refDataBase: DatabaseReference,
         csvFile: File,
+        importOnlyCredits: Boolean = false,
     ) = withContext(Dispatchers.IO) {
         val snapshot = suspendFirebaseSnapshot(refDataBase)
 
-        val bons = snapshot.children.mapNotNull { child ->
+        var bons = snapshot.children.mapNotNull { child ->
             val raw = child.value
             if (raw !is Map<*, *>) return@mapNotNull null
             @Suppress("UNCHECKED_CAST")
             val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
             runCatching { M8BonVent.Companion.to_Map(map) }.getOrNull()
+        }
+
+        if (importOnlyCredits) {
+            bons = bons.filter { it.etateActuellementEst.credit_type }
         }
 
         if (bons.isEmpty()) return@withContext
@@ -382,13 +389,16 @@ class Setter_LongOperations(
         }
     }
 
-    suspend fun import_M8Csv_To_Room(csvFile: File) = withContext(Dispatchers.IO) {
+    suspend fun import_M8Csv_To_Room(
+        csvFile: File,
+        importOnlyCredits: Boolean = false,
+    ) = withContext(Dispatchers.IO) {
         if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
         val lines = csvFile.readLines().filter { it.isNotBlank() }
         if (lines.size < 2) return@withContext
 
         val headers = lines[0].splitCsvLine()
-        val bons = lines.drop(1).mapNotNull { line ->
+        var bons = lines.drop(1).mapNotNull { line ->
             val cells = line.splitCsvLine()
             val map = headers.zip(cells).associate { (h, v) ->
                 h to v.trim().removeSurrounding("\"").ifEmpty { null }
@@ -396,20 +406,29 @@ class Setter_LongOperations(
             runCatching { M8BonVent.Companion.to_Map(map) }.getOrNull()
         }
 
+        if (importOnlyCredits) {
+            bons = bons.filter { it.etateActuellementEst.credit_type }
+        }
+
         if (bons.isNotEmpty()) bons.forEach { appDatabase.dao_M8BonVent().upsert(it) }
     }
 
     suspend fun import_M8_FireBase_To_Room(
         refDataBase: DatabaseReference,
+        importOnlyCredits: Boolean = false,
     ) = withContext(Dispatchers.IO) {
         val snapshot = suspendFirebaseSnapshot(refDataBase)
 
-        val bons = snapshot.children.mapNotNull { child ->
+        var bons = snapshot.children.mapNotNull { child ->
             val raw = child.value
             if (raw !is Map<*, *>) return@mapNotNull null
             @Suppress("UNCHECKED_CAST")
             val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
             runCatching { M8BonVent.Companion.to_Map(map) }.getOrNull()
+        }
+
+        if (importOnlyCredits) {
+            bons = bons.filter { it.etateActuellementEst.credit_type }
         }
 
         if (bons.isEmpty()) return@withContext
