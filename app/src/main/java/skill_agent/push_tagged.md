@@ -7,6 +7,7 @@ This skill instructs the assistant on how to automatically commit staged changes
 ## Trigger Phrases
 - "push_taged"
 - "push_"
+- "p_"
 
 ---
 
