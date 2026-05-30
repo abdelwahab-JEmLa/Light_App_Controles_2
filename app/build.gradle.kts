@@ -33,6 +33,7 @@ android {
         buildConfigField("String", "DROPBOX_APP_KEY",       "\"${localProps.getProperty("DROPBOX_APP_KEY", "")}\"")
         buildConfigField("String", "DROPBOX_APP_SECRET",    "\"${localProps.getProperty("DROPBOX_APP_SECRET", "")}\"")
         buildConfigField("String", "DROPBOX_REFRESH_TOKEN", "\"${localProps.getProperty("DROPBOX_REFRESH_TOKEN", "")}\"")
+        buildConfigField("String", "GEMINI_API_KEY",        "\"${localProps.getProperty("geminiApiKey", "").replace("\"", "")}\"")
     }
 
     buildTypes {
@@ -147,4 +148,6 @@ dependencies {
     // Calendar
     implementation("com.aminography:primecalendar:1.7.0")
 
+    // Google AI client SDK (Gemini API)
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
 }

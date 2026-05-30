@@ -48,6 +48,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import android.util.Log
+import Application5.App.Agent.GeminiObservationAgent
+
 
 @Composable
 fun TakiyimSelectionDialog_SeparatedAppsCodingPattern(
@@ -377,6 +383,17 @@ fun TakiyimSelectionDialog_SeparatedAppsCodingPattern(
 
                     Button(
                         onClick = {
+                            if (etudiantKeyID != null) {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    Log.d("TakiyimDialog", "Triggering AI JSON generation for student: $etudiantKeyID")
+                                    val result = GeminiObservationAgent.generateAndSaveStructuredJson(
+                                        etudiantKeyId = etudiantKeyID,
+                                        studentName = "Etudiant_$etudiantKeyID",
+                                        repo20Observation = repo20ObsarvationEtudion
+                                    )
+                                    Log.d("TakiyimDialog", "AI JSON Generation Result: $result")
+                                }
+                            }
                             onSelect(selectedTakiyim, selectedMoulahadat.toList())
                         },
                         modifier = Modifier.weight(1f)

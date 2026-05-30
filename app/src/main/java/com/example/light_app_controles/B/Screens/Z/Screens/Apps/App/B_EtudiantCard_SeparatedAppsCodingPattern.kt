@@ -843,7 +843,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
     if (showIstedrakTakiyimDialog) {
         TakiyimSelectionDialog_SeparatedAppsCodingPattern(
             currentTakiyim = etudiant.istedrak_kadim_Takyim_hali,
-            etudiantKeyID  = null,
+            etudiantKeyID  = etudiant.keyID,
             repo20ObsarvationEtudion = viewModel.repo20ObsarvationEtudion,
             activeOusstad  = viewModel.activeCentralValues.active_Ousstad_Tahfid,
             onDismiss      = { showIstedrakTakiyimDialog = false; showDetailsDialog = true },

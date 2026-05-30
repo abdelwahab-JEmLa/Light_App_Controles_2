@@ -48,6 +48,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.example.light_app_controles.B.Screens.Z.Screens.Apps.App.formatDate
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.launch
 
 @Composable
 fun EtudiantDetailsDialog_SeparatedAppsCodingPattern(
@@ -69,6 +72,9 @@ fun EtudiantDetailsDialog_SeparatedAppsCodingPattern(
 
     // FIXED: Get observations for absence calculation
     val observations = remember(repo20Observation.datasValue) { repo20Observation.datasValue }
+
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     // Edit states
     var isEditingNom by remember { mutableStateOf(false) }
@@ -340,7 +346,18 @@ fun EtudiantDetailsDialog_SeparatedAppsCodingPattern(
                     etudiant = etudiant,
                     onShowIstedrakSouraDialog = onShowIstedrakSouraDialog,
                     onShowIstedrakMokarrareDialog = onShowIstedrakMokarrareDialog,
-                    onShowIstedrakTakiyimDialog = onShowIstedrakTakiyimDialog
+                    onShowIstedrakTakiyimDialog = onShowIstedrakTakiyimDialog,
+                    onExportIstedrak = {
+                        android.widget.Toast.makeText(context, "Génération du JSON (Gemini)...", android.widget.Toast.LENGTH_SHORT).show()
+                        scope.launch {
+                            val result = Application5.App.Agent.GeminiObservationAgent.generateAndSaveStructuredJson(
+                                etudiantKeyId = etudiant.keyID,
+                                studentName = "${etudiant.prenom} ${etudiant.nom}",
+                                repo20Observation = repo20Observation
+                            )
+                            android.widget.Toast.makeText(context, result, android.widget.Toast.LENGTH_LONG).show()
+                        }
+                    }
                 )
                 Divider()
 
