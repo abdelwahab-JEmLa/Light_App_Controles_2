@@ -38,7 +38,7 @@ Output a markdown table documenting each custom skill.
 | **Fix TODOs** (`t_.md`) | `t_`, `t_models`, `t_usage`, `fix_todo` | Résout automatiquement les TODOs ou délègue aux skills correspondants (ex: `TODO: log_`, `TODO: sem_`, `TODO: con_c`, `TODO: room_d`), puis affiche le diff de code à la fin. |
 | **Copy Package / Sibling Files** (`cop_last.md`) | `cop_last`, `cop_`, `cl_`, `copy_package` | Copie tous les fichiers frères et sous-fichiers du package actif dans le presse-papiers, et l'enregistre pour les futurs appels. |
 | **Real-Time Logcat Inspector** (`log_.md`) | `log_`, `Todo: log_`, `logcat`, `adb_log` | Filtre les logs de l'appareil par rapport au tag ou au contexte spécifié dans le code ou le chat, et les affiche. |
-| **Room Database Query** (`room_d.md`) | `room_d`, `Todo: room_d` | Exécute des requêtes de base de données à chaud et les affiche sous forme de tableau Markdown. |
+| **Room Database Query** (`room_d/room_d.md`) | `room_d`, `Todo: room_d` | Exécute des requêtes de base de données à chaud et les affiche sous forme de tableau Markdown. |
 | **Help Skills** (`help_skill.md`) | `help_skill`, `h_`, `help_` | Affiche ce tableau d'aide documentant l'ensemble des Skills disponibles. |
 
 ### 4. Present Clickable Links
@@ -58,4 +58,4 @@ Always present the user with clickable links to the skill files in the skills di
 * 📋 [Copy Package / Sibling Files](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/cop_last.md)
 * 📋 [Real-Time Logcat Inspector](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/log_.md)
 * 📦 [Commit, Tag and Push](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/push_tagged.md)
-* 💾 [Room Database Query](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/room_d.md)
+* 💾 [Room Database Query](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/room_d/room_d.md)
