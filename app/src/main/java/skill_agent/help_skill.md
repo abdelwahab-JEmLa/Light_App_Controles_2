@@ -25,6 +25,8 @@ Output a markdown table documenting each custom skill.
 
 | Nom du Skill | Mots-clés (Triggers) | Description |
 | :--- | :--- | :--- |
+| **Semantics Inspector** (`sem_d.md`) | `sem_d`, `sem_`, `Todo: sem_`, `Todo: filter` | Injecte la sémantique d'une variable ou filtre (`TODO: sem_` ou `TODO: filter`), puis extrait instantanément les données d'accessibilité avec un dump ADB sans re-compiler/re-déployer l'application. |
+| **Fast Apply Changes and Launch** (`apply_.md`) | `apply_`, `ap_`, `fast_launch`, `fast_l` | Compile et déploie l'application à haute vitesse (surpassant la vitesse standard d'Android Studio) en ciblant le module `:app` et en utilisant des flux d'installation directe ADB (`--fastdeploy`). |
 | **Annotated Screen Capture** (`screenshot.md`) | `scr_s` | Capture l'écran de l'appareil Android ou de l'émulateur connecté avec des boîtes de délimitation étiquetées et l'affiche. |
 | **Tap Android FAB** (`tap.md`) | `tap` | Capture l'écran, localise le bouton flottant (FAB) ou l'élément ciblé, résout les coordonnées et simule un clic sur l'appareil. |
 | **Fast Build and Install** (`build.md`) | `build` | Compile et installe rapidement l'application en mode hors-ligne optimisé (`--offline --parallel --build-cache --configuration-cache`). |
@@ -35,13 +37,15 @@ Output a markdown table documenting each custom skill.
 | **Context Unique Working_IN** (`context_working_in.md`) | `agy_context_unique_workingIn_active`, `agy_context_unique_workingIn_desactive`, `c_w_a`, `c_w_d`, `c_w_e` | Active (isole), Désactive (restaure), ou vérifie l'état du contexte restreint uniquement sur `Working_IN.Feature`. |
 | **Concise Code** (`consize_comments.md`) | `consize_commants`, `co_` | Enlève les commentaires, les logs et les semantics pour rendre le code le plus concis possible. Supporte l'auto-concisation des fichiers marqués par un commentaire TODO co_. |
 | **Fast Launch Preview** (`launch_preview.md`) | `lp_`, `lance_preview` | Compile, installe et lance le preview de l'application de la façon la plus rapide possible. |
-| **Fix TODOs and Launch** (`t_.md`) | `t_`, `t_models`, `fix_todo` | Résout automatiquement les TODOs dans le code, compile et lance l'application (`l_r`), puis affiche le diff du code modifié à la fin. Supporte `t_models` pour include automatiquement la base de données et les modèles. |
+| **Fix TODOs** (`t_.md`) | `t_`, `t_models`, `fix_todo` | Résout automatiquement les TODOs dans le code et affiche le diff du code modifié à la fin. Supporte `t_models` pour include automatiquement la base de données et les modèles. |
 | **Help Skills** (`help_skill.md`) | `help_skill`, `h_`, `help_` | Affiche ce tableau d'aide documentant l'ensemble des Skills disponibles. |
 
 ### 4. Present Clickable Links
 Always present the user with clickable links to the skill files in the skills directory for quick editing.
 
 * ℹ️ [Help Skill](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/help_skill.md)
+* 🔍 [Semantics Inspector](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/sem_d.md)
+* ⚡ [Fast Apply Changes and Launch](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/apply_.md)
 * 🛠️ [Fast Build and Install](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/build.md)
 * 📦 [Fast Build, Export & Deploy](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/build_.md)
 * 🚀 [Fast Build, Install and Launch](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/launch.md)

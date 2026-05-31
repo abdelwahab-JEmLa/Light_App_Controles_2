@@ -1,6 +1,6 @@
-# Skill - Fix TODOs and Launch (t_)
+# Skill - Fix TODOs (t_)
 
-This skill instructs the assistant on how to automatically search for, identify, and fix `TODO` comments in the active codebase, compile/install the application on the connected device or emulator, launch the main activity, capture/verify the screen, and display a detailed code diff at the end of the explanations.
+This skill instructs the assistant on how to automatically search for, identify, and fix `TODO` comments in the active codebase, and display a detailed code diff at the end of the explanations.
 
 Additionally, this skill supports the **`t_models`** sub-trigger, which automatically adds `appDatabase.kt` and the `Models` package to the active restricted context before proceeding with the standard steps.
 
@@ -51,8 +51,8 @@ Generate and append the folder rules to [.antigravityignore](file:///C:/Users/Ab
 !app/src/main/java/EntreApps/Shared/Models/**
 ```
 
-#### 2. Execute standard TODO fixing, building, and launching
-Proceed directly to the standard steps below to locate/fix TODOs, rebuild, launch, and verify.
+#### 2. Execute standard TODO fixing
+Proceed directly to the standard steps below to locate and fix TODOs.
 
 ---
 
@@ -67,28 +67,7 @@ Search the codebase to find any outstanding `TODO` comments using the `grep_sear
 - Select the relevant `TODO` comments, analyze their requirements, and apply the appropriate code fixes using `replace_file_content` or `multi_replace_file_content`.
 - Remove the `TODO` comments after addressing them.
 
-### 3. Compile, Install and Launch the Application
-To verify that everything works correctly, run the build and launch tasks:
-- Compile and install:
-  ```powershell
-  .\gradlew.bat installDebug --offline --parallel --build-cache --configuration-cache
-  ```
-- Launch the main activity:
-  ```powershell
-  & "C:\Users\Abou Mohamed\AppData\Local\Android\Sdk\platform-tools\adb.exe" shell am start -n com.example.light_app_controles/com.example.light_app_controles.A.Main.MainActivity
-  ```
-
-### 4. Capture and View the Screen
-Capture the screen to verify visual correctness:
-- Take screenshot:
-  ```powershell
-  android screen capture -a -o screen.png
-  ```
-- Display the screenshot using the `view_file` tool:
-  * Path: `C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\screen.png`
-
-### 5. Report Success and Display Code Diffs
+### 3. Report Success and Display Code Diffs
 Provide the user with a detailed report including:
 - Clickable links to the modified files.
-- A direct clickable markdown link to [screen.png](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/screen.png).
 - **A detailed git-style code diff showing all modified files at the very end of your explanations.**
