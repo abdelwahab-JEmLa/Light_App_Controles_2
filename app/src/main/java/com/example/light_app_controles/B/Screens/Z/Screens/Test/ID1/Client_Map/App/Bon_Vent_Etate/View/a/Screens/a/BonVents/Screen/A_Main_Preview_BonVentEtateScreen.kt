@@ -388,7 +388,6 @@ fun Main_Preview_BonVentEtateScreen(
             }
         }
 
-        FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(onClick_Lence_Capture = onLenceCapture, appDatabase = appDatabase)
 
         A_FastAdd_FloatingSeparated_Button_1(
             relative_M2Client = relative_M2Client,
