@@ -180,7 +180,7 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                         },
                     )
 
-                    DropdownItem_Versement(
+                    DropdownItem_Versement(        //<--
                         clientKey = clientKey,
                         latestSituationMontant = latestSituationMontant,
                         isActive = activeItem == ActiveDropdownItem.Versement,

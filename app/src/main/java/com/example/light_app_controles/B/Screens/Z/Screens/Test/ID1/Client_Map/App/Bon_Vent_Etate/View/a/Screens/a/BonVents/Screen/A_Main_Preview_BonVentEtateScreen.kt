@@ -349,7 +349,6 @@ fun Main_Preview_BonVentEtateScreen(
                 it.add(0, bon1)
             }
             vm.active_Datas.list_M8bon = updated
-            fastAddCaptureVersion++
         }
     }
 
