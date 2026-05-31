@@ -21,6 +21,7 @@ Voici la liste complète des compétences personnalisées disponibles dans ce pr
 | **Concise Code** | [`consize_comments.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/consize_comments.md) | `consize_commants`, `co_` | Enlève les commentaires, les logs et les semantics pour rendre le code le plus concis possible. Supporte l'auto-concisation des fichiers marqués par un commentaire TODO co_. |
 | **Fast Launch Preview** | [`launch_preview.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/launch_preview.md) | `lp_`, `lance_preview` | Compile, installe et lance le preview de l'application de la façon la plus rapide possible. |
 | **Fix TODOs** | [`t_.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_.md) | `t_`, `t_models`, `fix_todo` | Résout automatiquement les TODOs dans le code et affiche le diff du code modifié à la fin. Supporte `t_models` pour inclure automatiquement la base de données et les modèles. |
+| **Copy Package / Sibling Files** | [`cop_last.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/cop_last.md) | `cop_last`, `cop_`, `cl_`, `copy_package` | Copie tous les fichiers frères et sous-fichiers du package actif pour un copier/coller instantané, et l'enregistre comme référence. |
 | **Help Skills** | [`help_skill.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/help_skill.md) | `help_skill`, `h_`, `help_` | Affiche ce tableau d'aide documentant l'ensemble des Skills disponibles. |
 
 ---
@@ -42,4 +43,5 @@ Vous pouvez éditer et configurer directement ces fichiers dans le répertoire d
 * 📝 [Concise Code](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/consize_comments.md)
 * ⚡ [Fast Launch Preview](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/launch_preview.md)
 * ✅ [Fix TODOs](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_.md)
+* 📋 [Copy Package / Sibling Files](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/cop_last.md)
 * 📦 [Commit, Tag and Push](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/push_tagged.md)

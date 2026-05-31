@@ -74,7 +74,6 @@ fun normaliseToWaMeNumber(raw: String): String {
         else -> "213$digits"
     }
 }
-
 const val ABDELWAHAB_WA_ME_NUMBER = "213553885037"
 
 @RequiresApi(Build.VERSION_CODES.Q)
