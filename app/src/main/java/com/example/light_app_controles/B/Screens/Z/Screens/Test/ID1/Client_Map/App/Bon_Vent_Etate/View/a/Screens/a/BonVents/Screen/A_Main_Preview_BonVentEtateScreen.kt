@@ -268,15 +268,16 @@ fun Main_Preview_BonVentEtateScreen(
     Box{
         Column(modifier = modifier.fillMaxSize()) {
             if (allBons.isEmpty()) {
-                Text(
+                Text(                //<--
                     "لا توجد حالة دين جديدة",
                     color = Color.Gray,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier
-                        .padding(16.dp)                       //<--
+                        .padding(16.dp)                  
                         .semantics(mergeDescendants = true) {
-                            set(value = allBons, key = SemanticsPropertyKey("allBons"))
-                        },
+                            set(value = allBons.filter { it.etateActuellementEst.credit_type }, key = SemanticsPropertyKey("allBons"))
+                        }
+                    ,
                 )
             } else LazyColumn(
                 state = listState,

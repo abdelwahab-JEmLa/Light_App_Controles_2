@@ -22,6 +22,7 @@ Search the codebase (`app/src/main/java`) for any dynamic semantics/filter comme
 ### 2. Inject Semantics Modifier
 - Locate the modified component or the specific component/line marked with `//<--` (e.g., where the arrow comment `//<--` is placed next to the component).
 - Inject a Jetpack Compose `.semantics` modifier directly on this component or layout element, setting the variable as a custom semantics property.
+- **Dynamic Filtering Rule:** If the dynamic comment specifies a filter condition (e.g., `//TODO: sem_ allbons filter credit type`), parse the expression and inject the filtered value (e.g., `allBons.filter { it.etateActuellementEst.credit_type }`) rather than the raw variable.
 - **Critical Placement:** Inject the `.semantics` modifier directly into the modified component or the component marked with `//<--` rather than outer layout containers, ensuring the custom semantics property is attached precisely to that element:
   ```kotlin
   Text(
