@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Modules.Setter_LongOperations
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models.M8BonVent
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.b.M3Couleur.Screen.ViewModel.preview.FAKE_ALL_BONS
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import kotlinx.coroutines.launch
 
@@ -34,7 +35,8 @@ class A_ViewModel(
 
     init {
         viewModelScope.launch {
-            active_Datas.list_M8bon = (appDatabase.dao_M8BonVent().getAll())
+            val dbBons = appDatabase.dao_M8BonVent().getAll()
+            active_Datas.list_M8bon = if (dbBons.isEmpty()) FAKE_ALL_BONS else dbBons
             active_Datas.list_M03 = (appDatabase.dao_M03CouleurProduitInfos().getAll())
         }
     }
@@ -45,7 +47,8 @@ class A_ViewModel(
 
     fun reload() {
         viewModelScope.launch {
-            active_Datas.list_M8bon = appDatabase.dao_M8BonVent().getAll()
+            val dbBons = appDatabase.dao_M8BonVent().getAll()
+            active_Datas.list_M8bon = if (dbBons.isEmpty()) FAKE_ALL_BONS else dbBons
             active_Datas.list_M03 = appDatabase.dao_M03CouleurProduitInfos().getAll()
         }
     }

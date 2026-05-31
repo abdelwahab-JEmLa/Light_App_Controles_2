@@ -267,7 +267,16 @@ fun Main_Preview_BonVentEtateScreen(
     }
 
     Box{
-        Column(modifier = modifier.fillMaxSize()) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .semantics(mergeDescendants = true) {
+                    set(value = active_Datas.list_M8bon?.filter { it.parent_M2Client_KeyID == relative_M2Client?.keyID } ?: emptyList(), 
+                        key = SemanticsPropertyKey("listM8bon_filtered"))
+                    set(value = active_Datas.list_M8bon ?: emptyList(), key = SemanticsPropertyKey("listM8bon"))
+                    set(value = allBons, key = SemanticsPropertyKey("allBons"))
+                }
+        ) {
             if (allBons.isEmpty()) {
                 Text(                //<--
                     "لا توجد حالة دين جديدة",
@@ -275,14 +284,9 @@ fun Main_Preview_BonVentEtateScreen(
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier
                         .padding(16.dp)                  
-                        .semantics(mergeDescendants = true) {//<--
-                            set(value = active_Datas.list_M8bon?.filter { it.parent_M2Client_KeyID == relative_M2Client?.keyID } ?: emptyList(), key = SemanticsPropertyKey("listM8bon_filtered"))
-                            set(value = active_Datas.list_M8bon ?: emptyList(), key = SemanticsPropertyKey("listM8bon"))
-                            set(value = allBons, key = SemanticsPropertyKey("allBons"))
-                        }
                     ,
                 )
-            } else LazyColumn(
+            } else LazyColumn(          //<--
                 state = listState,
                 modifier = Modifier
                     .fillMaxWidth()

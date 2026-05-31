@@ -2,34 +2,32 @@ import sqlite3
 import json
 
 def main():
-    conn = sqlite3.connect("fb_db_93f88")
+    conn = sqlite3.connect("app_database")
+    conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    cursor.execute("SELECT path, value FROM serverCache WHERE path LIKE '%M08BonVent%';")
-    rows = cursor.fetchall()
-    print(f"Found {len(rows)} M08BonVent records in fb_db_93f88")
     
-    parsed_bons = []
-    for path, val_bytes in rows:
-        try:
-            val_str = val_bytes.decode('utf-8')
-            data = json.loads(val_str)
-            if data is not None:
-                parsed_bons.append(data)
-        except Exception as e:
-            pass
-            
-    print(f"Successfully parsed {len(parsed_bons)} non-null records.")
-    
+    try:
+        cursor.execute("SELECT * FROM M8BonVent;")
+        rows = cursor.fetchall()
+        parsed_bons = [dict(row) for row in rows]
+        print(f"Found {len(parsed_bons)} M8BonVent records in app_database (Android Studio datas)")
+    except Exception as e:
+        print("Error querying M8BonVent from app_database:", e)
+        parsed_bons = []
+        
+    # Write to parsed_bons.json
     with open("copy_/parsed_bons.json", "w", encoding="utf-8") as f:
         json.dump(parsed_bons, f, ensure_ascii=False, indent=2)
         
+    print(f"Successfully parsed and wrote {len(parsed_bons)} records to copy_/parsed_bons.json")
+    
     states = {}
     for bon in parsed_bons:
         state = bon.get("etateActuellementEst")
         states[state] = states.get(state, 0) + 1
     print("States count:", states)
     
-    # Print the first 5 records with key details
+    # Print first 5 records with key details
     for i, bon in enumerate(parsed_bons[:5]):
         print(f"\nBon {i+1}:")
         print(f"  keyID: {bon.get('keyID')}")

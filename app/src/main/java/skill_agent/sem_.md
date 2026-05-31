@@ -9,6 +9,7 @@ This skill instructs the assistant on how to automatically detect any dynamic de
 - "sem_d"
 - "Todo: sem_"
 - "Todo: filter"
+- "sem_l"
 
 ---
 
@@ -21,6 +22,7 @@ Search the codebase (`app/src/main/java`) for any dynamic semantics/filter comme
 
 ### 2. Inject Semantics Modifier
 - **No-Injection Rule (Info Mode):** If the `TODO` comment is just `TODO: sem_` without any variable or expression attached (e.g. `//TODO: sem_`), DO NOT inject a new `.semantics` block. Instead, skip directly to Step 3 and Step 4 to read the existing custom semantics properties from the active UI component.
+- **Existing Semantics Block Rule:** If the `TODO: sem_` comment is already located inside a `.semantics(mergeDescendants = true) {` block, the assistant must extract all the `set()` expressions and infos defined within it. The assistant must then format and save these `set()` infos, along with the source file name (e.g., `A_Main_Preview_BonVentEtateScreen.kt`) and the exact line numbers of each `set()` call (e.g., line 278, 281, 282), into the file `skill_agent/sem_/last_semantics.md`.
 - Locate the modified component or the specific component/line marked with `<--` (e.g., where the arrow comment `//<--` is placed next to the component).
 - Inject a Jetpack Compose `.semantics` modifier directly on this component or layout element, setting the variable as a custom semantics property.
 - **Dynamic Filtering Rule:** If the dynamic comment specifies a filter condition (e.g., `//TODO: sem_ allbons filter credit type`), parse the expression and inject the filtered value (e.g., `allBons.filter { it.etateActuellementEst.credit_type }`) rather than the raw variable.
@@ -73,3 +75,6 @@ Use the following Markdown table structure containing all 13 columns to display 
 | ID | Date & Heure | État (Type) | Montant Principal | Versement Fait | Ancien Crédit | Nouveau Crédit | Crédit Cumulé | Versement | Crédit Fait | Nouvelle Situation | Total Sauvegardé | Client |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | `3tUR` | 30 Avril \| 22:27 | Credit | 10890.00 دج | - | - | 10890.00 دج | 10890.00 دج | - | 10890.00 دج | 10890.00 دج | - | `GFD` |
+
+### 5. Fast Read Last Semantics (sem_l)
+If the user directly types **"sem_l"** in the chat, the assistant must bypass all other steps and simply read the contents of `skill_agent/sem_/last_semantics.md` and display the last saved semantics information directly to the user.
