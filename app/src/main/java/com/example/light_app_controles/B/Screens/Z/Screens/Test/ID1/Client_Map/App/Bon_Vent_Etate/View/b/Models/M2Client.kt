@@ -54,13 +54,10 @@ data class M2Client(
 
     var c_un_admin_client: Boolean = false,
 
-    //Infos De Base
     var nom: String = "Non Defini",
     var cretionTimestamps: Long = DatesHandler().getCurrentTimestamps(),
-    //Forging Keys
     var its_Fournisseur: Boolean = false,
     var parentComptCreateurKEyID: String = "",
-    // Section Etates Mutable
     var numTelephone: String = "",
 
     var nom_worker: String = "",
@@ -82,11 +79,8 @@ data class M2Client(
     var title: String = "",
     var snippet: String = "",
     var actuelleEtat: DernierEtatAAffiche = DernierEtatAAffiche.NON_DEFINI,
-    //Etates Mutable
     var edite_Exact_Gps_est_fait: Boolean = false,
-    // Section Centralization Valeurs Pour Injection add_New TOu modules
     var tagCeBonEstOuvertPourComptsIds: String = "",
-    // Section keyFireBase et dernierFireBaseUpdateTimestamps
     var id: Long = 0L,
     var keyByParent: String = "",
     var bsonObjectId: String = genereUnPushKeyFireBase(ref),
@@ -131,16 +125,10 @@ data class M2Client(
         "nif_Num" to nif_Num,
     )
 
-    /**
-     * Get Arabic name with fallback to French name
-     */
     fun getNomAffichage(): String {
         return nomPrenomArabe.takeIf { it.isNotBlank() } ?: nom
     }
 
-    /**
-     * Get full display name with both French and Arabic if available
-     */
     fun getNomComplet(): String {
         return if (nomPrenomArabe.isBlank()) {
             nom
@@ -213,13 +201,6 @@ data class M2Client(
             M00CentralParametresOfAllApps.central_Local_Csv,
             "TestDatas/$pathString.csv"
         )
-//
-//        val parent = Firebase.database.getReference(
-//            "00_DataPrototype-04-02" +
-//                    "/_1_developingRef" +
-//                    "/C_InfosSqlDataBases"
-//        )
-//        val ref = parent.child("B_ClientInfosProtoJuin3")
 
         fun generePushKey() = genereUnPushKeyFireBase(ref)
 

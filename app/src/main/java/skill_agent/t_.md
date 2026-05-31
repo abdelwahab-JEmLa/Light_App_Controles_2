@@ -4,6 +4,8 @@ This skill instructs the assistant on how to automatically search for, identify,
 
 Additionally, this skill supports the **`t_models`** sub-trigger, which automatically adds `appDatabase.kt` and the `Models` package to the active restricted context before proceeding with the standard steps.
 
+**Central Dispatcher Capability**: If a `TODO` comment contains a trigger phrase for another custom skill (e.g., `TODO: log_`, `TODO: sem_`, `TODO: con_c`, `TODO: cop_`), the assistant must automatically chain and execute the corresponding custom skill's steps on that file/package, rather than applying a manual code fix.
+
 ---
 
 ## Trigger Phrases
@@ -63,9 +65,13 @@ Search the codebase to find any outstanding `TODO` comments using the `grep_sear
 - Query: `TODO`
 - SearchPath: `C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java`
 
-### 2. Implement the fixes in Code
-- Select the relevant `TODO` comments, analyze their requirements, and apply the appropriate code fixes using `replace_file_content` or `multi_replace_file_content`.
-- Remove the `TODO` comments after addressing them.
+### 2. Implement the fixes in Code / Delegate to Skills
+- **Skill Dispatcher Check**: For each found `TODO` comment, check if it contains a trigger for another custom skill:
+  - If it contains `log_` (e.g. `TODO: log_`), execute the **Real-Time Logcat Inspector (log_)** skill steps.
+  - If it contains `sem_` (e.g. `TODO: sem_`), execute the **Semantics Inspector (sem_)** skill steps.
+  - If it contains `con_` (e.g. `TODO: con_c` or `TODO: co_`), execute the **Concise Code (consize_comments)** skill steps.
+  - If it contains `cop_` (e.g. `TODO: cop_`), execute the **Copy Package / Sibling Files (cop_last)** skill steps.
+- **Standard Fixes**: If no skill trigger is matched, analyze the `TODO` comment requirements, apply the appropriate manual code fixes, and delete the comment using `replace_file_content` or `multi_replace_file_content`.
 
 ### 3. Report Success and Display Code Diffs
 Provide the user with a detailed report including:

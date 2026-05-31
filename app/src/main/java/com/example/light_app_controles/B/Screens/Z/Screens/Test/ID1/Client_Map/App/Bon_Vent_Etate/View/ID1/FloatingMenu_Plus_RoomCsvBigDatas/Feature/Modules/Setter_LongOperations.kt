@@ -15,7 +15,6 @@ import java.io.File
 import java.io.FileWriter
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
-
 @Suppress("unused")
 class Setter_LongOperations(
     val appDatabase: AppDatabase,
@@ -128,12 +127,13 @@ class Setter_LongOperations(
     ) = withContext(Dispatchers.IO) {
         val snapshot = suspendFirebaseSnapshot(refDataBase)
 
-        var clients = snapshot.children.mapNotNull { child ->
+        val clients = snapshot.children.mapNotNull { child ->
             val raw = child.value
             if (raw !is Map<*, *>) return@mapNotNull null
             @Suppress("UNCHECKED_CAST")
             val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
-            runCatching { m2client_from_Map(map) }.getOrNull()
+            val client = runCatching { m2client_from_Map(map) }.getOrNull()
+            client
         }
 
         if (clients.isEmpty()) return@withContext
