@@ -12,8 +12,14 @@ This skill instructs the assistant on how to automatically make the code of cont
 
 ## Steps to Execute
 
-### 1. Identify Target Files
-Identify the target Kotlin/Java/XML files in the current context or open editors that require minimization.
+### 1. Locate and Concise Files with `TODO` Comments containing `co_`
+When triggered, the assistant should automatically:
+- Search the codebase (within `app/src/main/java`) using a `grep_search` query for `co_` (specifically looking for `TODO` comments like `//TODO(1): co_` or `TODO` containing `co_`).
+- For each matching file found:
+  1. Treat the file as a target file for code concising.
+  2. Strip all comments, log statements, and redundant semantics, and crucially, remove the triggering `TODO` comment itself.
+  3. Apply the modifications using `replace_file_content` or `multi_replace_file_content`.
+- If no files are flagged with a `co_` `TODO` comment, fall back to identifying target files in the active context or open editors that require minimization.
 
 ### 2. Strip Comments
 Locate and remove all unnecessary comments:
