@@ -8,6 +8,7 @@ This skill instructs the assistant on how to automatically compile the Android a
 - "lance_r"
 - "l_"
 - "l_r"
+- "lr_"
 
 ---
 

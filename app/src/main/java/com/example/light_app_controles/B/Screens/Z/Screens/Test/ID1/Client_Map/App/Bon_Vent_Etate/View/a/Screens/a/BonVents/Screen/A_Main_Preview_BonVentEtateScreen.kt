@@ -80,7 +80,8 @@ fun Main_Preview_BonVentEtateScreen(
         nom = "Youcef Zohire",
         numTelephone = "+213 542 70 05 75"
     ),
-) {
+) {       //<--
+//TODO(1): co_
     val vm: A_ViewModel = viewModel(
         factory = viewModelFactory { initializer { A_ViewModel(appDatabase = appDatabase) } }
     )
