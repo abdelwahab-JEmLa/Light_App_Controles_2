@@ -208,6 +208,11 @@ data class M2Client(
         const val pathString = "M02Client"
         val ref = central_MainDataBases_RefProduction.child(pathString)
         val ref_Non_Active_Datas = M00CentralParametresOfAllApps.centralRef_Non_Active_Datas_PourLightApp.child(pathString)
+        val ref_Test = M00CentralParametresOfAllApps.central_Developing_Test.child(pathString)
+        val csv_test = java.io.File(
+            M00CentralParametresOfAllApps.central_Local_Csv,
+            "TestDatas/$pathString.csv"
+        )
 //
 //        val parent = Firebase.database.getReference(
 //            "00_DataPrototype-04-02" +

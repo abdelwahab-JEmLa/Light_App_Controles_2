@@ -1,6 +1,7 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Modules
 
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
+import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models.M8BonVent
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import com.google.firebase.database.DataSnapshot
@@ -19,6 +20,234 @@ import kotlin.coroutines.resumeWithException
 class Setter_LongOperations(
     val appDatabase: AppDatabase,
 ) {
+    // ──────────────────────────── M02 ────────────────────────────────────────
+    suspend fun add_New_M2Client(client: M2Client) {
+        appDatabase.dao_M2Client().insert(client)
+    }
+
+    suspend fun update_M2Client(client: M2Client) = withContext(Dispatchers.IO) {
+        appDatabase.dao_M2Client().upsert(client)
+    }
+
+    suspend fun insertAll_M2Client(clients: List<M2Client>) = withContext(Dispatchers.IO) {
+        clients.forEach { appDatabase.dao_M2Client().upsert(it) }
+    }
+
+    suspend fun bach_update_FireBase_M2Client(
+        clients: List<M2Client>,
+        refDataBase: DatabaseReference,
+    ) = withContext(Dispatchers.IO) {
+        clients.forEachIndexed { _, client ->
+            runCatching {
+                suspendCancellableCoroutine { cont ->
+                    refDataBase.child(client.keyID).setValue(client.toFirebaseMap())
+                        .addOnSuccessListener { cont.resume(Unit) }
+                        .addOnFailureListener { cont.resumeWithException(it) }
+                }
+            }.onFailure { return@withContext }
+        }
+    }
+
+    suspend fun get_Firebase_M2Client_Counts(
+        refDataBase: DatabaseReference
+    ): Pair<Int, Int> =
+        withContext(Dispatchers.IO) {
+            val snapshot = suspendFirebaseSnapshot(refDataBase)
+            val total = snapshot.childrenCount.toInt()
+            Pair(total, 0)
+        }
+
+    suspend fun get_Firebase_M2Client_Count(refDataBase: DatabaseReference): Int =
+        withContext(Dispatchers.IO) {
+            suspendFirebaseSnapshot(refDataBase).childrenCount.toInt()
+        }
+
+    suspend fun export_M2Client_Room_To_Csv(csv: File) = withContext(Dispatchers.IO) {
+        val datas = appDatabase.dao_M2Client().getAll()
+        if (datas.isEmpty()) return@withContext
+
+        csv.parentFile?.mkdirs()
+
+        val headers = datas.first().toFirebaseMap().keys.toList()
+        val existingRows: LinkedHashMap<String, List<String>> = linkedMapOf()
+
+        if (csv.exists()) {
+            val lines = csv.readLines()
+            if (lines.size > 1) {
+                val fileHeaders = lines[0].splitCsvLine()
+                val keyIdx = fileHeaders.indexOf("keyID")
+                lines.drop(1).forEach { line ->
+                    val cells = line.splitCsvLine()
+                    val id = cells.getOrNull(keyIdx) ?: ""
+                    if (id.isNotEmpty()) existingRows[id] = cells
+                }
+            }
+        }
+
+        datas.forEach { client ->
+            existingRows[client.keyID] = client.toFirebaseMap().values.map { (it?.toString() ?: "").escapeCsv() }
+        }
+
+        FileWriter(csv, false).use { w ->
+            w.write(headers.joinToString(",") + "\n")
+            existingRows.values.forEach { cells ->
+                w.write(cells.joinToString(",") { it.escapeCsv() } + "\n")
+            }
+        }
+    }
+
+    suspend fun set_scv_m2client_au_fireBase(
+        csvFile: File,
+        refDataBase: DatabaseReference,
+    ) = withContext(Dispatchers.IO) {
+        if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
+        val lines = csvFile.readLines().filter { it.isNotBlank() }
+        if (lines.size < 2) return@withContext
+
+        val headers = lines[0].splitCsvLine()
+        val keyIdx = headers.indexOf("keyID")
+        if (keyIdx == -1) return@withContext
+
+        val clients = lines.drop(1).mapNotNull { line ->
+            val cells = line.splitCsvLine()
+            val keyID = cells.getOrNull(keyIdx)?.trim()?.removeSurrounding("\"")
+            if (keyID.isNullOrBlank()) return@mapNotNull null
+            val map = headers.zip(cells).associate { (h, v) ->
+                h to v.trim().removeSurrounding("\"").ifEmpty { null }
+            }
+            runCatching { m2client_from_Map(map) }.getOrNull()
+        }
+
+        if (clients.isEmpty()) return@withContext
+        bach_update_FireBase_M2Client(clients, refDataBase)
+    }
+
+    suspend fun import_M2Client_FireBase_To_Csv(
+        refDataBase: DatabaseReference,
+        csvFile: File,
+        importOnlyCredits: Boolean = false,
+    ) = withContext(Dispatchers.IO) {
+        val snapshot = suspendFirebaseSnapshot(refDataBase)
+
+        var clients = snapshot.children.mapNotNull { child ->
+            val raw = child.value
+            if (raw !is Map<*, *>) return@mapNotNull null
+            @Suppress("UNCHECKED_CAST")
+            val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
+            runCatching { m2client_from_Map(map) }.getOrNull()
+        }
+
+        if (clients.isEmpty()) return@withContext
+
+        csvFile.parentFile?.mkdirs()
+
+        val headers = clients.first().toFirebaseMap().keys.toList()
+        val existingRows: LinkedHashMap<String, List<String>> = linkedMapOf()
+
+        if (csvFile.exists()) {
+            val lines = csvFile.readLines()
+            if (lines.size > 1) {
+                val fileHeaders = lines[0].splitCsvLine()
+                val keyIdx = fileHeaders.indexOf("keyID")
+                lines.drop(1).forEach { line ->
+                    val cells = line.splitCsvLine()
+                    val id = cells.getOrNull(keyIdx) ?: ""
+                    if (id.isNotEmpty()) existingRows[id] = cells
+                }
+            }
+        }
+
+        clients.forEach { client ->
+            existingRows[client.keyID] = client.toFirebaseMap().values.map { (it?.toString() ?: "").escapeCsv() }
+        }
+
+        FileWriter(csvFile, false).use { w ->
+            w.write(headers.joinToString(",") + "\n")
+            existingRows.values.forEach { cells ->
+                w.write(cells.joinToString(",") { it.escapeCsv() } + "\n")
+            }
+        }
+    }
+
+    suspend fun import_M2ClientCsv_To_Room(
+        csvFile: File,
+        importOnlyCredits: Boolean = false,
+    ) = withContext(Dispatchers.IO) {
+        if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
+        val lines = csvFile.readLines().filter { it.isNotBlank() }
+        if (lines.size < 2) return@withContext
+
+        val headers = lines[0].splitCsvLine()
+        var clients = lines.drop(1).mapNotNull { line ->
+            val cells = line.splitCsvLine()
+            val map = headers.zip(cells).associate { (h, v) ->
+                h to v.trim().removeSurrounding("\"").ifEmpty { null }
+            }
+            runCatching { m2client_from_Map(map) }.getOrNull()
+        }
+
+        if (clients.isNotEmpty()) clients.forEach { appDatabase.dao_M2Client().upsert(it) }
+    }
+
+    suspend fun import_M2Client_FireBase_To_Room(
+        refDataBase: DatabaseReference,
+        importOnlyCredits: Boolean = false,
+    ) = withContext(Dispatchers.IO) {
+        val snapshot = suspendFirebaseSnapshot(refDataBase)
+
+        var clients = snapshot.children.mapNotNull { child ->
+            val raw = child.value
+            if (raw !is Map<*, *>) return@mapNotNull null
+            @Suppress("UNCHECKED_CAST")
+            val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
+            runCatching { m2client_from_Map(map) }.getOrNull()
+        }
+
+        if (clients.isEmpty()) return@withContext
+        clients.forEach { appDatabase.dao_M2Client().upsert(it) }
+    }
+
+    suspend fun delete_All_M2Client() {
+        appDatabase.dao_M2Client().deleteAll()
+    }
+
+    private fun m2client_from_Map(map: Map<String, String?>): M2Client {
+        return M2Client(
+            keyID = map["keyID"] ?: M2Client.generePushKey(),
+            c_un_admin_client = map["c_un_admin_client"]?.toBoolean() ?: false,
+            nom_worker = map["nom_worker"] ?: "",
+            num_worker = map["num_worker"] ?: "",
+            dernierTimeTampsSynchronisationAvecFireBase = map["dernierTimeTampsSynchronisationAvecFireBase"]?.toLongOrNull() ?: 0L,
+            creationTimestamps = map["creationTimestamps"]?.toLongOrNull() ?: System.currentTimeMillis(),
+            nom = map["nom"] ?: "Non Defini",
+            cretionTimestamps = map["cretionTimestamps"]?.toLongOrNull() ?: System.currentTimeMillis(),
+            its_Fournisseur = map["its_Fournisseur"]?.toBoolean() ?: false,
+            parentComptCreateurKEyID = map["parentComptCreateurKEyID"] ?: "",
+            numTelephone = map["numTelephone"] ?: "",
+            couleur = map["couleur"] ?: "#FFFFFF",
+            bonDuClientsSu = map["bonDuClientsSu"] ?: "",
+            currentCreditBalance = map["currentCreditBalance"]?.toDoubleOrNull() ?: 0.0,
+            positionDonClientsList = map["positionDonClientsList"]?.toIntOrNull() ?: 0,
+            cUnClientTemporaire = map["cUnClientTemporaire"]?.toBoolean() ?: true,
+            auFilterFAB = map["auFilterFAB"]?.toBoolean() ?: false,
+            typeDeSonMagasine = map["typeDeSonMagasine"]?.let { runCatching { M2Client.TypeDeSonMagasine.valueOf(it) }.getOrNull() } ?: M2Client.TypeDeSonMagasine.ATAYAT_MOUKASSARAT,
+            clientTypeMode = map["clientTypeMode"]?.let { runCatching { M2Client.ClientTypeMode.valueOf(it) }.getOrNull() } ?: M2Client.ClientTypeMode.NEVEAU,
+            caMarqueGpsEstOuvert = map["caMarqueGpsEstOuvert"]?.toBoolean() ?: false,
+            latitude = map["latitude"]?.toDoubleOrNull() ?: 0.0,
+            longitude = map["longitude"]?.toDoubleOrNull() ?: 0.0,
+            title = map["title"] ?: "",
+            snippet = map["snippet"] ?: "",
+            actuelleEtat = map["actuelleEtat"]?.let { runCatching { M2Client.DernierEtatAAffiche.valueOf(it) }.getOrNull() } ?: M2Client.DernierEtatAAffiche.NON_DEFINI,
+            edite_Exact_Gps_est_fait = map["edite_Exact_Gps_est_fait"]?.toBoolean() ?: false,
+            tagCeBonEstOuvertPourComptsIds = map["tagCeBonEstOuvertPourComptsIds"] ?: "",
+            id = map["id"]?.toLongOrNull() ?: 0L,
+            keyByParent = map["keyByParent"] ?: "",
+            bsonObjectId = map["bsonObjectId"] ?: "",
+            nomPrenomArabe = map["nomPrenomArabe"] ?: "حمنيش عبد الوهاب",
+            register_Commerce_Nm = map["register_Commerce_Nm"] ?: "16/00 – 5138424 D20",
+            nif_Num = map["nif_Num"] ?: "16291403036"
+        )
+    }
     // ──────────────────────────── M03 ────────────────────────────────────────
     suspend fun delete_All_M03() {
         appDatabase.dao_M03CouleurProduitInfos().deleteAll()

@@ -2,6 +2,7 @@ package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.
 
 import EntreApps.Shared.Models.M09AppCompt
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
+import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -19,6 +20,7 @@ class ActiveDatas {
     var active_M9Compt: M09AppCompt? by mutableStateOf(null)
     var list_M8bon: List<M8BonVent>? by mutableStateOf(null)
     var list_M03: List<M3CouleurProduitInfos>? by mutableStateOf(null)
+    var list_M2Client: List<M2Client>? by mutableStateOf(null)
 }
 
 @SuppressLint("StaticFieldLeak")
@@ -36,6 +38,7 @@ class FeatureID1_ViewModel(
         viewModelScope.launch {
             active_Datas.list_M8bon = (appDatabase.dao_M8BonVent().getAll())
             active_Datas.list_M03 = (appDatabase.dao_M03CouleurProduitInfos().getAll())
+            active_Datas.list_M2Client = (appDatabase.dao_M2Client().getAll())
         }
     }
 
@@ -47,6 +50,7 @@ class FeatureID1_ViewModel(
         viewModelScope.launch {
             active_Datas.list_M8bon = appDatabase.dao_M8BonVent().getAll()
             active_Datas.list_M03 = appDatabase.dao_M03CouleurProduitInfos().getAll()
+            active_Datas.list_M2Client = appDatabase.dao_M2Client().getAll()
         }
     }
 
