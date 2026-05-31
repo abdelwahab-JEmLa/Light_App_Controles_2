@@ -13,9 +13,9 @@ This skill instructs the assistant on how to automatically display a clean docum
 
 ## Steps to Execute
 
-### 1. Synchronize and Copy Skill Files to Java Folder & Restore Root h_.md
-- Copy all `.md` files from the CLI skills directory (`C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\`) to the project's main Java `skill_agent` folder (`C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\`). Create this folder if it does not already exist.
-- **Ensure `h_.md` exists in Root**: Check if `h_.md` is present in the main root folder of the project (`C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\h_.md`). If it is not present, restore or create it using the content from the Help Skill table and the synchronized files.
+### 1. Verify and Synchronize Skill Files to Java Folder & Root h_.md
+- **Check for Differences**: Compare files, folders, and subfolders in the global AGY skills folder (`C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\`) with the project's local Java `skill_agent` folder (`C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\`), and verify if the root `h_.md` file (`C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\h_.md`) is missing or differs from the latest version.
+- **Update and Overwrite**: If any differences are found (modified content, missing files, or subfolders), copy/replace all files and folders from the global AGY skills directory to the project's `skill_agent` folder, and overwrite the root `h_.md` file completely to match.
 
 ### 2. Read Available Skill Files
 Scan the skills directory `C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\` to list all `.md` files.

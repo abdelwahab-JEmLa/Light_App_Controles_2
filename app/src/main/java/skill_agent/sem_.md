@@ -19,7 +19,6 @@ This skill instructs the assistant on how to automatically detect any dynamic de
 Search the codebase (`app/src/main/java`) for any dynamic semantics/filter comments using the `grep_search` tool:
 - Query: `TODO: sem_` or `TODO: filter` (case-insensitive)
 - Extract the file name, line number, and targeted variable/filter expression.
-- **Fallback Rule (No TODO Found):** If no `TODO: sem_` or `TODO: filter` comment is found in the codebase, the assistant must automatically read the `skill_agent/sem_/last_semantics.md` file to retrieve the last saved semantic keys, and then proceed directly to Step 3 and Step 4 to dump the current active Android UI hierarchy and display the actual runtime semantics data corresponding to those keys.
 
 ### 2. Inject Semantics Modifier
 - **No-Injection Rule (Info Mode):** If the `TODO` comment is just `TODO: sem_` without any variable or expression attached (e.g. `//TODO: sem_`), DO NOT inject a new `.semantics` block. Instead, skip directly to Step 3 and Step 4 to read the existing custom semantics properties from the active UI component.
