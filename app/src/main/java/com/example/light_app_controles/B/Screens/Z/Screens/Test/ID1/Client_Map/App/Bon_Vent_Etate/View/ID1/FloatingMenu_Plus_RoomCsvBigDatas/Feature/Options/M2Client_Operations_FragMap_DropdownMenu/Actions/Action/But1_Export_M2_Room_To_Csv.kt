@@ -4,7 +4,7 @@ import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.Ave
 import androidx.compose.runtime.Composable
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M2Client_Operations_FragMap_DropdownMenu.Actions.PendingAction
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.a.Main.ViewModel.FeatureID1_ViewModel
-import EntreApps.Shared.Models.Relative_Vents.Models.M2Client     //->
+import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

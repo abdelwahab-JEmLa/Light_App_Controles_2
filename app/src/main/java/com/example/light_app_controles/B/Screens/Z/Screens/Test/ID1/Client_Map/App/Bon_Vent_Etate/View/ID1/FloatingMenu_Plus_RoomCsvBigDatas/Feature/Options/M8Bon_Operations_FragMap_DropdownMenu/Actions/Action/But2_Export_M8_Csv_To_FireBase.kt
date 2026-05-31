@@ -29,7 +29,6 @@ fun But2_Export_M8_Csv_To_FireBase(
         confirmLabel = "رفع",
         onConfirm = {
             onPendingClear() // FIX: clear pending before launching (was missing)
-            Log.d(TAG, "▶ click confirmé | ref=${M8BonVent.ref_Test} | csv=${M8BonVent.csv_test.absolutePath}")
             coroutineScope.launch(Dispatchers.IO) {
                 runCatching {
                     vm.setter_LongOperations.set_scv_m8_au_fireBase(
@@ -37,9 +36,7 @@ fun But2_Export_M8_Csv_To_FireBase(
                         refDataBase = M8BonVent.ref_Test,
                     )
                 }.onFailure { err ->
-                    Log.e(TAG, "Échec du rفع CSV → Firebase | raison=${err.message ?: "inconnue"}", err)
                 }.onSuccess {
-                    Log.d(TAG, "CSV envoyé avec succès vers Firebase.")
                 }
                 withContext(Dispatchers.Main) { onDismiss() } // FIX: dismiss after operation (was missing)
             }

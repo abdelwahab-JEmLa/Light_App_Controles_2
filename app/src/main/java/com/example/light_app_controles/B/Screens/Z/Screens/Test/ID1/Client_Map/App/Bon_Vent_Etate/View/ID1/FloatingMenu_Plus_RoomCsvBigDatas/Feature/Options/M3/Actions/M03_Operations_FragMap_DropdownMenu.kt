@@ -96,8 +96,6 @@ fun M03_Operations_FragMap_DropdownMenu(
     var firebaseRowCount by remember { mutableStateOf<Int?>(null) }
     var firebaseCreditCount by remember { mutableStateOf<Int?>(null) }
 
-    // FIX: use M3CouleurProduitInfos.ref_Test (not M8BonVent.ref_Test)
-    // FIX: avoid ambiguous destructuring by using .first / .second
     LaunchedEffect(Unit) {
         runCatching {
             val counts = vm.setter_LongOperations.get_Firebase_M03_Counts(
@@ -195,7 +193,6 @@ fun M03_Operations_FragMap_DropdownMenu(
                 action_definition = PendingAction_M03.But6_Import_M03_FireBase_To_Csv_Entries,
             )
 
-            // FIX: use insertAll_M03 (not insertAll which targets M8BonVent)
             PendingAction_M03.But5_Import_M03_Ui_To_Room_Entries -> {
                 AvertissementDialog(
                     title = action.name,
@@ -215,7 +212,6 @@ fun M03_Operations_FragMap_DropdownMenu(
                 )
             }
 
-            // FIX: use insertAll_M03 (not insertAll which targets M8BonVent)
             PendingAction_M03.But7_DeleteImport_M03Csv_To_Room_Entries -> {
                 AvertissementDialog(
                     title = action.name,

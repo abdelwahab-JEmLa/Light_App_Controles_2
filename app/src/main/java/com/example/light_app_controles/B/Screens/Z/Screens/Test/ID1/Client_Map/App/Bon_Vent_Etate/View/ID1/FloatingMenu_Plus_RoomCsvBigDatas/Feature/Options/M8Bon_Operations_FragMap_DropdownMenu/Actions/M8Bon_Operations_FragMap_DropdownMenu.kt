@@ -87,12 +87,10 @@ fun M8Bon_Operations_FragMap_DropdownMenu(
 
     var pendingAction by remember { mutableStateOf<PendingAction?>(null) }
 
-    // CSV stats for But7 label: total rows, new (not in Room), updates (already in Room)
     var csvRowCount by remember { mutableStateOf<Int?>(null) }
     var csvNewCount by remember { mutableStateOf<Int?>(null) }
     var csvUpdateCount by remember { mutableStateOf<Int?>(null) }
     var csvCreditCount by remember { mutableStateOf<Int?>(null) }
-    // Bumped after any operation that writes to the CSV file, so stats always reflect the real file.
     var csvRefreshTrigger by remember { mutableStateOf(0) }
 
     var firebaseRowCount by remember { mutableStateOf<Int?>(null) }

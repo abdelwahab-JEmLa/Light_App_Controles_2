@@ -35,7 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Modules.splitCsvLine
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M2Client_Operations_FragMap_DropdownMenu.Actions.Action.But1_Export_M2_Room_To_Csv    //->
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M2Client_Operations_FragMap_DropdownMenu.Actions.Action.But1_Export_M2_Room_To_Csv
 
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M2Client_Operations_FragMap_DropdownMenu.Actions.Action.But2_Export_M2_Csv_To_FireBase
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M2Client_Operations_FragMap_DropdownMenu.Actions.Action.But3_Import_M2Csv_To_Room
@@ -76,25 +76,22 @@ enum class PendingAction(
 }
 
 @Composable
-fun M2Client_Operations_FragMap_DropdownMenu(       //<--
+fun M2Client_Operations_FragMap_DropdownMenu(
     modifier: Modifier = Modifier,
     vm: FeatureID1_ViewModel,
     expanded: Boolean,
     onDismiss: () -> Unit,
     on_vent_key: String = "",
     onClick_Lence_Capture: (() -> Unit)? = null,
-) {   //<--
-//TODO(1): con_
+) {
     val coroutineScope = rememberCoroutineScope()
 
     var pendingAction by remember { mutableStateOf<PendingAction?>(null) }
 
-    // CSV stats for But7 label: total rows, new (not in Room), updates (already in Room)
     var csvRowCount by remember { mutableStateOf<Int?>(null) }
     var csvNewCount by remember { mutableStateOf<Int?>(null) }
     var csvUpdateCount by remember { mutableStateOf<Int?>(null) }
     var csvCreditCount by remember { mutableStateOf<Int?>(null) }
-    // Bumped after any operation that writes to the CSV file, so stats always reflect the real file.
     var csvRefreshTrigger by remember { mutableStateOf(0) }
 
     var firebaseRowCount by remember { mutableStateOf<Int?>(null) }
@@ -111,7 +108,7 @@ fun M2Client_Operations_FragMap_DropdownMenu(       //<--
         }
     }
 
-    LaunchedEffect(vm.active_Datas.list_M2Client, csvRefreshTrigger) {//->
+    LaunchedEffect(vm.active_Datas.list_M2Client, csvRefreshTrigger) {
         withContext(Dispatchers.IO) {
             val csv = M2Client.csv_test
             if (csv.exists() && csv.length() > 0L) {
@@ -119,7 +116,6 @@ fun M2Client_Operations_FragMap_DropdownMenu(       //<--
                 if (lines.size >= 2) {
                     val headers = lines[0].splitCsvLine()
                     val keyIdx = headers.indexOf("keyID")
-                    // removed etateActuellementEst as requested
 
                     val dataLines = lines.drop(1)
                     val csvKeys = dataLines.mapNotNull { line ->

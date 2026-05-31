@@ -70,4 +70,3 @@ class FeatureID1_ViewModel(
     }
 }
 
-

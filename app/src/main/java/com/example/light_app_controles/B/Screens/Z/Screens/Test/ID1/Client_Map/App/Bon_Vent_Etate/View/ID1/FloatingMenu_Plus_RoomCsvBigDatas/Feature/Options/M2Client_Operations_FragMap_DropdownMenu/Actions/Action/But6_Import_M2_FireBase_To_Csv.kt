@@ -37,9 +37,7 @@ fun But6_Import_M2_FireBase_To_Csv(
                         csvFile     = M2Client.csv_test,
                     )
                 }.onFailure { err ->
-                    Log.e(TAG, "Échec Firebase → CSV | raison=${err.message ?: "inconnue"}", err)
                 }.onSuccess {
-                    Log.d(TAG, "Données Firebase importées avec succès vers CSV.")
                     withContext(Dispatchers.Main) { onCsvWritten() }
                 }
                 withContext(Dispatchers.Main) { onDismiss() }

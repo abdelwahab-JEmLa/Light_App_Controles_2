@@ -86,7 +86,6 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
     val fabSizePx      = with(density) { 58.dp.toPx() }
     val paddingPx      = with(density) { 16.dp.toPx() }
 
-    // Initial position: bottom-right corner (mirrors A_FastAdd_FloatingSeparated_Button_1)
     var offsetX by remember { mutableFloatStateOf(screenWidthPx  - fabSizePx - paddingPx) }
     var offsetY by remember { mutableFloatStateOf(screenHeightPx - fabSizePx * 5f) }
 
@@ -96,7 +95,6 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
         label         = "logoRot",
     )
 
-    // ── Overlay plein écran, FAB draggable ───────────────────────────────────
     Box(
         modifier         = Modifier.fillMaxSize(),
         contentAlignment = Alignment.TopStart,
@@ -121,7 +119,6 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
 
-            // ── Boutons enfants — apparaissent au-dessus du FAB principal ─────
             AnimatedVisibility(
                 visible = dialState != DialState.Closed,
                 enter   = fadeIn(tween(200)) + slideInVertically(tween(220)) { it },
@@ -132,7 +129,6 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
 
-                    // ── M2  ────────────────────────────────────────────
                     Row(
                         verticalAlignment     = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -165,7 +161,6 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
                                     modifier           = Modifier.size(22.dp),
                                 )
                             }
-                            // dropdown ancré sur ce Box
                             M2Client_Operations_FragMap_DropdownMenu(
                                 expanded = dialState == DialState.M2Open,
                                 onDismiss = { dialState = DialState.Closed },
@@ -175,7 +170,6 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
                             )
                         }
                     }
-                    // ── M8 BonVent ────────────────────────────────────────────
                     Row(
                         verticalAlignment     = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -208,7 +202,6 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
                                     modifier           = Modifier.size(22.dp),
                                 )
                             }
-                            // dropdown ancré sur ce Box
                             M8Bon_Operations_FragMap_DropdownMenu(
                                 expanded = dialState == DialState.M8Open,
                                 onDismiss = { dialState = DialState.Closed },
@@ -219,7 +212,6 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
                         }
                     }
 
-                    // ── M03 Couleur ───────────────────────────────────────────
                     Row(
                         verticalAlignment     = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -252,7 +244,6 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
                                     modifier           = Modifier.size(22.dp),
                                 )
                             }
-                            // dropdown ancré sur ce Box
                             M03_Operations_FragMap_DropdownMenu(
                                 expanded              = dialState == DialState.M03Open,
                                 onDismiss             = { dialState = DialState.Closed },
@@ -265,7 +256,6 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
                 }
             }
 
-            // ── FAB principal — logo / × ──────────────────────────────────────
             FloatingActionButton(
                 onClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)

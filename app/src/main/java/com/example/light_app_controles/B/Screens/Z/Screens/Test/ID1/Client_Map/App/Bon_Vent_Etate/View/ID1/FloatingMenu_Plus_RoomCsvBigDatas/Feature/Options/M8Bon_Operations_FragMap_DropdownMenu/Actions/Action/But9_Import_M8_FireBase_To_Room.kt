@@ -36,9 +36,7 @@ fun But9_Import_M8_FireBase_To_Room(
                     )
                     vm.reload()
                 }.onFailure { err ->
-                    Log.e(TAG, "Échec Firebase → Room | raison=${err.message ?: "inconnue"}", err)
                 }.onSuccess {
-                    Log.d(TAG, "Données Firebase importées avec succès vers Room.")
                 }
                 withContext(Dispatchers.Main) { onDismiss() }
             }

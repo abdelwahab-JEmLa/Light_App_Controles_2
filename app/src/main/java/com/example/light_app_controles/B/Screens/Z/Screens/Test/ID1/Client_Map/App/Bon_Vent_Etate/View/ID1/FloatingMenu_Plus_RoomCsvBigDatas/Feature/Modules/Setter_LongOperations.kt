@@ -20,7 +20,6 @@ import kotlin.coroutines.resumeWithException
 class Setter_LongOperations(
     val appDatabase: AppDatabase,
 ) {
-    // ──────────────────────────── M02 ────────────────────────────────────────
     suspend fun add_New_M2Client(client: M2Client) {
         appDatabase.dao_M2Client().insert(client)
     }
@@ -248,7 +247,6 @@ class Setter_LongOperations(
             nif_Num = map["nif_Num"] ?: "16291403036"
         )
     }
-    // ──────────────────────────── M03 ────────────────────────────────────────
     suspend fun delete_All_M03() {
         appDatabase.dao_M03CouleurProduitInfos().deleteAll()
     }
@@ -261,7 +259,6 @@ class Setter_LongOperations(
         withContext(Dispatchers.IO) {
             val snapshot = suspendFirebaseSnapshot(refDataBase)
             val total = snapshot.childrenCount.toInt()
-            // M03 has no credit concept → second value is always 0
             Pair(total, 0)
         }
 
@@ -416,7 +413,7 @@ class Setter_LongOperations(
         items.forEach { appDatabase.dao_M03CouleurProduitInfos().upsert(it) }
     }
 
-    /** Deserialise a flat String map (from CSV or Firebase) into [M3CouleurProduitInfos]. */
+    
     private fun m03_from_Map(map: Map<String, String?>): M3CouleurProduitInfos =
         M3CouleurProduitInfos(
             keyID = map["keyID"] ?: M3CouleurProduitInfos.generePushKey(),
@@ -453,8 +450,6 @@ class Setter_LongOperations(
             indexCouleurDansAncienProto = map["indexCouleurDansAncienProto"]?.toIntOrNull() ?: 0,
             extensionDisponible = map["extensionDisponible"] ?: "webp",
         )
-
-    // ──────────────────────────── M8 ─────────────────────────────────────────
 
     suspend fun add_New_M8BonVent(bon: M8BonVent) {
         appDatabase.dao_M8BonVent().insert(bon)
@@ -682,7 +677,6 @@ class Setter_LongOperations(
             cont.invokeOnCancellation { ref.removeEventListener(listener) }
         }
 }
-
 
 fun String.escapeCsv(): String {
     val sanitized = replace("\r\n", " ").replace("\n", " ").replace("\r", " ")
