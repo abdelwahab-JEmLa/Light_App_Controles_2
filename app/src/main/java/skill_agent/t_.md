@@ -6,7 +6,7 @@ Additionally, this skill supports the **`t_models`** sub-trigger, which automati
 
 If **`t_usage`** is triggered, the assistant will also compute and display the percentage and amount of model tokens consumed so far, and what remains in the current session (out of the calibrated 200,000 token limit) at the end of the execution report.
 
-**Central Dispatcher Capability**: If a `TODO` comment contains a trigger phrase for another custom skill (e.g., `TODO: log_`, `TODO: sem_`, `TODO: con_c`, `TODO: cop_`), the assistant must automatically chain and execute the corresponding custom skill's steps on that file/package, rather than applying a manual code fix.
+**Central Dispatcher Capability**: If a `TODO` comment contains a trigger phrase for another custom skill (e.g., `TODO: log_`, `TODO: sem_`, `TODO: con_c`, `TODO: cop_`, `TODO: room_d`), the assistant must automatically chain and execute the corresponding custom skill's steps on that file/package, rather than applying a manual code fix.
 
 ---
 
@@ -79,9 +79,10 @@ Search the codebase to find any outstanding `TODO` comments using the `grep_sear
   - If it contains `sem_` (e.g. `TODO: sem_`), execute the **Semantics Inspector (sem_)** skill steps.
   - If it contains `con_` (e.g. `TODO: con_c` or `TODO: co_`), execute the **Concise Code (consize_comments)** skill steps.
   - If it contains `cop_` (e.g. `TODO: cop_`), execute the **Copy Package / Sibling Files (cop_last)** skill steps.
+  - If it contains `room_d` (e.g. `TODO: room_d`), execute the **Room Database Query (room_d)** skill steps.
 - **Standard Fixes**: If no skill trigger is matched, analyze the `TODO` comment requirements, apply the appropriate manual code fixes, and delete the comment using `replace_file_content` or `multi_replace_file_content`.
 
 ### 3. Report Success and Display Code Diffs
 Provide the user with a detailed report including:
 - Clickable links to the modified files.
-- **A detailed git-style code diff showing all modified files at the very end of your explanations (unless the task delegated to the `sem_` skill, in which case DO NOT show the git-style code changes/diffs, only display the semantics details/infos).**
+- **A detailed git-style code diff showing all modified files at the very end of your explanations (unless the task delegated to the `sem_` or `room_d` skill, in which case DO NOT show the git-style code changes/diffs, only display the query/semantics details/infos).**

@@ -1,45 +1,21 @@
-import sqlite3
-import datetime
+import xml.etree.ElementTree as ET
 import os
+import re
 
-def format_timestamp(ts, heur):
-    if not ts:
-        return heur or "-"
-    try:
-        dt = datetime.datetime.fromtimestamp(ts / 1000)
-        months = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
-        return f"{dt.day} {months[dt.month - 1]} | {heur or dt.strftime('%H:%M')}"
-    except Exception:
-        return f"{ts} | {heur or '-'}"
+def clean_text(text):
+    if not text:
+        return ""
+    # Remove control characters like RTL/LTR marks
+    return text.replace('\u200f', '').replace('\u200e', '').strip()
 
-def format_currency(val):
-    if val is None or val == 0.0:
-        return "-"
-    return f"{val:.2f} دج"
+def parse_amount(text):
+    # E.g., "مبلغ القرض: 36970,00 دج" or "مبلغ الدفع: 23000,00 دج"
+    match = re.search(r'([\d.,\s]+)\s*دج', text)
+    if match:
+        return match.group(0).strip()
+    return "-"
 
-def format_short_id(key):
-    if not key:
-        return "-"
-    return f"`{key[-4:]}`"
-
-def format_client_short(client_key):
-    if not client_key:
-        return "-"
-    return f"`{client_key[-4:]}`"
-
-conn = sqlite3.connect("app_database_temp")
-cursor = conn.cursor()
-
-# Retrieve columns
-cursor.execute("PRAGMA table_info(M8BonVent);")
-columns = cursor.fetchall()
-colnames = [col[1] for col in columns]
-
-# Helper to execute query and format rows as Markdown table
-def get_table_markdown(query, params=()):
-    cursor.execute(query, params)
-    rows = cursor.fetchall()
-    
+def get_table_markdown(transactions, filter_fn=None):
     headers = [
         "ID", "Date & Heure", "État (Type)", "Montant Principal", "Versement Fait", 
         "Ancien Crédit", "Nouveau Crédit", "Crédit Cumulé", "Versement", "Crédit Fait", 
@@ -50,69 +26,136 @@ def get_table_markdown(query, params=()):
     lines.append("| " + " | ".join(headers) + " |")
     lines.append("| " + " | ".join([":---"] * len(headers)) + " |")
     
-    if not rows:
+    filtered_tx = [tx for tx in transactions if not filter_fn or filter_fn(tx)]
+    
+    if not filtered_tx:
         lines.append("| " + " | ".join(["-"] * len(headers)) + " |")
         return "\n".join(lines)
         
-    for row in rows:
-        row_dict = dict(zip(colnames, row))
-        
-        # Extract values
-        key_id = row_dict.get("keyID")
-        ts = row_dict.get("creationTimestamps")
-        heur = row_dict.get("heurDebutInString")
-        etat = row_dict.get("etateActuellementEst")
-        montant = row_dict.get("montant_principale_du_type")
-        vers_fait = row_dict.get("versement_fait")
-        anc_cred = row_dict.get("ancien_credit")
-        new_cred = row_dict.get("new_credit_apre_tout_fait")
-        cred_cum = row_dict.get("sum_De_Credit_Fait")
-        vers = row_dict.get("versement")
-        cred_fait = row_dict.get("credit_fait")
-        new_sit = row_dict.get("new_situation")
-        tot_saved = row_dict.get("totale_saved")
-        client = row_dict.get("parent_M2Client_KeyID")
-        
+    for tx in filtered_tx:
         row_cols = [
-            format_short_id(key_id),
-            format_timestamp(ts, heur),
-            str(etat or "-"),
-            format_currency(montant),
-            format_currency(vers_fait),
-            format_currency(anc_cred),
-            format_currency(new_cred),
-            format_currency(cred_cum),
-            format_currency(vers),
-            format_currency(cred_fait),
-            format_currency(new_sit),
-            format_currency(tot_saved),
-            format_client_short(client)
+            f"`{tx['id']}`",
+            tx['date'],
+            tx['type'],
+            tx['montant'],
+            "-", # Versement Fait
+            "-", # Ancien Crédit
+            "-", # Nouveau Crédit
+            "-", # Crédit Cumulé
+            tx['versement'],
+            tx['credit_fait'],
+            "-", # Nouvelle Situation
+            "-", # Total Sauvegardé
+            f"`{tx['client_short']}`"
         ]
         lines.append("| " + " | ".join(row_cols) + " |")
         
     return "\n".join(lines)
 
-# 1. listM8bon_filtered
-# parent_M2Client_KeyID == '-OWI8JQlhGjA_HzMCGFD'
-q_filtered = "SELECT * FROM M8BonVent WHERE parent_M2Client_KeyID = '-OWI8JQlhGjA_HzMCGFD' ORDER BY creationTimestamps DESC;"
-md_filtered = get_table_markdown(q_filtered)
+# 1. Parse window_dump.xml
+tree = ET.parse("window_dump.xml")
+root = tree.getroot()
 
-# 2. listM8bon (Top 10)
-q_all = "SELECT * FROM M8BonVent ORDER BY creationTimestamps DESC LIMIT 10;"
-md_all = get_table_markdown(q_all)
+# Find the client name
+client_name = ""
+for node in root.iter("node"):
+    text = node.get("text", "")
+    if text and node.get("class") == "android.widget.TextView" and not node.get("content-desc"):
+        client_name = clean_text(text)
+        break
 
-# 3. allBons
-# parent_M2Client_KeyID == '-OWI8JQlhGjA_HzMCGFD' and etateActuellementEst in CREDIT_VERSEMENT_STATES
-CREDIT_VERSEMENT_STATES = ("COMMANDE_LIVRAI", "Versemment", "Credit", "Cette_Transaction_Type_Est_Credit", "Demande_Versemet", "New_Situation_Credit")
-q_allbons = f"SELECT * FROM M8BonVent WHERE parent_M2Client_KeyID = '-OWI8JQlhGjA_HzMCGFD' AND etateActuellementEst IN {CREDIT_VERSEMENT_STATES} ORDER BY creationTimestamps DESC;"
-md_allbons = get_table_markdown(q_allbons)
+client_short = "".join([c for c in client_name if c.isupper()])[:4]
+if not client_short:
+    client_short = "CLNT"
 
-# 4. listM8bon_7xp4
-# keyID ending in fqTx or 7xp4
-q_7xp4 = "SELECT * FROM M8BonVent WHERE keyID LIKE '%fqTx' OR keyID LIKE '%7xp4' ORDER BY creationTimestamps DESC;"
-md_7xp4 = get_table_markdown(q_7xp4)
+# Find card nodes containing transaction details
+cards = []
+for node in root.iter("node"):
+    text_views = []
+    for child in node.iter("node"):
+        if child.get("class") == "android.widget.TextView":
+            txt = child.get("text", "")
+            if txt and txt.strip():
+                text_views.append(clean_text(txt))
+    
+    has_id = False
+    has_amount = False
+    has_date = False
+    for t in text_views:
+        if len(t) == 4 or (len(t) == 5 and t.endswith("-")):
+            has_id = True
+        if "مبلغ" in t:
+            has_amount = True
+        if "|" in t or "أفريل" in t or "ماي" in t:
+            has_date = True
+            
+    if has_id and has_amount and has_date:
+        cards.append((node.get("bounds"), text_views))
 
-conn.close()
+# Keep only the leaf card nodes
+unique_cards = []
+for bounds, tvs in cards:
+    is_parent = False
+    for other_bounds, other_tvs in cards:
+        if other_bounds != bounds and len(other_tvs) < len(tvs):
+            if all(item in tvs for item in other_tvs):
+                is_parent = True
+                break
+    if not is_parent:
+        unique_cards.append(tvs)
+
+# Convert cards to transaction objects
+transactions = []
+for tvs in unique_cards:
+    tx_id = ""
+    tx_date = ""
+    tx_type = ""
+    tx_amount = "-"
+    tx_versement = "-"
+    tx_credit = "-"
+    
+    for t in tvs:
+        if len(t) == 4 or (len(t) == 5 and t.endswith("-")):
+            tx_id = t
+        elif "مبلغ" in t:
+            tx_amount = parse_amount(t)
+            if "القرض" in t:
+                tx_type = "Credit"
+                tx_credit = tx_amount
+            elif "الدفع" in t:
+                tx_type = "Versemment"
+                tx_versement = tx_amount
+        elif "|" in t:
+            # Parse Date part from something like: "الثلاثاء 28 أفريل (4) قبل 3 أسابيع | 2:49:33 م"
+            parts = t.split("|")
+            date_part = parts[0].strip()
+            time_part = parts[1].strip() if len(parts) > 1 else ""
+            
+            # Clean up date_part to keep only day and month: "28 أفريل"
+            day_match = re.search(r'\d+', date_part)
+            month_match = re.search(r'[^\d\s()]+', date_part.replace("الثلاثاء", "").replace("الأحد", ""))
+            
+            day = day_match.group(0) if day_match else ""
+            month = month_match.group(0) if month_match else ""
+            
+            clean_date = f"{day} {month}" if day and month else date_part
+            tx_date = f"{clean_date} \\| {time_part}"
+            
+    transactions.append({
+        "id": tx_id,
+        "date": tx_date,
+        "type": tx_type,
+        "montant": tx_amount,
+        "versement": tx_versement,
+        "credit_fait": tx_credit,
+        "client_short": client_short
+    })
+
+# Format tables
+md_filtered = get_table_markdown(transactions)
+md_allbons = get_table_markdown(transactions)
+md_all = get_table_markdown(transactions[:10])
+md_7xp4 = get_table_markdown(transactions, filter_fn=lambda tx: tx['id'].endswith('7xp4') or tx['id'].endswith('fqTx'))
 
 # Generate Report
 report = f"""# Semantics Inspection Report
@@ -128,14 +171,14 @@ This report contains the parsed custom semantics properties extracted from the d
 
 ---
 
-## 2. Set `listM8bon_filtered` (Filtered by client GFD)
+## 2. Set `listM8bon_filtered` (Filtered by client {client_short})
 *Expression: `active_Datas.list_M8bon?.filter {{ it.parent_M2Client_KeyID == relative_M2Client?.keyID }} ?: emptyList()`*
 
 {md_filtered}
 
 ---
 
-## 3. Set `allBons` (Filtered by client GFD & Credit/Versement status)
+## 3. Set `allBons` (Filtered by client {client_short} & Credit/Versement status)
 *Expression: `listM8bon?.filter {{ it.parent_M2Client_KeyID == relative_M2Client?.keyID && it.etateActuellementEst in CREDIT_VERSEMENT_STATES }}?.sortedByDescending {{ it.creationTimestamps }}`*
 
 {md_allbons}
