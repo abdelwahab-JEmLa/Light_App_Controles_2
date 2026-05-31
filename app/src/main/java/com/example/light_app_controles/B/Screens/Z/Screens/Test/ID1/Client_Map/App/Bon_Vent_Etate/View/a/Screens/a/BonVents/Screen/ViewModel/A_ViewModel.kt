@@ -36,8 +36,8 @@ class A_ViewModel(
     init {
         viewModelScope.launch {
             val dbBons = appDatabase.dao_M8BonVent().getAll()
-            active_Datas.list_M8bon = if (dbBons.isEmpty()) FAKE_ALL_BONS else dbBons
-            active_Datas.list_M03 = (appDatabase.dao_M03CouleurProduitInfos().getAll())
+            active_Datas.list_M8bon = dbBons
+            active_Datas.list_M03 = appDatabase.dao_M03CouleurProduitInfos().getAll()
         }
     }
 
@@ -48,7 +48,7 @@ class A_ViewModel(
     fun reload() {
         viewModelScope.launch {
             val dbBons = appDatabase.dao_M8BonVent().getAll()
-            active_Datas.list_M8bon = if (dbBons.isEmpty()) FAKE_ALL_BONS else dbBons
+            active_Datas.list_M8bon = dbBons
             active_Datas.list_M03 = appDatabase.dao_M03CouleurProduitInfos().getAll()
         }
     }

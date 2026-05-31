@@ -84,4 +84,4 @@ Search the codebase to find any outstanding `TODO` comments using the `grep_sear
 ### 3. Report Success and Display Code Diffs
 Provide the user with a detailed report including:
 - Clickable links to the modified files.
-- **A detailed git-style code diff showing all modified files at the very end of your explanations.**
+- **A detailed git-style code diff showing all modified files at the very end of your explanations (unless the task delegated to the `sem_` skill, in which case DO NOT show the git-style code changes/diffs, only display the semantics details/infos).**
