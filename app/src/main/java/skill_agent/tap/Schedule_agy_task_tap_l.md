@@ -8,6 +8,7 @@ This skill instructs the assistant on how to start a background focus-monitoring
 - "Schedule_agy_task_tap_l"
 - "schedule_tap_l"
 - "sch_tap_l"
+- "st_"
 - "arrete_sch" (cancels any running schedule task)
 
 ---
