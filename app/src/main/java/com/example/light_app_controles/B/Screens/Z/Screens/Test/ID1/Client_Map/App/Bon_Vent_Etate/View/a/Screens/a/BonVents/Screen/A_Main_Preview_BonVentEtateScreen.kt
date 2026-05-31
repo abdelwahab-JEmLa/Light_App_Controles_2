@@ -88,7 +88,8 @@ fun Main_Preview_BonVentEtateScreen(
     )
 
     val active_Datas = vm.active_Datas
-    val allBons: List<M8BonVent> = active_Datas.list_M8bon
+    val listM8bon = active_Datas.list_M8bon
+    val allBons: List<M8BonVent> = listM8bon
         ?.filter { it.parent_M2Client_KeyID == relative_M2Client?.keyID && it.etateActuellementEst in CREDIT_VERSEMENT_STATES }
         ?.sortedByDescending { it.creationTimestamps } ?: emptyList()
 
@@ -274,8 +275,10 @@ fun Main_Preview_BonVentEtateScreen(
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier
                         .padding(16.dp)                  
-                        .semantics(mergeDescendants = true) {
-                            set(value = allBons.filter { it.etateActuellementEst.credit_type }, key = SemanticsPropertyKey("allBons"))
+                        .semantics(mergeDescendants = true) {//<--
+                            set(value = active_Datas.list_M8bon?.filter { it.parent_M2Client_KeyID == relative_M2Client?.keyID } ?: emptyList(), key = SemanticsPropertyKey("listM8bon_filtered"))
+                            set(value = active_Datas.list_M8bon ?: emptyList(), key = SemanticsPropertyKey("listM8bon"))
+                            set(value = allBons, key = SemanticsPropertyKey("allBons"))
                         }
                     ,
                 )

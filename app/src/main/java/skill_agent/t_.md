@@ -4,6 +4,8 @@ This skill instructs the assistant on how to automatically search for, identify,
 
 Additionally, this skill supports the **`t_models`** sub-trigger, which automatically adds `appDatabase.kt` and the `Models` package to the active restricted context before proceeding with the standard steps.
 
+If **`t_usage`** is triggered, the assistant will also compute and display the percentage and amount of model tokens consumed so far, and what remains in the current session (out of the calibrated 200,000 token limit) at the end of the execution report.
+
 **Central Dispatcher Capability**: If a `TODO` comment contains a trigger phrase for another custom skill (e.g., `TODO: log_`, `TODO: sem_`, `TODO: con_c`, `TODO: cop_`), the assistant must automatically chain and execute the corresponding custom skill's steps on that file/package, rather than applying a manual code fix.
 
 ---
@@ -11,6 +13,7 @@ Additionally, this skill supports the **`t_models`** sub-trigger, which automati
 ## Trigger Phrases
 - "t_"
 - "t_models"
+- "t_usage"
 - "fix_todo"
 - "fix_todos"
 
@@ -55,6 +58,11 @@ Generate and append the folder rules to [.antigravityignore](file:///C:/Users/Ab
 
 #### 2. Execute standard TODO fixing
 Proceed directly to the standard steps below to locate and fix TODOs.
+
+### When "t_usage" is triggered:
+
+#### 1. Calculate and Report Token Usage
+At the end of the standard execution steps, estimate the total token count of the current conversation (using the transcript file size `transcript_full.jsonl` size in bytes / 4 + system context overhead of ~15,000 tokens) and calculate what percentage of the calibrated 200,000 token limit this represents. Output both the consumed token percentage and amount, as well as the remaining token amount and percentage prominently at the end of the report.
 
 ---
 

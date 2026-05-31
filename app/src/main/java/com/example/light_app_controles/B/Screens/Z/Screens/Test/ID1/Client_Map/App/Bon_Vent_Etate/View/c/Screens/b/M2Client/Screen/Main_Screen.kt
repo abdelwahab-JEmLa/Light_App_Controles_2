@@ -43,6 +43,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.a.Main.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button
 import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
 import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 
 @Composable
 fun M2ClientList_Screen(
@@ -58,7 +59,15 @@ fun M2ClientList_Screen(
     val relative_listM02 by remember {
         derivedStateOf { viewModel.active_Datas.list_M02 ?: emptyList() }
     }
-    var query by remember { mutableStateOf("") }
+
+    var its_lanceRapide_develepment_de_searche by remember { mutableStateOf("zoh") }
+
+    val initialQuery = if (M00CentralParametresOfAllApps.get_Default().its_lanceRapide_develepment) {
+        its_lanceRapide_develepment_de_searche
+    } else {
+        ""
+    }
+    var query by remember { mutableStateOf(initialQuery) }
 
     Box(
         modifier = modifier
@@ -85,7 +94,7 @@ fun M2ClientList_Screen(
             }
 
             // ── Search field ─────────────────────────────────────────────────
-            OutlinedTextField(
+            OutlinedTextField(                    //<--
                 value = query,
                 onValueChange = { query = it },
                 modifier = Modifier

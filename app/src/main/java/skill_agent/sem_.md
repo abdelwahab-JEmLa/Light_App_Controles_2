@@ -20,17 +20,21 @@ Search the codebase (`app/src/main/java`) for any dynamic semantics/filter comme
 - Extract the file name, line number, and targeted variable/filter expression.
 
 ### 2. Inject Semantics Modifier
-- Locate the modified component or the specific component/line marked with `//<--` (e.g., where the arrow comment `//<--` is placed next to the component).
+- **No-Injection Rule (Info Mode):** If the `TODO` comment is just `TODO: sem_` without any variable or expression attached (e.g. `//TODO: sem_`), DO NOT inject a new `.semantics` block. Instead, skip directly to Step 3 and Step 4 to read the existing custom semantics properties from the active UI component.
+- Locate the modified component or the specific component/line marked with `<--` (e.g., where the arrow comment `//<--` is placed next to the component).
 - Inject a Jetpack Compose `.semantics` modifier directly on this component or layout element, setting the variable as a custom semantics property.
 - **Dynamic Filtering Rule:** If the dynamic comment specifies a filter condition (e.g., `//TODO: sem_ allbons filter credit type`), parse the expression and inject the filtered value (e.g., `allBons.filter { it.etateActuellementEst.credit_type }`) rather than the raw variable.
-- **Critical Placement:** Inject the `.semantics` modifier directly into the modified component or the component marked with `//<--` rather than outer layout containers, ensuring the custom semantics property is attached precisely to that element:
+- **Multi-Set Semantics Rule:** If the dynamic comment specifies multiple expressions or variables separated by `et`, `and`, `,`, or `&` (e.g., `//TODO: sem_ listM8bon .filter { it.parent_M2Client_KeyID == relative_M2Client?.keyID } et listM8bon`), parse each of them and generate a separate `set(value = <expression>, key = SemanticsPropertyKey("<key_name>"))` statement for each expression inside the Compose `.semantics` block. If 2, 3, or more sets are specified, generate all of them inside the same `.semantics` block.
+- **Critical Placement:** Inject the `.semantics` modifier directly into the modified component or the component marked with `//<--` rather than outer layout containers, ensuring the custom semantics properties are attached precisely to that element:
   ```kotlin
   Text(
       text = "...",
       modifier = Modifier
           .padding(16.dp)
           .semantics(mergeDescendants = true) {
-              set(value = $variable, key = SemanticsPropertyKey("$variable"))
+              set(value = expression1, key = SemanticsPropertyKey("key1"))
+              set(value = expression2, key = SemanticsPropertyKey("key2"))
+              set(value = expression3, key = SemanticsPropertyKey("key3"))
           }
   )
   ```
@@ -45,7 +49,11 @@ Do NOT run any Gradle compilation or build tasks. Directly capture the current a
 
 ### 4. Parse and Display the Semantics Data
 Read the pulled `window_dump.xml` using the `view_file` tool. Parse the node hierarchy corresponding to the Compose container and extract the active transaction data.
-Construct and display a clean, beautiful Markdown table representing the main **13 important values** of the **`M8` Bons (`M8BonVent`)** under the **Credit** context:
+- **List vs Info Display Rule:** When you parse the extracted semantic value:
+  - If the extracted value represents a collection or **list** of items, display it as a full Markdown table (see table structure below).
+  - If the extracted value represents a single object or basic **info** (e.g., not a list), display the semantic info cleanly as text, bullet points, or key-value pairs (NOT as a table).
+If multiple custom semantics properties or sets were generated (e.g. `listM8bon`, `listM8bon_filtered`, `allBons`), the assistant must parse and show the contents of each set in a clear, formatted presentation or dedicated Markdown table, detailing exactly what each set contains.
+For any set representing transaction data that requires table formatting, construct and display a clean, beautiful Markdown table representing the main **13 important values** of the **`M8` Bons (`M8BonVent`)** under the **Credit** context:
 1. **ID**: Short unique identifier of the bon (last 4 characters of `keyID`).
 2. **Date & Heure**: Formatted timestamp/time of the transaction (`creationTimestamps` / `heurDebutInString`).
 3. **État (Type)**: The transaction type state (`etateActuellementEst`).

@@ -23,6 +23,9 @@ data class M00CentralParametresOfAllApps(
 
     val desactive_Animation_Pour_LayoutInspector: Boolean = false,
 
+    val its_lanceRapide_develepment: Boolean = true,
+
+
     val listens_on_data_change_resources_consolation: Boolean = false,
     val no_loadKoin_CrachComposReglement: Boolean = false,
     val load_All_modules: Boolean = false,

@@ -2,12 +2,18 @@ package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.
 
 import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -15,13 +21,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.core.graphics.toColorInt
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.a.BonVents.Screen.Main_Preview_BonVentEtateScreen
 
 @Composable
 fun M2ClientItem(
     item: M2Client,
     highlight: String = "",
 ) {
+    var showDialog by remember { mutableStateOf(false) }
+
     val avatarBg = remember(item.couleur) {
         runCatching {
             val raw = item.couleur
@@ -39,7 +49,9 @@ fun M2ClientItem(
     ) Color(0xFFEDE7F6) else Color(0xFFF3E5F5)
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { showDialog = true },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = cardBg),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -70,27 +82,24 @@ fun M2ClientItem(
 
             Column(modifier = Modifier.weight(1f)) {
                 // Nom (Français)
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    Text(
-                        text = item.nom.ifBlank { "— nom non défini —" },
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4A148C),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false)
-                    )
-                    Text(
-                        text = "(${item.keyID})",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = Color.Gray,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
+                Text(
+                    text = item.nom.ifBlank { "— nom non défini —" },
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF4A148C),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Spacer(Modifier.height(2.dp))
+
+                Text(
+                    text = item.keyID,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF4A148C),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
 
                 Spacer(Modifier.height(2.dp))
 
@@ -136,21 +145,71 @@ fun M2ClientItem(
             Spacer(Modifier.width(8.dp))
 
             // Solde du Crédit
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.Center
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.End
             ) {
-                Text(
-                    text = "Crédit",
-                    style = MaterialTheme.typography.labelSmall,
-                    color = Color.Gray,
-                )
-                Text(
-                    text = String.format("%.2f DA", item.currentCreditBalance),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = if (item.currentCreditBalance > 0.0) Color(0xFFD32F2F) else Color(0xFF388E3C),
-                )
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Crédit",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color.Gray,
+                    )
+                    Text(
+                        text = String.format("%.2f DA", item.currentCreditBalance),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = if (item.currentCreditBalance > 0.0) Color(0xFFD32F2F) else Color(0xFF388E3C),
+                    )
+                }
+            }
+        }
+    }
+
+    if (showDialog) {
+        Dialog(
+            onDismissRequest = { showDialog = false }
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.9f),
+                shape = RoundedCornerShape(16.dp),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = item.nom,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = Color(0xFF4A148C)
+                        )
+                        IconButton(onClick = { showDialog = false }) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Fermer",
+                                tint = Color.Gray
+                            )
+                        }
+                    }
+                    HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
+                    Box(modifier = Modifier.weight(1f)) {
+                        Main_Preview_BonVentEtateScreen(
+                            relative_M2Client = item,
+                            onClick_Lence_Capture = {}
+                        )
+                    }
+                }
             }
         }
     }

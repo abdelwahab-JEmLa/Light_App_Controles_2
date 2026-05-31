@@ -21,19 +21,10 @@ The current default reference package is set below:
 
 ---
 
-## Last Copied Files
-
-The following files were copied during the last execution of the `cop_last` skill:
-- `C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\com\example\light_app_controles\B\Screens\Z\Screens\Test\ID1\Client_Map\App\Bon_Vent_Etate\View\ID3\WhatsappSendFolder\Feature\b_FastAdd_FloatingSeparated_Button_1\Actions\A_FastAdd_FloatingSeparated_Button_1.kt`
-- `C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\com\example\light_app_controles\B\Screens\Z\Screens\Test\ID1\Client_Map\App\Bon_Vent_Etate\View\ID3\WhatsappSendFolder\Feature\b_FastAdd_FloatingSeparated_Button_1\Actions\But3\Action\ButtonID_10_Imgs_Send_whatsappBuisness_By_Folder.kt`
-- `C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\com\example\light_app_controles\B\Screens\Z\Screens\Test\ID1\Client_Map\App\Bon_Vent_Etate\View\ID3\WhatsappSendFolder\Feature\b_FastAdd_FloatingSeparated_Button_1\Actions\But3\Action\Send_To_WhatsAppBuisness.kt`
-
----
-
 ## Steps to Execute
 
 ### 1. Identify Target Directory & Files
-- **Case A: cl_ / cop_l / cop_last (Default Trigger)**: If the user triggers `cl_`, `cop_l`, or `cop_last` without a path, the assistant must read the exact list of file paths defined in the **Last Copied Files** section of this file (`cop_last.md`). Copy *exactly* those files to the Windows clipboard.
+- **Case A: cl_ / cop_l / cop_last (Default Trigger)**: If the user triggers `cl_`, `cop_l`, or `cop_last` without a path, the assistant must read the exact list of file paths defined in [list_copied_files.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/copy_/list_copied_files.md). Copy *exactly* those files to the Windows clipboard.
 - **Case B: Dynamic Request**: If the user provides a path (e.g. `<directory_path> cop_`), or a dynamic comment `//TODO: cop_` is found, set the target directory to that path or the parent folder of the file containing the comment. Scan that directory recursively for `.kt` files.
 
 ### 2. Copy Files Directly to Windows Clipboard (Ctrl+C Simulation)
@@ -42,8 +33,8 @@ The following files were copied during the last execution of the `cop_last` skil
   Set-Clipboard -Path "<file_path_1>", "<file_path_2>", ...
   ```
 
-### 3. Save Copied Files to cop_last.md
-- If files were scanned dynamically (Case B), overwrite/update the **Last Copied Files** section in this file (`cop_last.md`) with the absolute paths of all the `.kt` files that were successfully copied, ensuring they are saved for subsequent fast triggers.
+### 3. Save Copied Files to list_copied_files.md
+- If files were scanned dynamically (Case B), overwrite the contents of [list_copied_files.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/copy_/list_copied_files.md) with the absolute paths of all the `.kt` files that were successfully copied, ensuring they are saved for subsequent fast triggers.
 
 ### 4. Report Copy Success (Ultra-concise)
 Always output a highly concise response containing ONLY:
