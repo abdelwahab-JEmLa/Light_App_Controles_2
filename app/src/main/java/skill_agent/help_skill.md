@@ -25,7 +25,7 @@ Output a markdown table documenting each custom skill.
 
 | Nom du Skill | Mots-clés (Triggers) | Description |
 | :--- | :--- | :--- |
-| **Semantics Inspector** (`sem_d.md`) | `sem_d`, `sem_`, `Todo: sem_`, `Todo: filter` | Injecte la sémantique d'une variable ou filtre (`TODO: sem_` ou `TODO: filter`), puis extrait instantanément les données d'accessibilité avec un dump ADB sans re-compiler/re-déployer l'application. |
+| **Semantics Inspector** (`sem_.md`) | `sem_d`, `sem_`, `Todo: sem_`, `Todo: filter` | Injecte la sémantique d'une variable ou filtre (`TODO: sem_` ou `TODO: filter`), puis extrait instantanément les données d'accessibilité avec un dump ADB sans re-compiler/re-déployer l'application. |
 | **Fast Apply Changes and Launch** (`apply_.md`) | `apply_`, `ap_`, `fast_launch`, `fast_l` | Compile et déploie l'application à haute vitesse (surpassant la vitesse standard d'Android Studio) en ciblant le module `:app` et en utilisant des flux d'installation directe ADB (`--fastdeploy`). |
 | **Annotated Screen Capture** (`screenshot.md`) | `scr_s` | Capture l'écran de l'appareil Android ou de l'émulateur connecté avec des boîtes de délimitation étiquetées et l'affiche. |
 | **Tap Android FAB** (`tap.md`) | `tap` | Capture l'écran, localise le bouton flottant (FAB) ou l'élément ciblé, résout les coordonnées et simule un clic sur l'appareil. |
@@ -44,7 +44,7 @@ Output a markdown table documenting each custom skill.
 Always present the user with clickable links to the skill files in the skills directory for quick editing.
 
 * ℹ️ [Help Skill](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/help_skill.md)
-* 🔍 [Semantics Inspector](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/sem_d.md)
+* 🔍 [Semantics Inspector](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/sem_.md)
 * ⚡ [Fast Apply Changes and Launch](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/apply_.md)
 * 🛠️ [Fast Build and Install](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/build.md)
 * 📦 [Fast Build, Export & Deploy](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/build_.md)

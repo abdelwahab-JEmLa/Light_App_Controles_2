@@ -53,12 +53,7 @@ data class M00CentralParametresOfAllApps(
     val its_AppType: AppType = if (au_Lence_Set_Compt_Ac_KeyId == Compts.Telephone_de_presentation.keyId) {
         AppType.JomLaElectroLivreurGrossist_PresenterScreen
     } else {
-        if (itsDevMode) {
-            AppType.JomLaElectroLivreurGrossist_VendeurHost
-        } else {
-            AppType.AllInOne
-            //JomLaElectroLivreurGrossist_VendeurHost
-        }
+        AppType.AllInOne
     },
 
     //---------------------------------App Settings----------------------------------------------------------------------------------------------------------------------------------

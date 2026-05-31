@@ -265,17 +265,18 @@ fun Main_Preview_BonVentEtateScreen(
         onClick_Lence_Capture()
     }
 
-    val filteredBons = allBons.filter { it.montant_principale_du_type > 0.0 }
-    Box(modifier = Modifier.semantics(mergeDescendants = true) {
-        set(value = filteredBons, key = SemanticsPropertyKey("allBons"))
-    }) {
+    Box{
         Column(modifier = modifier.fillMaxSize()) {
             if (allBons.isEmpty()) {
                 Text(
                     "لا توجد حالة دين جديدة",
                     color = Color.Gray,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier
+                        .padding(16.dp)                       //<--
+                        .semantics(mergeDescendants = true) {
+                            set(value = allBons, key = SemanticsPropertyKey("allBons"))
+                        },
                 )
             } else LazyColumn(
                 state = listState,
