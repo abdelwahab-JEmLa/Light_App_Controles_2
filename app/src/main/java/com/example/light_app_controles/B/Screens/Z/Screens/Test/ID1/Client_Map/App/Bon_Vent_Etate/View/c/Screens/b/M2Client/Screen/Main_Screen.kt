@@ -60,7 +60,7 @@ fun M2ClientList_Screen(
         derivedStateOf { viewModel.active_Datas.list_M02 ?: emptyList() }
     }
 
-    var its_lanceRapide_develepment_de_searche by remember { mutableStateOf("zoh") }
+    var its_lanceRapide_develepment_de_searche by remember { mutableStateOf("jam") }
 
     val initialQuery = if (M00CentralParametresOfAllApps.get_Default().its_lanceRapide_develepment) {
         its_lanceRapide_develepment_de_searche
