@@ -30,6 +30,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -339,8 +341,14 @@ fun M8Bon_Operations_FragMap_DropdownMenu(
                         text = PendingAction.But6_Import_M8_FireBase_To_Csv.name,
                         style = MaterialTheme.typography.bodyMedium,
                     )
-                    Text(
+                    Text(       //<--
                         text = fbStatsLine,
+                        modifier = Modifier.semantics(mergeDescendants = true) {
+                            set(
+                                value = vm.active_Datas.list_M8bon?.filter { it.keyID.takeLast(3) == "xp4" } ?: emptyList(),
+                                key = SemanticsPropertyKey("room_d_xp4")
+                            )
+                        },
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -428,7 +436,7 @@ fun M8Bon_Operations_FragMap_DropdownMenu(
                 )
             },
             text = {
-                Text(
+                Text(           //<--
                     text = PendingAction.But3_Import_M8Csv_To_Room.name,
                     style = MaterialTheme.typography.bodyMedium,
                 )

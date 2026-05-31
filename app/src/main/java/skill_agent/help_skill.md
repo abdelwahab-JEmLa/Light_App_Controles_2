@@ -1,6 +1,6 @@
 # Skill - Help Skills
 
-This skill instructs the assistant on how to automatically display a clean documentation table containing all available custom skills, their trigger phrases, and a brief explanation of what each skill does, whenever the user requests "help_skill", and automatically synchronize and back up all custom skill configurations into the project's Java source directory under `app/src/main/java/skill_agent/`.
+This skill instructs the assistant on how to automatically display a clean documentation table containing all available custom skills, their trigger phrases, and a brief explanation of what each skill does, whenever the user requests "help_skill", "h_", or "help_".
 
 ---
 
@@ -13,14 +13,7 @@ This skill instructs the assistant on how to automatically display a clean docum
 
 ## Steps to Execute
 
-### 1. Verify and Synchronize Skill Files to Java Folder & Root h_.md
-- **Check for Differences**: Compare files, folders, and subfolders in the global AGY skills folder (`C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\`) with the project's local Java `skill_agent` folder (`C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\`), and verify if the root `h_.md` file (`C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\h_.md`) is missing or differs from the latest version.
-- **Update and Overwrite**: If any differences are found (modified content, missing files, or subfolders), copy/replace all files and folders from the global AGY skills directory to the project's `skill_agent` folder, and overwrite the root `h_.md` file completely to match.
-
-### 2. Read Available Skill Files
-Scan the skills directory `C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\` to list all `.md` files.
-
-### 3. Format and Display the Help Table
+### 1. Format and Display the Help Table
 Output a markdown table documenting each custom skill.
 
 | Nom du Skill | Mots-clés (Triggers) | Description |
@@ -38,10 +31,12 @@ Output a markdown table documenting each custom skill.
 | **Fix TODOs** (`t_.md`) | `t_`, `t_models`, `t_usage`, `fix_todo` | Résout automatiquement les TODOs ou délègue aux skills correspondants (ex: `TODO: log_`, `TODO: sem_`, `TODO: con_c`, `TODO: room_d`), puis affiche le diff de code à la fin. |
 | **Copy Package / Sibling Files** (`cop_last.md`) | `cop_last`, `cop_`, `cl_`, `copy_package` | Copie tous les fichiers frères et sous-fichiers du package actif dans le presse-papiers, et l'enregistre pour les futurs appels. |
 | **Real-Time Logcat Inspector** (`log_.md`) | `log_`, `Todo: log_`, `logcat`, `adb_log` | Filtre les logs de l'appareil par rapport au tag ou au contexte spécifié dans le code ou le chat, et les affiche. |
+| **Real-Time Logcat Filter** (`log_f.md`) | `log_f`, `log_f ` followed by terms | Filtre et affiche en temps réel les logs de l'appareil par rapport aux mots-clés saisis dans le chat. |
 | **Room Database Query** (`room_d/room_d.md`) | `room_d`, `Todo: room_d` | Exécute des requêtes de base de données à chaud et les affiche sous forme de tableau Markdown. |
 | **Help Skills** (`help_skill.md`) | `help_skill`, `h_`, `help_` | Affiche ce tableau d'aide documentant l'ensemble des Skills disponibles. |
+| **AGY to Project Synchronizer** (`agy_to_project.md`) | `agy_to_project`, `agy_to_proj`, `a_t_p` | Synchronise et remplace les skills et le fichier `h_.md` du dossier AGY global vers le projet local. |
 
-### 4. Present Clickable Links
+### 2. Present Clickable Links
 Always present the user with clickable links to the skill files in the skills directory for quick editing.
 
 * ℹ️ [Help Skill](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/help_skill.md)
@@ -57,5 +52,7 @@ Always present the user with clickable links to the skill files in the skills di
 * ✅ [Fix TODOs and Launch](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_.md)
 * 📋 [Copy Package / Sibling Files](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/cop_last.md)
 * 📋 [Real-Time Logcat Inspector](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/log_.md)
+* 📋 [Real-Time Logcat Filter](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/log_f.md)
 * 📦 [Commit, Tag and Push](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/push_tagged.md)
 * 💾 [Room Database Query](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/room_d/room_d.md)
+* 🔄 [AGY to Project Synchronizer](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/agy_to_project.md)

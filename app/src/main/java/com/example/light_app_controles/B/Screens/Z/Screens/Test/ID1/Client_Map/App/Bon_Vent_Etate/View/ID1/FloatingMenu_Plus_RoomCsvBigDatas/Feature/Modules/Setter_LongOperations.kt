@@ -1,5 +1,6 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Modules
 
+import android.util.Log
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models.M8BonVent
@@ -577,6 +578,9 @@ class Setter_LongOperations(
             runCatching { M8BonVent.Companion.to_Map(map) }.getOrNull()
         }
 
+        val xp4Bons = bons.filter { it.keyID.endsWith("xp4") }
+        Log.d("But6_FireBaseToCsv", "XP4 records fetched from Firebase: ${xp4Bons.map { it.keyID }}")
+
         if (importOnlyCredits) {
             bons = bons.filter { it.etateActuellementEst.credit_type }
         }
@@ -602,6 +606,9 @@ class Setter_LongOperations(
         }
 
         bons.forEach { bon ->
+            if (bon.keyID.endsWith("xp4")) {
+                Log.d("But6_FireBaseToCsv", "Writing XP4 record to CSV: ${bon.keyID}")
+            }
             existingRows[bon.keyID] = bon.to_Map().values.map { (it?.toString() ?: "").escapeCsv() }
         }
 
@@ -630,11 +637,21 @@ class Setter_LongOperations(
             runCatching { M8BonVent.Companion.to_Map(map) }.getOrNull()
         }
 
+        val xp4Bons = bons.filter { it.keyID.endsWith("xp4") }
+        Log.d("But3_CsvToRoom", "XP4 records parsed from CSV: ${xp4Bons.map { it.keyID }}")
+
         if (importOnlyCredits) {
             bons = bons.filter { it.etateActuellementEst.credit_type }
         }
 
-        if (bons.isNotEmpty()) bons.forEach { appDatabase.dao_M8BonVent().upsert(it) }
+        if (bons.isNotEmpty()) {
+            bons.forEach { bon ->
+                if (bon.keyID.endsWith("xp4")) {
+                    Log.d("But3_CsvToRoom", "Upserting XP4 record to Room database: ${bon.keyID}")
+                }
+                appDatabase.dao_M8BonVent().upsert(bon)
+            }
+        }
     }
 
     suspend fun import_M8_FireBase_To_Room(
