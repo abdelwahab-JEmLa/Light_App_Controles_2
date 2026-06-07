@@ -39,9 +39,6 @@ Output a markdown table documenting each custom skill.
 | **Context Transfer** (`contexTrensefert/conTr_.md`) | `conT_`, `conTr_`, `/contexTrensefert`, `context_transfer`, `ctsave_`, `ctc_`, `ctecrase_`, `cwc_`, `ct_deepRead_` | Documente l'architecture du projet et sert de guide pour transférer le contexte de développement des modules (CSV/Firebase/Room) d'une session à l'autre. |
 | **Client Chained TODOs** (`t_appClient_chain_todo.md`) | `t_appClient_chain_todo`, `t>cli` | Résout et nettoie automatiquement les TODOs chaînés et dépendants (avec indicateurs comme `//<--`, `//...`) dans le projet externe ClientJetPack. |
 | **Click Android Studio Run** (`click_as_Run.md`) | `click_as_Run`, `click_run`, `r_` | Focuse la fenêtre d'Android Studio et simule le raccourci de lancement Shift + F10 pour lancer l'application (sans déboguer). |
-| **PC Specialist** (`skill_pc.md`) | `skill_pc`, `pc_spec`, `pc_status`, `diagnose_pc` | Exécute des diagnostics complets sur le PC hôte Windows (CPU, RAM, Disque, Réseau, Processus) et génère un rapport de performance. |
-| **PC Cleaner** (`clean_pc.md`) | `clean_pc`, `nettoyer_pc`, `pc_clean`, `cleanup_pc`, `cl_p`, `cl_e`, `cl_s` | Nettoie les fichiers temporaires, le cache de Windows Update, les fichiers logs et vide la corbeille pour libérer de l'espace sur le disque C:. |
-| **Help Hardware** (`hw_.md`) | `hw_`, `help_hw`, `help_pc` | Affiche le tableau d'aide documentant l'ensemble des Skills dédiés au PC/Matériel (diagnostics, contrôle AS, ADB, capture d'écran, etc.). |
 
 
 ### 2. Present Clickable Links
@@ -68,6 +65,3 @@ Always present the user with clickable links to the skill files in the skills di
 * 🔄 [Context Transfer](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/contexTrensefert/conTr_.md)
 * 📋 [Client Chained TODOs](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_appClient_chain_todo.md)
 * 🚀 [Click Android Studio Run](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/click_as_Run.md)
-* 🖥️ [PC Specialist](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/skill_pc.md)
-* 🧹 [PC Cleaner](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/clean_pc.md)
-* ⚙️ [PC Help Page (hw_)](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/hw_.md)

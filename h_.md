@@ -30,7 +30,6 @@ déclencher chaque skill en saisissant son mot-clé (trigger phrase) dans le cha
 | **Context Transfer**                | [`conTr_.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/contexTrensefert/conTr_.md)                         | `conT_`, `conTr_`, `/contexTrensefert`, `context_transfer`, `ctsave_`, `ctc_`, `ctecrase_`, `cwc_`, `ct_deepRead_`                 | Documente l'architecture du projet et sert de guide pour transférer le contexte de développement des modules (CSV/Firebase/Room) d'une session à l'autre.                                                      |
 | **Client Chained TODOs**           | [t_appClient_chain_todo.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_appClient_chain_todo.md) | `t_appClient_chain_todo`, `t>cli`                                                                          | Résout et nettoie automatiquement les TODOs chaînés et dépendants (avec indicateurs comme `//<--`, `//...`) dans le projet externe ClientJetPack. |
 | **Copy Coding Patterns**           | [t_copiePattersApp.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_copiePattersApp.md) | `t_copiePattersApp`, `t>copiePattersApp`, `copiePattersApp`, `t_c_client`                                                | Copie et adapte les patterns de code et implémentations du projet ClientJetPack vers le projet local Light App. |
-| **Click Android Studio Run**       | [click_as_Run.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/click_as_Run.md) | `click_as_Run`, `click_run`, `r_`                                                                          | Focuse la fenêtre d'Android Studio et simule le raccourci de lancement Shift + F10 pour lancer l'application (sans déboguer). |
 
 ---
 
@@ -59,5 +58,4 @@ Vous pouvez éditer et configurer directement ces fichiers dans le répertoire d
 * 🔄 [Context Transfer](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/contexTrensefert/conTr_.md)
 * 📋 [Client Chained TODOs](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_appClient_chain_todo.md)
 * 📋 [Copy Coding Patterns](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_copiePattersApp.md)
-* 🚀 [Click Android Studio Run](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/click_as_Run.md)
 

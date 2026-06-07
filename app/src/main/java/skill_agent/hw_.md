@@ -1,6 +1,6 @@
-# Table des Skills Hardware & PC (HW)
+# Table des Skills Hardware & PC (HP)
 
-Voici la liste des compétences d'administration et de diagnostic PC/Hardware disponibles dans ce projet. Vous pouvez déclencher chaque skill en saisissant son mot-clé (trigger phrase) dans le chat.
+Voici la liste des compétences d'administration et de diagnostic PC/Hardware disponibles dans ce projet. Vous pouvez déclencher ce tableau d'aide en saisissant le mot-clé `hp_` (ou `hw_`, `help_pc`, `help_hw`) dans le chat.
 
 ---
 
