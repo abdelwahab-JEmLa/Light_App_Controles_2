@@ -29,6 +29,7 @@ déclencher chaque skill en saisissant son mot-clé (trigger phrase) dans le cha
 | **AGY to Project Synchronizer**    | [`agy_to_project.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/agy_to_project.md)       | `agy_to_project`, `agy_to_proj`, `a_t_p`                                                                   | Synchronise et remplace les skills et le fichier `h_.md` du dossier AGY global vers le projet local.                                                                                                            |
 | **Context Transfer**                | [`conTr_.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/contexTrensefert/conTr_.md)                         | `conT_`, `conTr_`, `/contexTrensefert`, `context_transfer`, `ctsave_`, `ctc_`, `ctecrase_`, `cwc_`, `ct_deepRead_`                 | Documente l'architecture du projet et sert de guide pour transférer le contexte de développement des modules (CSV/Firebase/Room) d'une session à l'autre.                                                      |
 | **Client Chained TODOs**           | [t_appClient_chain_todo.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_appClient_chain_todo.md) | `t_appClient_chain_todo`, `t>cli`                                                                          | Résout et nettoie automatiquement les TODOs chaînés et dépendants (avec indicateurs comme `//<--`, `//...`) dans le projet externe ClientJetPack. |
+| **Copy Coding Patterns**           | [t_copiePattersApp.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_copiePattersApp.md) | `t_copiePattersApp`, `t>copiePattersApp`, `copiePattersApp`                                                | Copie et adapte les patterns de code et implémentations du projet ClientJetPack vers le projet local Light App. |
 
 ---
 
@@ -56,4 +57,5 @@ Vous pouvez éditer et configurer directement ces fichiers dans le répertoire d
 * 🔄 [AGY to Project Synchronizer](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/agy_to_project.md)
 * 🔄 [Context Transfer](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/contexTrensefert/conTr_.md)
 * 📋 [Client Chained TODOs](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_appClient_chain_todo.md)
+* 📋 [Copy Coding Patterns](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_copiePattersApp.md)
 

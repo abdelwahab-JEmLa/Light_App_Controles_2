@@ -17,6 +17,11 @@ The absolute fastest way to locate all TODO comments in the client codebase is u
 - **Path 1**: `D:\AndroidStudioProjects\ClientJetPack\app\src\main\java`
 - **Path 2**: `D:\AndroidStudioProjects\ClientJetPack\app\src\androidTest\java`
 
+*Note for Windows environments*: If `grep_search` fails or is not available, immediately use the `run_command` tool to run the following fast PowerShell search:
+```powershell
+Get-ChildItem -Path "D:\AndroidStudioProjects\ClientJetPack\app\src" -Recurse -Filter "*.kt" | Select-String -Pattern "TODO"
+```
+
 Analyze comments such as:
 - `//<--` or `//<-` pointers.
 - Chained relative comments (e.g. `//TODO(2.C Relative Au Todo(1):` or `//TODO(1):`).
