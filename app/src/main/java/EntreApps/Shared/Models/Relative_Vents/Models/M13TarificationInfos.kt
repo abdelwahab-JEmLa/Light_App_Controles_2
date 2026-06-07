@@ -251,12 +251,14 @@ data class M13TarificationInfos(    //<--
     )
 
     companion object {
-        val ref = central_MainDataBases_RefProduction
-            .child("M13Tariffication")
+        const val nam_Model_Str = "M13Tariffication"
+
+        val ref = central_MainDataBases_RefProduction.child(nam_Model_Str)
+
         val ref_Test = ref
         val csv_test = File(
             M00CentralParametresOfAllApps.central_Local_Csv,
-            "TestDatas/M13TarificationInfos.csv"
+            "TestDatas/$nam_Model_Str.csv"
         )
 
         /*  val ref = Firebase.database.getReference(
@@ -265,7 +267,7 @@ data class M13TarificationInfos(    //<--
 
         val ref_NonActiveDatas =
             M00CentralParametresOfAllApps.Companion.centralRef_Non_Active_Datas_PourLightApp
-                .child("M13Tariffication")
+                .child(nam_Model_Str)
 
 
         fun get_default_P0(

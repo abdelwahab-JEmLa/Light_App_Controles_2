@@ -1,6 +1,7 @@
 package EntreApps.Shared.Models.Relative_Vents.Models
 
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_MainDataBases_RefProduction
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent.Companion.sum_totale_et_benifice
@@ -9,7 +10,7 @@ import com.google.firebase.database.database
 import java.io.File
 
 @Entity
-data class M14VentPeriode(       //--
+data class M14VentPeriode(
     @PrimaryKey
     var keyID: String = generePushKey(),
     var creationTimestamp: Long = System.currentTimeMillis(),
@@ -75,13 +76,13 @@ data class M14VentPeriode(       //--
     }
 
     companion object {
-        val ref = Firebase.database.getReference(
-            "/00_DataPrototype-04-02/_1_developingRef/C_InfosSqlDataBases/DatasM14VentPeriode"
-        )
+        const val nam_Model_Str = "M14VentPeriode"
+        val ref = central_MainDataBases_RefProduction.child(nam_Model_Str)
+
         val ref_Test = ref
         val csv_test = File(
             M00CentralParametresOfAllApps.central_Local_Csv,
-            "TestDatas/M14VentPeriode.csv"
+            "TestDatas/$nam_Model_Str.csv"
         )
 
         fun remove_ref() {

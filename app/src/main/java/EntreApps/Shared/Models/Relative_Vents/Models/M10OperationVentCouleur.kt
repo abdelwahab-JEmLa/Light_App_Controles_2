@@ -1,6 +1,7 @@
 package EntreApps.Shared.Models.Relative_Vents.Models
 
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_MainDataBases_RefProduction
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -163,13 +164,12 @@ data class M10OperationVentCouleur(         //<--
 
         fun get_Default() = M10OperationVentCouleur()
 
-
-        val ref =
-            Firebase.database.getReference("/00_DataPrototype-04-02/_1_developingRef/C_InfosSqlDataBases/Datas10OperationVentCouleur")
+        const val nam_Model_Str = "M10OperationVentCouleur"
+        val ref = central_MainDataBases_RefProduction.child(nam_Model_Str)
         val ref_Test = ref
         val csv_test = File(
             M00CentralParametresOfAllApps.central_Local_Csv,
-            "TestDatas/M10OperationVentCouleur.csv"
+            "TestDatas/$nam_Model_Str.csv"
         )
 
         fun remove_ref() {

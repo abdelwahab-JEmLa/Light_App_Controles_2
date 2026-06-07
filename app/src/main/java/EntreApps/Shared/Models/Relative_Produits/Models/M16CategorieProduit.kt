@@ -1,11 +1,12 @@
 package EntreApps.Shared.Models.Relative_Produits.Models
 
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_MainDataBases_RefProduction
 import EntreApps.Shared.Models.M09AppCompt
-import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit.Companion.filter_passive
 import android.util.Log
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.File
 
 @Entity
 data class M16CategorieProduit(
@@ -54,9 +55,15 @@ data class M16CategorieProduit(
     )
 
     companion object {
-        val ref = M00CentralParametresOfAllApps.Companion.centralRef
-            .child("C_CategorieProduitInfos")
+        const val nam_Model_Str = "M16CategorieProduit"
 
+        val ref = central_MainDataBases_RefProduction.child(nam_Model_Str)
+
+        val ref_Test = ref
+        val csv_test = File(
+            M00CentralParametresOfAllApps.central_Local_Csv,
+            "TestDatas/$nam_Model_Str.csv"
+        )
 
         fun safeRemoveRef(): Unit {
             ref.removeValue()
