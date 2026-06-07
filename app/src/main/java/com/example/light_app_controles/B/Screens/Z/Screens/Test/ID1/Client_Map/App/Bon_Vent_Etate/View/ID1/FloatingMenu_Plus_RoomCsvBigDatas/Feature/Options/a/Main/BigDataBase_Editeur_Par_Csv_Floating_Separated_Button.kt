@@ -60,10 +60,14 @@ import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.A
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M2Client_Operations_FragMap_DropdownMenu.Actions.M2Client_Operations_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M8Bon_Operations_FragMap_DropdownMenu.Actions.M8Bon_Operations_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M1.Actions.M01_FragMap_DropdownMenu
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M10.Actions.M10_FragMap_DropdownMenu
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M13.Actions.M13_FragMap_DropdownMenu
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M14.Actions.M14_FragMap_DropdownMenu
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.a.Main.MultiOperations_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.a.Main.ViewModel.FeatureID1_ViewModel
 import EntreApps.Shared.Modules.Base.AppDatabase
 
-private enum class DialState { Closed, ChildsVisible, M8Open, M03Open, M2Open, M1_OpertaionsDatasRow_Open }
+private enum class DialState { Closed, ChildsVisible, M8Open, M03Open, M2Open, M1_OpertaionsDatasRow_Open, M10Open, M13Open, M14Open, MultiOperationsOpen }  //<--
 
 @Composable
 fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
@@ -132,6 +136,45 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         Text(
+                            text       = "Multi Operations",
+                            style      = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color      = Color.White,
+                            modifier   = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFF37474F).copy(alpha = 0.92f))
+                                .padding(horizontal = 10.dp, vertical = 5.dp),
+                        )
+                        Box {
+                            FloatingActionButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    dialState = DialState.MultiOperationsOpen
+                                },
+                                modifier       = Modifier.size(46.dp),
+                                containerColor = Color(0xFF37474F),
+                                shape          = CircleShape,
+                                elevation      = FloatingActionButtonDefaults.elevation(4.dp),
+                            ) {
+                                Icon(
+                                    imageVector        = Icons.Default.AllInbox,
+                                    contentDescription = "Multi",
+                                    tint               = Color.White,
+                                    modifier           = Modifier.size(22.dp),
+                                )
+                            }
+                            MultiOperations_FragMap_DropdownMenu(
+                                expanded = dialState == DialState.MultiOperationsOpen,
+                                onDismiss = { dialState = DialState.Closed },
+                                vm = viewModel,
+                            )
+                        }
+                    }
+                    Row(
+                        verticalAlignment     = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
                             text       = "M1 Produit",
                             style      = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold,
@@ -164,6 +207,123 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
                                 onDismiss = { dialState = DialState.Closed },
                                 on_vent_key = on_vent_key,
                                 onClick_Lence_Capture = onClick_Lence_Capture,
+                                vm = viewModel,
+                            )
+                        }
+                    }
+                    Row(
+                        verticalAlignment     = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            text       = "M10 Operation",
+                            style      = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color      = Color.White,
+                            modifier   = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFFE91E63).copy(alpha = 0.92f))
+                                .padding(horizontal = 10.dp, vertical = 5.dp),
+                        )
+                        Box {
+                            FloatingActionButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    dialState = DialState.M10Open
+                                },
+                                modifier       = Modifier.size(46.dp),
+                                containerColor = Color(0xFFE91E63),
+                                shape          = CircleShape,
+                                elevation      = FloatingActionButtonDefaults.elevation(4.dp),
+                            ) {
+                                Icon(
+                                    imageVector        = Icons.Default.AllInbox,
+                                    contentDescription = "M10",
+                                    tint               = Color.White,
+                                    modifier           = Modifier.size(22.dp),
+                                )
+                            }
+                            M10_FragMap_DropdownMenu(
+                                expanded = dialState == DialState.M10Open,
+                                onDismiss = { dialState = DialState.Closed },
+                                vm = viewModel,
+                            )
+                        }
+                    }
+                    Row(
+                        verticalAlignment     = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            text       = "M13 Tarification",
+                            style      = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color      = Color.White,
+                            modifier   = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFF9C27B0).copy(alpha = 0.92f))
+                                .padding(horizontal = 10.dp, vertical = 5.dp),
+                        )
+                        Box {
+                            FloatingActionButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    dialState = DialState.M13Open
+                                },
+                                modifier       = Modifier.size(46.dp),
+                                containerColor = Color(0xFF9C27B0),
+                                shape          = CircleShape,
+                                elevation      = FloatingActionButtonDefaults.elevation(4.dp),
+                            ) {
+                                Icon(
+                                    imageVector        = Icons.Default.AllInbox,
+                                    contentDescription = "M13",
+                                    tint               = Color.White,
+                                    modifier           = Modifier.size(22.dp),
+                                )
+                            }
+                            M13_FragMap_DropdownMenu(
+                                expanded = dialState == DialState.M13Open,
+                                onDismiss = { dialState = DialState.Closed },
+                                vm = viewModel,
+                            )
+                        }
+                    }
+                    Row(
+                        verticalAlignment     = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            text       = "M14 VentPeriode",
+                            style      = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color      = Color.White,
+                            modifier   = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFF3F51B5).copy(alpha = 0.92f))
+                                .padding(horizontal = 10.dp, vertical = 5.dp),
+                        )
+                        Box {
+                            FloatingActionButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    dialState = DialState.M14Open
+                                },
+                                modifier       = Modifier.size(46.dp),
+                                containerColor = Color(0xFF3F51B5),
+                                shape          = CircleShape,
+                                elevation      = FloatingActionButtonDefaults.elevation(4.dp),
+                            ) {
+                                Icon(
+                                    imageVector        = Icons.Default.AllInbox,
+                                    contentDescription = "M14",
+                                    tint               = Color.White,
+                                    modifier           = Modifier.size(22.dp),
+                                )
+                            }
+                            M14_FragMap_DropdownMenu(
+                                expanded = dialState == DialState.M14Open,
+                                onDismiss = { dialState = DialState.Closed },
                                 vm = viewModel,
                             )
                         }

@@ -6,9 +6,10 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
+import java.io.File
 
 @Entity
-data class M10OperationVentCouleur(
+data class M10OperationVentCouleur(         //<--
     @PrimaryKey var keyID: String = M00CentralParametresOfAllApps.Companion.getPushFireBase(ref),
     var creationTimestamps: Long = System.currentTimeMillis(),
     var dernierTimeTampsSynchronisationAvecFireBase: Long = System.currentTimeMillis(),
@@ -165,6 +166,11 @@ data class M10OperationVentCouleur(
 
         val ref =
             Firebase.database.getReference("/00_DataPrototype-04-02/_1_developingRef/C_InfosSqlDataBases/Datas10OperationVentCouleur")
+        val ref_Test = ref
+        val csv_test = File(
+            M00CentralParametresOfAllApps.central_Local_Csv,
+            "TestDatas/M10OperationVentCouleur.csv"
+        )
 
         fun remove_ref() {
             ref.removeValue()

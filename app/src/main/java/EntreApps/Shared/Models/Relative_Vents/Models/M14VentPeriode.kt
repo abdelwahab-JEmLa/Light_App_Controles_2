@@ -6,9 +6,10 @@ import androidx.room.PrimaryKey
 import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent.Companion.sum_totale_et_benifice
 import com.google.firebase.Firebase
 import com.google.firebase.database.database
+import java.io.File
 
 @Entity
-data class M14VentPeriode(
+data class M14VentPeriode(       //--
     @PrimaryKey
     var keyID: String = generePushKey(),
     var creationTimestamp: Long = System.currentTimeMillis(),
@@ -42,6 +43,26 @@ data class M14VentPeriode(
         EtateActuellementEst.SoquetteNonDefinie,
 
     ) {
+    fun toFirebaseMap(): Map<String, Any?> = mapOf(
+        "keyID" to keyID,
+        "creationTimestamp" to creationTimestamp,
+        "dernierTimeTampsSynchronisationAvecFireBase" to dernierTimeTampsSynchronisationAvecFireBase,
+        "abdelmounen_Doit_Etre_Ici" to abdelmounen_Doit_Etre_Ici,
+        "parent_M9AppCompt_KeyID" to parent_M9AppCompt_KeyID,
+        "parent_M9AppCompt_DebugInfos" to parent_M9AppCompt_DebugInfos,
+        "son_verification_entre_vent_et_achat_est_fait" to son_verification_entre_vent_et_achat_est_fait,
+        "credit_Vents_Totale" to credit_Vents_Totale,
+        "cash_Vents_Totale" to cash_Vents_Totale,
+        "credit_achats_Totale" to credit_achats_Totale,
+        "cash_achats_Totale" to cash_achats_Totale,
+        "credit_produitsAuDepot" to credit_produitsAuDepot,
+        "valeur_Produits_depuit_Ancien_Vent_Period" to valeur_Produits_depuit_Ancien_Vent_Period,
+        "acheter_produitsAuDepot" to acheter_produitsAuDepot,
+        "pre_fraits_voiture_essance_marche_et_paprasse" to pre_fraits_voiture_essance_marche_et_paprasse,
+        "saved_balance" to saved_balance,
+        "etateActuellementEst" to etateActuellementEst.name,
+    )
+
     fun get_DebugInfos(): String {
         return buildString {
             append(keyID.takeLast(3))
@@ -56,6 +77,11 @@ data class M14VentPeriode(
     companion object {
         val ref = Firebase.database.getReference(
             "/00_DataPrototype-04-02/_1_developingRef/C_InfosSqlDataBases/DatasM14VentPeriode"
+        )
+        val ref_Test = ref
+        val csv_test = File(
+            M00CentralParametresOfAllApps.central_Local_Csv,
+            "TestDatas/M14VentPeriode.csv"
         )
 
         fun remove_ref() {

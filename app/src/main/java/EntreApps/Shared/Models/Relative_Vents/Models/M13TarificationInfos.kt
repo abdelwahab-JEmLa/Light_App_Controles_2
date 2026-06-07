@@ -15,9 +15,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.File
 
 @Entity
-data class M13TarificationInfos(
+data class M13TarificationInfos(    //<--
 
     @PrimaryKey
     val keyID: String = M09AppCompt.Companion.getPushFireBase(ref),
@@ -252,6 +253,11 @@ data class M13TarificationInfos(
     companion object {
         val ref = central_MainDataBases_RefProduction
             .child("M13Tariffication")
+        val ref_Test = ref
+        val csv_test = File(
+            M00CentralParametresOfAllApps.central_Local_Csv,
+            "TestDatas/M13TarificationInfos.csv"
+        )
 
         /*  val ref = Firebase.database.getReference(
               "/00_DataPrototype-04-02/_1_developingRef/C_InfosSqlDataBases/DataBase13TarificationInfos"

@@ -4,6 +4,9 @@ import EntreApps.Shared.Models.M09AppCompt
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
 import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
+import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
+import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
+import EntreApps.Shared.Models.Relative_Vents.Models.M14VentPeriode
 import android.annotation.SuppressLint
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -24,6 +27,9 @@ class ActiveDatas {
     var list_M03: List<M3CouleurProduitInfos>? by mutableStateOf(null)
     var list_M2Client: List<M2Client>? by mutableStateOf(null)     //<-- //<--
     var list_M1Produit: List<M01Produit>? by mutableStateOf(null)
+    var list_M10Operation: List<M10OperationVentCouleur>? by mutableStateOf(null)
+    var list_M13Tariff: List<M13TarificationInfos>? by mutableStateOf(null)
+    var list_M14Period: List<M14VentPeriode>? by mutableStateOf(null)
 }
 
 @SuppressLint("StaticFieldLeak")
@@ -45,6 +51,9 @@ class FeatureID1_ViewModel(
             active_Datas.list_M03 = (appDatabase.dao_M03CouleurProduitInfos().getAll())
             active_Datas.list_M2Client = (appDatabase.dao_M2Client().getAll())
             active_Datas.list_M1Produit = (appDatabase.dao_M1Produit().getAll())
+            active_Datas.list_M10Operation = (appDatabase.dao_M10OperationVentCouleur().getAll())
+            active_Datas.list_M13Tariff = (appDatabase.dao_M13TarificationInfos().getAll())
+            active_Datas.list_M14Period = (appDatabase.dao_M14VentPeriode().getAll())
         }
     }
 
@@ -58,6 +67,9 @@ class FeatureID1_ViewModel(
             active_Datas.list_M03 = appDatabase.dao_M03CouleurProduitInfos().getAll()
             active_Datas.list_M2Client = appDatabase.dao_M2Client().getAll()
             active_Datas.list_M1Produit = appDatabase.dao_M1Produit().getAll()
+            active_Datas.list_M10Operation = appDatabase.dao_M10OperationVentCouleur().getAll()
+            active_Datas.list_M13Tariff = appDatabase.dao_M13TarificationInfos().getAll()
+            active_Datas.list_M14Period = appDatabase.dao_M14VentPeriode().getAll()
         }
     }
 

@@ -2,7 +2,7 @@
 
 This skill teaches the assistant how to recover, catalog, and overwrite context from past implementation sessions by reading and managing files inside the context transfer folder [conversationsContext](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/contexTrensefert/conversationsContext).
 
-Whenever the user triggers "conT_", "conTr_", "/contexTrensefert", "context_transfer", "ctsave_", "ctc_", or "ctecrase_", the assistant must follow these instructions.
+Whenever the user triggers "conT_", "conTr_", "/contexTrensefert", "context_transfer", "ctsave_", "ctc_", "ctecrase_", "cwc_", or "ct_deepRead_", the assistant must follow these instructions.
 
 ---
 
@@ -14,10 +14,24 @@ Whenever the user triggers "conT_", "conTr_", "/contexTrensefert", "context_tran
 - "ctsave_"
 - "ctc_"
 - "ctecrase_"
+- "cwc_"
+- "ct_deepRead_"
 
 ---
 
 ## Steps to Execute
+
+### When "cwc_<conversation_id>" (or "cwc_<conversation_id>_agy" or "cwc_") is triggered:
+#### 1. Locate and Read the Context File
+Locate the context file matching the conversation ID in [conversationsContext](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/contexTrensefert/conversationsContext) (e.g., `<conversation_id>_agy.md`).
+#### 2. Display Context Content Only
+Display the contents of the context markdown file to the user. Do **NOT** read, open, or inspect any of the actual source code files listed or mentioned within it.
+
+### When "ct_deepRead_<conversation_id>" (or "ct_deepRead_<conversation_id>_agy" or "ct_deepRead_") is triggered:
+#### 1. Read the Context File
+Locate and read the context file matching the conversation ID in [conversationsContext](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/contexTrensefert/conversationsContext) (e.g., `<conversation_id>_agy.md`).
+#### 2. Open and Read All Referenced Source Files
+Extract the file paths of all source files listed or modified in that context file. Open and read all of these source files to load their complete context into the AI session.
 
 ### When "ctc_" is triggered:
 #### 1. List Available Contexts

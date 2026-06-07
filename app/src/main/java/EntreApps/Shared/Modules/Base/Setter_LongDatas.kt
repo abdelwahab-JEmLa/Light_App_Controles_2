@@ -10,6 +10,7 @@ import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
 import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
 import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
 import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent
+import EntreApps.Shared.Models.Relative_Vents.Models.M14VentPeriode
 import EntreApps.Shared.Modules.Base.AppDatabase
 import android.content.Context
 import android.widget.Toast
@@ -1363,6 +1364,645 @@ class Setter_LongDatas(
             val updates = mutableMapOf<String, Any>(new.keyID to new.toFirebaseMap())
             M2Client.Companion.ref.updateChildren(updates).await()
         }
+    }
+
+    // =========================================================================
+    // M10OperationVentCouleur Sync Operations
+    // =========================================================================
+
+    suspend fun delete_All_M10() {
+        appDatabase.dao_M10OperationVentCouleur().deleteAll()
+    }
+
+    suspend fun insertAll_M10(items: List<M10OperationVentCouleur>) = withContext(Dispatchers.IO) {
+        items.forEach { appDatabase.dao_M10OperationVentCouleur().upsert(it) }
+    }
+
+    suspend fun get_Firebase_M10_Counts(refDataBase: DatabaseReference): Pair<Int, Int> =
+        withContext(Dispatchers.IO) {
+            val snapshot = suspendFirebaseSnapshot(refDataBase)
+            val total = snapshot.childrenCount.toInt()
+            Pair(total, 0)
+        }
+
+    suspend fun export_M10_Room_To_Csv(csv: File) = withContext(Dispatchers.IO) {
+        val datas = appDatabase.dao_M10OperationVentCouleur().getAll()
+        if (datas.isEmpty()) return@withContext
+
+        csv.parentFile?.mkdirs()
+
+        val headers = datas.first().to_Map().keys.toList()
+        val existingRows: LinkedHashMap<String, List<String>> = linkedMapOf()
+
+        if (csv.exists()) {
+            val lines = csv.readLines()
+            if (lines.size > 1) {
+                val fileHeaders = lines[0].splitCsvLine()
+                val keyIdx = fileHeaders.indexOf("keyID")
+                lines.drop(1).forEach { line ->
+                    val cells = line.splitCsvLine()
+                    val id = cells.getOrNull(keyIdx) ?: ""
+                    if (id.isNotEmpty()) existingRows[id] = cells
+                }
+            }
+        }
+
+        datas.forEach { item ->
+            existingRows[item.keyID] = item.to_Map().values.map { (it?.toString() ?: "").escapeCsv() }
+        }
+
+        FileWriter(csv, false).use { w ->
+            w.write(headers.joinToString(",") + "\n")
+            existingRows.values.forEach { cells ->
+                w.write(cells.joinToString(",") { it.escapeCsv() } + "\n")
+            }
+        }
+    }
+
+    suspend fun set_scv_M10_au_fireBase(
+        csvFile: File,
+        refDataBase: DatabaseReference,
+    ) = withContext(Dispatchers.IO) {
+        if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
+        val lines = csvFile.readLines().filter { it.isNotBlank() }
+        if (lines.size < 2) return@withContext
+
+        val headers = lines[0].splitCsvLine()
+        val keyIdx = headers.indexOf("keyID")
+        if (keyIdx == -1) return@withContext
+
+        val items = lines.drop(1).mapNotNull { line ->
+            val cells = line.splitCsvLine()
+            val keyID = cells.getOrNull(keyIdx)?.trim()?.removeSurrounding("\"")
+            if (keyID.isNullOrBlank()) return@mapNotNull null
+            val map = headers.zip(cells).associate { (h, v) ->
+                h to v.trim().removeSurrounding("\"").ifEmpty { null }
+            }
+            runCatching { m10_from_Map(map) }.getOrNull()
+        }
+
+        if (items.isEmpty()) return@withContext
+        val updates: Map<String, Any> = items.associate { it.keyID to it.to_Map() }
+        refDataBase.updateChildren(updates).await()
+    }
+
+    suspend fun import_M10_FireBase_To_Csv(
+        refDataBase: DatabaseReference,
+        csvFile: File,
+    ) = withContext(Dispatchers.IO) {
+        val snapshot = suspendFirebaseSnapshot(refDataBase)
+
+        val items = snapshot.children.mapNotNull { child ->
+            val raw = child.value
+            if (raw !is Map<*, *>) return@mapNotNull null
+            @Suppress("UNCHECKED_CAST")
+            val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
+            val item = runCatching { m10_from_Map(map) }.getOrNull()
+            item
+        }
+
+        if (items.isEmpty()) return@withContext
+
+        csvFile.parentFile?.mkdirs()
+
+        val headers = items.first().to_Map().keys.toList()
+        val existingRows: LinkedHashMap<String, List<String>> = linkedMapOf()
+
+        if (csvFile.exists()) {
+            val lines = csvFile.readLines()
+            if (lines.size > 1) {
+                val fileHeaders = lines[0].splitCsvLine()
+                val keyIdx = fileHeaders.indexOf("keyID")
+                lines.drop(1).forEach { line ->
+                    val cells = line.splitCsvLine()
+                    val id = cells.getOrNull(keyIdx) ?: ""
+                    if (id.isNotEmpty()) existingRows[id] = cells
+                }
+            }
+        }
+
+        items.forEach { item ->
+            existingRows[item.keyID] = item.to_Map().values.map { (it?.toString() ?: "").escapeCsv() }
+        }
+
+        FileWriter(csvFile, false).use { w ->
+            w.write(headers.joinToString(",") + "\n")
+            existingRows.values.forEach { cells ->
+                w.write(cells.joinToString(",") { it.escapeCsv() } + "\n")
+            }
+        }
+    }
+
+    suspend fun import_M10Csv_To_Room(csvFile: File) = withContext(Dispatchers.IO) {
+        if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
+        val lines = csvFile.readLines().filter { it.isNotBlank() }
+        if (lines.size < 2) return@withContext
+
+        val headers = lines[0].splitCsvLine()
+        val keyIdx = headers.indexOf("keyID")
+        if (keyIdx == -1) return@withContext
+
+        val items = lines.drop(1).mapNotNull { line ->
+            val cells = line.splitCsvLine()
+            val keyID = cells.getOrNull(keyIdx)?.trim()?.removeSurrounding("\"")
+            if (keyID.isNullOrBlank()) return@mapNotNull null
+            val map = headers.zip(cells).associate { (h, v) ->
+                h to v.trim().removeSurrounding("\"").ifEmpty { null }
+            }
+            runCatching { m10_from_Map(map) }.getOrNull()
+        }
+
+        if (items.isNotEmpty()) {
+            items.forEach { appDatabase.dao_M10OperationVentCouleur().upsert(it) }
+        }
+    }
+
+    suspend fun import_M10_FireBase_To_Room(refDataBase: DatabaseReference) =
+        withContext(Dispatchers.IO) {
+            val snapshot = suspendFirebaseSnapshot(refDataBase)
+            val items = snapshot.children.mapNotNull { child ->
+                val raw = child.value
+                if (raw !is Map<*, *>) return@mapNotNull null
+                @Suppress("UNCHECKED_CAST")
+                val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
+                val item = runCatching { m10_from_Map(map) }.getOrNull()
+                item
+            }
+            items.forEach { appDatabase.dao_M10OperationVentCouleur().upsert(it) }
+        }
+
+    private fun M10OperationVentCouleur.to_Map(): Map<String, Any?> {
+        return mapOf(
+            "keyID" to keyID,
+            "creationTimestamps" to creationTimestamps,
+            "dernierTimeTampsSynchronisationAvecFireBase" to dernierTimeTampsSynchronisationAvecFireBase,
+            "its_created_in_working_for_wholesaler" to its_created_in_working_for_wholesaler,
+            "commetaire" to commetaire,
+            "prix_de_Vent_entre_directement_NewProto" to prix_de_Vent_entre_directement_NewProto,
+            "its_Linked_To_Autre_Vent_Si_NonDispo" to its_Linked_To_Autre_Vent_Si_NonDispo,
+            "linked_To_M10OperationVent_KeyID" to linked_To_M10OperationVent_KeyID,
+            "linked_To_M10OperationVent_DebugInfos" to linked_To_M10OperationVent_DebugInfos,
+            "siNonDispoParentM10Vent_it_parent_M3CouleurInfos_KeyId" to siNonDispoParentM10Vent_it_parent_M3CouleurInfos_KeyId,
+            "siNonDispoParentM10Vent_it_parent_M1Produit_Nom" to siNonDispoParentM10Vent_it_parent_M1Produit_Nom,
+            "parent_M9AppCompt_KeyID" to parent_M9AppCompt_KeyID,
+            "parent_M9AppCompt_DebugInfos" to parent_M9AppCompt_DebugInfos,
+            "parent_M14VentPeriod_KeyId" to parent_M14VentPeriod_KeyId,
+            "parent_M14VentPeriod_DebugInfos" to parent_M14VentPeriod_DebugInfos,
+            "parentEPeriodVentStartDate" to parentEPeriodVentStartDate,
+            "parent_M8BonVent_KeyId" to parent_M8BonVent_KeyId,
+            "parent_M8BonVent_DebugInfos" to parent_M8BonVent_DebugInfos,
+            "parent_M1Produit_KeyId" to parent_M1Produit_KeyId,
+            "parent_M1Produit_DebugInfos" to parent_M1Produit_DebugInfos,
+            "parent_M1Produit_Nom" to parent_M1Produit_Nom,
+            "parentProduitInfosOldId" to parentProduitInfosOldId,
+            "parent_M3CouleurProduit_KeyID" to parent_M3CouleurProduit_KeyID,
+            "parent_M3CouleurProduit_DebugInfos" to parent_M3CouleurProduit_DebugInfos,
+            "parentM13TarificationKeyID" to parentM13TarificationKeyID,
+            "parentM13TarificationDebugInfos" to parentM13TarificationDebugInfos,
+            "etateActuellementEst" to etateActuellementEst.name,
+            "provisoireMonPrix" to provisoireMonPrix,
+            "etateDelivery" to etateDelivery.name,
+            "lence_pour_check" to lence_pour_check,
+            "premier_Check_Donne" to premier_Check_Donne,
+            "last_update_premier_Check_Donne_TimeTamps" to last_update_premier_Check_Donne_TimeTamps,
+            "non_places_au_depot" to non_places_au_depot,
+            "pas_Dispo_Pour_Aujourduit" to pas_Dispo_Pour_Aujourduit,
+            "typeTarificationEnumT2" to typeTarificationEnumT2.name,
+            "parentClientInfosKeyID" to parentClientInfosKeyID,
+            "parentClientName" to parentClientName,
+            "type" to type.name,
+            "achatParentBsonIDOld" to achatParentBsonIDOld,
+            "quantite_Boit_Par_Carton" to quantite_Boit_Par_Carton,
+            "quantity" to quantity,
+            "setIN_Vent_Its_Quantity_Represent" to setIN_Vent_Its_Quantity_Represent.name,
+            "affiche_Unite_Au_Printing" to affiche_Unite_Au_Printing,
+            "parent_M2Client_KeyID" to parent_M2Client_KeyID
+        )
+    }
+
+    private fun m10_from_Map(map: Map<String, String?>): M10OperationVentCouleur {
+        return M10OperationVentCouleur(
+            keyID = map["keyID"] ?: "",
+            creationTimestamps = map["creationTimestamps"]?.toLongOrNull() ?: System.currentTimeMillis(),
+            dernierTimeTampsSynchronisationAvecFireBase = map["dernierTimeTampsSynchronisationAvecFireBase"]?.toLongOrNull() ?: System.currentTimeMillis(),
+            its_created_in_working_for_wholesaler = map["its_created_in_working_for_wholesaler"]?.toBoolean() ?: false,
+            commetaire = map["commetaire"] ?: "",
+            prix_de_Vent_entre_directement_NewProto = map["prix_de_Vent_entre_directement_NewProto"]?.toDoubleOrNull() ?: 0.0,
+            its_Linked_To_Autre_Vent_Si_NonDispo = map["its_Linked_To_Autre_Vent_Si_NonDispo"]?.toBoolean() ?: false,
+            linked_To_M10OperationVent_KeyID = map["linked_To_M10OperationVent_KeyID"] ?: "",
+            linked_To_M10OperationVent_DebugInfos = map["linked_To_M10OperationVent_DebugInfos"] ?: "",
+            siNonDispoParentM10Vent_it_parent_M3CouleurInfos_KeyId = map["siNonDispoParentM10Vent_it_parent_M3CouleurInfos_KeyId"] ?: "",
+            siNonDispoParentM10Vent_it_parent_M1Produit_Nom = map["siNonDispoParentM10Vent_it_parent_M1Produit_Nom"] ?: "",
+            parent_M9AppCompt_KeyID = map["parent_M9AppCompt_KeyID"] ?: "null",
+            parent_M9AppCompt_DebugInfos = map["parent_M9AppCompt_DebugInfos"] ?: "null",
+            parent_M14VentPeriod_KeyId = map["parent_M14VentPeriod_KeyId"] ?: "null",
+            parent_M14VentPeriod_DebugInfos = map["parent_M14VentPeriod_DebugInfos"] ?: "null",
+            parentEPeriodVentStartDate = map["parentEPeriodVentStartDate"]?.toLongOrNull() ?: 0L,
+            parent_M8BonVent_KeyId = map["parent_M8BonVent_KeyId"] ?: "null",
+            parent_M8BonVent_DebugInfos = map["parent_M8BonVent_DebugInfos"] ?: "null",
+            parent_M1Produit_KeyId = map["parent_M1Produit_KeyId"] ?: "null",
+            parent_M1Produit_DebugInfos = map["parent_M1Produit_DebugInfos"] ?: "null",
+            parent_M1Produit_Nom = map["parent_M1Produit_Nom"] ?: "",
+            parentProduitInfosOldId = map["parentProduitInfosOldId"]?.toLongOrNull() ?: 0L,
+            parent_M3CouleurProduit_KeyID = map["parent_M3CouleurProduit_KeyID"] ?: "null",
+            parent_M3CouleurProduit_DebugInfos = map["parent_M3CouleurProduit_DebugInfos"] ?: "null",
+            parentM13TarificationKeyID = map["parentM13TarificationKeyID"] ?: "null",
+            parentM13TarificationDebugInfos = map["parentM13TarificationDebugInfos"] ?: "null",
+            etateActuellementEst = map["etateActuellementEst"]?.let { runCatching { M10OperationVentCouleur.EtateActuellementEst.valueOf(it) }.getOrNull() } ?: M10OperationVentCouleur.EtateActuellementEst.CreeSlote,
+            provisoireMonPrix = map["provisoireMonPrix"]?.toDoubleOrNull() ?: 0.0,
+            etateDelivery = map["etateDelivery"]?.let { runCatching { M10OperationVentCouleur.EtateDelivery.valueOf(it) }.getOrNull() } ?: M10OperationVentCouleur.EtateDelivery.Trouve,
+            lence_pour_check = map["lence_pour_check"]?.toBoolean() ?: false,
+            premier_Check_Donne = map["premier_Check_Donne"]?.toBoolean() ?: false,
+            last_update_premier_Check_Donne_TimeTamps = map["last_update_premier_Check_Donne_TimeTamps"]?.toLongOrNull() ?: 0L,
+            non_places_au_depot = map["non_places_au_depot"]?.toBoolean() ?: false,
+            pas_Dispo_Pour_Aujourduit = map["pas_Dispo_Pour_Aujourduit"]?.toBoolean() ?: false,
+            typeTarificationEnumT2 = map["typeTarificationEnumT2"]?.let { runCatching { M13TarificationInfos.TypeChoisi.valueOf(it) }.getOrNull() } ?: M13TarificationInfos.TypeChoisi.Prix_Detaille,
+            parentClientInfosKeyID = map["parentClientInfosKeyID"] ?: "",
+            parentClientName = map["parentClientName"] ?: "",
+            type = map["type"]?.let { runCatching { M10OperationVentCouleur.Type.valueOf(it) }.getOrNull() } ?: M10OperationVentCouleur.Type.CommandeDeLui,
+            achatParentBsonIDOld = map["achatParentBsonIDOld"] ?: "",
+            quantite_Boit_Par_Carton = map["quantite_Boit_Par_Carton"]?.toIntOrNull() ?: 10,
+            quantity = map["quantity"]?.toIntOrNull() ?: 0,
+            setIN_Vent_Its_Quantity_Represent = map["setIN_Vent_Its_Quantity_Represent"]?.let { runCatching { M10OperationVentCouleur.SetIN_Vent_Its_Quantity_Represent.valueOf(it) }.getOrNull() } ?: M10OperationVentCouleur.SetIN_Vent_Its_Quantity_Represent.quantity_Par_Boit,
+            affiche_Unite_Au_Printing = map["affiche_Unite_Au_Printing"]?.toBoolean() ?: true,
+            parent_M2Client_KeyID = map["parent_M2Client_KeyID"] ?: "null"
+        )
+    }
+
+    // =========================================================================
+    // M13TarificationInfos Sync Operations
+    // =========================================================================
+
+    suspend fun delete_All_M13() {
+        appDatabase.dao_M13TarificationInfos().deleteAll()
+    }
+
+    suspend fun insertAll_M13(items: List<M13TarificationInfos>) = withContext(Dispatchers.IO) {
+        items.forEach { appDatabase.dao_M13TarificationInfos().upsert(it) }
+    }
+
+    suspend fun get_Firebase_M13_Counts(refDataBase: DatabaseReference): Pair<Int, Int> =
+        withContext(Dispatchers.IO) {
+            val snapshot = suspendFirebaseSnapshot(refDataBase)
+            val total = snapshot.childrenCount.toInt()
+            Pair(total, 0)
+        }
+
+    suspend fun export_M13_Room_To_Csv(csv: File) = withContext(Dispatchers.IO) {
+        val datas = appDatabase.dao_M13TarificationInfos().getAll()
+        if (datas.isEmpty()) return@withContext
+
+        csv.parentFile?.mkdirs()
+
+        val headers = datas.first().toFirebaseMap().keys.toList()
+        val existingRows: LinkedHashMap<String, List<String>> = linkedMapOf()
+
+        if (csv.exists()) {
+            val lines = csv.readLines()
+            if (lines.size > 1) {
+                val fileHeaders = lines[0].splitCsvLine()
+                val keyIdx = fileHeaders.indexOf("keyID")
+                lines.drop(1).forEach { line ->
+                    val cells = line.splitCsvLine()
+                    val id = cells.getOrNull(keyIdx) ?: ""
+                    if (id.isNotEmpty()) existingRows[id] = cells
+                }
+            }
+        }
+
+        datas.forEach { item ->
+            existingRows[item.keyID] = item.toFirebaseMap().values.map { (it?.toString() ?: "").escapeCsv() }
+        }
+
+        FileWriter(csv, false).use { w ->
+            w.write(headers.joinToString(",") + "\n")
+            existingRows.values.forEach { cells ->
+                w.write(cells.joinToString(",") { it.escapeCsv() } + "\n")
+            }
+        }
+    }
+
+    suspend fun set_scv_M13_au_fireBase(
+        csvFile: File,
+        refDataBase: DatabaseReference,
+    ) = withContext(Dispatchers.IO) {
+        if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
+        val lines = csvFile.readLines().filter { it.isNotBlank() }
+        if (lines.size < 2) return@withContext
+
+        val headers = lines[0].splitCsvLine()
+        val keyIdx = headers.indexOf("keyID")
+        if (keyIdx == -1) return@withContext
+
+        val items = lines.drop(1).mapNotNull { line ->
+            val cells = line.splitCsvLine()
+            val keyID = cells.getOrNull(keyIdx)?.trim()?.removeSurrounding("\"")
+            if (keyID.isNullOrBlank()) return@mapNotNull null
+            val map = headers.zip(cells).associate { (h, v) ->
+                h to v.trim().removeSurrounding("\"").ifEmpty { null }
+            }
+            runCatching { m13_from_Map(map) }.getOrNull()
+        }
+
+        if (items.isEmpty()) return@withContext
+        val updates: Map<String, Any> = items.associate { it.keyID to it.toFirebaseMap() }
+        refDataBase.updateChildren(updates).await()
+    }
+
+    suspend fun import_M13_FireBase_To_Csv(
+        refDataBase: DatabaseReference,
+        csvFile: File,
+    ) = withContext(Dispatchers.IO) {
+        val snapshot = suspendFirebaseSnapshot(refDataBase)
+
+        val items = snapshot.children.mapNotNull { child ->
+            val raw = child.value
+            if (raw !is Map<*, *>) return@mapNotNull null
+            @Suppress("UNCHECKED_CAST")
+            val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
+            val item = runCatching { m13_from_Map(map) }.getOrNull()
+            item
+        }
+
+        if (items.isEmpty()) return@withContext
+
+        csvFile.parentFile?.mkdirs()
+
+        val headers = items.first().toFirebaseMap().keys.toList()
+        val existingRows: LinkedHashMap<String, List<String>> = linkedMapOf()
+
+        if (csvFile.exists()) {
+            val lines = csvFile.readLines()
+            if (lines.size > 1) {
+                val fileHeaders = lines[0].splitCsvLine()
+                val keyIdx = fileHeaders.indexOf("keyID")
+                lines.drop(1).forEach { line ->
+                    val cells = line.splitCsvLine()
+                    val id = cells.getOrNull(keyIdx) ?: ""
+                    if (id.isNotEmpty()) existingRows[id] = cells
+                }
+            }
+        }
+
+        items.forEach { item ->
+            existingRows[item.keyID] = item.toFirebaseMap().values.map { (it?.toString() ?: "").escapeCsv() }
+        }
+
+        FileWriter(csvFile, false).use { w ->
+            w.write(headers.joinToString(",") + "\n")
+            existingRows.values.forEach { cells ->
+                w.write(cells.joinToString(",") { it.escapeCsv() } + "\n")
+            }
+        }
+    }
+
+    suspend fun import_M13Csv_To_Room(csvFile: File) = withContext(Dispatchers.IO) {
+        if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
+        val lines = csvFile.readLines().filter { it.isNotBlank() }
+        if (lines.size < 2) return@withContext
+
+        val headers = lines[0].splitCsvLine()
+        val keyIdx = headers.indexOf("keyID")
+        if (keyIdx == -1) return@withContext
+
+        val items = lines.drop(1).mapNotNull { line ->
+            val cells = line.splitCsvLine()
+            val keyID = cells.getOrNull(keyIdx)?.trim()?.removeSurrounding("\"")
+            if (keyID.isNullOrBlank()) return@mapNotNull null
+            val map = headers.zip(cells).associate { (h, v) ->
+                h to v.trim().removeSurrounding("\"").ifEmpty { null }
+            }
+            runCatching { m13_from_Map(map) }.getOrNull()
+        }
+
+        if (items.isNotEmpty()) {
+            items.forEach { appDatabase.dao_M13TarificationInfos().upsert(it) }
+        }
+    }
+
+    suspend fun import_M13_FireBase_To_Room(refDataBase: DatabaseReference) =
+        withContext(Dispatchers.IO) {
+            val snapshot = suspendFirebaseSnapshot(refDataBase)
+            val items = snapshot.children.mapNotNull { child ->
+                val raw = child.value
+                if (raw !is Map<*, *>) return@mapNotNull null
+                @Suppress("UNCHECKED_CAST")
+                val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
+                val item = runCatching { m13_from_Map(map) }.getOrNull()
+                item
+            }
+            items.forEach { appDatabase.dao_M13TarificationInfos().upsert(it) }
+        }
+
+    private fun m13_from_Map(map: Map<String, String?>): M13TarificationInfos {
+        return M13TarificationInfos(
+            keyID = map["keyID"] ?: "",
+            id = map["id"]?.toLongOrNull() ?: 0L,
+            creationTimestamps = map["creationTimestamps"]?.toLongOrNull() ?: System.currentTimeMillis(),
+            dernierTimeTampsSynchronisationAvecFireBase = map["dernierTimeTampsSynchronisationAvecFireBase"]?.toLongOrNull() ?: System.currentTimeMillis(),
+            defaultNonSaved_Entre = map["defaultNonSaved_Entre"]?.toBoolean() ?: true,
+            its_From_CalculeParNewBenifice = map["its_From_CalculeParNewBenifice"]?.toBoolean() ?: true,
+            laisse_Au_Gerant = map["laisse_Au_Gerant"]?.toBoolean() ?: false,
+            typeChoisi = map["typeChoisi"]?.let { runCatching { M13TarificationInfos.TypeChoisi.valueOf(it) }.getOrNull() } ?: M13TarificationInfos.TypeChoisi.Prix_SupperGro_Et_PresentationService,
+            prixCurrency = map["prixCurrency"]?.toDoubleOrNull() ?: 0.0,
+            profitMargin = map["profitMargin"]?.toDoubleOrNull() ?: 0.0,
+            suggestedUpgrade = map["suggestedUpgrade"]?.let { runCatching { M13TarificationInfos.TypeChoisi.valueOf(it) }.getOrNull() },
+            parent_M14VentPeriod_KeyId = map["parent_M14VentPeriod_KeyId"] ?: "",
+            parent_M14VentPeriod_DebugInfos = map["parent_M14VentPeriod_DebugInfos"] ?: "",
+            parent_M1Produit_KeyId = map["parent_M1Produit_KeyId"] ?: "null",
+            parent_M1Produit_DebugInfos = map["parent_M1Produit_DebugInfos"] ?: "null",
+            parent_M8BonVent_KeyId = map["parent_M8BonVent_KeyId"] ?: "null",
+            parent_M8BonVent_DebugInfos = map["parent_M8BonVent_DebugInfos"] ?: "null",
+            parent_M2Client_KeyId = map["parent_M2Client_KeyId"] ?: "null",
+            parent_M2Client_DebugInfos = map["parent_M2Client_DebugInfos"] ?: "null"
+        )
+    }
+
+    // =========================================================================
+    // M14VentPeriode Sync Operations
+    // =========================================================================
+
+    suspend fun delete_All_M14() {
+        appDatabase.dao_M14VentPeriode().deleteAll()
+    }
+
+    suspend fun insertAll_M14(items: List<M14VentPeriode>) = withContext(Dispatchers.IO) {
+        items.forEach { appDatabase.dao_M14VentPeriode().upsert(it) }
+    }
+
+    suspend fun get_Firebase_M14_Counts(refDataBase: DatabaseReference): Pair<Int, Int> =
+        withContext(Dispatchers.IO) {
+            val snapshot = suspendFirebaseSnapshot(refDataBase)
+            val total = snapshot.childrenCount.toInt()
+            Pair(total, 0)
+        }
+
+    suspend fun export_M14_Room_To_Csv(csv: File) = withContext(Dispatchers.IO) {
+        val datas = appDatabase.dao_M14VentPeriode().getAll()
+        if (datas.isEmpty()) return@withContext
+
+        csv.parentFile?.mkdirs()
+
+        val headers = datas.first().toFirebaseMap().keys.toList()
+        val existingRows: LinkedHashMap<String, List<String>> = linkedMapOf()
+
+        if (csv.exists()) {
+            val lines = csv.readLines()
+            if (lines.size > 1) {
+                val fileHeaders = lines[0].splitCsvLine()
+                val keyIdx = fileHeaders.indexOf("keyID")
+                lines.drop(1).forEach { line ->
+                    val cells = line.splitCsvLine()
+                    val id = cells.getOrNull(keyIdx) ?: ""
+                    if (id.isNotEmpty()) existingRows[id] = cells
+                }
+            }
+        }
+
+        datas.forEach { item ->
+            existingRows[item.keyID] = item.toFirebaseMap().values.map { (it?.toString() ?: "").escapeCsv() }
+        }
+
+        FileWriter(csv, false).use { w ->
+            w.write(headers.joinToString(",") + "\n")
+            existingRows.values.forEach { cells ->
+                w.write(cells.joinToString(",") { it.escapeCsv() } + "\n")
+            }
+        }
+    }
+
+    suspend fun set_scv_M14_au_fireBase(
+        csvFile: File,
+        refDataBase: DatabaseReference,
+    ) = withContext(Dispatchers.IO) {
+        if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
+        val lines = csvFile.readLines().filter { it.isNotBlank() }
+        if (lines.size < 2) return@withContext
+
+        val headers = lines[0].splitCsvLine()
+        val keyIdx = headers.indexOf("keyID")
+        if (keyIdx == -1) return@withContext
+
+        val items = lines.drop(1).mapNotNull { line ->
+            val cells = line.splitCsvLine()
+            val keyID = cells.getOrNull(keyIdx)?.trim()?.removeSurrounding("\"")
+            if (keyID.isNullOrBlank()) return@mapNotNull null
+            val map = headers.zip(cells).associate { (h, v) ->
+                h to v.trim().removeSurrounding("\"").ifEmpty { null }
+            }
+            runCatching { m14_from_Map(map) }.getOrNull()
+        }
+
+        if (items.isEmpty()) return@withContext
+        val updates: Map<String, Any> = items.associate { it.keyID to it.toFirebaseMap() }
+        refDataBase.updateChildren(updates).await()
+    }
+
+    suspend fun import_M14_FireBase_To_Csv(
+        refDataBase: DatabaseReference,
+        csvFile: File,
+    ) = withContext(Dispatchers.IO) {
+        val snapshot = suspendFirebaseSnapshot(refDataBase)
+
+        val items = snapshot.children.mapNotNull { child ->
+            val raw = child.value
+            if (raw !is Map<*, *>) return@mapNotNull null
+            @Suppress("UNCHECKED_CAST")
+            val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
+            val item = runCatching { m14_from_Map(map) }.getOrNull()
+            item
+        }
+
+        if (items.isEmpty()) return@withContext
+
+        csvFile.parentFile?.mkdirs()
+
+        val headers = items.first().toFirebaseMap().keys.toList()
+        val existingRows: LinkedHashMap<String, List<String>> = linkedMapOf()
+
+        if (csvFile.exists()) {
+            val lines = csvFile.readLines()
+            if (lines.size > 1) {
+                val fileHeaders = lines[0].splitCsvLine()
+                val keyIdx = fileHeaders.indexOf("keyID")
+                lines.drop(1).forEach { line ->
+                    val cells = line.splitCsvLine()
+                    val id = cells.getOrNull(keyIdx) ?: ""
+                    if (id.isNotEmpty()) existingRows[id] = cells
+                }
+            }
+        }
+
+        items.forEach { item ->
+            existingRows[item.keyID] = item.toFirebaseMap().values.map { (it?.toString() ?: "").escapeCsv() }
+        }
+
+        FileWriter(csvFile, false).use { w ->
+            w.write(headers.joinToString(",") + "\n")
+            existingRows.values.forEach { cells ->
+                w.write(cells.joinToString(",") { it.escapeCsv() } + "\n")
+            }
+        }
+    }
+
+    suspend fun import_M14Csv_To_Room(csvFile: File) = withContext(Dispatchers.IO) {
+        if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
+        val lines = csvFile.readLines().filter { it.isNotBlank() }
+        if (lines.size < 2) return@withContext
+
+        val headers = lines[0].splitCsvLine()
+        val keyIdx = headers.indexOf("keyID")
+        if (keyIdx == -1) return@withContext
+
+        val items = lines.drop(1).mapNotNull { line ->
+            val cells = line.splitCsvLine()
+            val keyID = cells.getOrNull(keyIdx)?.trim()?.removeSurrounding("\"")
+            if (keyID.isNullOrBlank()) return@mapNotNull null
+            val map = headers.zip(cells).associate { (h, v) ->
+                h to v.trim().removeSurrounding("\"").ifEmpty { null }
+            }
+            runCatching { m14_from_Map(map) }.getOrNull()
+        }
+
+        if (items.isNotEmpty()) {
+            items.forEach { appDatabase.dao_M14VentPeriode().upsert(it) }
+        }
+    }
+
+    suspend fun import_M14_FireBase_To_Room(refDataBase: DatabaseReference) =
+        withContext(Dispatchers.IO) {
+            val snapshot = suspendFirebaseSnapshot(refDataBase)
+            val items = snapshot.children.mapNotNull { child ->
+                val raw = child.value
+                if (raw !is Map<*, *>) return@mapNotNull null
+                @Suppress("UNCHECKED_CAST")
+                val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
+                val item = runCatching { m14_from_Map(map) }.getOrNull()
+                item
+            }
+            items.forEach { appDatabase.dao_M14VentPeriode().upsert(it) }
+        }
+
+    private fun m14_from_Map(map: Map<String, String?>): M14VentPeriode {
+        return M14VentPeriode(
+            keyID = map["keyID"] ?: "",
+            creationTimestamp = map["creationTimestamp"]?.toLongOrNull() ?: System.currentTimeMillis(),
+            dernierTimeTampsSynchronisationAvecFireBase = map["dernierTimeTampsSynchronisationAvecFireBase"]?.toLongOrNull() ?: System.currentTimeMillis(),
+            abdelmounen_Doit_Etre_Ici = map["abdelmounen_Doit_Etre_Ici"]?.toBoolean() ?: false,
+            parent_M9AppCompt_KeyID = map["parent_M9AppCompt_KeyID"] ?: "",
+            parent_M9AppCompt_DebugInfos = map["parent_M9AppCompt_DebugInfos"] ?: "",
+            son_verification_entre_vent_et_achat_est_fait = map["son_verification_entre_vent_et_achat_est_fait"]?.toBoolean() ?: true,
+            credit_Vents_Totale = map["credit_Vents_Totale"]?.toDoubleOrNull() ?: 0.0,
+            cash_Vents_Totale = map["cash_Vents_Totale"]?.toDoubleOrNull() ?: 0.0,
+            credit_achats_Totale = map["credit_achats_Totale"]?.toDoubleOrNull() ?: 0.0,
+            cash_achats_Totale = map["cash_achats_Totale"]?.toDoubleOrNull() ?: 0.0,
+            credit_produitsAuDepot = map["credit_produitsAuDepot"]?.toDoubleOrNull() ?: 0.0,
+            valeur_Produits_depuit_Ancien_Vent_Period = map["valeur_Produits_depuit_Ancien_Vent_Period"]?.toDoubleOrNull() ?: 0.0,
+            acheter_produitsAuDepot = map["acheter_produitsAuDepot"]?.toDoubleOrNull() ?: 0.0,
+            pre_fraits_voiture_essance_marche_et_paprasse = map["pre_fraits_voiture_essance_marche_et_paprasse"]?.toDoubleOrNull() ?: 0.0,
+            saved_balance = map["saved_balance"]?.toDoubleOrNull() ?: 0.0,
+            etateActuellementEst = map["etateActuellementEst"]?.let { runCatching { M14VentPeriode.EtateActuellementEst.valueOf(it) }.getOrNull() } ?: M14VentPeriode.EtateActuellementEst.SoquetteNonDefinie
+        )
     }
 }
 
