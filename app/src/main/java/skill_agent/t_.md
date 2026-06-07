@@ -6,6 +6,8 @@ Additionally, this skill supports the **`t_models`** sub-trigger, which automati
 
 If **`t_usage`** is triggered, the assistant will also compute and display the percentage and amount of model tokens consumed so far, and what remains in the current session (out of the calibrated 200,000 token limit) at the end of the execution report.
 
+If **`>clientApp`** or **`>ca`** is triggered, the assistant will automatically redirect and execute the **Client JetPack Fix TODOs & Coding Patterns (t_appClient_chain_todo)** skill to inspect relative/chained TODOs and search coding patterns or files in the external client codebase.
+
 **Central Dispatcher Capability**: If a `TODO` comment contains a trigger phrase for another custom skill (e.g., `TODO: log_`, `TODO: sem_`, `TODO: con_c`, `TODO: cop_`, `TODO: room_d`), the assistant must automatically chain and execute the corresponding custom skill's steps on that file/package, rather than applying a manual code fix.
 
 ---
@@ -14,8 +16,11 @@ If **`t_usage`** is triggered, the assistant will also compute and display the p
 - "t_"
 - "t_models"
 - "t_usage"
+- ">clientApp"
+- ">ca"
 - "fix_todo"
 - "fix_todos"
+
 
 ---
 
@@ -63,6 +68,11 @@ Proceed directly to the standard steps below to locate and fix TODOs.
 
 #### 1. Calculate and Report Token Usage
 At the end of the standard execution steps, estimate the total token count of the current conversation (using the transcript file size `transcript_full.jsonl` size in bytes / 4 + system context overhead of ~15,000 tokens) and calculate what percentage of the calibrated 200,000 token limit this represents. Output both the consumed token percentage and amount, as well as the remaining token amount and percentage prominently at the end of the report.
+
+### When ">clientApp" or ">ca" is triggered:
+
+#### 1. Dispatch to Client JetPack Fix TODOs & Coding Patterns Skill
+Immediately redirect execution to the **Client JetPack Fix TODOs & Coding Patterns (t_appClient_chain_todo)** skill. Run its steps to locate outstanding relative/chained TODOs in the client codebase, search coding patterns or files, apply fixes, and report success. Do not execute the standard local codebase TODO steps.
 
 ---
 
