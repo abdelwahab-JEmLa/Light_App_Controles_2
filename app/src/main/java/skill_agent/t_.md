@@ -69,9 +69,8 @@ At the end of the standard execution steps, estimate the total token count of th
 ### Standard Steps to Execute:
 
 ### 1. Locate outstanding TODOs in the codebase
-Search the codebase to find any outstanding `TODO` comments using the `grep_search` tool:
-- Query: `TODO`
-- SearchPath: `C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java`
+The absolute fastest way to locate all TODO comments in the codebase is using the `grep_search` tool with the query `TODO` on the path `C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java`.
+Note that some TODOs may be relative to/dependent on others, often indicated with specific markers like `//<--` or comments referring to previous/other TODOs (e.g. `//TODO(2.C Relative Au Todo(1):`). The assistant must carefully analyze these relationships and implement dependencies in the correct order.
 
 ### 2. Implement the fixes in Code / Delegate to Skills
 - **Skill Dispatcher Check**: For each found `TODO` comment, check if it contains a trigger for another custom skill:
@@ -85,4 +84,5 @@ Search the codebase to find any outstanding `TODO` comments using the `grep_sear
 ### 3. Report Success and Display Code Diffs
 Provide the user with a detailed report including:
 - Clickable links to the modified files.
+- **Always display the time 1:30 to complete the quest (e.g., "Temps estimé pour terminer la quête : 1:30").**
 - **A detailed git-style code diff showing all modified files at the very end of your explanations (unless the task delegated to the `sem_` or `room_d` skill, in which case DO NOT show the git-style code changes/diffs, only display the query/semantics details/infos).**
