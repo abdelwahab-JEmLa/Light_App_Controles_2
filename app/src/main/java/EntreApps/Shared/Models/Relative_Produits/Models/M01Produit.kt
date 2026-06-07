@@ -4,12 +4,14 @@ import Application4.App.Fragment.ID1.Fragment.ViewModel.Prioriter
 import EntreApps.Shared.Models.Components.DisponibilityEtates
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_MainDataBases_RefProduction
+import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos.Companion.nam_Model_Str
 import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.File
 
 @Entity
 data class M01Produit(
@@ -186,7 +188,7 @@ data class M01Produit(
         return tags.any { it in filter }
     }
 
-    fun toFirebaseMap(): Map<String, Any?> {
+    fun to_Map(): Map<String, Any?> {
         return mapOf(
             "id" to id,
             "keyID" to keyID,
@@ -321,17 +323,26 @@ data class M01Produit(
     }
 
     companion object {
+        const val nam_Model_Str = "M01Produit"
+
         fun get_Default(): M01Produit {
             return M01Produit()
         }
-
         fun safe_Remove_DataBase_Ref(): Unit {
             ref.removeValue()
         }
 
-        val ref = central_MainDataBases_RefProduction
-            .child("M01Produit")
+        val ref = central_MainDataBases_RefProduction.child(nam_Model_Str)
+        val ref_Test = ref
 
+        fun generePushKey() = M00CentralParametresOfAllApps.genereUnPushKeyFireBase(
+            ref
+        )
+
+        val csv_test = File(
+            M00CentralParametresOfAllApps.central_Local_Csv,
+            "TestDatas/$nam_Model_Str.csv"
+        )
         val ref_Ancien_Proto = M00CentralParametresOfAllApps.Companion.centralRef
             .child("A_ProduitInfos")
 

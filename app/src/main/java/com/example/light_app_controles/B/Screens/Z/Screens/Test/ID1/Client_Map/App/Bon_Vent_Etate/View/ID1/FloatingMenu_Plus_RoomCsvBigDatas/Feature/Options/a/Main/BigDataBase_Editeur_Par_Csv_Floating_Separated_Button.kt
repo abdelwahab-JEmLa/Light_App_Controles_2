@@ -59,10 +59,11 @@ import com.example.light_app_controles.R
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M3.Actions.M03_Operations_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M2Client_Operations_FragMap_DropdownMenu.Actions.M2Client_Operations_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M8Bon_Operations_FragMap_DropdownMenu.Actions.M8Bon_Operations_FragMap_DropdownMenu
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M1.Actions.M01_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.a.Main.ViewModel.FeatureID1_ViewModel
 import EntreApps.Shared.Modules.Base.AppDatabase
 
-private enum class DialState { Closed, ChildsVisible, M8Open, M03Open, M2Open }
+private enum class DialState { Closed, ChildsVisible, M8Open, M03Open, M2Open, M1_OpertaionsDatasRow_Open }
 
 @Composable
 fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
@@ -126,7 +127,47 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-
+                    Row(
+                        verticalAlignment     = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            text       = "M1 Produit",
+                            style      = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color      = Color.White,
+                            modifier   = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFF2E7D32).copy(alpha = 0.92f))
+                                .padding(horizontal = 10.dp, vertical = 5.dp),
+                        )
+                        Box {
+                            FloatingActionButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    dialState = DialState.M1_OpertaionsDatasRow_Open
+                                },
+                                modifier       = Modifier.size(46.dp),
+                                containerColor = Color(0xFF2E7D32),
+                                shape          = CircleShape,
+                                elevation      = FloatingActionButtonDefaults.elevation(4.dp),
+                            ) {
+                                Icon(
+                                    imageVector        = Icons.Default.AllInbox,
+                                    contentDescription = "M1",
+                                    tint               = Color.White,
+                                    modifier           = Modifier.size(22.dp),
+                                )
+                            }
+                            M01_FragMap_DropdownMenu(
+                                expanded = dialState == DialState.M1_OpertaionsDatasRow_Open,
+                                onDismiss = { dialState = DialState.Closed },
+                                on_vent_key = on_vent_key,
+                                onClick_Lence_Capture = onClick_Lence_Capture,
+                                vm = viewModel,
+                            )
+                        }
+                    }
                     Row(
                         verticalAlignment     = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp),

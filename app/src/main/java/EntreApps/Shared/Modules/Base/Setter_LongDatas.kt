@@ -30,11 +30,272 @@ import kotlin.String
 import kotlin.collections.forEach
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import Application4.App.Fragment.ID1.Fragment.ViewModel.Prioriter
+import EntreApps.Shared.Models.Components.DisponibilityEtates
+
 @Suppress("unused")
 class Setter_LongDatas(
     val appDatabase: AppDatabase,
     val  context: Context,
-) {
+) {      //<--
+
+    suspend fun delete_All_M01Produit() {
+        appDatabase.dao_M1Produit().deleteAll()
+    }
+
+    suspend fun insertAll_M01Produit(items: List<M01Produit>) = withContext(Dispatchers.IO) {
+        items.forEach { appDatabase.dao_M1Produit().upsertData(it) }
+    }
+
+    suspend fun get_Firebase_M01Produit_Counts(refDataBase: DatabaseReference): Pair<Int, Int> =
+        withContext(Dispatchers.IO) {
+            val snapshot = suspendFirebaseSnapshot(refDataBase)
+            val total = snapshot.childrenCount.toInt()
+            Pair(total, 0)
+        }
+
+    suspend fun export_M01Produit_Room_To_Csv(csv: File) = withContext(Dispatchers.IO) {
+        val datas = appDatabase.dao_M1Produit().getAll()
+        if (datas.isEmpty()) return@withContext
+
+        csv.parentFile?.mkdirs()
+
+        val headers = datas.first().to_Map().keys.toList()
+        val existingRows: LinkedHashMap<String, List<String>> = linkedMapOf()
+
+        if (csv.exists()) {
+            val lines = csv.readLines()
+            if (lines.size > 1) {
+                val fileHeaders = lines[0].splitCsvLine()
+                val keyIdx = fileHeaders.indexOf("keyID")
+                lines.drop(1).forEach { line ->
+                    val cells = line.splitCsvLine()
+                    val id = cells.getOrNull(keyIdx) ?: ""
+                    if (id.isNotEmpty()) existingRows[id] = cells
+                }
+            }
+        }
+
+        datas.forEach { item ->
+            existingRows[item.keyID] = item.to_Map().values.map { (it?.toString() ?: "").escapeCsv() }
+        }
+
+        FileWriter(csv, false).use { w ->
+            w.write(headers.joinToString(",") + "\n")
+            existingRows.values.forEach { cells ->
+                w.write(cells.joinToString(",") { it.escapeCsv() } + "\n")
+            }
+        }
+    }
+
+    suspend fun set_scv_M01Produit_au_fireBase(
+        csvFile: File,
+        refDataBase: DatabaseReference,
+    ) = withContext(Dispatchers.IO) {
+        if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
+        val lines = csvFile.readLines().filter { it.isNotBlank() }
+        if (lines.size < 2) return@withContext
+
+        val headers = lines[0].splitCsvLine()
+        val keyIdx = headers.indexOf("keyID")
+        if (keyIdx == -1) return@withContext
+
+        val items = lines.drop(1).mapNotNull { line ->
+            val cells = line.splitCsvLine()
+            val keyID = cells.getOrNull(keyIdx)?.trim()?.removeSurrounding("\"")
+            if (keyID.isNullOrBlank()) return@mapNotNull null
+            val map = headers.zip(cells).associate { (h, v) ->
+                h to v.trim().removeSurrounding("\"").ifEmpty { null }
+            }
+            runCatching { m01_from_Map(map) }.getOrNull()
+        }
+
+        if (items.isEmpty()) return@withContext
+        val updates: Map<String, Any> = items.associate { it.keyID to it.to_Map() }
+        refDataBase.updateChildren(updates).await()
+    }
+
+    suspend fun import_M01Produit_FireBase_To_Csv(
+        refDataBase: DatabaseReference,
+        csvFile: File,
+    ) = withContext(Dispatchers.IO) {
+        val snapshot = suspendFirebaseSnapshot(refDataBase)
+
+        val items = snapshot.children.mapNotNull { child ->
+            val raw = child.value
+            if (raw !is Map<*, *>) return@mapNotNull null
+            @Suppress("UNCHECKED_CAST")
+            val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
+            val item = runCatching { m01_from_Map(map) }.getOrNull()
+            item
+        }
+
+        if (items.isEmpty()) return@withContext
+
+        csvFile.parentFile?.mkdirs()
+
+        val headers = items.first().to_Map().keys.toList()
+        val existingRows: LinkedHashMap<String, List<String>> = linkedMapOf()
+
+        if (csvFile.exists()) {
+            val lines = csvFile.readLines()
+            if (lines.size > 1) {
+                val fileHeaders = lines[0].splitCsvLine()
+                val keyIdx = fileHeaders.indexOf("keyID")
+                lines.drop(1).forEach { line ->
+                    val cells = line.splitCsvLine()
+                    val id = cells.getOrNull(keyIdx) ?: ""
+                    if (id.isNotEmpty()) existingRows[id] = cells
+                }
+            }
+        }
+
+        items.forEach { item ->
+            existingRows[item.keyID] = item.to_Map().values.map { (it?.toString() ?: "").escapeCsv() }
+        }
+
+        FileWriter(csvFile, false).use { w ->
+            w.write(headers.joinToString(",") + "\n")
+            existingRows.values.forEach { cells ->
+                w.write(cells.joinToString(",") { it.escapeCsv() } + "\n")
+            }
+        }
+    }
+
+    suspend fun import_M01ProduitCsv_To_Room(csvFile: File) = withContext(Dispatchers.IO) {
+        if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
+        val lines = csvFile.readLines().filter { it.isNotBlank() }
+        if (lines.size < 2) return@withContext
+
+        val headers = lines[0].splitCsvLine()
+        val keyIdx = headers.indexOf("keyID")
+        if (keyIdx == -1) return@withContext
+
+        val items = lines.drop(1).mapNotNull { line ->
+            val cells = line.splitCsvLine()
+            val keyID = cells.getOrNull(keyIdx)?.trim()?.removeSurrounding("\"")
+            if (keyID.isNullOrBlank()) return@mapNotNull null
+            val map = headers.zip(cells).associate { (h, v) ->
+                h to v.trim().removeSurrounding("\"").ifEmpty { null }
+            }
+            runCatching { m01_from_Map(map) }.getOrNull()
+        }
+
+        if (items.isNotEmpty()) {
+            items.forEach { appDatabase.dao_M1Produit().upsertData(it) }
+        }
+    }
+
+    suspend fun import_M01Produit_FireBase_To_Room(refDataBase: DatabaseReference) =
+        withContext(Dispatchers.IO) {
+            val snapshot = suspendFirebaseSnapshot(refDataBase)
+            val items = snapshot.children.mapNotNull { child ->
+                val raw = child.value
+                if (raw !is Map<*, *>) return@mapNotNull null
+                @Suppress("UNCHECKED_CAST")
+                val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
+                val item = runCatching { m01_from_Map(map) }.getOrNull()
+                item
+            }
+            items.forEach { appDatabase.dao_M1Produit().upsertData(it) }
+        }
+
+    private fun m01_from_Map(map: Map<String, String?>): M01Produit {
+        return M01Produit(
+            id = map["id"]?.toLongOrNull() ?: 0L,
+            keyID = map["keyID"] ?: M01Produit.generePushKey(),
+            creationTimestamp = map["creationTimestamp"]?.toLongOrNull() ?: System.currentTimeMillis(),
+            dernierTimeTampsSynchronisationAvecFireBase = map["dernierTimeTampsSynchronisationAvecFireBase"]?.toLongOrNull() ?: System.currentTimeMillis(),
+            bsonObjectId = map["bsonObjectId"] ?: "",
+            dernierFireBaseUpdateTimestamps = map["dernierFireBaseUpdateTimestamps"]?.toLongOrNull() ?: 0L,
+            count_Don_Depot = map["count_Don_Depot"]?.toIntOrNull() ?: 0,
+            idParentCategorie = map["idParentCategorie"]?.toLongOrNull() ?: 0L,
+            positionDonSonCesFrereCategorieProduits = map["positionDonSonCesFrereCategorieProduits"]?.toIntOrNull() ?: 0,
+            nom = map["nom"] ?: "",
+            nomMutable = map["nomMutable"] ?: "",
+            processPositioningInFactory = map["processPositioningInFactory"]?.let {
+                runCatching { M01Produit.ProcessPositioningInFactoryID1.valueOf(it) }.getOrNull()
+            } ?: M01Produit.ProcessPositioningInFactoryID1.CreeAuGeneralHandler,
+            etateActuelleOnFusionAvecBaseDonne = map["etateActuelleOnFusionAvecBaseDonne"]?.let {
+                runCatching { M01Produit.EtateActuelleOnFusionAvecBaseDonne.valueOf(it) }.getOrNull()
+            } ?: M01Produit.EtateActuelleOnFusionAvecBaseDonne.CategorieOriginaleDefinie,
+            tag_prioriter_str = map["tag_prioriter_str"] ?: "",
+            nombreUniteInt = map["nombreUniteInt"]?.toIntOrNull() ?: 1,
+            nombreProduitDonSonCarton = map["nombreProduitDonSonCarton"]?.toIntOrNull() ?: 1,
+            its_Carton = map["its_Carton"]?.toBoolean() ?: false,
+            cartonState = map["cartonState"] ?: "",
+            heldPrioriteDemandAuGrossist = map["heldPrioriteDemandAuGrossist"]?.toBoolean() ?: false,
+            position_store_3jamale = map["position_store_3jamale"]?.toIntOrNull() ?: 0,
+            dernier_timeTamps_position_store_3jamale = map["dernier_timeTamps_position_store_3jamale"]?.toLongOrNull() ?: 0L,
+            prixDefiniParGerant = map["prixDefiniParGerant"]?.toDoubleOrNull() ?: 0.0,
+            prixVent = map["prixVent"]?.toDoubleOrNull() ?: 0.0,
+            cachePrixVent = map["cachePrixVent"]?.toBoolean() ?: false,
+            pourcentage_Prix_Progressive = map["pourcentage_Prix_Progressive"]?.toIntOrNull() ?: 60,
+            prixAchat = map["prixAchat"]?.toDoubleOrNull() ?: 0.0,
+            prixAchatDernierTimeTempUpdate = map["prixAchatDernierTimeTempUpdate"]?.toLongOrNull() ?: 0L,
+            clientPrixVentUnite = map["clientPrixVentUnite"]?.toDoubleOrNull() ?: 0.0,
+            afficheUniteAuPrint = map["afficheUniteAuPrint"]?.toBoolean() ?: false,
+            monPrixVentUniter = map["monPrixVentUniter"]?.toDoubleOrNull() ?: 0.0,
+            actualiseSonImage = map["actualiseSonImage"]?.toIntOrNull() ?: 0,
+            actualiseSonImageTest2 = map["actualiseSonImageTest2"]?.toIntOrNull() ?: 0,
+            afficheCesDetailPourComptBsonId = map["afficheCesDetailPourComptBsonId"] ?: "",
+            disponibilityEtates = map["disponibilityEtates"]?.let {
+                runCatching { DisponibilityEtates.valueOf(it) }.getOrNull()
+            } ?: DisponibilityEtates.NON_DISPO,
+            disponibilityEtates_Pour_presentaion_par_Camion = map["disponibilityEtates_Pour_presentaion_par_Camion"]?.let {
+                runCatching { DisponibilityEtates.valueOf(it) }.getOrNull()
+            } ?: DisponibilityEtates.NON_DISPO,
+            keyFireBase = map["keyFireBase"] ?: "",
+            nomArab = map["nomArab"] ?: "",
+            autreNomDarticle = map["autreNomDarticle"],
+            couleur1 = map["couleur1"] ?: "couleur1",
+            couleur2 = map["couleur2"],
+            couleur3 = map["couleur3"],
+            couleur4 = map["couleur4"],
+            couleur5 = map["couleur5"],
+            couleur6 = map["couleur6"],
+            couleur7 = map["couleur7"],
+            couleur8 = map["couleur8"],
+            couleur9 = map["couleur9"],
+            idcolor1 = map["idcolor1"]?.toLongOrNull() ?: 1L,
+            idcolor2 = map["idcolor2"]?.toLongOrNull() ?: 0L,
+            idcolor3 = map["idcolor3"]?.toLongOrNull() ?: 0L,
+            idcolor4 = map["idcolor4"]?.toLongOrNull() ?: 0L,
+            idcolor5 = map["idcolor5"]?.toLongOrNull() ?: 0L,
+            idcolor6 = map["idcolor6"]?.toLongOrNull() ?: 0L,
+            idcolor7 = map["idcolor7"]?.toLongOrNull() ?: 0L,
+            idcolor8 = map["idcolor8"]?.toLongOrNull() ?: 0L,
+            idcolor9 = map["idcolor9"]?.toLongOrNull() ?: 0L,
+            nomCategorie2 = map["nomCategorie2"],
+            affichageUniteState = map["affichageUniteState"]?.toBoolean() ?: false,
+            commmentSeVent = map["commmentSeVent"],
+            afficheBoitSiUniter = map["afficheBoitSiUniter"],
+            minQuan = map["minQuan"]?.toIntOrNull() ?: 0,
+            monBenfice = map["monBenfice"]?.toDoubleOrNull() ?: 0.0,
+            neaon2 = map["neaon2"] ?: "",
+            funChangeImagsDimention = map["funChangeImagsDimention"]?.toBoolean() ?: false,
+            nomCategorie = map["nomCategorie"] ?: "",
+            neaon1 = map["neaon1"]?.toDoubleOrNull() ?: 0.0,
+            lastUpdateState = map["lastUpdateState"] ?: "",
+            dateCreationCategorie = map["dateCreationCategorie"] ?: "",
+            prixDeVentTotaleChezClient = map["prixDeVentTotaleChezClient"]?.toDoubleOrNull() ?: 0.0,
+            benficeTotaleEntreMoiEtClien = map["benficeTotaleEntreMoiEtClien"]?.toDoubleOrNull() ?: 0.0,
+            benificeTotaleEn2 = map["benificeTotaleEn2"]?.toDoubleOrNull() ?: 0.0,
+            monPrixAchatUniter = map["monPrixAchatUniter"]?.toDoubleOrNull() ?: 0.0,
+            articleHaveUniteImages = map["articleHaveUniteImages"]?.toBoolean() ?: false,
+            itsNewArrivale = map["itsNewArrivale"]?.toBoolean() ?: false,
+            imageDimention = map["imageDimention"] ?: "",
+            idForSearchArticles = map["idForSearchArticles"]?.toLongOrNull() ?: 0L,
+            quantite_Boit_Par_Carton = map["quantite_Boit_Par_Carton"]?.toIntOrNull() ?: 1,
+            prioriter = map["prioriter"]?.let {
+                runCatching { Prioriter.valueOf(it) }.getOrNull()
+            },
+            setIN_Vent_Its_Quantity_Represent = map["setIN_Vent_Its_Quantity_Represent"]?.let {
+                runCatching { M10OperationVentCouleur.SetIN_Vent_Its_Quantity_Represent.valueOf(it) }.getOrNull()
+            } ?: M10OperationVentCouleur.SetIN_Vent_Its_Quantity_Represent.quantity_Par_Boit
+        )
+    }
+
     private val composScope = CoroutineScope(Dispatchers.IO)
 
     suspend fun add_New_M2Client(client: M2Client) {
@@ -718,7 +979,7 @@ class Setter_LongDatas(
         composScope.launch {
             if (datas.isNotEmpty()) {
                 datas.forEach { appDatabase.dao_M1Produit().update(it) }
-                val updates: Map<String, Any> = datas.associate { it.keyID to it.toFirebaseMap() }
+                val updates: Map<String, Any> = datas.associate { it.keyID to it.to_Map() }
                 M01Produit.Companion.ref.updateChildren(updates).await()
             }
             withContext(Dispatchers.Main) { onSuccess() }
@@ -749,7 +1010,7 @@ class Setter_LongDatas(
     fun update_M1Produit(data: M01Produit) {
         composScope.launch {
             appDatabase.dao_M1Produit().update(data)
-            val updates = mutableMapOf<String, Any>(data.keyID to data.toFirebaseMap())
+            val updates = mutableMapOf<String, Any>(data.keyID to data.to_Map())
             M01Produit.Companion.ref.updateChildren(updates).await()
         }
     }
