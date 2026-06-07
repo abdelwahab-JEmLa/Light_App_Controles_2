@@ -82,6 +82,9 @@ Immediately redirect execution to the **Client JetPack Fix TODOs & Coding Patter
 The absolute fastest way to locate all TODO comments in the codebase is using the `grep_search` tool with the query `TODO` on the path `C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java`.
 Note that some TODOs may be relative to/dependent on others, often indicated with specific markers like `//<--` or comments referring to previous/other TODOs (e.g. `//TODO(2.C Relative Au Todo(1):`). The assistant must carefully analyze these relationships and implement dependencies in the correct order.
 
+### 1.5. Present Beginner-Friendly Summary
+**CRITICAL RULE**: Before explaining the details of the code changes, the assistant MUST present a beginner-friendly summary of the problem, the list of concerned files to change, and a brief explanation of what changes will be made. The assistant should proceed directly to apply the modifications in the same turn without stopping to wait for user confirmation.
+
 ### 2. Implement the fixes in Code / Delegate to Skills
 - **Skill Dispatcher Check**: For each found `TODO` comment, check if it contains a trigger for another custom skill:
   - If it contains `log_` (e.g. `TODO: log_`), execute the **Real-Time Logcat Inspector (log_)** skill steps.
@@ -90,6 +93,7 @@ Note that some TODOs may be relative to/dependent on others, often indicated wit
   - If it contains `cop_` (e.g. `TODO: cop_`), execute the **Copy Package / Sibling Files (cop_last)** skill steps.
   - If it contains `room_d` (e.g. `TODO: room_d`), execute the **Room Database Query (room_d)** skill steps.
 - **Standard Fixes**: If no skill trigger is matched, analyze the `TODO` comment requirements, apply the appropriate manual code fixes, and delete the comment using `replace_file_content` or `multi_replace_file_content`. Be sure to also thoroughly clean up any associated pointer/indicator comments (such as `//<--`, `//<-`, or any inline TODO pointers) from adjacent lines.
+- **CRITICAL RULE**: Do NOT run compilation (like gradle compile) to verify errors during the `t_` skill execution. The `t_` skill is strictly to apply the code fixes without compiling. Compilation should only be run if explicitly requested by the user.
 
 ### 3. Report Success and Display Code Diffs
 Provide the user with a detailed report including:

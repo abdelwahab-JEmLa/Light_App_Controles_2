@@ -8,6 +8,7 @@ import Application4.App.Fragment.ID1.Fragment.ViewModel.Filter_Affichage_Mode_Pr
 import EntreApps.Shared.Models.Relative_Vents.Models.M14VentPeriode.Companion.sum_vent_et_benifice
 import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent.Companion.benifice
 import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent.Companion.sum_totale_vents
+import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -133,6 +134,29 @@ fun PressistatntMainActivityButtons_App4(
         }
     }
 
+    val sumRasseMaleProduitsAuDepot by remember(
+        activeDatas.list_M03CouleurProduitInfos,
+        uiState.list_M13TarificationInfos
+    ) {
+        derivedStateOf {
+            val colors = activeDatas.list_M03CouleurProduitInfos ?: emptyList()
+            val tariffsList = uiState.list_M13TarificationInfos ?: emptyList()
+            colors.filter { it.count_Don_Depot > 0 }.sumOf { color ->
+                val productKey = color.parentBProduitInfosKeyID
+                val productTariffs = tariffsList.filter { it.parent_M1Produit_KeyId == productKey }
+                val superGrosTariff = productTariffs.find { it.typeChoisi == M13TarificationInfos.TypeChoisi.Tariff_ItsWorkInGrossist_SuperGros }
+                val groTariff = productTariffs.find { it.typeChoisi == M13TarificationInfos.TypeChoisi.Tariff_ItsWorkInGrossist_Gro }
+
+                val price = if (superGrosTariff != null && superGrosTariff.prixCurrency > 0.0) {
+                    superGrosTariff.prixCurrency
+                } else {
+                    groTariff?.prixCurrency ?: 0.0
+                }
+                color.count_Don_Depot * price
+            }
+        }
+    }
+
     val m14VentPeriode_sums by remember(
         current_OnVent_M14VentPeriode_KeyID,
         activeDatas.list_M8BonVent,
@@ -214,7 +238,23 @@ fun PressistatntMainActivityButtons_App4(
                 vents = datas.on_vent_couleurs,
                 produits = datas.relative_produits
             )
-
+            if (sumRasseMaleProduitsAuDepot > 0.0) {
+                Box(
+                    modifier = Modifier
+                        .padding(vertical = 4.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = "dépôt: %.0f DA".format(sumRasseMaleProduitsAuDepot),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
             Text("Period")
             Row {
                 m14VentPeriode_sums?.let { periodSums ->
