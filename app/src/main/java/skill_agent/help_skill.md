@@ -37,6 +37,8 @@ Output a markdown table documenting each custom skill.
 | **Help Skills** (`help_skill.md`) | `help_skill`, `h_`, `help_` | Affiche ce tableau d'aide documentant l'ensemble des Skills disponibles. |
 | **AGY to Project Synchronizer** (`agy_to_project.md`) | `agy_to_project`, `agy_to_proj`, `a_t_p` | Synchronise et remplace les skills et le fichier `h_.md` du dossier AGY global vers le projet local. |
 | **Context Transfer** (`contexTrensefert/conTr_.md`) | `conT_`, `conTr_`, `/contexTrensefert`, `context_transfer`, `ctsave_`, `ctc_`, `ctecrase_`, `cwc_`, `ct_deepRead_` | Documente l'architecture du projet et sert de guide pour transférer le contexte de développement des modules (CSV/Firebase/Room) d'une session à l'autre. |
+| **Client Chained TODOs** (`t_appClient_chain_todo.md`) | `t_appClient_chain_todo` | Résout et nettoie automatiquement les TODOs chaînés et dépendants (avec indicateurs comme `//<--`, `//...`) dans le projet externe ClientJetPack. |
+
 
 ### 2. Present Clickable Links
 Always present the user with clickable links to the skill files in the skills directory for quick editing.
@@ -60,3 +62,5 @@ Always present the user with clickable links to the skill files in the skills di
 * 💾 [Room Database Query](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/room_d/room_d.md)
 * 🔄 [AGY to Project Synchronizer](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/agy_to_project.md)
 * 🔄 [Context Transfer](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/contexTrensefert/conTr_.md)
+* 📋 [Client Chained TODOs](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_appClient_chain_todo.md)
+

@@ -57,7 +57,10 @@ class A_ViewModel_NewProtoPatterns(
         produit: M01Produit?,
         couleur: M3CouleurProduitInfos?,
         sendToClient: Boolean = true,
-    ) =  {}
+    ) {
+        active_Datas.expanded_M1Produit = produit
+        active_Datas.expanded_M3CouleurProduitInfos = couleur
+    }
 
     init {
         Initializer_ViewModel(this@A_ViewModel_NewProtoPatterns).run()

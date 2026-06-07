@@ -79,7 +79,7 @@ Note that some TODOs may be relative to/dependent on others, often indicated wit
   - If it contains `con_` (e.g. `TODO: con_c` or `TODO: co_`), execute the **Concise Code (consize_comments)** skill steps.
   - If it contains `cop_` (e.g. `TODO: cop_`), execute the **Copy Package / Sibling Files (cop_last)** skill steps.
   - If it contains `room_d` (e.g. `TODO: room_d`), execute the **Room Database Query (room_d)** skill steps.
-- **Standard Fixes**: If no skill trigger is matched, analyze the `TODO` comment requirements, apply the appropriate manual code fixes, and delete the comment using `replace_file_content` or `multi_replace_file_content`.
+- **Standard Fixes**: If no skill trigger is matched, analyze the `TODO` comment requirements, apply the appropriate manual code fixes, and delete the comment using `replace_file_content` or `multi_replace_file_content`. Be sure to also thoroughly clean up any associated pointer/indicator comments (such as `//<--`, `//<-`, or any inline TODO pointers) from adjacent lines.
 
 ### 3. Report Success and Display Code Diffs
 Provide the user with a detailed report including:
