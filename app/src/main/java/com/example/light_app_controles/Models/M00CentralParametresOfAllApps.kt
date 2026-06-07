@@ -9,7 +9,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.database
 import java.io.File
 
-enum class Compts(val keyId: String) {
+enum class Compts(val keyId: String,) {
     AbdelwahabTravailleChezGros_KeyId("-OV9dYujH9cA3yEx8AY2"),
     Telephone_de_presentation("-OTmoNn0cljrRuhVR2sp"),
 }
@@ -58,7 +58,7 @@ data class M00CentralParametresOfAllApps(
     } else {
         AppType.AllInOne
     },
-
+    val fireBase_source_compt_email: Gmail = Gmail.Jomla,
     //---------------------------------App Settings----------------------------------------------------------------------------------------------------------------------------------
     val activeWindowsSearchProduit: Boolean = false,
     var enablePerformAutoClickImageDisplayer: Boolean = false,
@@ -151,6 +151,12 @@ data class M00CentralParametresOfAllApps(
     }
 }
 
+enum class Gmail(
+    val gmail: String,
+) {
+    Jomla("abdelwahab.jomla@gmail.com"),
+    Electro_ro("abdelwahab.electrogro@gmail.com"),
+}
 enum class Utilisateur(
     val comp: String,
     val ayam_tadriss: String = "dimanch/jeudi",

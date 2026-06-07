@@ -137,8 +137,6 @@ fun M3CouleurList_Screen(
                 viewModel.active_Datas.tiger_filterID2_Filter_Affichage_Mode_Proto
             )
         }
-
-        FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(appDatabase = appDatabase)
     }
 }
 

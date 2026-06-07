@@ -1,6 +1,7 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M3.Actions.Action
 
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.AvertissementDialog
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import android.util.Log
 import androidx.compose.runtime.Composable
@@ -12,7 +13,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 private const val TAG = "But6_FireBaseToCsv"
-
+val fireBase_source_compt_email =
+    " Firebase Realtime Database (${M00CentralParametresOfAllApps.get_Default().fireBase_source_compt_email.gmail})\n"
 @Composable
 fun But6_Import_M03_FireBase_To_Csv(
     vm: FeatureID1_ViewModel,
@@ -22,9 +24,12 @@ fun But6_Import_M03_FireBase_To_Csv(
     onCsvWritten: () -> Unit,
     action_definition: PendingAction_M03,
 ) {
+
     AvertissementDialog(
         title        = action_definition.name,
-        message      = "سيتم استيراد بيانات M3CouleurProduitInfos من Firebase Realtime Database إلى\nM3CouleurProduitInfos.csv\n" +
+        message      = "سيتم استيراد بيانات M3CouleurProduitInfos من" +
+                fireBase_source_compt_email +
+                " إلى\nM3CouleurProduitInfos.csv\n" +
                 "الصفوف الموجودة ستُحدَّث والجديدة ستُضاف.\n" +
                 "هل تريد المتابعة؟",
         confirmLabel = "استيراد",

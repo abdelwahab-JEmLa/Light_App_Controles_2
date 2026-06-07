@@ -73,7 +73,9 @@ Provide the user with a clear message stating that the full workspace context is
 Check if the `.antigravityignore` and/or `.geminiignore` files exist in the project root and read their contents to verify if the restrict rule `*` is active.
 
 #### 2. Report Current Status
-- **If active**: Confirm that context restriction is **ACTIF** (only `Working_IN.Feature` and other explicitly allowed packages/files are visible). List any individually allowed files along with their full package names or directory paths for clarity.
+- **If active**: 
+  - Confirm that context restriction is **ACTIF** (only `Working_IN.Feature` and other explicitly allowed packages/files are visible). List any individually allowed files along with their full package names or directory paths for clarity.
+  - **Calculate and display the total number of lines across all included/allowed files. Use the fastest method for calculation (such as counting lines in parallel or using a fast local command like PowerShell `(Get-ChildItem -Recurse -File | Get-Content | Measure-Object -Line).Lines` or a quick script).**
 - **If inactive**: Confirm that context restriction is **INACTIF / DÉSACTIVÉ** (the full workspace context is visible).
 - Show clickable links to [.antigravityignore](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/.antigravityignore) and [.geminiignore](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/.geminiignore).
 
