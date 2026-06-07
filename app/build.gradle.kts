@@ -134,6 +134,10 @@ dependencies {
     // ─── Desugaring ──────────────────────────────────────────────────────────
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
 
+    // ─── PDF Generation ──────────────────────────────────────────────────────
+    implementation("com.itextpdf:itext7-core:7.2.5")
+    implementation("com.itextpdf:html2pdf:4.0.5")
+
     // ─── Test Dependencies (Instrumented Tests) ───────────────────────────────
     androidTestImplementation("androidx.test:runner:1.6.1")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
