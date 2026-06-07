@@ -24,8 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import com.example.light_app_controles.B.Screens.MainScreen
-import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
-import com.example.light_app_controles.Modules.PermissionHandler
+import EntreApps.Shared.Modules.Base.AppDatabase
+import EntreApps.Shared.Modules.PermissionHandler
 import com.example.light_app_controles.ui.theme.Light_App_ControlesTheme
 
 class MainActivity : ComponentActivity() {

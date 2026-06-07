@@ -99,7 +99,7 @@ fun M03_Operations_FragMap_DropdownMenu(
 
     LaunchedEffect(Unit) {
         runCatching {
-            val counts = vm.setter_LongOperations.get_Firebase_M03_Counts(
+            val counts = vm.setter_LongDatas.get_Firebase_M03_Counts(
                 M3CouleurProduitInfos.ref_Test
             )
             firebaseRowCount = counts.first
@@ -204,7 +204,7 @@ fun M03_Operations_FragMap_DropdownMenu(
                         pendingAction = null
                         coroutineScope.launch {
                             vm.active_Datas.list_M03?.let { items ->
-                                vm.setter_LongOperations.insertAll_M03(items)
+                                vm.setter_LongDatas.insertAll_M03(items)
                             }
                             onDismiss()
                         }
@@ -221,8 +221,8 @@ fun M03_Operations_FragMap_DropdownMenu(
                         pendingAction = null
                         coroutineScope.launch {
                             vm.active_Datas.list_M03?.let { items ->
-                                vm.setter_LongOperations.delete_All_M03()
-                                vm.setter_LongOperations.insertAll_M03(items)
+                                vm.setter_LongDatas.delete_All_M03()
+                                vm.setter_LongDatas.insertAll_M03(items)
                             }
                             vm.reload()
                             onDismiss()

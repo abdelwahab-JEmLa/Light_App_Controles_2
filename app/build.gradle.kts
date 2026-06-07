@@ -148,4 +148,8 @@ dependencies {
     // Calendar
     implementation("com.aminography:primecalendar:1.7.0")
 
+    // Glide & Glide Compose Integration
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.github.bumptech.glide:compose:1.0.0-beta01")
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
 }

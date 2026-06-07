@@ -44,7 +44,7 @@ import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.A
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M8Bon_Operations_FragMap_DropdownMenu.Actions.Action.But8_DeleteAll_M8_Room
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M8Bon_Operations_FragMap_DropdownMenu.Actions.Action.But9_Import_M8_FireBase_To_Room
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.a.Main.ViewModel.FeatureID1_ViewModel
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models.M8BonVent
+import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -100,7 +100,7 @@ fun M8Bon_Operations_FragMap_DropdownMenu(
 
     LaunchedEffect(Unit) {
         runCatching {
-            val (total, credit) = vm.setter_LongOperations.get_Firebase_M8_Counts(M8BonVent.ref_Test)
+            val (total, credit) = vm.setter_LongDatas.get_Firebase_M8_Counts(M8BonVent.ref_Test)
             firebaseRowCount = total
             firebaseCreditCount = credit
         }.onFailure {
@@ -213,7 +213,7 @@ fun M8Bon_Operations_FragMap_DropdownMenu(
                         pendingAction = null
                         coroutineScope.launch {
                             vm.active_Datas.list_M8bon?.let { bons ->
-                                vm.setter_LongOperations.insertAll(bons)
+                                vm.setter_LongDatas.insertAll(bons)
                             }
                             onDismiss()
                         }
@@ -231,8 +231,8 @@ fun M8Bon_Operations_FragMap_DropdownMenu(
                         pendingAction = null
                         coroutineScope.launch {
                             vm.active_Datas.list_M8bon?.let { bons ->
-                                vm.setter_LongOperations.delete_All_M8()
-                                vm.setter_LongOperations.insertAll(bons)
+                                vm.setter_LongDatas.delete_All_M8()
+                                vm.setter_LongDatas.insertAll(bons)
                             }
                             vm.reload()
                             onDismiss()

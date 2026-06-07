@@ -99,7 +99,7 @@ fun M2Client_Operations_FragMap_DropdownMenu(
 
     LaunchedEffect(Unit) {
         runCatching {
-            val (total, credit) = vm.setter_LongOperations.get_Firebase_M2Client_Counts(M2Client.ref_Test)   
+            val (total, credit) = vm.setter_LongDatas.get_Firebase_M2Client_Counts(M2Client.ref_Test)
             firebaseRowCount = total
             firebaseCreditCount = credit
         }.onFailure {
@@ -202,7 +202,7 @@ fun M2Client_Operations_FragMap_DropdownMenu(
                         pendingAction = null
                         coroutineScope.launch {
                             vm.active_Datas.list_M2Client?.let { bons ->
-                                vm.setter_LongOperations.insertAll_M2Client(bons)
+                                vm.setter_LongDatas.insertAll_M2Client(bons)
                             }
                             onDismiss()
                         }
@@ -220,8 +220,8 @@ fun M2Client_Operations_FragMap_DropdownMenu(
                         pendingAction = null
                         coroutineScope.launch {
                             vm.active_Datas.list_M2Client?.let { bons ->
-                                vm.setter_LongOperations.delete_All_M2Client()
-                                vm.setter_LongOperations.insertAll_M2Client(bons)
+                                vm.setter_LongDatas.delete_All_M2Client()
+                                vm.setter_LongDatas.insertAll_M2Client(bons)
                             }
                             vm.reload()
                             onDismiss()

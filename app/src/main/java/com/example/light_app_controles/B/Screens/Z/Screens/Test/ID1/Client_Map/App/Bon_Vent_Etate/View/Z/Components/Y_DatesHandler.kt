@@ -2,7 +2,7 @@ package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.
 
 import android.annotation.SuppressLint
 import android.util.Log
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models.M8BonVent
+import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date

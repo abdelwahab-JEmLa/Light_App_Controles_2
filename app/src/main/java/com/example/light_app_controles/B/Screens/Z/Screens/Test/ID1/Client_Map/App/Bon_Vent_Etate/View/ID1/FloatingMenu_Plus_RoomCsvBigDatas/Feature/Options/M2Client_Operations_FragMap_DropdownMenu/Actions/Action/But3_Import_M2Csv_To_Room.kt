@@ -27,7 +27,7 @@ fun But3_Import_M2Csv_To_Room(
         onConfirm    = {
             onPendingClear()
             coroutineScope.launch(Dispatchers.IO) {
-                vm.setter_LongOperations.import_M2ClientCsv_To_Room(M2Client.csv_test)
+                vm.setter_LongDatas.import_M2ClientCsv_To_Room(M2Client.csv_test)
                 vm.reload()
                 withContext(Dispatchers.Main) { onDismiss() }
             }

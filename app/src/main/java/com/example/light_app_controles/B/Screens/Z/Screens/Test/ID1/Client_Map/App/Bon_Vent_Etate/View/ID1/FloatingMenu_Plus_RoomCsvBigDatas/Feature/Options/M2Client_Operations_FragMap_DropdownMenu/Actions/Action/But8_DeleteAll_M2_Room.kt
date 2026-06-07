@@ -26,7 +26,7 @@ fun But8_DeleteAll_M2_Room(
         onConfirm    = {
             onPendingClear()
             coroutineScope.launch(Dispatchers.IO) {
-                vm.setter_LongOperations.delete_All_M2Client()
+                vm.setter_LongDatas.delete_All_M2Client()
                 vm.reload()
                 withContext(Dispatchers.Main) { onDismiss() }
             }

@@ -1,0 +1,287 @@
+package Application4.App.Fragment.ID1.Fragment.ViewModel.y.Components
+
+import Application4.App.Fragment.ID1.Fragment.ViewModel.A_ViewModel_NewProtoPatterns
+import EntreApps.Shared.Models.M09AppCompt
+import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
+import EntreApps.Shared.Models.Relative_Produits.Models.M16CategorieProduit
+import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
+import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
+import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
+import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
+import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent
+import android.content.Context
+import android.util.Log
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Modules.Setter_LongDatas
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+
+private const val TAG_SETTER = "Setter_ViewModel"
+
+class Setter_ViewModel(
+    private val vm: A_ViewModel_NewProtoPatterns,
+    context: Context,
+    val setter_LongDatas: Setter_LongDatas
+) {
+    private val composScope = CoroutineScope(Dispatchers.IO)
+
+    fun updateTariffForProductOperations(
+        produitKeyID: String,
+        newTariff: M13TarificationInfos,
+    ) {
+        val daoM10operationventcouleur = vm.dao_M10OperationVentCouleur
+        composScope.launch {
+            val operations = vm.dao_M10OperationVentCouleur
+                .getAll()
+                .filter { it.parent_M1Produit_KeyId == produitKeyID }
+
+            val updated = operations.map { op ->
+                op.copy(
+                    parentM13TarificationKeyID = newTariff.keyID,
+                    parentM13TarificationDebugInfos = newTariff.getDebugInfos(),
+                )
+            }
+
+            updated.forEach { op ->
+                daoM10operationventcouleur.update(op)
+                val updates = mutableMapOf<String, Any>(op.keyID to op)
+                M10OperationVentCouleur.Companion.ref.updateChildren(updates).await()
+            }
+        }
+    }
+    // M01 ─────────────────────────────────────────────────────────────────
+    fun update_m1Produit(new: M01Produit) {
+        vm.active_Datas.list_M1Produit =
+            vm.active_Datas.list_M1Produit?.map { if (it.keyID == new.keyID) new else it }
+        setter_LongDatas.update_M1Produit(new)
+    }
+
+    fun delete_m1Produit(produit: M01Produit) {
+        vm.active_Datas.list_M1Produit =
+            vm.active_Datas.list_M1Produit?.filter { it.keyID != produit.keyID }
+        setter_LongDatas.delete_M1Produit(produit)
+    }
+
+    // M03 ─────────────────────────────────────────────────────────────────
+    fun deleteInsertFireBase_listKeys_M3CouleurProduitInfos(
+        keys: Map<String, Boolean>,
+        onSuccess: () -> Unit = {}
+    ) {
+        setter_LongDatas
+            .deleteInsertFireBase_listKeys_M3CouleurProduitInfos(keys, onSuccess)
+    }
+
+    fun update_m3couleur(couleur: M3CouleurProduitInfos) {
+        vm.active_Datas.list_M03CouleurProduitInfos =
+            vm.active_Datas.list_M03CouleurProduitInfos?.map { if (it.keyID == couleur.keyID) couleur else it }
+        setter_LongDatas.update_M3CouleurProduitInfos(couleur)
+    }
+
+    fun delete_m3couleur(couleur: M3CouleurProduitInfos) {
+        vm.active_Datas.list_M03CouleurProduitInfos =
+            vm.active_Datas.list_M03CouleurProduitInfos?.filter { it.keyID != couleur.keyID }
+        setter_LongDatas.delete_M3CouleurProduitInfos(couleur)
+    }
+
+    fun update_depot_count(
+        couleur: M3CouleurProduitInfos,
+        newDepotCount: Int,
+        onSuccess: () -> Unit = {},
+    ) {
+        val updated = couleur.copy(
+            count_Don_Depot = newDepotCount,
+            dernierTimeTampsSynchronisationAvecFireBase = System.currentTimeMillis()
+        )
+        vm.active_Datas.list_M03CouleurProduitInfos =
+            vm.active_Datas.list_M03CouleurProduitInfos?.map { if (it.keyID == updated.keyID) updated else it }
+        setter_LongDatas.update_M3CouleurProduitInfos(
+            data = updated,
+            onSuccess = onSuccess
+        )
+    }
+
+    // M08 ─────────────────────────────────────────────────────────────────
+
+    fun update_m8(new: M8BonVent) {
+        vm.active_Datas.list_M8BonVent =
+            vm.active_Datas.list_M8BonVent?.map { if (it.keyID == new.keyID) new else it }
+        setter_LongDatas.update_M8BonVent(new)
+    }
+
+    // M09 ─────────────────────────────────────────────────────────────────
+
+    fun update_active_Compt(compt: M09AppCompt) {
+        vm.active_Datas.active_M9Compt = compt
+        setter_LongDatas.update_M9AppCompt(compt) {
+        }
+    }
+
+    // M10 ─────────────────────────────────────────────────────────────────
+
+    fun addNew_listM10OperationVentCouleur(
+        updatedList: List<M10OperationVentCouleur>?,
+    ) {
+        if (!updatedList.isNullOrEmpty()) {
+            val existingKeys = vm.active_Datas.list_M10OperationVentCouleur
+                ?.map { it.keyID }?.toSet() ?: emptySet()
+            val newOnly = updatedList.filter { it.keyID !in existingKeys }
+            vm.active_Datas.list_M10OperationVentCouleur =
+                (vm.active_Datas.list_M10OperationVentCouleur ?: emptyList()) + newOnly
+        }
+        upsert_M10OperationVentCouleur(updatedList)
+    }
+
+    /**
+     * Updates existing M10 operations in-place.
+     * Aborts if any entry in [updatedList] does not already exist in the current list —
+     * those should go through [addNew_listM10OperationVentCouleur] instead.
+     */
+    fun update_listM10OperationVentCouleur(
+        updatedList: List<M10OperationVentCouleur>?,
+    ) {
+        val currentAll = vm.active_Datas.list_M10OperationVentCouleur ?: emptyList()
+        val existingKeys = currentAll.map { it.keyID }.toSet()
+
+        val missingEntries = updatedList?.filter { it.keyID !in existingKeys }
+        if (!missingEntries.isNullOrEmpty()) {
+            Log.e(
+                TAG_SETTER,
+                "update_listM10OperationVentCouleur: entry not found — aborting. " +
+                        "Missing keyIDs: ${missingEntries.map { it.keyID }}"
+            )
+            return
+        }
+
+        val updatedMap = updatedList?.associateBy { it.keyID } ?: emptyMap()
+        vm.active_Datas.list_M10OperationVentCouleur =
+            currentAll.map { existing -> updatedMap[existing.keyID] ?: existing }
+        upsert_M10OperationVentCouleur(updatedList)
+    }
+
+    fun update_listM10OperationVentCouleur_FilteredBy_activeM8BonVent(
+        updatedList: List<M10OperationVentCouleur>?,
+    ) {
+        val updatedMap = updatedList?.associateBy { it.keyID } ?: emptyMap()
+        vm.active_Datas.list_M10OperationVentCouleur =
+            vm.active_Datas.list_M10OperationVentCouleur?.map { existing ->
+                updatedMap[existing.keyID] ?: existing
+            }
+        upsert_M10OperationVentCouleur(updatedList)
+    }
+
+    /**
+     * Removes [op] from in-memory state and propagates the delete to DAO + Firebase.
+     * Use this when quantity drops to 0 — do NOT route through [update_listM10OperationVentCouleur],
+     * which only maps/replaces and will silently keep the entry alive.
+     */
+    fun delete_M10OperationVentCouleur(op: M10OperationVentCouleur) {
+        vm.active_Datas.list_M10OperationVentCouleur =
+            vm.active_Datas.list_M10OperationVentCouleur?.filter { it.keyID != op.keyID }
+        setter_LongDatas.delete_M10OperationVentCouleur(op)
+    }
+
+    /**
+     * Inserts only genuinely new entries (by keyID) into the current list.
+     * Entries whose keyID already exists are silently skipped — use
+     * [update_listM10OperationVentCouleur] to update existing ones.
+     */
+    private fun addNew_ListM10OperationVentCouleur(datas: List<M10OperationVentCouleur>?) {
+        if (datas.isNullOrEmpty()) return
+        val existingKeys = vm.active_Datas.list_M10OperationVentCouleur
+            ?.map { it.keyID }?.toSet() ?: emptySet()
+        val newOnly = datas.filter { it.keyID !in existingKeys }
+        if (newOnly.isEmpty()) return
+        vm.active_Datas.list_M10OperationVentCouleur =
+            (vm.active_Datas.list_M10OperationVentCouleur ?: emptyList()) + newOnly
+        upsert_M10OperationVentCouleur(newOnly)
+    }
+
+    private fun upsert_M10OperationVentCouleur(updatedList: List<M10OperationVentCouleur>?) {
+        val allTariffs = vm._uiStateNewProtoPatterns.value.list_Datas?.m13TarificationInfos
+        updatedList?.forEach { operation ->
+            val tariff = allTariffs?.find { it.keyID == operation.parentM13TarificationKeyID }
+                ?: allTariffs?.filter { it.parent_M1Produit_KeyId == operation.parent_M1Produit_KeyId }
+                    ?.maxByOrNull { it.creationTimestamps }
+            if (tariff == null) return@forEach
+            val opToSave = if (tariff.keyID != operation.parentM13TarificationKeyID) {
+                operation.copy(
+                    parentM13TarificationKeyID = tariff.keyID,
+                    parentM13TarificationDebugInfos = tariff.getDebugInfos()
+                )
+            } else operation
+            setter_LongDatas.upsert_M10OperationVentCouleur(opToSave, tariff)
+        }
+    }
+
+    // M13 ─────────────────────────────────────────────────────────────────
+
+    fun update_M13TarificationInfos(tariff: M13TarificationInfos) {
+        vm._uiStateNewProtoPatterns.update { state ->
+            val current = state.list_Datas ?: List_Datas()
+            state.copy(
+                list_Datas = current.copy(
+                    m13TarificationInfos = current.m13TarificationInfos
+                        .filter { it.keyID != tariff.keyID } + tariff
+                )
+            )
+        }
+        setter_LongDatas.update_M13TarificationInfos(tariff)
+
+        val currentAll = vm.active_Datas.list_M10OperationVentCouleur
+        val affected = currentAll?.filter { it.parentM13TarificationKeyID == tariff.keyID }
+        if (!affected.isNullOrEmpty()) {
+            vm.active_Datas.list_M10OperationVentCouleur = currentAll.map { op ->
+                if (op.parentM13TarificationKeyID == tariff.keyID)
+                    op.copy(
+                        prix_de_Vent_entre_directement_NewProto = tariff.prixCurrency,
+                        typeTarificationEnumT2 = tariff.typeChoisi,
+                        dernierTimeTampsSynchronisationAvecFireBase = System.currentTimeMillis()
+                    )
+                else op
+            }
+            upsert_M10OperationVentCouleur(vm.active_Datas.list_M10OperationVentCouleur?.filter { op ->
+                affected.any { it.keyID == op.keyID }
+            })
+        }
+    }
+
+    // M16 ─────────────────────────────────────────────────────────────────
+
+    fun insert_M16CategorieProduit(new: M16CategorieProduit) {
+        vm._uiStateNewProtoPatterns.update { state ->
+            val current = state.list_Datas ?: List_Datas()
+            state.copy(list_Datas = current.copy(m16CategorieProduit = current.m16CategorieProduit + new))
+        }
+        setter_LongDatas.insert_M16CategorieProduit(new)
+    }
+
+    fun update_m16CategorieProduit(new: M16CategorieProduit) {
+        vm._uiStateNewProtoPatterns.update { state ->
+            val current = state.list_Datas ?: List_Datas()
+            state.copy(
+                list_Datas = current.copy(
+                    m16CategorieProduit = current.m16CategorieProduit.map {
+                        if (it.keyID == new.keyID) new else it
+                    }
+                )
+            )
+        }
+        setter_LongDatas.update_M16CategorieProduit(new)
+    }
+
+    fun update_m2(new: M2Client) {
+        vm._uiStateNewProtoPatterns.update { state ->
+            val current = state.list_Datas ?: List_Datas()
+            state.copy(
+                list_Datas = current.copy(
+                    m2Client = current.m2Client.map {
+                        if (it.keyID == new.keyID) new else it
+                    }
+                )
+            )
+        }
+        setter_LongDatas.update_M2(new)
+    }
+}

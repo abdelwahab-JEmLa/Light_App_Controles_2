@@ -1,0 +1,373 @@
+package Application4.App.Fragment.View
+
+import Application4.App.Fragment.ID1.Fragment.ViewModel.A_ViewModel_NewProtoPatterns
+import Application4.App.Fragment.ID1.Fragment.ViewModel.Filter_Affichage_Mode_Proto
+import Application4.App.Fragment.ID1.Fragment.ViewModel.y.Components.UiState_NewProtoPatterns
+import Application4.App.Fragment.View.Components.A_Header.View.A_Compact_Header_App4
+import Application4.App.Fragment.View.Components.Big_Principale_FragID3
+import Application4.App.Fragment.View.Components.SubColorCard_WithButton
+import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
+import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
+import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
+import android.annotation.SuppressLint
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+fun find_ListM3CouleurInfos_By_Parent_Produit_KeyID(datas: List<M3CouleurProduitInfos>, parentBProduitInfosKeyID: String) =
+    datas.filter { it.parentBProduitInfosKeyID == parentBProduitInfosKeyID }
+
+fun findMatchingColorIndex(
+    expandedColor: M3CouleurProduitInfos,
+    availableColors: List<M3CouleurProduitInfos>
+): Int {
+    val exactMatch = availableColors.indexOfFirst { it.keyID == expandedColor.keyID }
+    if (exactMatch != -1) return exactMatch
+
+    val indexMatch = availableColors.indexOfFirst {
+        it.parentBProduitOldID == expandedColor.parentBProduitOldID &&
+                it.indexCouleurDansAncienProto == expandedColor.indexCouleurDansAncienProto
+    }
+    if (indexMatch != -1) return indexMatch
+
+    if (expandedColor.nomCouleurStrSiSonImageDispo.isNotBlank()) {
+        val colorNameMatch = availableColors.indexOfFirst {
+            it.nomCouleurStrSiSonImageDispo.equals(
+                expandedColor.nomCouleurStrSiSonImageDispo,
+                ignoreCase = true
+            )
+        }
+        if (colorNameMatch != -1) return colorNameMatch
+    }
+
+    return -1
+}
+
+@SuppressLint("StateFlowValueCalledInComposition")
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun A_Item_Produit_App4(
+    relative_M1produit: M01Produit,
+    modifier: Modifier = Modifier,
+    onCategoryClick: (() -> Unit)? = null,
+    uiState_NewProtoPatterns_viewModel: Pair<UiState_NewProtoPatterns, A_ViewModel_NewProtoPatterns>,
+    relative_ListM3Couleurs_override: List<M3CouleurProduitInfos>? = null,
+    on_update_M13TarificationInfos_par_ecriture: (M13TarificationInfos) -> Unit,
+) {
+    val (uiState, viewModel) = uiState_NewProtoPatterns_viewModel
+    val activeDatas = viewModel.active_Datas
+    val wifiState = viewModel.active_Datas
+
+    val allColorsForProduit = relative_ListM3Couleurs_override
+        ?: remember(activeDatas.list_M03CouleurProduitInfos) {
+            find_ListM3CouleurInfos_By_Parent_Produit_KeyID(
+                activeDatas.list_M03CouleurProduitInfos ?: emptyList(),
+                relative_M1produit.keyID
+            )
+        }
+
+    val isEchatillantsMode = activeDatas.filterAffichageMode_Proto == Filter_Affichage_Mode_Proto.Echants_Seulement
+
+    val relative_ListM3Couleurs = remember(allColorsForProduit, isEchatillantsMode) {
+        if (isEchatillantsMode) allColorsForProduit.filter { it.its_in_echantiallants }
+        else allColorsForProduit
+    }
+
+    val expanded_M1Produit = activeDatas.expanded_M1Produit
+    val expanded_M3CouleurProduitInfos = wifiState.expanded_M3CouleurProduitInfos
+
+    val isThisProductExpanded = remember(expanded_M1Produit) {
+        expanded_M1Produit?.keyID == relative_M1produit.keyID
+    }
+    val shouldShowButtons = true
+
+    val initialColorIndex = remember(expanded_M3CouleurProduitInfos, relative_ListM3Couleurs) {
+        expanded_M3CouleurProduitInfos?.let { expandedColor ->
+            if (expandedColor.parentBProduitOldID == relative_M1produit.id) {
+                val matchingIndex = findMatchingColorIndex(
+                    expandedColor = expandedColor,
+                    availableColors = relative_ListM3Couleurs
+                )
+                if (matchingIndex != -1) matchingIndex else 0
+            } else 0
+        } ?: 0
+    }
+
+    var big_presenter_couleur_produit by remember(initialColorIndex) {
+        mutableStateOf(initialColorIndex)
+    }
+
+    LaunchedEffect(expanded_M3CouleurProduitInfos, relative_ListM3Couleurs) {
+        expanded_M3CouleurProduitInfos?.let { expandedColor ->
+            if (expandedColor.parentBProduitOldID == relative_M1produit.id) {
+                val matchingIndex = findMatchingColorIndex(
+                    expandedColor = expandedColor,
+                    availableColors = relative_ListM3Couleurs
+                )
+                if (matchingIndex != -1 && matchingIndex != big_presenter_couleur_produit) {
+                    big_presenter_couleur_produit = matchingIndex
+                }
+            }
+        }
+    }
+
+    val datasValue_distinct_type =
+        uiState.list_M13TarificationInfos
+            .filter { it.parent_M1Produit_KeyId == relative_M1produit.keyID }
+            .groupBy { it.typeChoisi }
+            .mapValues { (_, tariffs) -> tariffs.maxByOrNull { it.creationTimestamps } }
+            .values
+            .filterNotNull()
+
+    val activeM9compt = activeDatas.active_M9Compt
+
+    val tariff_ItsWorkInGrossist_SuperGros by remember {
+        derivedStateOf {
+            datasValue_distinct_type.find {
+                it.typeChoisi == M13TarificationInfos.TypeChoisi.Tariff_ItsWorkInGrossist_SuperGros &&
+                        it.prixCurrency != 0.0
+            }
+        }
+    }
+
+    val supperGro = datasValue_distinct_type.find {
+        it.typeChoisi == M13TarificationInfos.TypeChoisi.Prix_SupperGro_Et_PresentationService &&
+                it.prixCurrency != 0.0
+    }
+
+    val detaille = datasValue_distinct_type.find {
+        it.typeChoisi == M13TarificationInfos.TypeChoisi.Prix_Detaille &&
+                it.prixCurrency != 0.0
+    }
+
+    val editedPourClient = datasValue_distinct_type.find {
+        it.typeChoisi == M13TarificationInfos.TypeChoisi.Edited_Pour_Client &&
+                it.prixCurrency != 0.0
+    }
+
+    val new_Prix_Progressive_Editable = remember(relative_M1produit.keyID) {
+        M13TarificationInfos.get_default().copy(
+            typeChoisi = M13TarificationInfos.TypeChoisi.Prix_Progressive_Editable,
+            parent_M1Produit_KeyId = relative_M1produit.keyID,
+        )
+    }
+
+    val tariff_algorithme_De_Start = editedPourClient ?: supperGro ?: detaille
+
+    var selectedTariffKeyID by remember(tariff_algorithme_De_Start?.keyID) {
+        mutableStateOf(tariff_algorithme_De_Start?.keyID ?: new_Prix_Progressive_Editable.keyID)
+    }
+
+    val selectedTariff by remember(selectedTariffKeyID, datasValue_distinct_type) {
+        derivedStateOf {
+            datasValue_distinct_type.find { it.keyID == selectedTariffKeyID }
+                ?: new_Prix_Progressive_Editable
+        }
+    }
+
+    if (relative_ListM3Couleurs.isEmpty()) return
+
+    val safeIndex = big_presenter_couleur_produit.coerceIn(0, relative_ListM3Couleurs.lastIndex)
+    if (safeIndex != big_presenter_couleur_produit) big_presenter_couleur_produit = safeIndex
+    val selectedCouleur = relative_ListM3Couleurs[safeIndex]
+
+    var isUserManuallySelectedTariff by remember(relative_M1produit.keyID, selectedCouleur.keyID) {
+        mutableStateOf(false)
+    }
+
+    val activeM10ForSelectedCouleur by remember(
+        selectedCouleur.keyID,
+        activeDatas.listM10OperationVentCouleur_FilteredBy_activeM8BonVent_state
+    ) {
+        derivedStateOf {
+            activeDatas.listM10OperationVentCouleur_FilteredBy_activeM8BonVent_state
+                ?.find { it.parent_M3CouleurProduit_KeyID == selectedCouleur.keyID }
+        }
+    }
+
+    LaunchedEffect(activeM10ForSelectedCouleur) {
+        if (isUserManuallySelectedTariff) return@LaunchedEffect
+        val opTariffKeyID = activeM10ForSelectedCouleur?.parentM13TarificationKeyID
+            ?: return@LaunchedEffect
+        if (datasValue_distinct_type.any { it.keyID == opTariffKeyID }) {
+            selectedTariffKeyID = opTariffKeyID
+        }
+    }
+
+    val hasPremierCheckDonne by remember(
+        activeDatas.listM10OperationVentCouleur_FilteredBy_activeM8BonVent_state,
+        relative_M1produit.keyID
+    ) {
+        derivedStateOf {
+            activeDatas.listM10OperationVentCouleur_FilteredBy_activeM8BonVent_state
+                .any {
+                    it.parent_M1Produit_KeyId == relative_M1produit.keyID &&
+                            it.premier_Check_Donne
+                }
+        }
+    }
+
+    val itemBackgroundColor by animateColorAsState(
+        targetValue = if (hasPremierCheckDonne) Color(0xFFFFFF00).copy(alpha = 0.35f)
+        else Color.Transparent,
+        animationSpec = tween(durationMillis = 400),
+        label = "itemPremierCheckBackground"
+    )
+
+    val cardPadding = if (isThisProductExpanded) 8.dp else 4.dp
+
+    val isAdmin = activeDatas.currentApp_Est_Admin
+            && activeDatas.active_M9Compt?.affiche_ProduitDataBaseEdites_ComposableViews == true
+    val categoryClickForHeader: (() -> Unit)? = if (isAdmin) onCategoryClick else null
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(itemBackgroundColor, RoundedCornerShape(8.dp))
+            .padding(cardPadding)
+    ) {
+        A_Compact_Header_App4(
+            prix_achat = tariff_ItsWorkInGrossist_SuperGros?.prixCurrency,
+            relative_M1produit = relative_M1produit,
+            isExpanded = isThisProductExpanded,
+            onUpdateTariff = {
+                activeM9compt?.let { appCompt ->
+                    viewModel.setActiveFocuceTariffPrixDifineur(relative_M1produit, appCompt)
+                }
+            },
+            onUpdateProduit = { viewModel.update_m1Produit(it) },
+            affiche_ProduitDataBaseEdites_ComposableViews = activeDatas.currentApp_Est_Admin
+                    && activeDatas.active_M9Compt?.affiche_ProduitDataBaseEdites_ComposableViews == true,
+            onDelete = { viewModel.delete_m1Produit(it) },
+            modifier = modifier,
+            onCategoryClick = categoryClickForHeader,
+            section_ToggleButton_TagPreiorities__start_Collapsed = activeDatas.section_ToggleButton_TagPrioriter__start_Collapsed == true,
+            onSetPremierCheckDonneForAllVents = {
+                val currentList = activeDatas
+                    .listM10OperationVentCouleur_FilteredBy_activeM8BonVent_state
+                val now = System.currentTimeMillis()
+                val updated = currentList.map { op ->
+                    if (op.parent_M1Produit_KeyId == relative_M1produit.keyID)
+                        op.copy(
+                            premier_Check_Donne = true,
+                            dernierTimeTampsSynchronisationAvecFireBase = now
+                        )
+                    else op
+                }
+                viewModel.update_listM10OperationVentCouleur(updated)
+            }
+        )
+
+        Big_Principale_FragID3(
+            on_update_M13TarificationInfos_par_ecriture = on_update_M13TarificationInfos_par_ecriture,
+            uiState_NewProtoPatterns_viewModel = uiState_NewProtoPatterns_viewModel,
+            relative_M1produit = relative_M1produit,
+            selectedCouleur = selectedCouleur,
+            selectedTariff = selectedTariff,
+            onTariffSelected = { newTariff ->
+                isUserManuallySelectedTariff = true
+
+                val parentM13TarificationKeyID =
+                    if (newTariff.typeChoisi == M13TarificationInfos.TypeChoisi.Edited_Pour_Client) "Prix_Progressive_Editable Non Saved"
+                    else newTariff.keyID
+
+                selectedTariffKeyID = newTariff.keyID
+
+                if (newTariff.typeChoisi == M13TarificationInfos.TypeChoisi.Prix_Progressive_Editable) {
+                    val createdTariff = viewModel.maybeCreateEditedPourClientTariff(
+                        produit = relative_M1produit,
+                        synthetic = newTariff,
+                        datasValue_distinct_type = datasValue_distinct_type.toList(),
+                    )
+                    if (createdTariff != null) {
+                        selectedTariffKeyID = createdTariff.keyID
+                    }
+                }
+
+                val currentList = activeDatas.listM10OperationVentCouleur_FilteredBy_activeM8BonVent_state
+                val affected = currentList?.filter { it.parent_M1Produit_KeyId == relative_M1produit.keyID }
+                if (!affected.isNullOrEmpty() && newTariff.prixCurrency > 0.0) {
+                    val updatedList = currentList.map { op ->
+                        if (op.parent_M1Produit_KeyId == relative_M1produit.keyID)
+                            op.copy(
+                                parentM13TarificationKeyID = parentM13TarificationKeyID,
+                                parentM13TarificationDebugInfos = newTariff.getDebugInfos(),
+                                typeTarificationEnumT2 = newTariff.typeChoisi,
+                                prix_de_Vent_entre_directement_NewProto = newTariff.prixCurrency,
+                                dernierTimeTampsSynchronisationAvecFireBase = System.currentTimeMillis()
+                            )
+                        else op
+                    }
+                    viewModel.update_listM10OperationVentCouleur(updatedList)
+                }
+            },
+            tariffsList = datasValue_distinct_type,
+            isThisProductExpanded = isThisProductExpanded,
+            shouldShowButtons = shouldShowButtons,
+        )
+
+        if (relative_ListM3Couleurs.size > 1) {
+            Spacer(modifier = Modifier.height(8.dp))
+
+            if (isThisProductExpanded) {
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    maxItemsInEachRow = 4
+                ) {
+                    relative_ListM3Couleurs.forEachIndexed { index, couleur ->
+                        if (index != big_presenter_couleur_produit) {
+                            SubColorCard_WithButton(
+                                uiState_NewProtoPatterns_viewModel = uiState_NewProtoPatterns_viewModel,
+                                couleur = couleur,
+                                relative_M1produit = relative_M1produit,
+                                selectedTariff = selectedTariff,
+                                isExpanded = true,
+                                modifier = Modifier.weight(1f, fill = false),
+                                shouldShowButtons = shouldShowButtons,
+                            )
+                        }
+                    }
+                }
+            } else {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    relative_ListM3Couleurs.forEachIndexed { index, couleur ->
+                        if (index != big_presenter_couleur_produit) {
+                            SubColorCard_WithButton(
+                                uiState_NewProtoPatterns_viewModel = uiState_NewProtoPatterns_viewModel,
+                                couleur = couleur,
+                                relative_M1produit = relative_M1produit,
+                                selectedTariff = selectedTariff,
+                                shouldShowButtons = shouldShowButtons,
+                                isExpanded = false,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

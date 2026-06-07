@@ -1,0 +1,508 @@
+package Application4.App.Fragment.View.Components.A_Header.View
+
+import Application4.App.Fragment.ID1.Fragment.ViewModel.A_ViewModel_NewProtoPatterns
+import Application4.App.Fragment.ID1.Fragment.ViewModel.y.Components.UiState_NewProtoPatterns
+import Application4.App.Fragment.View.ViewS.Views.Image_Displaye
+import EntreApps.Shared.Compose_Injectable_Sepecialise.Kotlin.ID1.EditeBaseDonne.Package.M16Categorie.CategoryBadge
+import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
+import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.CheckBoxOutlineBlank
+import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.Outbox
+import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.ViewModule
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.light_app_controles.Feature.Fragment.View.Components.A_Header.View.DeleteProductHeader
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun A_Compact_Header_App4(
+    modifier: Modifier = Modifier,
+    relative_M1produit: M01Produit,
+    isExpanded: Boolean,
+    section_ToggleButton_TagPreiorities__start_Collapsed: Boolean,
+    onUpdateTariff: () -> Unit,
+    onUpdateProduit: (M01Produit) -> Unit,
+    affiche_ProduitDataBaseEdites_ComposableViews: Boolean,
+    shouldShowButtons: Boolean = affiche_ProduitDataBaseEdites_ComposableViews,
+    onDelete: (M01Produit) -> Unit,
+    catalogueName: String? = null,
+    categoryName: String? = null,
+    onCategoryClick: (() -> Unit)? = null,
+    prix_achat: Double?,
+    onSetPremierCheckDonneForAllVents: (() -> Unit)? = null,
+) {
+    val nameTextSize = if (isExpanded) 14.sp else 10.sp
+    val arabicTextSize = if (isExpanded) 12.sp else 9.sp
+    val labelTextSize = if (isExpanded) 10.sp else 7.sp
+    val valueTextSize = if (isExpanded) 12.sp else 9.sp
+    val iconSize = if (isExpanded) 14.dp else 10.dp
+    val cardPadding = if (isExpanded) 6.dp else 3.dp
+    val itemPadding = if (isExpanded) 4.dp else 2.dp
+
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(if (isExpanded) 8.dp else 6.dp)),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (isExpanded) 2.dp else 1.dp
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+                            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.3f)
+                        )
+                    )
+                )
+                .padding(cardPadding),
+            verticalArrangement = Arrangement.spacedBy(itemPadding)
+        ) {
+            if (onCategoryClick != null) {
+                CategoryBadge(
+                    catalogueName = catalogueName,
+                    categoryName = categoryName,
+                    onClick = onCategoryClick,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.Top
+            ) {
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(1.dp)
+                ) {
+                    Text(
+                        text = relative_M1produit.nom,
+                        fontSize = nameTextSize,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        lineHeight = if (isExpanded) 16.sp else 12.sp
+                    )
+
+                    if (relative_M1produit.nomArab.isNotBlank() && isExpanded) {
+                        Text(
+                            text = relative_M1produit.nomArab,
+                            fontSize = arabicTextSize,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            lineHeight = 14.sp
+                        )
+                    }
+                }
+            }
+
+            // Second row: Info cards in FlowRow
+            FlowRow(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(itemPadding),
+                verticalArrangement = Arrangement.spacedBy(itemPadding)
+            ) {
+                // Delete button - only visible for admin users
+                if (shouldShowButtons && affiche_ProduitDataBaseEdites_ComposableViews) {
+                    DeleteProductHeader(
+                        productName = relative_M1produit.nom,
+                        onDelete = {
+                            onDelete(relative_M1produit)
+                        }
+                    )
+                }
+
+                // Sync tariff button
+                if (shouldShowButtons && affiche_ProduitDataBaseEdites_ComposableViews) {
+                    ClickableInfoCard(
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.Sync,
+                                contentDescription = "Update Tariff",
+                                tint = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.size(iconSize)
+                            )
+                        },
+                        value = "↻",
+                        label = "Tarif",
+                        labelTextSize = labelTextSize,
+                        valueTextSize = valueTextSize,
+                        itemPadding = itemPadding,
+                        onClick = onUpdateTariff
+                    )
+
+                    ClickableInfoCard(
+                        icon = {
+                            Icon(
+                                imageVector = if (relative_M1produit.its_Carton)
+                                    Icons.Default.CheckBox
+                                else
+                                    Icons.Default.CheckBoxOutlineBlank,
+                                contentDescription = "Toggle Carton",
+                                tint = if (relative_M1produit.its_Carton)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+                                modifier = Modifier.size(iconSize)
+                            )
+                        },
+                        value = if (relative_M1produit.its_Carton) "✓" else "○",
+                        label = "Carton",
+                        labelTextSize = labelTextSize,
+                        valueTextSize = valueTextSize,
+                        itemPadding = itemPadding,
+                        onClick = {
+                            onUpdateProduit(
+                                relative_M1produit.copy(
+                                    its_Carton = !relative_M1produit.its_Carton,
+                                    dernierTimeTampsSynchronisationAvecFireBase = System.currentTimeMillis()
+                                )
+                            )
+                        }
+                    )
+
+                    onSetPremierCheckDonneForAllVents?.let { callback ->
+                        ClickableInfoCard(
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.DoneAll,
+                                    contentDescription = "Marquer premier check",
+                                    tint = MaterialTheme.colorScheme.tertiary,
+                                    modifier = Modifier.size(iconSize)
+                                )
+                            },
+                            value = "✔✔",
+                            label = "Check",
+                            labelTextSize = labelTextSize,
+                            valueTextSize = valueTextSize,
+                            itemPadding = itemPadding,
+                            onClick = callback
+                        )
+                    }
+                }
+
+                // Number of units card
+                if (relative_M1produit.nombreUniteInt > 1 || affiche_ProduitDataBaseEdites_ComposableViews) {
+                    if (affiche_ProduitDataBaseEdites_ComposableViews) {
+                        EditableInfoCard(
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.ViewModule,
+                                    contentDescription = "Units",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(iconSize)
+                                )
+                            },
+                            value = "${relative_M1produit.nombreUniteInt}",
+                            label = "U",
+                            labelTextSize = labelTextSize,
+                            valueTextSize = valueTextSize,
+                            itemPadding = itemPadding,
+                            startCount = relative_M1produit.nombreUniteInt,
+                            isExpanded = isExpanded,
+                            onUpdate = { new ->
+                                onUpdateProduit(
+                                    relative_M1produit.copy(nombreUniteInt = new)
+                                )
+                            }
+                        )
+                    } else {
+                        InfoCard(
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.ViewModule,
+                                    contentDescription = "Units",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(iconSize)
+                                )
+                            },
+                            value = "${relative_M1produit.nombreUniteInt}",
+                            label = "U",
+                            labelTextSize = labelTextSize,
+                            valueTextSize = valueTextSize,
+                            itemPadding = itemPadding
+                        )
+                    }
+                }
+
+                // Carton quantity card
+                if (relative_M1produit.quantite_Boit_Par_Carton > 1 || affiche_ProduitDataBaseEdites_ComposableViews) {
+                    if (affiche_ProduitDataBaseEdites_ComposableViews) {
+                        EditableInfoCard(
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.Inventory2,
+                                    contentDescription = "Carton",
+                                    tint = MaterialTheme.colorScheme.tertiary,
+                                    modifier = Modifier.size(iconSize)
+                                )
+                            },
+                            value = "${relative_M1produit.quantite_Boit_Par_Carton}",
+                            label = "C",
+                            labelTextSize = labelTextSize,
+                            valueTextSize = valueTextSize,
+                            itemPadding = itemPadding,
+                            startCount = relative_M1produit.quantite_Boit_Par_Carton,
+                            isExpanded = isExpanded,
+                            onUpdate = { new ->
+                                onUpdateProduit(
+                                    relative_M1produit.copy(quantite_Boit_Par_Carton = new)
+                                )
+                            }
+                        )
+                    } else {
+                        InfoCard(
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.Inventory2,
+                                    contentDescription = "Carton",
+                                    tint = MaterialTheme.colorScheme.tertiary,
+                                    modifier = Modifier.size(iconSize)
+                                )
+                            },
+                            value = "${relative_M1produit.quantite_Boit_Par_Carton}",
+                            label = "C",
+                            labelTextSize = labelTextSize,
+                            valueTextSize = valueTextSize,
+                            itemPadding = itemPadding
+                        )
+                    }
+                }
+
+                EditableDoubleInfoCard(
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.AttachMoney,
+                            contentDescription = "Prix client unité",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(iconSize)
+                        )
+                    },
+                    value = "%.2f".format(relative_M1produit.clientPrixVentUnite),
+                    label = "ب.حبة",
+                    labelTextSize = labelTextSize,
+                    valueTextSize = valueTextSize,
+                    itemPadding = itemPadding,
+                    startValue = relative_M1produit.clientPrixVentUnite,
+                    isExpanded = isExpanded,
+                    onUpdate = { new ->
+                        onUpdateProduit(
+                            relative_M1produit.copy(clientPrixVentUnite = new)
+                        )
+                    }
+                )
+
+                InfoCard(
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Outbox,
+                            contentDescription = "Prix Achat",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(iconSize)
+                        )
+                    },
+                    value = "%.2f".format(prix_achat),
+                    label = "شراء",
+                    labelTextSize = labelTextSize,
+                    valueTextSize = valueTextSize,
+                    itemPadding = itemPadding
+                )
+
+                val totalClient =
+                    relative_M1produit.clientPrixVentUnite * relative_M1produit.nombreUniteInt
+                if (totalClient > 0.0) {
+                    InfoCard(
+                        icon = {
+                            Icon(
+                                imageVector = Icons.Default.AttachMoney,
+                                contentDescription = "Total client",
+                                tint = MaterialTheme.colorScheme.secondary,
+                                modifier = Modifier.size(iconSize)
+                            )
+                        },
+                        value = "%.2f".format(totalClient),
+                        label = "تخرج",
+                        labelTextSize = labelTextSize,
+                        valueTextSize = valueTextSize,
+                        itemPadding = itemPadding
+                    )
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun InfoCard(
+    icon: @Composable () -> Unit,
+    value: String,
+    label: String,
+    labelTextSize: TextUnit,
+    valueTextSize: TextUnit,
+    itemPadding: Dp,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = itemPadding + 2.dp, vertical = itemPadding),
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            icon()
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = label,
+                    fontSize = labelTextSize,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                    fontWeight = FontWeight.Medium,
+                    lineHeight = labelTextSize
+                )
+                Text(
+                    text = value,
+                    fontSize = valueTextSize,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = valueTextSize
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ClickableInfoCard(
+    icon: @Composable () -> Unit,
+    value: String,
+    label: String,
+    labelTextSize: TextUnit,
+    valueTextSize: TextUnit,
+    itemPadding: Dp,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.8f)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = itemPadding + 2.dp, vertical = itemPadding),
+            horizontalArrangement = Arrangement.spacedBy(2.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            icon()
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = label,
+                    fontSize = labelTextSize,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.9f),
+                    fontWeight = FontWeight.Medium,
+                    lineHeight = labelTextSize
+                )
+                Text(
+                    text = value,
+                    fontSize = valueTextSize,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = valueTextSize
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ColorImageCard_FragID3(
+    relative_M3CouleurProduitInfos: M3CouleurProduitInfos,
+    isSelected: Boolean,
+    modifier: Modifier = Modifier.Companion,
+    roundedCorners: RoundedCornerShape = RoundedCornerShape(12.dp),
+    uiState_NewProtoPatterns_viewModel: Pair<UiState_NewProtoPatterns, A_ViewModel_NewProtoPatterns>
+) {
+    val elevation = if (isSelected) 4.dp else 2.dp
+
+    Card(
+        modifier = modifier,
+        elevation = CardDefaults.cardElevation(defaultElevation = elevation),
+        shape = roundedCorners
+    ) {
+        Box(
+            modifier = if (isSelected) {
+                Modifier.Companion
+                    .fillMaxWidth()
+                    .aspectRatio(370.dp / 500.dp)
+            } else {
+                Modifier.Companion
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+            }
+        ) {
+            Image_Displaye(
+                modifier = Modifier.Companion,
+                relative_M3CouleurProduitInfos = relative_M3CouleurProduitInfos,
+                contentScale = if (isSelected) ContentScale.Companion.Fit else ContentScale.Companion.Crop,
+                uiState_NewProtoPatterns_viewModel = uiState_NewProtoPatterns_viewModel,
+                list_M1Produit = uiState_NewProtoPatterns_viewModel.second.active_Datas
+                    .list_M1Produit
+            )
+        }
+    }
+}

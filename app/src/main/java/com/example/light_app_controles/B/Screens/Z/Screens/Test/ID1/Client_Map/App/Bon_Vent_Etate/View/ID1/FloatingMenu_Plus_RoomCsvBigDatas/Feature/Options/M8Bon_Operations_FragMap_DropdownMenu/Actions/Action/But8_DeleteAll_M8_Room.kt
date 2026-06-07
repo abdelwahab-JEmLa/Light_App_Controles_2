@@ -26,7 +26,7 @@ fun But8_DeleteAll_M8_Room(
         onConfirm    = {
             onPendingClear()
             coroutineScope.launch(Dispatchers.IO) {
-                vm.setter_LongOperations.delete_All_M8()
+                vm.setter_LongDatas.delete_All_M8()
                 vm.reload()
                 withContext(Dispatchers.Main) { onDismiss() }
             }

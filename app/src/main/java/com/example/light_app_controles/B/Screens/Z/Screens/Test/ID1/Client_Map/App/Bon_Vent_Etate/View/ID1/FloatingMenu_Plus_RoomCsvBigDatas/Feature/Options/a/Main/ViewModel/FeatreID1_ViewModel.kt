@@ -10,9 +10,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Modules.Setter_LongOperations
-import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.b.Models.M8BonVent
-import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Modules.Setter_LongDatas
+import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent
+import EntreApps.Shared.Modules.Base.AppDatabase
+import android.content.Context
 import kotlinx.coroutines.launch
 
 @Stable
@@ -26,10 +27,12 @@ class ActiveDatas {
 @SuppressLint("StaticFieldLeak")
 class FeatureID1_ViewModel(
     private val appDatabase: AppDatabase,
+    context: Context,
 ) : ViewModel() {
     val active_Datas = ActiveDatas()
-    val setter_LongOperations = Setter_LongOperations(
+    val setter_LongDatas = Setter_LongDatas(
         appDatabase,
+        context,
     )
 
     var captureRequested by mutableStateOf(false)
@@ -59,13 +62,13 @@ class FeatureID1_ViewModel(
             ?.map { bon -> if (bon.keyID == it.keyID) it else bon }
 
         viewModelScope.launch {
-            setter_LongOperations.update_M8(it)
+            setter_LongDatas.update_M8(it)
         }
     }
 
     fun add_New_M8BonVent(bon: M8BonVent) {
         viewModelScope.launch {
-            setter_LongOperations.add_New_M8BonVent(bon)
+            setter_LongDatas.add_New_M8BonVent(bon)
         }
     }
 }

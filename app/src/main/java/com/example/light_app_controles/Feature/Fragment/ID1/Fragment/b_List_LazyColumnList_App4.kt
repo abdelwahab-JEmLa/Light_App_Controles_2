@@ -1,0 +1,204 @@
+package Application4.App.Fragment.ID1.Fragment
+
+import Application4.App.Fragment.ID1.Fragment.ViewModel.A_ViewModel_NewProtoPatterns
+import Application4.App.Fragment.ID1.Fragment.ViewModel.Filter_Affichage_Mode_Proto
+import Application4.App.Fragment.ID1.Fragment.ViewModel.y.Components.UiState_NewProtoPatterns
+import Application4.App.Fragment.View.A_Item_Produit_App4
+import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
+import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
+import EntreApps.Shared.Models.Relative_Produits.Models.get_ListM21CataloguesCategorie
+import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
+import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+@Composable
+fun Main_LazyColumnList_App4(
+    modifier: Modifier = Modifier,
+    uiState_NewProtoPatterns_viewModel: Pair<UiState_NewProtoPatterns, A_ViewModel_NewProtoPatterns>,
+    onProductCategoryClick: (M01Produit) -> Unit,
+    justMovedProductKeyID: String?,
+    on_update_M13TarificationInfos_par_ecriture: (M13TarificationInfos) -> Unit,
+    ventCouleurs: List<M10OperationVentCouleur>,
+) {
+    val gridState = rememberLazyStaggeredGridState()
+    val viewModel = uiState_NewProtoPatterns_viewModel.second
+    val activeDatas = viewModel.active_Datas
+    val coroutineScope = rememberCoroutineScope()
+
+    val set_couleursKey_echantilliants_achat by remember {
+        derivedStateOf {
+            activeDatas.list_M10OperationVentCouleur
+                ?.sortedByDescending { it.creationTimestamps }
+                ?.map { it.parent_M3CouleurProduit_KeyID }
+                ?: emptyList()
+        }
+    }
+
+    val currentMode   = activeDatas.filterAffichageMode_Proto
+
+    val listM10OperationVentCouleur_FilteredBy_activeM8BonVent_state =
+        activeDatas.listM10OperationVentCouleur_FilteredBy_activeM8BonVent_state
+
+    val finale_filtred_list by remember {
+        derivedStateOf {
+            val currentColors = activeDatas.list_M03CouleurProduitInfos
+            activeDatas.filter_relode_tiger
+
+            ProductListFilterLogic.compute(
+                rawColors = currentColors,
+                productMap = activeDatas.list_M1Produit?.associateBy { it.keyID } ?: emptyMap(),
+                query = activeDatas.filter_echatilaten.trim().lowercase(),
+                mode = currentMode,
+                ventCouleurs = listM10OperationVentCouleur_FilteredBy_activeM8BonVent_state,
+                categories = activeDatas.list_M16CategorieProduit ?: emptyList(),
+                catalogues = get_ListM21CataloguesCategorie(),
+                echantillantsPurchaseOrder = set_couleursKey_echantilliants_achat,
+                classement = activeDatas.parentProduit_Classement,
+                sort_Order = currentMode.mais_sort_order,
+                periode = activeDatas.active_PeriodVent
+            )
+        }
+    }
+
+    val gridColumns by remember {
+        derivedStateOf {
+            when (activeDatas.filterAffichageMode_Proto) {
+                Filter_Affichage_Mode_Proto.Echants_Seulement -> 4
+                else -> 2
+            }
+        }
+    }
+
+    LaunchedEffect(finale_filtred_list) {
+        activeDatas.parentProduit_Classement = finale_filtred_list
+            .mapIndexed { index, (product, _) -> product.keyID to index }
+            .toMap()
+    }
+
+    // Scroll to top as soon as the filter activates (query length hits 3).
+    val searchQuery = activeDatas.filter_echatilaten
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.trim().length == 3) {
+            gridState.scrollToItem(0)
+        }
+    }
+
+    val expanded_M1Produit = viewModel.active_Datas.expanded_M1Produit
+
+    LaunchedEffect(expanded_M1Produit) {
+        expanded_M1Produit ?: return@LaunchedEffect
+        val targetKeyID = expanded_M1Produit.keyID
+        if (targetKeyID.isBlank()) return@LaunchedEffect
+        val foundIndex =
+            finale_filtred_list.indexOfFirst { (product, _) -> product.keyID == targetKeyID }
+        if (foundIndex < 0) return@LaunchedEffect
+        coroutineScope.launch { gridState.scrollToItem(foundIndex) }
+        delay(300)
+        coroutineScope.launch { gridState.animateScrollToItem(foundIndex, scrollOffset = 0) }
+    }
+
+
+    LazyVerticalStaggeredGrid(
+        columns = StaggeredGridCells.Fixed(gridColumns),
+        state = gridState,
+        contentPadding = PaddingValues(8.dp),
+        modifier = modifier
+            .semantics(mergeDescendants = true) {
+                set(value = ventCouleurs.firstOrNull()?.toString() ?: "[]", key = SemanticsPropertyKey("ventCouleurs.first().toString()"))      //<--
+
+
+                set(value = currentMode, key = SemanticsPropertyKey("currentMode"))       //<--
+                set(value = finale_filtred_list, key = SemanticsPropertyKey("finale_filtred_list"))       //<--
+                set(value = listM10OperationVentCouleur_FilteredBy_activeM8BonVent_state, key = SemanticsPropertyKey("listM10OperationVentCouleur_FilteredBy_activeM8BonVent_state"))
+            }
+            .fillMaxWidth()
+            .background(Color(0xFFFFF0F5)),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalItemSpacing = 8.dp,
+    ) {
+        finale_filtred_list.forEach { (product, colors) ->
+            val isExpanded = expanded_M1Produit?.keyID == product.keyID
+            item(
+                key = "product_${product.keyID}",
+                span = if (isExpanded) StaggeredGridItemSpan.FullLine else StaggeredGridItemSpan.SingleLane
+            ) {
+                LazyStigerList_Produits_FragID4(
+                    product = product,
+                    colors = colors,
+                    onCategoryClick = { onProductCategoryClick(product) },
+                    justMoved = product.keyID == justMovedProductKeyID,
+                    uiState_NewProtoPatterns_viewModel = uiState_NewProtoPatterns_viewModel,
+                    on_update_M13TarificationInfos_par_ecriture = on_update_M13TarificationInfos_par_ecriture,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun LazyStigerList_Produits_FragID4(
+    modifier: Modifier = Modifier,
+    product: M01Produit,
+    colors: List<M3CouleurProduitInfos>,
+    onCategoryClick: (() -> Unit)? = null,
+    justMoved: Boolean = false,
+    uiState_NewProtoPatterns_viewModel: Pair<UiState_NewProtoPatterns, A_ViewModel_NewProtoPatterns>,
+    on_update_M13TarificationInfos_par_ecriture: (M13TarificationInfos) -> Unit
+) {
+    val backgroundColor by animateColorAsState(
+        targetValue = if (justMoved) Color(0xFF4CAF50).copy(alpha = 0.3f) else Color.Transparent,
+        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing),
+        label = "backgroundColorAnimation"
+    )
+    val scale by animateFloatAsState(
+        targetValue = if (justMoved) 1.05f else 1f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "scaleAnimation"
+    )
+    Box(
+        modifier = Modifier
+            .graphicsLayer { scaleX = scale; scaleY = scale }
+            .background(backgroundColor, RoundedCornerShape(12.dp))
+    ) {
+        A_Item_Produit_App4(
+            relative_M1produit = product,
+            modifier = modifier,
+            onCategoryClick = onCategoryClick,
+            uiState_NewProtoPatterns_viewModel = uiState_NewProtoPatterns_viewModel,
+            relative_ListM3Couleurs_override = colors,
+            on_update_M13TarificationInfos_par_ecriture = on_update_M13TarificationInfos_par_ecriture,
+        )
+    }
+}

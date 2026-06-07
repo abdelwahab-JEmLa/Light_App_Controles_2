@@ -29,7 +29,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -51,7 +50,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
@@ -62,7 +60,7 @@ import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.A
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M2Client_Operations_FragMap_DropdownMenu.Actions.M2Client_Operations_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M8Bon_Operations_FragMap_DropdownMenu.Actions.M8Bon_Operations_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.a.Main.ViewModel.FeatureID1_ViewModel
-import com.example.light_app_controles.Modules.Base.SQL.Daos.AppDatabase
+import EntreApps.Shared.Modules.Base.AppDatabase
 
 private enum class DialState { Closed, ChildsVisible, M8Open, M03Open, M2Open }
 
@@ -73,7 +71,7 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
     context: Context = LocalContext.current,
     appDatabase: AppDatabase ,
     viewModel: FeatureID1_ViewModel = viewModel(
-        factory = viewModelFactory { initializer { FeatureID1_ViewModel(appDatabase = appDatabase) } }
+        factory = viewModelFactory { initializer { FeatureID1_ViewModel(appDatabase = appDatabase,context) } }
     )
 ) {
     val haptic = LocalHapticFeedback.current
