@@ -16,13 +16,13 @@ plugins {
 android {
     namespace = "com.example.light_app_controles"
     compileSdk = 34
-
+    //Balence_Actuelle_EnvDevFeature
     defaultConfig {
         applicationId = "com.example.light_app_controles"
         minSdk = 26
         targetSdk = 34
         versionCode = 1
-        versionName = "0.2.appTestWhatspp"
+        versionName = "0.2.Balence_Actuelle_EnvDevFeature"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"

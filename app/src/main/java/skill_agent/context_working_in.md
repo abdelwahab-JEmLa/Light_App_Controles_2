@@ -14,6 +14,7 @@ This skill instructs the assistant on how to isolate the AI's working context so
 - "cwd_"
 - "cwe_"
 - "cwa_add_package <package>"
+- "cwa_<package>" (where <package> starts with "com.example.light_app_controles.")
 - "cwa_add_<short_name>"
 - "cwa_add_<filename.kt>"
 - "cwa_add_<filename>"
@@ -78,7 +79,7 @@ Check if the `.antigravityignore` and/or `.geminiignore` files exist in the proj
 
 ---
 
-### When "cwa_add_package <package>" is triggered:
+### When "cwa_add_package <package>" or "cwa_<package>" (where <package> starts with "com.example.light_app_controles.") is triggered:
 
 #### 1. Parse and Translate the Package Name
 Convert the dot-separated package name (e.g. `com.example.light_app_controles.Modules.Base.SQL.Daos`) into matching folder directory rules under `app/src/main/java/`.
@@ -161,3 +162,4 @@ Confirm to the user that the package has been successfully removed from the acti
 ## Mapped Packages
 - Daos = com.example.light_app_controles.Modules.Base.SQL.Daos
 - FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button = com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button
+- light_app_controles = com.example.light_app_controles
