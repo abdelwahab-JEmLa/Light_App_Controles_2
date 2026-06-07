@@ -63,11 +63,12 @@ import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.A
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M10.Actions.M10_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M13.Actions.M13_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M14.Actions.M14_FragMap_DropdownMenu
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.M9.Actions.M09_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.a.Main.MultiOperations_FragMap_DropdownMenu
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.a.Main.ViewModel.FeatureID1_ViewModel
 import EntreApps.Shared.Modules.Base.AppDatabase
 
-private enum class DialState { Closed, ChildsVisible, M8Open, M03Open, M2Open, M1_OpertaionsDatasRow_Open, M10Open, M13Open, M14Open, MultiOperationsOpen }  //<--
+private enum class DialState { Closed, ChildsVisible, M8Open, M03Open, M2Open, M1_OpertaionsDatasRow_Open, M10Open, M13Open, M14Open, MultiOperationsOpen, M9Open }  //<--
 
 @Composable
 fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
@@ -403,6 +404,47 @@ fun FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button(
                             }
                             M8Bon_Operations_FragMap_DropdownMenu(
                                 expanded = dialState == DialState.M8Open,
+                                onDismiss = { dialState = DialState.Closed },
+                                on_vent_key = on_vent_key,
+                                onClick_Lence_Capture = onClick_Lence_Capture,
+                                vm = viewModel,
+                            )
+                        }
+                    }
+                    Row(
+                        verticalAlignment     = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        Text(
+                            text       = "M9 AppCompt",
+                            style      = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color      = Color.White,
+                            modifier   = Modifier
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color(0xFF00796B).copy(alpha = 0.92f))
+                                .padding(horizontal = 10.dp, vertical = 5.dp),
+                        )
+                        Box {
+                            FloatingActionButton(
+                                onClick = {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                    dialState = DialState.M9Open
+                                },
+                                modifier       = Modifier.size(46.dp),
+                                containerColor = Color(0xFF00796B),
+                                shape          = CircleShape,
+                                elevation      = FloatingActionButtonDefaults.elevation(4.dp),
+                            ) {
+                                Icon(
+                                    imageVector        = Icons.Default.AllInbox,
+                                    contentDescription = "M9",
+                                    tint               = Color.White,
+                                    modifier           = Modifier.size(22.dp),
+                                )
+                            }
+                            M09_FragMap_DropdownMenu(
+                                expanded = dialState == DialState.M9Open,
                                 onDismiss = { dialState = DialState.Closed },
                                 on_vent_key = on_vent_key,
                                 onClick_Lence_Capture = onClick_Lence_Capture,

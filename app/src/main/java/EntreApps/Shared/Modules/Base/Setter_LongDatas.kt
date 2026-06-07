@@ -297,6 +297,238 @@ class Setter_LongDatas(
         )
     }
 
+    suspend fun delete_All_M09AppCompt() {
+        appDatabase.dao_M9AppCompt().deleteAll()
+    }
+
+    suspend fun insertAll_M09AppCompt(items: List<M09AppCompt>) = withContext(Dispatchers.IO) {
+        items.forEach { appDatabase.dao_M9AppCompt().upsert(it) }
+    }
+
+    suspend fun get_Firebase_M09AppCompt_Counts(refDataBase: DatabaseReference): Pair<Int, Int> =
+        withContext(Dispatchers.IO) {
+            val snapshot = suspendFirebaseSnapshot(refDataBase)
+            val total = snapshot.childrenCount.toInt()
+            Pair(total, 0)
+        }
+
+    suspend fun export_M09AppCompt_Room_To_Csv(csv: File) = withContext(Dispatchers.IO) {
+        val datas = appDatabase.dao_M9AppCompt().getAll()
+        if (datas.isEmpty()) return@withContext
+
+        csv.parentFile?.mkdirs()
+
+        val headers = datas.first().to_Map().keys.toList()
+        val existingRows: LinkedHashMap<String, List<String>> = linkedMapOf()
+
+        if (csv.exists()) {
+            val lines = csv.readLines()
+            if (lines.size > 1) {
+                val fileHeaders = lines[0].splitCsvLine()
+                val keyIdx = fileHeaders.indexOf("keyID")
+                lines.drop(1).forEach { line ->
+                    val cells = line.splitCsvLine()
+                    val id = cells.getOrNull(keyIdx) ?: ""
+                    if (id.isNotEmpty()) existingRows[id] = cells
+                }
+            }
+        }
+
+        datas.forEach { item ->
+            existingRows[item.keyID] = item.to_Map().values.map { (it?.toString() ?: "").escapeCsv() }
+        }
+
+        FileWriter(csv, false).use { w ->
+            w.write(headers.joinToString(",") + "\n")
+            existingRows.values.forEach { cells ->
+                w.write(cells.joinToString(",") { it.escapeCsv() } + "\n")
+            }
+        }
+    }
+
+    suspend fun set_scv_M09AppCompt_au_fireBase(
+        csvFile: File,
+        refDataBase: DatabaseReference,
+    ) = withContext(Dispatchers.IO) {
+        if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
+        val lines = csvFile.readLines().filter { it.isNotBlank() }
+        if (lines.size < 2) return@withContext
+
+        val headers = lines[0].splitCsvLine()
+        val keyIdx = headers.indexOf("keyID")
+        if (keyIdx == -1) return@withContext
+
+        val items = lines.drop(1).mapNotNull { line ->
+            val cells = line.splitCsvLine()
+            val keyID = cells.getOrNull(keyIdx)?.trim()?.removeSurrounding("\"")
+            if (keyID.isNullOrBlank()) return@mapNotNull null
+            val map = headers.zip(cells).associate { (h, v) ->
+                h to v.trim().removeSurrounding("\"").ifEmpty { null }
+            }
+            runCatching { m09_from_Map(map) }.getOrNull()
+        }
+
+        if (items.isEmpty()) return@withContext
+        val updates: Map<String, Any> = items.associate { it.keyID to it.to_Map() }
+        refDataBase.updateChildren(updates).await()
+    }
+
+    suspend fun import_M09AppCompt_FireBase_To_Csv(
+        refDataBase: DatabaseReference,
+        csvFile: File,
+    ) = withContext(Dispatchers.IO) {
+        val snapshot = suspendFirebaseSnapshot(refDataBase)
+
+        val items = snapshot.children.mapNotNull { child ->
+            val raw = child.value
+            if (raw !is Map<*, *>) return@mapNotNull null
+            @Suppress("UNCHECKED_CAST")
+            val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
+            val item = runCatching { m09_from_Map(map) }.getOrNull()
+            item
+        }
+
+        if (items.isEmpty()) return@withContext
+
+        csvFile.parentFile?.mkdirs()
+
+        val headers = items.first().to_Map().keys.toList()
+        val existingRows: LinkedHashMap<String, List<String>> = linkedMapOf()
+
+        if (csvFile.exists()) {
+            val lines = csvFile.readLines()
+            if (lines.size > 1) {
+                val fileHeaders = lines[0].splitCsvLine()
+                val keyIdx = fileHeaders.indexOf("keyID")
+                lines.drop(1).forEach { line ->
+                    val cells = line.splitCsvLine()
+                    val id = cells.getOrNull(keyIdx) ?: ""
+                    if (id.isNotEmpty()) existingRows[id] = cells
+                }
+            }
+        }
+
+        items.forEach { item ->
+            existingRows[item.keyID] = item.to_Map().values.map { (it?.toString() ?: "").escapeCsv() }
+        }
+
+        FileWriter(csvFile, false).use { w ->
+            w.write(headers.joinToString(",") + "\n")
+            existingRows.values.forEach { cells ->
+                w.write(cells.joinToString(",") { it.escapeCsv() } + "\n")
+            }
+        }
+    }
+
+    suspend fun import_M09AppComptCsv_To_Room(csvFile: File) = withContext(Dispatchers.IO) {
+        if (!csvFile.exists() || csvFile.length() == 0L) return@withContext
+        val lines = csvFile.readLines().filter { it.isNotBlank() }
+        if (lines.size < 2) return@withContext
+
+        val headers = lines[0].splitCsvLine()
+        val keyIdx = headers.indexOf("keyID")
+        if (keyIdx == -1) return@withContext
+
+        val items = lines.drop(1).mapNotNull { line ->
+            val cells = line.splitCsvLine()
+            val keyID = cells.getOrNull(keyIdx)?.trim()?.removeSurrounding("\"")
+            if (keyID.isNullOrBlank()) return@mapNotNull null
+            val map = headers.zip(cells).associate { (h, v) ->
+                h to v.trim().removeSurrounding("\"").ifEmpty { null }
+            }
+            runCatching { m09_from_Map(map) }.getOrNull()
+        }
+
+        if (items.isNotEmpty()) {
+            items.forEach { appDatabase.dao_M9AppCompt().upsert(it) }
+        }
+    }
+
+    suspend fun import_M09AppCompt_FireBase_To_Room(refDataBase: DatabaseReference) =
+        withContext(Dispatchers.IO) {
+            val snapshot = suspendFirebaseSnapshot(refDataBase)
+            val items = snapshot.children.mapNotNull { child ->
+                val raw = child.value
+                if (raw !is Map<*, *>) return@mapNotNull null
+                @Suppress("UNCHECKED_CAST")
+                val map = (raw as Map<String, Any?>).mapValues { it.value?.toString() }
+                val item = runCatching { m09_from_Map(map) }.getOrNull()
+                item
+            }
+            items.forEach { appDatabase.dao_M9AppCompt().upsert(it) }
+        }
+
+    private fun m09_from_Map(map: Map<String, String?>): M09AppCompt {
+        return M09AppCompt(
+            keyID = map["keyID"] ?: M09AppCompt.generePushKey(),
+            creationTimestamp = map["creationTimestamp"]?.toLongOrNull() ?: System.currentTimeMillis(),
+            dernierTimeTampsSynchronisationAvecFireBase = map["dernierTimeTampsSynchronisationAvecFireBase"]?.toLongOrNull() ?: System.currentTimeMillis(),
+            appDesignedPourWorkingGrossisst3Ali = map["appDesignedPourWorkingGrossisst3Ali"]?.toBoolean() ?: true,
+            its_mode_affiche_que_produits_au_depot = map["its_mode_affiche_que_produits_au_depot"]?.toBoolean() ?: true,
+            mode_edite_dispo = map["mode_edite_dispo"]?.toBoolean() ?: false,
+            credit_fait = map["credit_fait"]?.toDoubleOrNull() ?: 0.0,
+            nom = map["nom"] ?: "",
+            autres_Noms_SepareParComma = map["autres_Noms_SepareParComma"] ?: "",
+            deviceModelNom = map["deviceModelNom"] ?: android.os.Build.MODEL,
+            deviceModelId = map["deviceModelId"] ?: android.os.Build.ID,
+            period_Qui_Doit_Etre_Au_Entre = map["period_Qui_Doit_Etre_Au_Entre"] ?: "",
+            separeted_by_commas_keys_clients_a_cible_groupe_n1 = map["separeted_by_commas_keys_clients_a_cible_groupe_n1"] ?: ",",
+            keys_clients_a_cible_groupe_n2 = map["keys_clients_a_cible_groupe_n2"] ?: ",",
+            keys_clients_a_cible_groupe_n3 = map["keys_clients_a_cible_groupe_n3"] ?: ",",
+            image_detail_produit_s_affiche = map["image_detail_produit_s_affiche"]?.toBoolean() ?: true,
+            presentoireEBoutiqueFilterProduitDuCatalogueAvecBsonObjectId = map["presentoireEBoutiqueFilterProduitDuCatalogueAvecBsonObjectId"] ?: "",
+            hideAppScreen = map["hideAppScreen"]?.toBoolean() ?: false,
+            travailleChezGrossisst3Ali = map["travailleChezGrossisst3Ali"]?.toBoolean() ?: false,
+            affiche_toujoure_tariffs_tournet = map["affiche_toujoure_tariffs_tournet"]?.toBoolean() ?: false,
+            its_Admin = map["its_Admin"]?.toBoolean() ?: false,
+            c_Ouvert_Pour_Au_Command_Add_Period = map["c_Ouvert_Pour_Au_Command_Add_Period"]?.toBoolean() ?: true,
+            text_Message_Warning = map["text_Message_Warning"] ?: "",
+            ne_affiche_que_fragment = map["ne_affiche_que_fragment"] ?: "",
+            itsProductionModePourCeCompt = map["itsProductionModePourCeCompt"]?.toBoolean() ?: false,
+            ceComptVendeurInsertBonsAchatAuPeriodID = map["ceComptVendeurInsertBonsAchatAuPeriodID"]?.toLongOrNull() ?: 0L,
+            ceComptVendeurStartAffichePeriod = map["ceComptVendeurStartAffichePeriod"]?.toLongOrNull() ?: 0L,
+            migreSonDataBaseAuStart = map["migreSonDataBaseAuStart"]?.toBoolean() ?: false,
+            cConnectAuDevelopingDataBaseAuRelodApp = map["cConnectAuDevelopingDataBaseAuRelodApp"]?.toBoolean() ?: false,
+            mainInitDataBaseProgressEtate = map["mainInitDataBaseProgressEtate"]?.toFloatOrNull() ?: 0f,
+            its_Panie_Mode_Au_Lence_Boutique = map["its_Panie_Mode_Au_Lence_Boutique"]?.toBoolean() ?: false,
+            filter_marqueClient_Name = map["filter_marqueClient_Name"] ?: "no Filter",
+            next_start = map["next_start"]?.let {
+                runCatching { EntreApps.Shared.Models.Do.valueOf(it) }.getOrNull()
+            } ?: EntreApps.Shared.Models.Do.StandartInit_Sans_RienFair,
+            force_next_start_ = map["force_next_start_"]?.let {
+                runCatching { EntreApps.Shared.Models.Do.valueOf(it) }.getOrNull()
+            } ?: EntreApps.Shared.Models.Do.DeleteInsertAll_Active_Key,
+            activeDialogSearchM1Produit = map["activeDialogSearchM1Produit"]?.toBoolean() ?: false,
+            active_ProduitKeyID_Au_DroopDown_PresenterEcran = map["active_ProduitKeyID_Au_DroopDown_PresenterEcran"] ?: "",
+            active_CouleurKeyID_Extended_Image = map["active_CouleurKeyID_Extended_Image"] ?: "",
+            affiche_Dialog_Fast_Affiche_Panie_App4 = map["affiche_Dialog_Fast_Affiche_Panie_App4"]?.toBoolean() ?: false,
+            affiche_ProduitDataBaseEdites_ComposableViews = map["affiche_ProduitDataBaseEdites_ComposableViews"]?.toBoolean() ?: true,
+            couleurAchateOperationIdOuvertPourCeCompt = map["couleurAchateOperationIdOuvertPourCeCompt"] ?: "",
+            couleurAchateOperationKeyOuvertPourCeCompt = map["couleurAchateOperationKeyOuvertPourCeCompt"] ?: "",
+            ouvertProduitOnVentNom = map["ouvertProduitOnVentNom"] ?: "",
+            current_OnVent_M14VentPeriode_KeyID = map["current_OnVent_M14VentPeriode_KeyID"] ?: "",
+            current_OnVent_M14VentPeriode_DebugInfos = map["current_OnVent_M14VentPeriode_DebugInfos"] ?: "",
+            onVentM8BonVentKey = map["onVentM8BonVentKey"] ?: "",
+            onVentM8BonVentDebugInfos = map["onVentM8BonVentDebugInfos"] ?: "",
+            onVentM1ProduitInfosKeyID = map["onVentM1ProduitInfosKeyID"] ?: "",
+            onVentM1ProduitInfosDebugName = map["onVentM1ProduitInfosDebugName"] ?: "",
+            onVentM3CouleurProduitInfosKeyID = map["onVentM3CouleurProduitInfosKeyID"] ?: "null",
+            onVentM3CouleurProduitDebugInfos = map["onVentM3CouleurProduitDebugInfos"] ?: "null",
+            dialogAboveAll_OutlinedSearchListProduits = map["dialogAboveAll_OutlinedSearchListProduits"]?.toBoolean() ?: false,
+            dialogChoisireQuantityM1ProduitInfosKeyID = map["dialogChoisireQuantityM1ProduitInfosKeyID"] ?: "null",
+            dialogChoisireQuantityM1ProduitInfosDebugName = map["dialogChoisireQuantityM1ProduitInfosDebugName"] ?: "null",
+            activeFocuce_TariffPrixDifineur_M1ProduitKeyID = map["activeFocuce_TariffPrixDifineur_M1ProduitKeyID"] ?: "null",
+            activeFocuceTariffPrixDifineurM1ProduitDebugInfos = map["activeFocuceTariffPrixDifineurM1ProduitDebugInfos"] ?: "null",
+            startTextSearchM1Produit = map["startTextSearchM1Produit"] ?: "",
+            click_On_Marque = map["click_On_Marque"]?.let {
+                runCatching { EntreApps.Shared.Models.Home.ActiveCentralValues.Click_On_Marque.valueOf(it) }.getOrNull()
+            } ?: EntreApps.Shared.Models.Home.ActiveCentralValues.Click_On_Marque.Standart,
+            KeyByParent = map["KeyByParent"] ?: "",
+            vid = map["vid"]?.toLongOrNull() ?: 1L,
+            limite_couleurs_ou_leur_last_achate_est_moin_que_jour = map["limite_couleurs_ou_leur_last_achate_est_moin_que_jour"]?.toIntOrNull() ?: 30
+        )
+    }
+
     private val composScope = CoroutineScope(Dispatchers.IO)
 
     suspend fun add_New_M2Client(client: M2Client) {

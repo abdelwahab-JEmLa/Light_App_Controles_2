@@ -1,6 +1,7 @@
 package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Options.a.Main
 
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.C.Components.AvertissementDialog
+import EntreApps.Shared.Models.M09AppCompt
 import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
 import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
@@ -51,7 +52,7 @@ fun MultiOperations_FragMap_DropdownMenu(
     if (showMultiImportFirebaseToCsvConfirm) {
         AvertissementDialog(
             title        = "Multi Firebase to CSV",
-            message      = "سيتم تحميل البيانات لجميع الجداول (M1, M2, M3, M8, M10, M13, M14) من Firebase وحفظها في ملفات CSV.\nهل تريد المتابعة؟",
+            message      = "سيتم تحميل البيانات لجميع الجداول (M1, M2, M3, M8, M9, M10, M13, M14) من Firebase وحفظها في ملفات CSV.\nهل تريد المتابعة؟",
             confirmLabel = "تحميل الكل",
             onConfirm    = {
                 showMultiImportFirebaseToCsvConfirm = false
@@ -92,6 +93,11 @@ fun MultiOperations_FragMap_DropdownMenu(
                             refDataBase = M14VentPeriode.ref_Test,
                             csvFile     = M14VentPeriode.csv_test
                         )
+                        // 8. M9 AppCompt
+                        vm.setter_LongDatas.import_M09AppCompt_FireBase_To_Csv(
+                            refDataBase = M09AppCompt.ref_Test,
+                            csvFile     = M09AppCompt.csv_test
+                        )
                     }.onSuccess {
                         withContext(Dispatchers.Main) {
                             Toast.makeText(context, "تم تحميل جميع الجداول إلى CSV بنجاح ✓", Toast.LENGTH_SHORT).show()
@@ -111,7 +117,7 @@ fun MultiOperations_FragMap_DropdownMenu(
     if (showMultiImportCsvToRoomConfirm) {
         AvertissementDialog(
             title        = "Multi CSV to Room",
-            message      = "سيتم استيراد البيانات لجميع الجداول (M1, M2, M3, M8, M10, M13, M14) من ملفات CSV وتحديث قاعدة البيانات المحلية.\nهل تريد المتابعة؟",
+            message      = "سيتم استيراد البيانات لجميع الجداول (M1, M2, M3, M8, M9, M10, M13, M14) من ملفات CSV وتحديث قاعدة البيانات المحلية.\nهل تريد المتابعة؟",
             confirmLabel = "استيراد الكل",
             onConfirm    = {
                 showMultiImportCsvToRoomConfirm = false
@@ -131,6 +137,8 @@ fun MultiOperations_FragMap_DropdownMenu(
                         vm.setter_LongDatas.import_M13Csv_To_Room(M13TarificationInfos.csv_test)
                         // 7. M14 VentPeriode
                         vm.setter_LongDatas.import_M14Csv_To_Room(M14VentPeriode.csv_test)
+                        // 8. M9 AppCompt
+                        vm.setter_LongDatas.import_M09AppComptCsv_To_Room(M09AppCompt.csv_test)
                     }.onSuccess {
                         vm.reload()
                         withContext(Dispatchers.Main) {

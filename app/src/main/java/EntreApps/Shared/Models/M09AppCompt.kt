@@ -205,8 +205,15 @@ data class M09AppCompt(
 
         fun get_Default() = M09AppCompt()
 
-        val ref = Firebase.database.getReference(
-            "/00_DataPrototype-04-02/_1_developingRef/C_InfosSqlDataBases/Z_AppCompt"
+        const val nam_Model_Str = "M09AppCompt"
+
+        val ref = M00CentralParametresOfAllApps.central_MainDataBases_RefProduction.child(nam_Model_Str)
+
+        val ref_Test = ref
+
+        val csv_test = java.io.File(
+            M00CentralParametresOfAllApps.central_Local_Csv,
+            "TestDatas/$nam_Model_Str.csv"
         )
 
         fun generePushKey() = M00CentralParametresOfAllApps.genereUnPushKeyFireBase(ref)
