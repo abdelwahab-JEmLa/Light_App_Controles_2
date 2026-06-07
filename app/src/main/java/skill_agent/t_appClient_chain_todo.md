@@ -6,6 +6,7 @@ This skill instructs the assistant on how to automatically search for, identify,
 
 ## Trigger Phrases
 - "t_appClient_chain_todo"
+- "t>cli"
 
 ---
 
