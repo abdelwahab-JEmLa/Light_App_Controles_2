@@ -1,13 +1,23 @@
-# Last Saved Semantics Info
+# Semantics Inspection Report - Product Details
 
-- **Source File**: [M8Bon_Operations_FragMap_DropdownMenu.kt](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/App/Bon_Vent_Etate/View/ID1/FloatingMenu_Plus_RoomCsvBigDatas/Feature/Options/M8Bon_Operations_FragMap_DropdownMenu/Actions/M8Bon_Operations_FragMap_DropdownMenu.kt)
-- **Active Semantics Block**: Lines 346-351
+**Target Product KeyID**: `-OV3rmZB2ffLjTxgS0p4`
 
-## Extracted `set()` Semantics Properties:
-1. **Lines 347-350**:
-   ```kotlin
-   set(
-       value = vm.active_Datas.list_M8bon?.filter { it.keyID.takeLast(3) == "xp4" } ?: emptyList(),
-       key = SemanticsPropertyKey("room_d_xp4")
-   )
-   ```
+## 📦 Product Info
+- **ID**: `82`
+- **Nom**: Trix®
+- **Nom Arabe**: تريكس
+- **Prix Achat**: 455.0 DA
+- **Prix Vent**: 485.0 DA
+- **Prix Vent Unité Client**: 10.0 DA
+
+## 🎨 Colors Info
+KeyID | Nom Couleur | Affiche | Index Ancien Proto
+--- | --- | --- | ---
+-OWDMGbsb3_8abnBFqNb | 🎇 nougat 🎇 | Image | 0
+
+## 📊 Tariffs Info
+Type | Prix Currency | Marge Profit | Upgrade Suggéré
+--- | --- | --- | ---
+Prix_SupperGro_Et_PresentationService | 495.0 | 0.0 | Historique
+Tariff_ItsWorkInGrossist_SuperGros | 460.0 | 0.0 | Historique
+Tariff_ItsWorkInGrossist_Achat | 455.0 | 0.0 | 

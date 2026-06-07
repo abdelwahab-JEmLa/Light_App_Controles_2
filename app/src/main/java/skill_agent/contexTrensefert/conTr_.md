@@ -16,6 +16,7 @@ Whenever the user triggers "conT_", "conTr_", "/contexTrensefert", "context_tran
 - "ctecrase_"
 - "cwc_"
 - "ct_deepRead_"
+- "ct_l"
 
 ---
 
@@ -32,6 +33,12 @@ Display the contents of the context markdown file to the user. Do **NOT** read, 
 Locate and read the context file matching the conversation ID in [conversationsContext](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/contexTrensefert/conversationsContext) (e.g., `<conversation_id>_agy.md`).
 #### 2. Open and Read All Referenced Source Files
 Extract the file paths of all source files listed or modified in that context file. Open and read all of these source files to load their complete context into the AI session.
+
+### When "ct_l" is triggered:
+#### 1. Find the Latest Context File
+Locate the most recently modified/created `.md` file inside the [conversationsContext](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/contexTrensefert/conversationsContext) folder.
+#### 2. Deep Read Referenced Source Files
+Extract all file paths listed or modified in that latest context file. Open and read each of these source files to load their complete context into the current AI session.
 
 ### When "ctc_" is triggered:
 #### 1. List Available Contexts

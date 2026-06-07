@@ -1,39 +1,23 @@
-# Semantics Inspection Report
+# Semantics Inspection Report - Product Details
 
-This report contains the parsed custom semantics properties extracted from the device's active UI component at runtime.
+**Target Product KeyID**: `-OV3rmZB2ffLjTxgS0p4`
 
----
+## 📦 Product Info
+- **ID**: `82`
+- **Nom**: Trix®
+- **Nom Arabe**: تريكس
+- **Prix Achat**: 455.0 DA
+- **Prix Vent**: 485.0 DA
+- **Prix Vent Unité Client**: 10.0 DA
 
-## 1. Set `listM8bon_7xp4` (Filtered by last 4 = 7xp4 / fqTx)
-*Expression: `listM8bon?.filter { it.keyID.takeLast(4) == "7xp4" } ?: emptyList()`*
+## 🎨 Colors Info
+KeyID | Nom Couleur | Affiche | Index Ancien Proto
+--- | --- | --- | ---
+-OWDMGbsb3_8abnBFqNb | 🎇 nougat 🎇 | Image | 0
 
-| ID | Date & Heure | État (Type) | Montant Principal | Versement Fait | Ancien Crédit | Nouveau Crédit | Crédit Cumulé | Versement | Crédit Fait | Nouvelle Situation | Total Sauvegardé | Client |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| - | - | - | - | - | - | - | - | - | - | - | - | - |
-
----
-
-## 2. Set `listM8bon_filtered` (Filtered by client FB)
-*Expression: `active_Datas.list_M8bon?.filter { it.parent_M2Client_KeyID == relative_M2Client?.keyID } ?: emptyList()`*
-
-| ID | Date & Heure | État (Type) | Montant Principal | Versement Fait | Ancien Crédit | Nouveau Crédit | Crédit Cumulé | Versement | Crédit Fait | Nouvelle Situation | Total Sauvegardé | Client |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| - | - | - | - | - | - | - | - | - | - | - | - | - |
-
----
-
-## 3. Set `allBons` (Filtered by client FB & Credit/Versement status)
-*Expression: `listM8bon?.filter { it.parent_M2Client_KeyID == relative_M2Client?.keyID && it.etateActuellementEst in CREDIT_VERSEMENT_STATES }?.sortedByDescending { it.creationTimestamps }`*
-
-| ID | Date & Heure | État (Type) | Montant Principal | Versement Fait | Ancien Crédit | Nouveau Crédit | Crédit Cumulé | Versement | Crédit Fait | Nouvelle Situation | Total Sauvegardé | Client |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| - | - | - | - | - | - | - | - | - | - | - | - | - |
-
----
-
-## 4. Set `listM8bon` (Total All Transactions - Top 10)
-*Expression: `listM8bon ?: emptyList()`*
-
-| ID | Date & Heure | État (Type) | Montant Principal | Versement Fait | Ancien Crédit | Nouveau Crédit | Crédit Cumulé | Versement | Crédit Fait | Nouvelle Situation | Total Sauvegardé | Client |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| - | - | - | - | - | - | - | - | - | - | - | - | - |
+## 📊 Tariffs Info
+Type | Prix Currency | Marge Profit | Upgrade Suggéré
+--- | --- | --- | ---
+Prix_SupperGro_Et_PresentationService | 495.0 | 0.0 | Historique
+Tariff_ItsWorkInGrossist_SuperGros | 460.0 | 0.0 | Historique
+Tariff_ItsWorkInGrossist_Achat | 455.0 | 0.0 | 

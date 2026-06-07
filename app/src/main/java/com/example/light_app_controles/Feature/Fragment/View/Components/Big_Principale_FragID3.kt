@@ -25,6 +25,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
 private const val IMAGE_HEIGHT_EXPANDED: Int = 370
@@ -78,6 +80,9 @@ fun Big_Principale_FragID3(
         FlowRow(
             modifier = Modifier
                 .fillMaxWidth()
+                .semantics(mergeDescendants = true) {
+                    set(value = tariffsList, key = SemanticsPropertyKey("tariffsList"))
+                }
                 .wrapContentHeight()
                 .background(
                     color = Color.White.copy(alpha = 0.95f),
