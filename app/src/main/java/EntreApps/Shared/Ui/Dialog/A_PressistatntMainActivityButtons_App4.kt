@@ -425,7 +425,8 @@ fun PressistatntMainActivityButtons_App4(
             }
 
             HorizontalDivider()
-            Text("Bon Vent")
+            Text("Bon Vent")         //<--
+            //TODO(1): affiche ici le nom de client par ad activeOnVent_M2Client et fait pour les autres infos de t_copiePattersApp
             Row {
                 activeOnVent_M8BonVent_benefice?.let { benef ->
                     if (benef > 0.0) {
