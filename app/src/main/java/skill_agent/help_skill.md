@@ -8,6 +8,8 @@ This skill instructs the assistant on how to automatically display a clean docum
 - "help_skill"
 - "h_"
 - "help_"
+- "h_cwe_"
+- "h_<trigger_phrase>"
 
 ---
 
@@ -18,13 +20,14 @@ Output a markdown table documenting each custom skill.
 
 | Nom du Skill | Mots-clés (Triggers) | Description |
 | :--- | :--- | :--- |
-| **Help Skills** (`help_skill.md`) | `help_skill`, `h_`, `help_` | Affiche ce tableau d'aide documentant l'ensemble des Skills disponibles. |
+| **Help Skills** (`help_skill.md`) | `help_skill`, `h_`, `help_`, `h_cwe_` | Affiche ce tableau d'aide ou explique en détail un skill spécifique (ex: h_cwe_). |
 | **Copy Coding Patterns** (`t_copiePattersApp.md`) | `t_copiePattersApp`, `t>copiePattersApp`, `copiePattersApp`, `t_c_client` | Copie et adapte les patterns de code et implémentations du projet ClientJetPack vers le projet local Light App. |
 | **Client Chained TODOs** (`t_appClient_chain_todo.md`) | `t_appClient_chain_todo`, `t>cli`, `>clientApp` | Résout et nettoie automatiquement les TODOs chaînés et dépendants (avec indicateurs comme `//<--`, `//...`) dans le projet externe ClientJetPack. |
 | **Fix TODOs** (`t_.md`) | `t_`, `t_models`, `t_usage`, `>clientApp`, `fix_todo` | Résout automatiquement les TODOs ou délègue aux skills correspondants (ex: `TODO: log_`, `TODO: sem_`, `TODO: con_c`, `TODO: room_d`), puis affiche le diff de code à la fin. |
 | **Context Transfer** (`contexTrensefert/conTr_.md`) | `conT_`, `conTr_`, `/contexTrensefert`, `context_transfer`, `ctsave_`, `ctc_`, `ctecrase_`, `cwc_`, `ct_deepRead_`, `ct_l` | Documente l'architecture du projet et sert de guide pour transférer le contexte de développement des modules (CSV/Firebase/Room) d'une session à l'autre. |
 | **Commit, Tag and Push** (`push_tagged.md`) | `push_taged`, `push_`, `p_` | Commite proprement les modifications locales, génère/incrémente intelligemment un tag Git, l'applique et pousse le tout sur GitHub. |
-| **Context Unique Working_IN** (`context_working_in.md`) | `agy_context_unique_workingIn_active`, `agy_context_unique_workingIn_desactive`, `c_w_a`, `c_w_d`, `c_w_e`, `cwa_<package>`, `cwa_`, `cwd_`, `cwe_` | Active (isole), Désactive (restaure), ou vérifie l'état du contexte restreint uniquement sur `Working_IN.Feature`. |
+| **Context Unique Working_IN** (`context_working_in/context_working_in.md`) | `agy_context_unique_workingIn_active`, `agy_context_unique_workingIn_desactive`, `c_w_a`, `c_w_d`, `c_w_e`, `cwa_<package>`, `cwa_`, `cwd_`, `cwe_` | Active (isole), Désactive (restaure), ou vérifie l'état du contexte restreint uniquement sur `Working_IN.Feature`. |
+| **Context Map Generator** (`context_working_in/contex_par_md_map/contex_par_md_ma.md`) | `cree_map`, `cta_map`, `cw_map_d` | Gère le contexte actif via une arborescence ASCII annotée dans `files_affiched.md` (`-` = focus, `x` = ignore). |
 | **Schedule App Launch & Tap Replay** (`tap/Schedule_agy_task_tap_l.md`) | `Schedule_agy_task_tap_l`, `schedule_tap_l`, `sch_tap_l`, `st_`, `arrete_sch` | Attend que l'app se lance depuis Android Studio pour exécuter tap_l, ou annule l'attente en cours (arrete_sch). |
 | **Tap Android FAB** (`tap/tap.md`) | `tap`, `tap <target>`, `tap_l`, `shel_tap_l` | Exécute un clic à haute vitesse en analysant l'arbre XML de l'UI (ciblant le FAB ou un texte) ou instantanément via le dernier tap rejoué (tap_l). |
 | **Real-Time Logcat Filter** (`log_f.md`) | `log_f`, `log_f ` followed by terms | Filtre et affiche en temps réel les logs de l'appareil par rapport aux mots-clés saisis dans le chat. |
@@ -52,7 +55,8 @@ Always present the user with clickable links to the skill files in the skills di
 * ✅ [Fix TODOs and Launch](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_.md)
 * 🔄 [Context Transfer](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/contexTrensefert/conTr_.md)
 * 📦 [Commit, Tag and Push](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/push_tagged.md)
-* 📂 [Context Unique Working_IN](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/context_working_in.md)
+* 📂 [Context Unique Working_IN](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/context_working_in/context_working_in.md)
+* 🗺️ [Context Map Generator](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/context_working_in/contex_par_md_map/contex_par_md_ma.md)
 * ⏰ [Schedule App Launch & Tap Replay](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/tap/Schedule_agy_task_tap_l.md)
 * 👆 [Tap Android FAB](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/tap/tap.md)
 * 📋 [Real-Time Logcat Filter](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/log_f.md)
@@ -70,3 +74,8 @@ Always present the user with clickable links to the skill files in the skills di
 * 📸 [Annotated Screen Capture](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/screenshot.md)
 * 🚀 [AS Click Run](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/as_click_run.md)
 
+### 3. Detail and Explain a Specific Skill (e.g. h_cwe_ or h_<trigger>)
+If the user's request matches `h_<trigger>` (such as `h_cwe_`):
+- Identify the corresponding skill using the trigger (e.g., `cwe_` points to the **Context Unique Working_IN** skill).
+- Open and read the markdown file of that skill (e.g., `context_working_in/context_working_in.md`).
+- Present a detailed explanation of the skill: its purpose, triggers, steps of execution, and relevant file paths.

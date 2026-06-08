@@ -1,1 +1,21 @@
-# Context restrictions deactivated
+# Context map active (restricted context)
+*
+
+# Whitelist parent folders and main directory
+!app/
+!app/src/
+!app/src/main/
+!app/src/main/java/
+!app/src/main/java/skill_agent/
+!app/src/main/java/skill_agent/**
+
+# Whitelisted folders and files (++)
+!app/src/main/java/EntreApps/
+!app/src/main/java/EntreApps//
+!app/src/main/java/EntreApps//Shared/
+!app/src/main/java/EntreApps//Shared/
+!app/src/main/java/EntreApps//Shared/**
+
+# Blacklisted folders and files (--)
+app/src/main/java/EntreApps//Shared//Ui//Views//FastEdite_OutlinedTextField.kt
+app/src/main/java/EntreApps//Shared//Ui//Views//FastEdite_OutlinedTextField_2.kt
