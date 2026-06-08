@@ -35,7 +35,11 @@ def main():
             # Extract masked root path e.g. app / src / main / java/
             match = re.search(r'`([^`]+)`', line)
             if match:
-                masked_root = "".join(match.group(1).split()).rstrip('/')
+                val = match.group(1).strip()
+                if val in [".", "/"]:
+                    masked_root = ""
+                else:
+                    masked_root = "".join(val.split()).rstrip('/')
         elif line.strip() == "```diff" or line.strip() == "<pre>":
             in_block = True
             continue
@@ -86,8 +90,13 @@ def main():
         path_parts.append(name)
         
         # Reconstruct path
-        rel_path = "/".join([masked_root] + path_parts)
+        if masked_root:
+            rel_path = "/".join([masked_root] + path_parts)
+        else:
+            rel_path = "/".join(path_parts)
         rel_path = re.sub(r'/+', '/', rel_path)
+        if rel_path.startswith('/'):
+            rel_path = rel_path[1:]
         if name.endswith('/') and not rel_path.endswith('/'):
             rel_path += '/'
         elif not name.endswith('/') and rel_path.endswith('/'):

@@ -14,6 +14,23 @@
 !app/src/main/java/EntreApps/Shared/
 !app/src/main/java/EntreApps/Shared/
 !app/src/main/java/EntreApps/Shared/**
+!app/src/main/java/com/
+!app/src/main/java/com/example/
+!app/src/main/java/com/example/light_app_controles/
+!app/src/main/java/com/example/light_app_controles/B/
+!app/src/main/java/com/example/light_app_controles/B/Screens/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/App/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/App/Bon_Vent_Etate/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/App/Bon_Vent_Etate/View/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/App/Bon_Vent_Etate/View/a/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/App/Bon_Vent_Etate/View/a/
+!app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/App/Bon_Vent_Etate/View/a/**
+!build.gradle.kts
 
 # Blacklisted folders and files (--)
 app/src/main/java/EntreApps/Shared/Ui/Views/FastEdite_OutlinedTextField.kt

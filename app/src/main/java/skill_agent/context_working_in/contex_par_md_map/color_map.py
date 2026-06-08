@@ -107,7 +107,7 @@ def main():
         }
         
         # Maintain depth path_stack to find parent
-        path_stack = path_stack[:depth]
+        path_stack = path_stack[:depth - 1]
         if path_stack:
             parent = path_stack[-1]
             node['parent'] = parent

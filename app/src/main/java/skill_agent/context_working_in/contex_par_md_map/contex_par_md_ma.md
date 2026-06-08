@@ -19,7 +19,7 @@ This skill instructs the assistant on how to generate a visual map of the worksp
 ### When "cree_map" is triggered:
 
 #### 1. Scan the Workspace Folders and Files
-Scan the workspace directories. If context restriction is active (i.e., `.antigravityignore` exists and restricts folders), only include the files and folders that are visible/allowed in the active context. If no restriction is active, scan the project directory (under `app/src/main/java/`).
+Scan the workspace directories (under `app/src/main/java/`) as well as the root `build.gradle.kts` and `app/build.gradle.kts` files. If context restriction is active (i.e., `.antigravityignore` exists and restricts folders), only include the files and folders that are visible/allowed in the active context.
 
 #### 2. Run the Python Script to Generate the Map
 Run the python script `app/src/main/java/skill_agent/context_working_in/contex_par_md_map/generate_map.py` (which preserves annotations by default) using a terminal command:

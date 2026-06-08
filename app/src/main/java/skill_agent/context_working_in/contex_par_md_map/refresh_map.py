@@ -27,7 +27,11 @@ def parse_existing_annotations(map_file_path):
             if "Racine commune masquée :" in line:
                 match = re.search(r'`([^`]+)`', line)
                 if match:
-                    masked_root = "".join(match.group(1).split()).rstrip('/')
+                    val = match.group(1).strip()
+                    if val in [".", "/"]:
+                        masked_root = ""
+                    else:
+                        masked_root = "".join(val.split()).rstrip('/')
             elif line.strip() in ["```diff", "```text", "<pre>"]:
                 in_block = True
                 continue
@@ -65,8 +69,13 @@ def parse_existing_annotations(map_file_path):
             path_parts = path_parts[:level]
             path_parts.append(name)
             
-            rel_path = "/".join([masked_root] + path_parts)
+            if masked_root:
+                rel_path = "/".join([masked_root] + path_parts)
+            else:
+                rel_path = "/".join(path_parts)
             rel_path = re.sub(r'/+', '/', rel_path)
+            if rel_path.startswith('/'):
+                rel_path = rel_path[1:]
             # Ensure trailing slash for directory mapping
             if name.endswith('/') and not rel_path.endswith('/'):
                 rel_path += '/'
@@ -101,6 +110,12 @@ def main():
     
     # 2. Scan directory tree
     all_files = []
+    
+    # Add build.gradle files if they exist
+    for extra_file in ["build.gradle.kts", "app/build.gradle.kts"]:
+        if os.path.exists(os.path.join(project_root, extra_file)):
+            all_files.append(extra_file)
+            
     if os.path.exists(search_dir):
         for root, dirs, files in os.walk(search_dir):
             for file in files:
@@ -136,6 +151,8 @@ def main():
 
     if common_path:
         markdown_lines.append(f"Racine commune masquée : `{' / '.join(common_path)}/` \n")
+    else:
+        markdown_lines.append("Racine commune masquée : `.` \n")
 
     markdown_lines.append("```diff")
 
