@@ -2,9 +2,11 @@
 
 Voici l'arborescence des dossiers et des fichiers du contexte actif :
 
+Racine commune masquée : `app / src / main / java/` 
+
 ```diff
   ├── EntreApps/
-+ │    └── Shared/            ++
++ │   └── Shared/            ++
 + │       ├── Models/
 + │       │   ├── Components/
   <!--
@@ -33,11 +35,11 @@ Voici l'arborescence des dossiers et des fichiers du contexte actif :
   -->
 + │       ├── Modules/
   <!--
-+ │       │   ├── Base/                                    
++ │       │   ├── Base/
 + │       │   │   ├── AppDatabase.kt
 + │       │   │   ├── SQL/
 + │       │   │   │   ├── Dao13TarificationInfos.kt
-+ │       │   │   │   ├── Dao14VentPeriode.kt                
++ │       │   │   │   ├── Dao14VentPeriode.kt
 + │       │   │   │   ├── Dao_M03CouleurProduitInfos.kt
 + │       │   │   │   ├── Dao_M10OperationVentCouleur.kt
 + │       │   │   │   ├── Dao_M16CategorieProduit.kt
@@ -84,8 +86,8 @@ Voici l'arborescence des dossiers et des fichiers du contexte actif :
 + │           │           └── sendImgsViaWhatsAppBusiness.kt
   -->
 + │           └── Views/
-- │               ├── FastEdite_OutlinedTextField.kt        --
-- │               └── FastEdite_OutlinedTextField_2.kt          --
+- │               ├── FastEdite_OutlinedTextField.kt            --
+- │               └── FastEdite_OutlinedTextField_2.kt            --
   ├── com/
   │   └── example/
   │       └── light_app_controles/
@@ -247,7 +249,7 @@ Voici l'arborescence des dossiers et des fichiers du contexte actif :
   └── skill_agent/
     ├── agy_to_project.md
     ├── as_click_run.md
-    ├── build.md      ca
+    ├── build.md
     ├── build_.md
     ├── consize_comments.md
     ├── contexTrensefert/
@@ -260,9 +262,12 @@ Voici l'arborescence des dossiers et des fichiers du contexte actif :
     │       └── f96cf255-aa97-44e3-82b7-4c6e83c2df8f_agy.md
     ├── context_working_in/
     │   ├── contex_par_md_map/
+    │   │   ├── apply_map.py
+    │   │   ├── color_map.py
     │   │   ├── contex_par_md_ma.md
     │   │   ├── files_affiched.md
-    │   │   └── generate_map.py
+    │   │   ├── generate_map.py
+    │   │   └── refresh_map.py
     │   └── context_working_in.md
     ├── cop_last/
     │   ├── copy_.md
@@ -273,10 +278,11 @@ Voici l'arborescence des dossiers et des fichiers du contexte actif :
     │   └── last_query.md
     ├── fb_db/
     │   ├── fb_d.md
-    │   └── last_query.md
+    │   ├── last_query.md
+    │   └── last_query_m13_m3.md
     ├── h_.md
     ├── help_skill.md
-    ├── launch_preview.md         ca
+    ├── launch_preview.md
     ├── log_.md
     ├── log_f.md
     ├── push_tagged.md

@@ -87,6 +87,11 @@ def main():
         
         # Reconstruct path
         rel_path = "/".join([masked_root] + path_parts)
+        rel_path = re.sub(r'/+', '/', rel_path)
+        if name.endswith('/') and not rel_path.endswith('/'):
+            rel_path += '/'
+        elif not name.endswith('/') and rel_path.endswith('/'):
+            rel_path = rel_path.rstrip('/')
         
         # Check marker in suffix
         if has_allow:

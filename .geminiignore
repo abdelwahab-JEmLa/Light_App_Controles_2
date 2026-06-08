@@ -11,11 +11,10 @@
 
 # Whitelisted folders and files (++)
 !app/src/main/java/EntreApps/
-!app/src/main/java/EntreApps//
-!app/src/main/java/EntreApps//Shared/
-!app/src/main/java/EntreApps//Shared/
-!app/src/main/java/EntreApps//Shared/**
+!app/src/main/java/EntreApps/Shared/
+!app/src/main/java/EntreApps/Shared/
+!app/src/main/java/EntreApps/Shared/**
 
 # Blacklisted folders and files (--)
-app/src/main/java/EntreApps//Shared//Ui//Views//FastEdite_OutlinedTextField.kt
-app/src/main/java/EntreApps//Shared//Ui//Views//FastEdite_OutlinedTextField_2.kt
+app/src/main/java/EntreApps/Shared/Ui/Views/FastEdite_OutlinedTextField.kt
+app/src/main/java/EntreApps/Shared/Ui/Views/FastEdite_OutlinedTextField_2.kt

@@ -2,15 +2,20 @@
   <dictionary name="project">
     <words>
       <w>achant</w>
+      <w>actif</w>
       <w>balence</w>
+      <w>contexte</w>
       <w>editeur</w>
       <w>etat</w>
+      <w>fichiers</w>
       <w>fileprovider</w>
+      <w>l'arborescence</w>
       <w>montant</w>
       <w>opertaions</w>
       <w>principale</w>
       <w>seulement</w>
       <w>targted</w>
+      <w>voici</w>
     </words>
   </dictionary>
 </component>

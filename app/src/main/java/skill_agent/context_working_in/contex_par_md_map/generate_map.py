@@ -1,5 +1,6 @@
 import os
 import re
+import sys
 
 def find_project_root(start_dir):
     current = os.path.abspath(start_dir)
@@ -12,11 +13,87 @@ def find_project_root(start_dir):
             return os.path.abspath(os.path.join(start_dir, "..", "..", "..", "..", "..", "..", ".."))
         current = parent
 
+def parse_existing_annotations(map_file_path):
+    if not os.path.exists(map_file_path):
+        return {}
+        
+    with open(map_file_path, "r", encoding="utf-8") as f:
+        lines = f.readlines()
+        
+    in_block = False
+    tree_lines = []
+    masked_root = "app/src/main/java"
+    
+    for line in lines:
+        if "Racine commune masquée :" in line:
+            match = re.search(r'`([^`]+)`', line)
+            if match:
+                masked_root = "".join(match.group(1).split()).rstrip('/')
+        elif line.strip() in ["```diff", "```text", "<pre>"]:
+            in_block = True
+            continue
+        elif line.strip() in ["```", "</pre>"]:
+            in_block = False
+            continue
+        if in_block:
+            tree_lines.append(line.rstrip('\n'))
+            
+    annotations = {}
+    path_parts = []
+    for line in tree_lines:
+        if not line.strip():
+            continue
+        line_clean = line
+        if line_clean.startswith('+ ') or line_clean.startswith('- ') or line_clean.startswith('  '):
+            line_clean = line_clean[2:]
+        if '<!--' in line_clean or '-->' in line_clean:
+            continue
+            
+        has_allow = '++' in line_clean
+        has_deny = '--' in line_clean
+        
+        cleaned_node_line = line_clean.replace('++', '').replace('--', '').rstrip()
+        match = re.match(r'^([│\s├└─┌]*)([^/]+/?)$', cleaned_node_line)
+        if not match:
+            continue
+            
+        prefix, name = match.groups()
+        name = name.strip()
+        
+        depth = len(prefix) // 4
+        level = max(0, depth - 1)
+        path_parts = path_parts[:level]
+        path_parts.append(name)
+        
+        rel_path = "/".join([masked_root] + path_parts)
+        rel_path = re.sub(r'/+', '/', rel_path)
+        if name.endswith('/') and not rel_path.endswith('/'):
+            rel_path += '/'
+        elif not name.endswith('/') and rel_path.endswith('/'):
+            rel_path = rel_path.rstrip('/')
+            
+        if has_allow:
+            annotations[rel_path] = "++"
+        elif has_deny:
+            annotations[rel_path] = "--"
+            
+    return annotations
+
 def main():
     project_root = find_project_root(os.path.dirname(__file__))
     ignore_file_path = os.path.join(project_root, ".antigravityignore")
     search_dir = os.path.join(project_root, "app", "src", "main", "java")
+    map_file_path = os.path.join(os.path.dirname(__file__), "files_affiched.md")
     
+    # Determine if we should erase annotations
+    ecrase = "--ecrase" in sys.argv or "--erase" in sys.argv
+    annotations = {}
+    if not ecrase:
+        annotations = parse_existing_annotations(map_file_path)
+        print(f"Preserving {len(annotations)} existing annotations.")
+    else:
+        print("Erasing all existing annotations (--ecrase).")
+        
     is_restricted = False
     allowed_patterns = []
     
@@ -92,33 +169,41 @@ def main():
 
     markdown_lines.append("```diff")
 
-    def render(node, prefix="  "):
+    def render(node, current_path_parts, prefix="  "):
         keys = sorted(node.keys())
         for i, key in enumerate(keys):
             is_last = (i == len(keys) - 1)
             connector = "└── " if is_last else "├── "
             is_file = (len(node[key]) == 0)
             
+            node_path_parts = current_path_parts + [key]
+            rel_path = "/".join(node_path_parts)
+            rel_path = re.sub(r'/+', '/', rel_path)
+            if not is_file:
+                rel_path += "/"
+                
+            annot = annotations.get(rel_path, "")
+            annot_suffix = f"            {annot}" if annot else ""
+            
             if is_file:
-                markdown_lines.append(f"{prefix}{connector}{key}")
+                markdown_lines.append(f"{prefix}{connector}{key}{annot_suffix}")
             else:
-                markdown_lines.append(f"{prefix}{connector}{key}/")
+                markdown_lines.append(f"{prefix}{connector}{key}/{annot_suffix}")
                 new_prefix = prefix + ("    " if is_last else "│   ")
-                render(node[key], new_prefix)
+                render(node[key], node_path_parts, new_prefix)
 
     if common_path:
-        render(curr, "")
+        render(curr, common_path, "")
     else:
-        render(tree, "")
+        render(tree, [], "")
 
     markdown_lines.append("```")
 
-    # Write to files_affiched.md in the same directory as this script
-    output_path = os.path.join(os.path.dirname(__file__), "files_affiched.md")
-    with open(output_path, "w", encoding="utf-8") as f:
+    # Write to files_affiched.md
+    with open(map_file_path, "w", encoding="utf-8") as f:
         f.write("\n".join(markdown_lines) + "\n")
         
-    print(f"Map successfully generated at: {output_path}")
+    print(f"Map successfully generated at: {map_file_path}")
 
 if __name__ == "__main__":
     main()

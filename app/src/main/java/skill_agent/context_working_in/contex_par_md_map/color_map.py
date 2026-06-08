@@ -1,7 +1,4 @@
-import os // ->
-// TODO(FIXME): Fix
-erreur
-No module named 'os'
+import os
 import re
 
 def find_project_root(start_dir):
