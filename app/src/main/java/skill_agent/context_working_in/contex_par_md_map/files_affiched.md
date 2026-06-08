@@ -249,7 +249,6 @@ Voici l'arborescence des dossiers et des fichiers du contexte actif :
     ├── as_click_run.md
     ├── build.md      ca
     ├── build_.md
-    ├── clean_pc.md
     ├── consize_comments.md
     ├── contexTrensefert/
     │   ├── conTr_.md
@@ -277,7 +276,6 @@ Voici l'arborescence des dossiers et des fichiers du contexte actif :
     │   └── last_query.md
     ├── h_.md
     ├── help_skill.md
-    ├── hw_.md
     ├── launch_preview.md         ca
     ├── log_.md
     ├── log_f.md
@@ -292,7 +290,6 @@ Voici l'arborescence des dossiers et des fichiers du contexte actif :
     │   ├── last_sem_d.md
     │   └── last_semantics.md
     ├── sem_.md
-    ├── skill_pc.md
     ├── t_.md
     ├── t_appClient_chain_todo.md
     ├── t_copiePattersApp.md
