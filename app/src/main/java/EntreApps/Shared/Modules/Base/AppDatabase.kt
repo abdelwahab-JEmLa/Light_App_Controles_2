@@ -53,7 +53,8 @@ import java.util.Date
 @TypeConverters(
     DateConverter::class,
     AppTypeConverter::class,
-    TypeChoisiConverter::class
+    TypeChoisiConverter::class,
+    EtateActuellementEstConverter::class
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun dao_M1Produit(): Dao_M1Produit
@@ -124,5 +125,21 @@ class DateConverter {
     @TypeConverter
     fun fromDate(date: Date?): Long? {
         return date?.time
+    }
+}
+
+class EtateActuellementEstConverter {
+    @TypeConverter
+    fun fromEtateActuellementEst(value: M8BonVent.EtateActuellementEst?): String? = value?.name
+
+    @TypeConverter
+    fun toEtateActuellementEst(value: String?): M8BonVent.EtateActuellementEst {
+        if (value.isNullOrBlank()) return M8BonVent.EtateActuellementEst.CreeMaisNonDefinie
+        if (value == "Cette_Transaction_Type_Est_Credit") return M8BonVent.EtateActuellementEst.Credit
+        return try {
+            M8BonVent.EtateActuellementEst.valueOf(value)
+        } catch (e: IllegalArgumentException) {
+            M8BonVent.EtateActuellementEst.CreeMaisNonDefinie
+        }
     }
 }

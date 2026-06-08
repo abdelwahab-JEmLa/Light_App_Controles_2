@@ -194,10 +194,22 @@ data class M2Client(
     }
 
     fun getLastSituationCredit(bons: List<M8BonVent>): M8BonVent? {
-        return bons
-            .filter { it.parent_M2Client_KeyID == this.keyID && it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit }
-            .maxByOrNull { it.creationTimestamps }
-            ?: if (this.currentCreditBalance != 0.0) {
+        val clientBons = bons.filter { it.parent_M2Client_KeyID == this.keyID }
+        val creditRelatedBons = clientBons.filter {
+            it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit ||
+                    it.etateActuellementEst == M8BonVent.EtateActuellementEst.Versemment ||
+                    it.etateActuellementEst == M8BonVent.EtateActuellementEst.Credit
+        }
+        val absoluteLast = creditRelatedBons.maxByOrNull { it.creationTimestamps }
+
+        return if (absoluteLast != null) {
+            when (absoluteLast.etateActuellementEst) {
+                M8BonVent.EtateActuellementEst.New_Situation_Credit -> absoluteLast
+                M8BonVent.EtateActuellementEst.Credit -> absoluteLast
+                else -> null
+            }
+        } else {
+            if (this.currentCreditBalance != 0.0) {
                 val clientKey = this.keyID
                 val balance = this.currentCreditBalance
                 M8BonVent().apply {
@@ -205,7 +217,10 @@ data class M2Client(
                     etateActuellementEst = M8BonVent.EtateActuellementEst.New_Situation_Credit
                     new_situation = balance
                 }
-            } else null
+            } else {
+                null
+            }
+        }
     }
 
     companion object {

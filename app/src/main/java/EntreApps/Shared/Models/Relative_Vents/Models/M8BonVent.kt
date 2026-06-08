@@ -318,9 +318,13 @@ data class M8BonVent(
                     ignoreCase = true
                 ) ?: false,
                 etateActuellementEst = map["etateActuellementEst"]?.let {
-                    runCatching { EtateActuellementEst.valueOf(it) }.getOrDefault(
-                        EtateActuellementEst.ON_MODE_COMMEND_ACTUELLEMENT
-                    )
+                    if (it == "Cette_Transaction_Type_Est_Credit") {
+                        EtateActuellementEst.Credit
+                    } else {
+                        runCatching { EtateActuellementEst.valueOf(it) }.getOrDefault(
+                            EtateActuellementEst.ON_MODE_COMMEND_ACTUELLEMENT
+                        )
+                    }
                 } ?: EtateActuellementEst.ON_MODE_COMMEND_ACTUELLEMENT,
                 vocaleKeyID = map["vocaleKeyID"] ?: "",
                 sonVocaleEstEcoute = map["sonVocaleEstEcoute"]?.equals("true", ignoreCase = true)
