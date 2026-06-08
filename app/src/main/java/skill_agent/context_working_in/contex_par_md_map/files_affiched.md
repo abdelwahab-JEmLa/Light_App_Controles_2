@@ -2,7 +2,6 @@
 
 Voici l'arborescence des dossiers et des fichiers du contexte actif :
 
-Racine commune masquée : `app / src / main / java/` 
 ```diff
   ├── EntreApps/
 + │    └── Shared/            ++
