@@ -11,10 +11,12 @@ import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
 import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.viewModelScope
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Modules.Setter_LongDatas
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -127,10 +129,19 @@ class Setter_ViewModel(
             val existingKeys = vm.active_Datas.list_M10OperationVentCouleur
                 ?.map { it.keyID }?.toSet() ?: emptySet()
             val newOnly = updatedList.filter { it.keyID !in existingKeys }
+            if (newOnly.isEmpty()) return
             vm.active_Datas.list_M10OperationVentCouleur =
                 (vm.active_Datas.list_M10OperationVentCouleur ?: emptyList()) + newOnly
+
+            Log.d("BUG_DEBUG", "addNew_listM10OperationVentCouleur: newOnly count = ${newOnly.size}")
+            val jobs = upsert_M10OperationVentCouleur(newOnly)
+
+            vm.viewModelScope.launch {
+                jobs?.joinAll()
+                Log.d("BUG_DEBUG", "addNew_listM10OperationVentCouleur: Room writes completed. Reloading...")
+                vm.retryLoadingData()
+            }
         }
-        upsert_M10OperationVentCouleur(updatedList)
     }
 
     /**
@@ -198,20 +209,22 @@ class Setter_ViewModel(
         upsert_M10OperationVentCouleur(newOnly)
     }
 
-    private fun upsert_M10OperationVentCouleur(updatedList: List<M10OperationVentCouleur>?) {
+    private fun upsert_M10OperationVentCouleur(updatedList: List<M10OperationVentCouleur>?): List<kotlinx.coroutines.Job>? {
         val allTariffs = vm._uiStateNewProtoPatterns.value.list_Datas?.m13TarificationInfos
-        updatedList?.forEach { operation ->
+        return updatedList?.mapNotNull { operation ->
             val tariff = allTariffs?.find { it.keyID == operation.parentM13TarificationKeyID }
                 ?: allTariffs?.filter { it.parent_M1Produit_KeyId == operation.parent_M1Produit_KeyId }
                     ?.maxByOrNull { it.creationTimestamps }
-            if (tariff == null) return@forEach
-            val opToSave = if (tariff.keyID != operation.parentM13TarificationKeyID) {
-                operation.copy(
-                    parentM13TarificationKeyID = tariff.keyID,
-                    parentM13TarificationDebugInfos = tariff.getDebugInfos()
-                )
-            } else operation
-            setter_LongDatas.upsert_M10OperationVentCouleur(opToSave, tariff)
+            if (tariff == null) null
+            else {
+                val opToSave = if (tariff.keyID != operation.parentM13TarificationKeyID) {
+                    operation.copy(
+                        parentM13TarificationKeyID = tariff.keyID,
+                        parentM13TarificationDebugInfos = tariff.getDebugInfos()
+                    )
+                } else operation
+                setter_LongDatas.upsert_M10OperationVentCouleur(opToSave, tariff)
+            }
         }
     }
 

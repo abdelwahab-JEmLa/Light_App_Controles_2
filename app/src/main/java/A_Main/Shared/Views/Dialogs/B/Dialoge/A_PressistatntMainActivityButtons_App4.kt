@@ -5,6 +5,7 @@ import A_Main.Shared.Views.Dialogs.B.Dialoge.ButtonID7.Action.Datas
 import A_Main.Shared.Views.Dialogs.B.Dialoge.ButtonID8.Action.Button_8_Imgs_Send_whatsappBuisness_Stored_Bon_App4
 import Application4.App.Fragment.ID1.Fragment.ViewModel.A_ViewModel_NewProtoPatterns
 import Application4.App.Fragment.ID1.Fragment.ViewModel.Filter_Affichage_Mode_Proto
+import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
 import EntreApps.Shared.Models.Relative_Vents.Models.M14VentPeriode.Companion.sum_vent_et_benifice
 import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent.Companion.benifice
 import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent.Companion.sum_totale_vents
@@ -22,16 +23,20 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -239,19 +244,111 @@ fun PressistatntMainActivityButtons_App4(
                 produits = datas.relative_produits
             )
             if (sumRasseMaleProduitsAuDepot > 0.0) {
+                var showConfirmDialog by remember { mutableStateOf(false) }
+
                 Box(
                     modifier = Modifier
                         .padding(vertical = 4.dp)
                         .background(
-                            color = MaterialTheme.colorScheme.surface,
+                            color = MaterialTheme.colorScheme.secondaryContainer,
                             shape = RoundedCornerShape(8.dp)
                         )
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
-                    Text(
-                        text = "dépôt: %.0f DA".format(sumRasseMaleProduitsAuDepot),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.secondary
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "dépôt: %.0f DA".format(sumRasseMaleProduitsAuDepot),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
+                        IconButton(
+                            onClick = { showConfirmDialog = true },
+                            modifier = Modifier.size(18.dp)
+                        ) {
+                            Icon(            //<--
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add depot sales",
+                                tint = MaterialTheme.colorScheme.onSecondaryContainer,
+                                modifier = Modifier.size(14.dp)
+                            )
+                        }
+                    }
+                }
+
+                if (showConfirmDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showConfirmDialog = false },
+                        title = { Text("Confirmer la vente", style = MaterialTheme.typography.titleMedium) },
+                        text = { Text("Voulez-vous ajouter tous les produits au dépôt dans le panier de vente actuel ?", style = MaterialTheme.typography.bodyMedium) },
+                        confirmButton = {
+                            TextButton(
+                                onClick = {
+                                    val colors = activeDatas.list_M03CouleurProduitInfos ?: emptyList()
+                                    val products = activeDatas.list_M1Produit ?: emptyList()
+                                    val tariffsList = uiState.list_M13TarificationInfos ?: emptyList()
+                                    val activeOnVent_M8BonVent = activeDatas.activeOnVent_M8BonVent
+                                    val isGrossist = activeDatas.currentApp_ItsWorkChezGrossisst
+                                    val currentList = activeDatas.listM10OperationVentCouleur_FilteredBy_activeM8BonVent_state ?: emptyList()
+
+                                    if (activeOnVent_M8BonVent != null) {
+                                        val newOps = mutableListOf<M10OperationVentCouleur>()
+
+                                        colors.filter { it.count_Don_Depot > 0 }.forEach { color ->
+                                            val product = products.find { it.keyID == color.parentBProduitInfosKeyID } ?: return@forEach
+                                            val productTariffs = tariffsList.filter { it.parent_M1Produit_KeyId == product.keyID }
+                                            val superGrosTariff = productTariffs.find { it.typeChoisi == M13TarificationInfos.TypeChoisi.Tariff_ItsWorkInGrossist_SuperGros }
+                                            val groTariff = productTariffs.find { it.typeChoisi == M13TarificationInfos.TypeChoisi.Tariff_ItsWorkInGrossist_Gro }
+
+                                            val selectedTariff = if (superGrosTariff != null && superGrosTariff.prixCurrency > 0.0) {
+                                                superGrosTariff
+                                            } else {
+                                                groTariff
+                                            } ?: return@forEach
+
+                                            val parentM13TarificationKeyID =
+                                                if (selectedTariff.typeChoisi == M13TarificationInfos.TypeChoisi.Edited_Pour_Client) "Prix_Progressive_Editable Non Saved"
+                                                else selectedTariff.keyID
+
+                                            val newOperation = M10OperationVentCouleur.get_Default().copy(
+                                                creationTimestamps = System.currentTimeMillis(),
+                                                setIN_Vent_Its_Quantity_Represent = product.setIN_Vent_Its_Quantity_Represent,
+                                                quantite_Boit_Par_Carton = product.quantite_Boit_Par_Carton,
+                                                quantity = color.count_Don_Depot,
+                                                prix_de_Vent_entre_directement_NewProto = selectedTariff.prixCurrency,
+                                                parentM13TarificationKeyID = parentM13TarificationKeyID,
+                                                parentM13TarificationDebugInfos = selectedTariff.getDebugInfos(),
+                                                parent_M1Produit_KeyId = product.keyID,
+                                                parent_M1Produit_DebugInfos = "par.produit ${product.nom}",
+                                                parent_M3CouleurProduit_KeyID = color.keyID,
+                                                parent_M3CouleurProduit_DebugInfos = color.get_DebugsInfos(),
+                                                parent_M8BonVent_KeyId = activeOnVent_M8BonVent.keyID,
+                                                parent_M8BonVent_DebugInfos = activeOnVent_M8BonVent.get_DebugInfos(),
+                                                parent_M2Client_KeyID = activeOnVent_M8BonVent.parent_M2Client_KeyID,
+                                                typeTarificationEnumT2 = selectedTariff.typeChoisi,
+                                                its_created_in_working_for_wholesaler = isGrossist
+                                            )
+                                            newOps.add(newOperation)
+                                        }
+
+                                        if (newOps.isNotEmpty()) {
+                                            val newList = currentList + newOps
+                                            viewModelNewProtoPatterns.addNew_listM10OperationVentCouleur(newList)
+                                        }
+                                    }
+                                    showConfirmDialog = false
+                                }
+                            ) {
+                                Text("Confirmer")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showConfirmDialog = false }) {
+                                Text("Annuler")
+                            }
+                        }
                     )
                 }
             }

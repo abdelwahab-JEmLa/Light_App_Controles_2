@@ -1468,21 +1468,32 @@ class Setter_LongDatas(
     fun upsert_M10OperationVentCouleur(
         operation: M10OperationVentCouleur,
         selectedTariff: M13TarificationInfos
-    ) {
-        composScope.launch {
+    ): kotlinx.coroutines.Job {
+        return composScope.launch {
+            Log.d("BUG_DEBUG", "Room upsert starting for op: ${operation.keyID}")
             appDatabase.dao_M10OperationVentCouleur().upsert(operation)
-            val opUpdates = mutableMapOf<String, Any>(operation.keyID to operation)
-            M10OperationVentCouleur.Companion.ref.updateChildren(opUpdates).await()
-
             val tariffWithDefaults = selectedTariff.copy(
                 defaultNonSaved_Entre = false,
                 dernierTimeTampsSynchronisationAvecFireBase = System.currentTimeMillis()
             )
             appDatabase.dao_M13TarificationInfos().update(tariffWithDefaults)
-            val tariffUpdates = mutableMapOf<String, Any>(
-                tariffWithDefaults.keyID to tariffWithDefaults.toFirebaseMap()
-            )
-            M13TarificationInfos.Companion.ref.updateChildren(tariffUpdates).await()
+            Log.d("BUG_DEBUG", "Room upsert completed for op: ${operation.keyID}")
+
+            // Firebase updates in background
+            composScope.launch {
+                try {
+                    val opUpdates = mutableMapOf<String, Any>(operation.keyID to operation)
+                    M10OperationVentCouleur.Companion.ref.updateChildren(opUpdates).await()
+
+                    val tariffUpdates = mutableMapOf<String, Any>(
+                        tariffWithDefaults.keyID to tariffWithDefaults.toFirebaseMap()
+                    )
+                    M13TarificationInfos.Companion.ref.updateChildren(tariffUpdates).await()
+                    Log.d("BUG_DEBUG", "Firebase updates sync completed for op: ${operation.keyID}")
+                } catch (e: Exception) {
+                    Log.e("BUG_DEBUG", "Firebase sync failed for op ${operation.keyID}: ${e.message}")
+                }
+            }
         }
     }
 
