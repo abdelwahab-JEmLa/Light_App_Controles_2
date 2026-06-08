@@ -30,6 +30,9 @@
 !app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/App/Bon_Vent_Etate/View/a/
 !app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/App/Bon_Vent_Etate/View/a/
 !app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Test/ID1/Client_Map/App/Bon_Vent_Etate/View/a/**
+!app/src/main/java/extarnaleDepandencie/
+!app/src/main/java/extarnaleDepandencie/Dependencie_Id/
+!app/src/main/java/extarnaleDepandencie/Dependencie_Id/**
 !build.gradle.kts
 
 # Blacklisted folders and files (--)

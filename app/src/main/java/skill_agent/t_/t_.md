@@ -10,7 +10,7 @@ If **`t_usage`** is triggered, the assistant will also compute and display the p
 
 If **`>clientApp`** or **`>ca`** is triggered, the assistant will automatically redirect and execute the **Client JetPack Fix TODOs & Coding Patterns (t_appClient_chain_todo)** skill to inspect relative/chained TODOs and search coding patterns or files in the external client codebase.
 
-**Central Dispatcher Capability**: If a `TODO` comment contains a trigger phrase for another custom skill (e.g., `TODO: log_`, `TODO: sem_`, `TODO: con_c`, `TODO: cop_`, `TODO: room_d`), the assistant must automatically chain and execute the corresponding custom skill's steps on that file/package, rather than applying a manual code fix.
+**Central Dispatcher Capability**: If a `TODO` comment contains a trigger phrase for another custom skill (e.g., `TODO: log_`, `TODO: sem_`, `TODO: con_c`, `TODO: cop_`, `TODO: room_d`, `TODO: extract`), the assistant must automatically chain and execute the corresponding custom skill's steps on that file/package, rather than applying a manual code fix.
 
 ---
 
@@ -112,6 +112,7 @@ Note that some TODOs may be relative to/dependent on others, often indicated wit
   - If it contains `con_` (e.g. `TODO: con_c` or `TODO: co_`), execute the **Concise Code (consize_comments)** skill steps.
   - If it contains `cop_` (e.g. `TODO: cop_`), execute the **Copy Package / Sibling Files (cop_last)** skill steps.
   - If it contains `room_d` (e.g. `TODO: room_d`), execute the **Room Database Query (room_d)** skill steps.
+  - If it contains `extract` (e.g. `TODO: extract` or `TODO: <extract ...>`), execute the **Extract Dependency (t_extract)** skill steps.
 - **Standard Fixes**: If no skill trigger is matched, analyze the `TODO` comment requirements, apply the appropriate manual code fixes, and delete the comment using `replace_file_content` or `multi_replace_file_content`. Be sure to also thoroughly clean up any associated pointer/indicator comments (such as `//<--`, `//<-`, or any inline TODO pointers) from adjacent lines.
 - **CRITICAL RULE**: Do NOT run compilation (like gradle compile) to verify errors during the `t_` skill execution. The `t_` skill is strictly to apply the code fixes without compiling. Compilation should only be run if explicitly requested by the user.
 
