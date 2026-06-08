@@ -79,7 +79,7 @@ Immediately redirect execution to the **Client JetPack Fix TODOs & Coding Patter
 ### Standard Steps to Execute:
 
 ### 1. Locate outstanding TODOs in the codebase
-The absolute fastest way to locate all TODO comments in the codebase is using the `grep_search` tool with the query `TODO` on the path `C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java`.
+The absolute fastest way to locate all TODO comments in the codebase is using the `grep_search` tool with the query `TODO` on the path `C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main` (which covers code folders, custom PC skills, and files like `files_affiched.md` under `context_working_in`).
 Note that some TODOs may be relative to/dependent on others, often indicated with specific markers like `//<--` or comments referring to previous/other TODOs (e.g. `//TODO(2.C Relative Au Todo(1):`). The assistant must carefully analyze these relationships and implement dependencies in the correct order.
 
 ### 1.5. Present Beginner-Friendly Summary
