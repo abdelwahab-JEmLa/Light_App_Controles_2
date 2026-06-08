@@ -1,6 +1,6 @@
 package EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Module
 
-import A_Main.Shared.Views.Dialogs.B.Dialoge.ButtonID7.Action.Module.Pdf.CreditReceiptData_Mai
+import EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Module.Pdf.CreditReceiptData_Mai
 import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
 import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
 import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos

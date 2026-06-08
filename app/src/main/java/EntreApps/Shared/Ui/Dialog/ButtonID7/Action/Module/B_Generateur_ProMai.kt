@@ -1,14 +1,14 @@
 package EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Module
 
-import A_Main.Shared.Views.Dialogs.B.Dialoge.ButtonID7.Action.Datas
-import A_Main.Shared.Views.Dialogs.B.Dialoge.ButtonID7.Action.Module.Pdf.CreditReceiptData_Mai
-import A_Main.Shared.Views.Dialogs.B.Dialoge.ButtonID7.Action.Module.Pdf.PdfContentBuilder_Mai
-import A_Main.Shared.Views.Dialogs.B.Dialoge.ButtonID7.Action.Module.Pdf.PdfFormatterUtils_Mai
-import A_Main.Shared.Views.Dialogs.B.Dialoge.ButtonID7.Action.Module.Pdf.PdfGenerationParams_Mai
-import A_Main.Shared.Views.Dialogs.B.Dialoge.ButtonID7.Action.Module.Pdf.PdfGeneratorCore_Mai
-import A_Main.Shared.Views.Dialogs.B.Dialoge.ButtonID7.Action.Module.Pdf.PdfTableBuilder_Mai
-import A_Main.Shared.Views.Dialogs.B.Dialoge.ButtonID7.Action.Module.Pdf.PdfType
-import A_Main.Shared.Views.Dialogs.B.Dialoge.ButtonID7.Action.Module.Pdf.UploadHandler_Mai
+import EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Datas
+import EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Module.Pdf.CreditReceiptData_Mai
+import EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Module.Pdf.PdfContentBuilder_Mai
+import EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Module.Pdf.PdfFormatterUtils_Mai
+import EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Module.Pdf.PdfGenerationParams_Mai
+import EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Module.Pdf.PdfGeneratorCore_Mai
+import EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Module.Pdf.PdfTableBuilder_Mai
+import EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Module.Pdf.PdfType
+import EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Module.Pdf.UploadHandler_Mai
 import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
 import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
 import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos

@@ -1,8 +1,8 @@
 package EntreApps.Shared.Ui.Dialog.ButtonID7.Action
 
-import A_Main.Shared.Views.Dialogs.B.Dialoge.ButtonID7.Action.Module.A_PrintReceiptHandler_ProMai
-import A_Main.Shared.Views.Dialogs.B.Dialoge.ButtonID7.Action.Module.B_Generateur_ProMai
-import A_Main.Shared.Views.Dialogs.B.Dialoge.ButtonID7.Action.Module.Pdf.UploadHandler_Mai
+import EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Module.A_PrintReceiptHandler_ProMai
+import EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Module.B_Generateur_ProMai
+import EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Module.Pdf.UploadHandler_Mai
 import EntreApps.Shared.Models.Relative_Vents.Models.M10OperationVentCouleur
 import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
 import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent

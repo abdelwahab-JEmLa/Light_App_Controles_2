@@ -1,6 +1,6 @@
 package EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Module.Pdf
 
-import A_Main.Shared.Views.Dialogs.B.Dialoge.ButtonID7.Action.Datas
+import EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Datas
 import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
 import java.util.Calendar
 import java.util.Date
