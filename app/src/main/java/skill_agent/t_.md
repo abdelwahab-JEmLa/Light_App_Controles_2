@@ -4,6 +4,8 @@ This skill instructs the assistant on how to automatically search for, identify,
 
 Additionally, this skill supports the **`t_models`** sub-trigger, which automatically adds `appDatabase.kt` and the `Models` package to the active restricted context before proceeding with the standard steps.
 
+If **`t_flow`** is triggered, the assistant will display a summary of the credit/payment settlement flow and wait for 2 seconds before continuing.
+
 If **`t_usage`** is triggered, the assistant will also compute and display the percentage and amount of model tokens consumed so far, and what remains in the current session (out of the calibrated 200,000 token limit) at the end of the execution report.
 
 If **`>clientApp`** or **`>ca`** is triggered, the assistant will automatically redirect and execute the **Client JetPack Fix TODOs & Coding Patterns (t_appClient_chain_todo)** skill to inspect relative/chained TODOs and search coding patterns or files in the external client codebase.
@@ -15,6 +17,7 @@ If **`>clientApp`** or **`>ca`** is triggered, the assistant will automatically 
 ## Trigger Phrases
 - "t_"
 - "t_models"
+- "t_flow"
 - "t_usage"
 - ">clientApp"
 - ">ca"
@@ -64,6 +67,22 @@ Generate and append the folder rules to [.antigravityignore](file:///C:/Users/Ab
 #### 2. Execute standard TODO fixing
 Proceed directly to the standard steps below to locate and fix TODOs.
 
+### When "t_flow" is triggered:
+
+#### 1. Display Settlement Flow Summary (Flow de Règlement)
+Before applying or explaining any code modifications, the assistant MUST display a summary of the credit/payment settlement flow:
+- **Credit (Crédit)**: Enregistre les transactions à crédit (débit client).
+- **Versemment (Versement)**: Enregistre les paiements effectués par le client.
+- **Demande_Versemet (Demande Versement)**: Représente le montant demandé par le vendeur.
+- **New_Situation_Credit (Nouvelle Situation)**: Calcule la nouvelle balance en temps réel en faisant la somme des crédits moins les versements de la période.
+- **currentCreditBalance**: Solde actuel global du client mis à jour à chaque impression de bon.
+
+#### 2. Wait 2 Seconds (Attendre 2 secondes)
+The assistant must pause execution for 2 seconds (using a simulated or real pause/sleep) before continuing to apply the TODO fixes.
+
+#### 3. Proceed to Standard TODO Fixing
+Continue immediately with the standard steps to locate and resolve TODOs.
+
 ### When "t_usage" is triggered:
 
 #### 1. Calculate and Report Token Usage
@@ -80,6 +99,7 @@ Immediately redirect execution to the **Client JetPack Fix TODOs & Coding Patter
 
 ### 1. Locate outstanding TODOs in the codebase
 The absolute fastest way to locate all TODO comments in the codebase is using the `grep_search` tool with the query `TODO` on the path `C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main` (which covers code folders, custom PC skills, and files like `files_affiched.md` under `context_working_in`).
+**CRITICAL Context-Isolation Rule**: When executing `t_` and `t_flow`, the assistant must **NOT** read, open, scan, or analyze any of the latest conversation history files or past session context files in the `conversationsContext` directory (specifically `app/src/main/java/skill_agent/contexTrensefert/conversationsContext`). Any matches found within this directory must be ignored, and the assistant must not access those files.
 Note that some TODOs may be relative to/dependent on others, often indicated with specific markers like `//<--` or comments referring to previous/other TODOs (e.g. `//TODO(2.C Relative Au Todo(1):`). The assistant must carefully analyze these relationships and implement dependencies in the correct order.
 
 ### 1.5. Present Beginner-Friendly Summary

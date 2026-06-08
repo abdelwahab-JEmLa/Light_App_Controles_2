@@ -262,6 +262,14 @@ fun PressistatntMainActivityButtons_App4(
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSecondaryContainer
                         )
+                        val client = activeDatas.activeOnVent_M2Client
+                        val clientBons = activeDatas.list_M8BonVent?.filter { it.parent_M2Client_KeyID == client?.keyID } ?: emptyList()
+                        val remainingCredit = client?.getLastSituationCredit(clientBons)?.new_situation ?: 0.0
+                        Text(
+                            text = " | crédit: %.0f DA".format(remainingCredit),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                        )
                         IconButton(
                             onClick = { showConfirmDialog = true },
                             modifier = Modifier.size(18.dp)

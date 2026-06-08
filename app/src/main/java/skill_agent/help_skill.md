@@ -23,7 +23,7 @@ Output a markdown table documenting each custom skill.
 | **Help Skills** (`help_skill.md`) | `help_skill`, `h_`, `help_`, `h_cwe_` | Affiche ce tableau d'aide ou explique en détail un skill spécifique (ex: h_cwe_). |
 | **Copy Coding Patterns** (`t_copiePattersApp.md`) | `t_copiePattersApp`, `t>copiePattersApp`, `copiePattersApp`, `t_c_client` | Copie et adapte les patterns de code et implémentations du projet ClientJetPack vers le projet local Light App. |
 | **Client Chained TODOs** (`t_appClient_chain_todo.md`) | `t_appClient_chain_todo`, `t>cli`, `>clientApp` | Résout et nettoie automatiquement les TODOs chaînés et dépendants (avec indicateurs comme `//<--`, `//...`) dans le projet externe ClientJetPack. |
-| **Fix TODOs** (`t_.md`) | `t_`, `t_models`, `t_usage`, `>clientApp`, `fix_todo` | Résout automatiquement les TODOs ou délègue aux skills correspondants (ex: `TODO: log_`, `TODO: sem_`, `TODO: con_c`, `TODO: room_d`), puis affiche le diff de code à la fin. |
+| **Fix TODOs** (`t_.md`) | `t_`, `t_models`, `t_flow`, `t_usage`, `>clientApp`, `fix_todo` | Résout automatiquement les TODOs ou délègue aux skills correspondants (ex: `TODO: log_`, `TODO: sem_`, `TODO: con_c`, `TODO: room_d`), puis affiche le diff de code à la fin. |
 | **Fix Specified Comments** (`t_ex_commantaire.md`) | `t_ex_commantaire`, `t_ex_commentaire`, `ex_commantaire`, `fix_ex_commantaire`, `t_exe_<file_name>`, `t_ex_<file_name>` | Navigue vers un fichier spécifique, y localise les commentaires d'instruction ou TODOs, applique le correctif demandé et supprime le commentaire. |
 | **Context Transfer** (`contexTrensefert/conTr_.md`) | `conT_`, `conTr_`, `/contexTrensefert`, `context_transfer`, `ctsave_`, `ctc_`, `ctecrase_`, `cwc_`, `ct_deepRead_`, `ct_l` | Documente l'architecture du projet et sert de guide pour transférer le contexte de développement des modules (CSV/Firebase/Room) d'une session à l'autre. |
 | **Commit, Tag and Push** (`push_tagged.md`) | `push_taged`, `push_`, `p_` | Commite proprement les modifications locales, génère/incrémente intelligemment un tag Git, l'applique et pousse le tout sur GitHub. |
@@ -36,6 +36,7 @@ Output a markdown table documenting each custom skill.
 | **AGY to Project Synchronizer** (`agy_to_project.md`) | `agy_to_project`, `agy_to_proj`, `a_t_p` | Synchronise et remplace les skills et le fichier `h_.md` du dossier AGY global vers le projet local. |
 | **Room Database Query** (`room_d/room_d.md`) | `room_d`, `Todo: room_d` | Exécute des requêtes de base de données à chaud et les affiche sous forme de tableau Markdown. |
 | **Firebase Cache Query** (`fb_db/fb_d.md`) | `fb_d`, `Todo: fb_d`, `firebase_search`, `fb_query` | Extrait et recherche dans le cache local SQLite de Firebase Realtime Database et génère les liens console associés. |
+| **FragMap Data Flow** (`fm_.md`) | `fm_`, `fm_flow` | Affiche le résumé du flux de synchronisation des bases de données FragMap (Room, CSV, Firebase). |
 | **Semantics Inspector** (`sem_.md`) | `sem_`, `sem_d`, `Todo: sem_`, `Todo: filter` | Injecte la sémantique d'une variable ou filtre (`TODO: sem_` ou `TODO: filter`), puis extrait instantanément les données d'accessibilité avec un dump ADB sans re-compiler/re-déployer l'application. |
 | **Concise Code** (`consize_comments.md`) | `consize_commants`, `co_`, `con_`, `con_c`, `TODO: con_c` | Enlève les commentaires, les logs et les semantics pour rendre le code le plus concis possible. Supporte le mode automatique individuel (`TODO: co_`) ou par package (`TODO: con_c`). |
 | **Real-Time Logcat Inspector** (`log_.md`) | `log_`, `Todo: log_`, `logcat`, `adb_log` | Filtre les logs de l'appareil par rapport au tag ou au contexte spécifié dans le code ou le chat, et les affiche. |
@@ -66,6 +67,7 @@ Always present the user with clickable links to the skill files in the skills di
 * 🔄 [AGY to Project Synchronizer](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/agy_to_project.md)
 * 💾 [Room Database Query](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/room_d/room_d.md)
 * 💾 [Firebase Cache Query](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/fb_db/fb_d.md)
+* 🔄 [FragMap Data Flow](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/fm_.md)
 * 🔍 [Semantics Inspector](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/sem_.md)
 * 📝 [Concise Code](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/consize_comments.md)
 * 📋 [Real-Time Logcat Inspector](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/log_.md)

@@ -140,7 +140,7 @@ data class M8BonVent(
                 val sumCredits = samePeriodClientBons
                     .filter {
                         it.etateActuellementEst == EtateActuellementEst.Credit ||
-                                it.etateActuellementEst == EtateActuellementEst.Cette_Transaction_Type_Est_Credit
+                                it.etateActuellementEst == EtateActuellementEst.Credit
                     }
                     .sumOf { it.credit_fait }
                 val sumVersements = samePeriodClientBons
@@ -151,7 +151,7 @@ data class M8BonVent(
 
             EtateActuellementEst.Versemment -> versement_fait
             EtateActuellementEst.Credit,
-            EtateActuellementEst.Cette_Transaction_Type_Est_Credit -> credit_fait
+            EtateActuellementEst.Credit -> credit_fait
 
             EtateActuellementEst.Demande_Versemet -> demande_Versemet_si_Type
             else -> 0.0
@@ -210,14 +210,13 @@ data class M8BonVent(
         Passed_Sans_Livre(Color(0xFF444444), "Passed_Sans_Livre"),
 
         //Credits
-        Credit(Color(0xFFFF5722), " ", credit_type = true,nonDeletable=true),
-        Cette_Transaction_Type_Est_Credit(Color(0xFFFF5722), "تم اقراضه  ", credit_type = true,nonDeletable=true),
-        Versemment(Color(0xFF4CAF50), "", credit_type = true,nonDeletable=true),
+        Credit(Color(0xFFFF5722), "كريدي", credit_type = true,nonDeletable=true),
+        Versemment(Color(0xFF4CAF50), "فارسو", credit_type = true,nonDeletable=true),
         Demande_Versemet(
             Color(0xFFCDDC39), "المبلغ المرجو تحظيره", credit_type = true,
             text_color = Color(0xFF000000)     ,nonDeletable=true
         ),
-        New_Situation_Credit(Color(0xFFD2180D), "الحالة الجديدة للدين", credit_type = true,nonDeletable=true),
+        New_Situation_Credit(Color(0xFFD2180D), "الحالة الجديدة للدين", credit_type = true,nonDeletable=true), 
         ;
 
         companion object {

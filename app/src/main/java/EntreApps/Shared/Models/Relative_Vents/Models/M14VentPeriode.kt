@@ -5,8 +5,6 @@ import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.central_M
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent.Companion.sum_totale_et_benifice
-import com.google.firebase.Firebase
-import com.google.firebase.database.database
 import java.io.File
 
 @Entity
@@ -122,7 +120,7 @@ data class M14VentPeriode(
                 totalBenifices += bonSums.benifices_vents
 
                 when (bon.etateActuellementEst) {
-                    M8BonVent.EtateActuellementEst.Cette_Transaction_Type_Est_Credit,
+                    M8BonVent.EtateActuellementEst.Credit,
                     M8BonVent.EtateActuellementEst.Credit -> {
                         creditsBons += 1.0
                         creditSum += if (bon.credit_fait > 0.0) bon.credit_fait else bonSums.totale_vents

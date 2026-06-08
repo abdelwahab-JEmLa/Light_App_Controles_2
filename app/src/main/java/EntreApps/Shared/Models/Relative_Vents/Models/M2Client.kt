@@ -193,6 +193,21 @@ data class M2Client(
         )
     }
 
+    fun getLastSituationCredit(bons: List<M8BonVent>): M8BonVent? {
+        return bons
+            .filter { it.parent_M2Client_KeyID == this.keyID && it.etateActuellementEst == M8BonVent.EtateActuellementEst.New_Situation_Credit }
+            .maxByOrNull { it.creationTimestamps }
+            ?: if (this.currentCreditBalance != 0.0) {
+                val clientKey = this.keyID
+                val balance = this.currentCreditBalance
+                M8BonVent().apply {
+                    parent_M2Client_KeyID = clientKey
+                    etateActuellementEst = M8BonVent.EtateActuellementEst.New_Situation_Credit
+                    new_situation = balance
+                }
+            } else null
+    }
+
     companion object {
         const val nam_Model_Str = "M02Client"
         val ref = central_MainDataBases_RefProduction.child(nam_Model_Str)
@@ -226,6 +241,8 @@ data class M2Client(
         fun removeRef(preparedData: M2Client) {
             ref.child(preparedData.keyID).removeValue()
         }
+
+
 
         fun get_default(): M2Client {
             return M2Client()
