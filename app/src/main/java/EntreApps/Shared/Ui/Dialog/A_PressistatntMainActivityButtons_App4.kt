@@ -11,6 +11,7 @@ import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent.Companion.benific
 import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent.Companion.sum_totale_vents
 import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -265,15 +266,15 @@ fun PressistatntMainActivityButtons_App4(
                         val client = activeDatas.activeOnVent_M2Client
                         val clientBons = activeDatas.list_M8BonVent?.filter { it.parent_M2Client_KeyID == client?.keyID } ?: emptyList()
                         val remainingCredit = client?.getLastSituationCredit(clientBons)?.new_situation ?: 0.0
-                        if (client != null && client.currentCreditBalance == 0.0 && remainingCredit != 0.0) {
-                            androidx.compose.runtime.LaunchedEffect(client.keyID, remainingCredit) {
-                                viewModelNewProtoPatterns.update_m2(client.copy(currentCreditBalance = remainingCredit))
-                            }
-                        }
                         Text(
                             text = " | crédit: %.0f DA".format(remainingCredit),
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSecondaryContainer
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier.clickable {
+                                if (client != null && client.currentCreditBalance == 0.0 && remainingCredit != 0.0) {
+                                    viewModelNewProtoPatterns.update_m2(client.copy(currentCreditBalance = remainingCredit))
+                                }
+                            }
                         )
                         IconButton(
                             onClick = { showConfirmDialog = true },
