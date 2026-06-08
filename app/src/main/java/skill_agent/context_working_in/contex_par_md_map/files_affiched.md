@@ -5,248 +5,233 @@ Voici l'arborescence des dossiers et des fichiers du contexte actif :
 Racine commune masquée : `app / src / main / java/` 
 
 ```diff
-  ├── EntreApps/
-+ │   └── Shared/            ++
-+ │       ├── Models/
-+ │       │   ├── Components/
-  <!--
-+ │       │   │   ├── DisponibilityEtates.kt
-+ │       │   │   ├── Ousstad_Tahfid.kt
-+ │       │   │   └── Prioriter.kt
-+ │       │   ├── Home/
-+ │       │   │   └── ActiveCentralValues.kt
-+ │       │   ├── M00CentralParametresOfAllApps.kt
-+ │       │   ├── M09AppCompt.kt
-+ │       │   ├── Relative_Produits/
-+ │       │   │   └── Models/
-+ │       │   │       ├── M01Produit.kt
-+ │       │   │       ├── M16CategorieProduit.kt
-+ │       │   │       ├── M21CataloguesCategorie.kt
-+ │       │   │       └── M3CouleurProduitInfos.kt
-+ │       │   ├── Relative_Vents/
-+ │       │   │   └── Models/
-+ │       │   │       ├── M10OperationVentCouleur.kt
-+ │       │   │       ├── M13TarificationInfos.kt
-+ │       │   │       ├── M14VentPeriode.kt
-+ │       │   │       ├── M15Grossist.kt
-+ │       │   │       ├── M2Client.kt
-+ │       │   │       └── M8BonVent.kt
-+ │       │   └── Screen.kt
-  -->
-+ │       ├── Modules/
-  <!--
-+ │       │   ├── Base/
-+ │       │   │   ├── AppDatabase.kt
-+ │       │   │   ├── SQL/
-+ │       │   │   │   ├── Dao13TarificationInfos.kt
-+ │       │   │   │   ├── Dao14VentPeriode.kt
-+ │       │   │   │   ├── Dao_M03CouleurProduitInfos.kt
-+ │       │   │   │   ├── Dao_M10OperationVentCouleur.kt
-+ │       │   │   │   ├── Dao_M16CategorieProduit.kt
-+ │       │   │   │   ├── Dao_M1Produit.kt
-+ │       │   │   │   ├── Dao_M2Client.kt
-+ │       │   │   │   ├── Dao_M8BonVent.kt
-+ │       │   │   │   └── Dao_M9AppCompt.kt
-+ │       │   │   └── Setter_LongDatas.kt
-+ │       │   ├── PermissionHandler.kt
-+ │       │   └── Uis/
-+ │       │       └── Ui/
-+ │       │           ├── StoragePermissionDialog.kt
-+ │       │           └── SyncProgressIndicator.kt
-  -->
-+ │       └── Ui/
-+ │           ├── Dialog/
-  <!--
-+ │           │   ├── A_PressistatntMainActivityButtons_App4.kt
-+ │           │   ├── But_4_DisconnectFAB.kt
-+ │           │   ├── But_4_FloatingSearchFAB.kt
-+ │           │   ├── ButtonID7/
-+ │           │   │   └── Action/
-+ │           │   │       ├── But7_Cree_Images_Bons.kt
-+ │           │   │       ├── Datas.kt
-+ │           │   │       ├── Module/
-+ │           │   │       │   ├── A_PrintReceiptHandler_ProMai.kt
-+ │           │   │       │   ├── B_Generateur_ProMai.kt
-+ │           │   │       │   ├── C_PdfPrintHandler.kt
-+ │           │   │       │   ├── Pdf/
-+ │           │   │       │   │   ├── A_PdfTableBuilder.kt
-+ │           │   │       │   │   ├── PdfContentBuilder.kt
-+ │           │   │       │   │   ├── PdfFileNamingUtils.kt
-+ │           │   │       │   │   ├── PdfFormatterUtils.kt
-+ │           │   │       │   │   ├── PdfGeneratorCore.kt
-+ │           │   │       │   │   ├── PdfSaverUtility.kt
-+ │           │   │       │   │   ├── PdfType.kt
-+ │           │   │       │   │   └── UploadHandler.kt
-+ │           │   │       │   └── WindowsShareHandler.kt
-+ │           │   │       └── initiateBackgroundPdfCreation.kt
-+ │           │   └── ButtonID8/
-+ │           │       └── Action/
-+ │           │           ├── Button_8_Imgs_Send_whatsappBuisness_Stored_Bon.kt
-+ │           │           ├── findBonJpgsFromMediaStore.kt
-+ │           │           └── sendImgsViaWhatsAppBusiness.kt
-  -->
-+ │           └── Views/
-- │               ├── FastEdite_OutlinedTextField.kt            --
-- │               └── FastEdite_OutlinedTextField_2.kt            --
-  ├── com/
-  │   └── example/
-  │       └── light_app_controles/
-  │           ├── A/
-  │           │   └── Main/
-  │           │       ├── MainActivity.kt
-  │           │       ├── MyApplication.kt
-  │           │       └── Prompt/
-  │           │           └── Ai/
-  │           │               └── Instruction_Str_Replace.md
-  │           ├── B/
-  │           │   └── Screens/
-  │           │       ├── MainScreen.kt
-  │           │       └── Z/
-  │           │           └── Screens/
-  │           │               └── Test/
-  │           │                   └── ID1/
-  │           │                       └── Client_Map/
-  │           │                           └── App/
-  │           │                               └── Bon_Vent_Etate/
-  │           │                                   └── View/
-  │           │                                       ├── ID1/
-  │           │                                       │   └── FloatingMenu_Plus_RoomCsvBigDatas/
-  │           │                                       │       └── Feature/
-  │           │                                       │           └── Options/
-  │           │                                       │               ├── M1/
-  │           │                                       │               │   └── Actions/
-  │           │                                       │               │       ├── Action/
-  │           │                                       │               │       │   ├── But1_Export_M1_Room_To_Csv.kt
-  │           │                                       │               │       │   ├── But2_Export_M1_Csv_To_FireBase.kt
-  │           │                                       │               │       │   ├── But3_Import_M1Csv_To_Room.kt
-  │           │                                       │               │       │   ├── But6_Import_M1_FireBase_To_Csv.kt
-  │           │                                       │               │       │   ├── But8_DeleteAll_M1_Room.kt
-  │           │                                       │               │       │   └── But9_Import_M1_FireBase_To_Room.kt
-  │           │                                       │               │       └── M01_FragMap_DropdownMenu.kt
-  │           │                                       │               ├── M10/
-  │           │                                       │               │   └── Actions/
-  │           │                                       │               │       └── M10_FragMap_DropdownMenu.kt
-  │           │                                       │               ├── M13/
-  │           │                                       │               │   └── Actions/
-  │           │                                       │               │       └── M13_FragMap_DropdownMenu.kt
-  │           │                                       │               ├── M14/
-  │           │                                       │               │   └── Actions/
-  │           │                                       │               │       └── M14_FragMap_DropdownMenu.kt
-  │           │                                       │               ├── M2Client_Operations_FragMap_DropdownMenu/
-  │           │                                       │               │   └── Actions/
-  │           │                                       │               │       ├── Action/
-  │           │                                       │               │       │   ├── But1_Export_M2_Room_To_Csv.kt
-  │           │                                       │               │       │   ├── But2_Export_M2_Csv_To_FireBase.kt
-  │           │                                       │               │       │   ├── But3_Import_M2Csv_To_Room.kt
-  │           │                                       │               │       │   ├── But6_Import_M2_FireBase_To_Csv.kt
-  │           │                                       │               │       │   ├── But8_DeleteAll_M2_Room.kt
-  │           │                                       │               │       │   └── But9_Import_M2_FireBase_To_Room.kt
-  │           │                                       │               │       └── M2Client_Operations_FragMap_DropdownMenu.kt
-  │           │                                       │               ├── M3/
-  │           │                                       │               │   └── Actions/
-  │           │                                       │               │       ├── Action/
-  │           │                                       │               │       │   ├── But1_Export_M8_Room_To_Csv.kt
-  │           │                                       │               │       │   ├── But2_Export_M8_Csv_To_FireBase.kt
-  │           │                                       │               │       │   ├── But3_Import_M8Csv_To_Room.kt
-  │           │                                       │               │       │   ├── But6_Import_M8_FireBase_To_Csv.kt
-  │           │                                       │               │       │   ├── But8_DeleteAll_M8_Room.kt
-  │           │                                       │               │       │   └── But9_Import_M8_FireBase_To_Room.kt
-  │           │                                       │               │       └── M03_Operations_FragMap_DropdownMenu.kt
-  │           │                                       │               ├── M8Bon_Operations_FragMap_DropdownMenu/
-  │           │                                       │               │   └── Actions/
-  │           │                                       │               │       ├── Action/
-  │           │                                       │               │       │   ├── But1_Export_M8_Room_To_Csv.kt
-  │           │                                       │               │       │   ├── But2_Export_M8_Csv_To_FireBase.kt
-  │           │                                       │               │       │   ├── But3_Import_M8Csv_To_Room.kt
-  │           │                                       │               │       │   ├── But6_Import_M8_FireBase_To_Csv.kt
-  │           │                                       │               │       │   ├── But8_DeleteAll_M8_Room.kt
-  │           │                                       │               │       │   └── But9_Import_M8_FireBase_To_Room.kt
-  │           │                                       │               │       └── M8Bon_Operations_FragMap_DropdownMenu.kt
-  │           │                                       │               ├── M9/
-  │           │                                       │               │   └── Actions/
-  │           │                                       │               │       ├── Action/
-  │           │                                       │               │       │   ├── But1_Export_M9_Room_To_Csv.kt
-  │           │                                       │               │       │   ├── But2_Export_M9_Csv_To_FireBase.kt
-  │           │                                       │               │       │   ├── But3_Import_M9Csv_To_Room.kt
-  │           │                                       │               │       │   ├── But6_Import_M9_FireBase_To_Csv.kt
-  │           │                                       │               │       │   ├── But8_DeleteAll_M9_Room.kt
-  │           │                                       │               │       │   └── But9_Import_M9_FireBase_To_Room.kt
-  │           │                                       │               │       └── M09_FragMap_DropdownMenu.kt
-  │           │                                       │               └── a/
-  │           │                                       │                   └── Main/
-  │           │                                       │                       ├── BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.kt
-  │           │                                       │                       ├── MultiOperations_FragMap_DropdownMenu.kt
-  │           │                                       │                       └── ViewModel/
-  │           │                                       │                           └── FeatreID1_ViewModel.kt
-  │           │                                       ├── ID2/
-  │           │                                       │   └── CaptureListItems/
-  │           │                                       │       └── Feature/
-  │           │                                       │           └── Capture/
-  │           │                                       │               ├── Afficheur_locale_Image_Captured.kt
-  │           │                                       │               └── CapturableLayer_FINAL.kt
-  │           │                                       ├── Z/
-  │           │                                       │   └── Components/
-  │           │                                       │       ├── EditableAmountField.kt
-  │           │                                       │       └── Y_DatesHandler.kt
-  │           │                                       └── a/
-  │           │                                           └── Screens/
-  │           │                                               └── a/
-  │           │                                                   └── Vendeur_Boutiqe/
-  │           │                                                       └── Screen/
-  │           │                                                           ├── ViewModel/
-  │           │                                                           │   ├── A_ViewModel_NewProtoPatterns.kt
-  │           │                                                           │   ├── ActiveDatasFragNewProto.kt
-  │           │                                                           │   ├── Filter_Affichage_Mode_Proto.kt
-  │           │                                                           │   ├── Initializer_ViewModel.kt
-  │           │                                                           │   ├── ProductListFilterLogic.kt
-  │           │                                                           │   ├── Setter_ViewModel.kt
-  │           │                                                           │   └── UiState_NewProtoPatterns.kt
-  │           │                                                           ├── a_Compact_Presentoire_App_Produits_FragID4.kt
-  │           │                                                           └── b_List_LazyColumnList_App4.kt
-  │           ├── Feature/
-  │           │   └── Fragment/
-  │           │       ├── Ui/
-  │           │       │   └── PubAbdelwahabElectroGroStore.kt
-  │           │       └── View/
-  │           │           ├── A_Item_Produit_App4.kt
-  │           │           ├── Components/
-  │           │           │   ├── A_Header/
-  │           │           │   │   └── View/
-  │           │           │   │       ├── A_Compact_Header_App4.kt
-  │           │           │   │       ├── DeleteProductHeader.kt
-  │           │           │   │       ├── EditableDoubleInfoCard.kt
-  │           │           │   │       ├── EditableInfoCard.kt
-  │           │           │   │       ├── FastInit_Double_Outlined_Edite_Modulable_Proto4.kt
-  │           │           │   │       ├── FastInit_Outlined_Int_Edite_Modulable_Proto4.kt
-  │           │           │   │       ├── InfoCard.kt
-  │           │           │   │       └── M16Categorie/
-  │           │           │   │           └── CategoryBadge.kt
-  │           │           │   ├── Big_Principale_FragID3.kt
-  │           │           │   └── SubColorCard_WithButton.kt
-  │           │           └── ViewS/
-  │           │               └── Views/
-  │           │                   ├── Image_Displaye.kt
-  │           │                   └── Lenceur_Vent_Handler/
-  │           │                       └── View/
-  │           │                           ├── CartonVentHandler_App4.kt
-  │           │                           ├── Lenceur_Vent_Handler_App4.kt
-  │           │                           ├── Pricipale_Tariffs_Vendeurs.kt
-  │           │                           ├── TariffItem.kt
-  │           │                           ├── Tariffs_MainList.kt
-  │           │                           └── Z_EntreParEcriture_Tariff.kt
-  │           ├── Floating_DropDownMenuS/
-  │           │   └── Dialoge/
-  │           │       └── Dialog/
-  │           │           └── C/
-  │           │               └── Components/
-  │           │                   ├── AvertissementDialog.kt
-  │           │                   └── Local_Organizer.kt
-  │           └── ui/
-  │               └── theme/
-  │                   ├── Color.kt
-  │                   ├── Theme.kt
-  │                   └── Type.kt
-  └── skill_agent/
+├── EntreApps/
+│   └── Shared/            ++
+│       ├── Models/
+│       │   ├── Components/
+│       │   │   ├── DisponibilityEtates.kt
+│       │   │   ├── Ousstad_Tahfid.kt
+│       │   │   └── Prioriter.kt
+│       │   ├── Home/
+│       │   │   └── ActiveCentralValues.kt
+│       │   ├── M00CentralParametresOfAllApps.kt
+│       │   ├── M09AppCompt.kt
+│       │   ├── Relative_Produits/
+│       │   │   └── Models/
+│       │   │       ├── M01Produit.kt
+│       │   │       ├── M16CategorieProduit.kt
+│       │   │       ├── M21CataloguesCategorie.kt
+│       │   │       └── M3CouleurProduitInfos.kt
+│       │   ├── Relative_Vents/
+│       │   │   └── Models/
+│       │   │       ├── M10OperationVentCouleur.kt
+│       │   │       ├── M13TarificationInfos.kt
+│       │   │       ├── M14VentPeriode.kt
+│       │   │       ├── M15Grossist.kt
+│       │   │       ├── M2Client.kt
+│       │   │       └── M8BonVent.kt
+│       │   └── Screen.kt
+│       ├── Modules/
+│       │   ├── Base/
+│       │   │   ├── AppDatabase.kt
+│       │   │   ├── SQL/
+│       │   │   │   ├── Dao13TarificationInfos.kt
+│       │   │   │   ├── Dao14VentPeriode.kt
+│       │   │   │   ├── Dao_M03CouleurProduitInfos.kt
+│       │   │   │   ├── Dao_M10OperationVentCouleur.kt
+│       │   │   │   ├── Dao_M16CategorieProduit.kt
+│       │   │   │   ├── Dao_M1Produit.kt
+│       │   │   │   ├── Dao_M2Client.kt
+│       │   │   │   ├── Dao_M8BonVent.kt
+│       │   │   │   └── Dao_M9AppCompt.kt
+│       │   │   └── Setter_LongDatas.kt
+│       │   ├── PermissionHandler.kt
+│       │   └── Uis/
+│       │       └── Ui/
+│       │           ├── StoragePermissionDialog.kt
+│       │           └── SyncProgressIndicator.kt
+│       └── Ui/
+│           ├── Dialog/
+│           │   ├── A_PressistatntMainActivityButtons_App4.kt
+│           │   ├── But_4_DisconnectFAB.kt
+│           │   ├── But_4_FloatingSearchFAB.kt
+│           │   ├── ButtonID7/
+│           │   │   └── Action/
+│           │   │       ├── But7_Cree_Images_Bons.kt
+│           │   │       ├── Datas.kt
+│           │   │       ├── Module/
+│           │   │       │   ├── A_PrintReceiptHandler_ProMai.kt
+│           │   │       │   ├── B_Generateur_ProMai.kt
+│           │   │       │   ├── C_PdfPrintHandler.kt
+│           │   │       │   ├── Pdf/
+│           │   │       │   │   ├── A_PdfTableBuilder.kt
+│           │   │       │   │   ├── PdfContentBuilder.kt
+│           │   │       │   │   ├── PdfFileNamingUtils.kt
+│           │   │       │   │   ├── PdfFormatterUtils.kt
+│           │   │       │   │   ├── PdfGeneratorCore.kt
+│           │   │       │   │   ├── PdfSaverUtility.kt
+│           │   │       │   │   ├── PdfType.kt
+│           │   │       │   │   └── UploadHandler.kt
+│           │   │       │   └── WindowsShareHandler.kt
+│           │   │       └── initiateBackgroundPdfCreation.kt
+│           │   └── ButtonID8/
+│           │       └── Action/
+│           │           ├── Button_8_Imgs_Send_whatsappBuisness_Stored_Bon.kt
+│           │           ├── findBonJpgsFromMediaStore.kt
+│           │           └── sendImgsViaWhatsAppBusiness.kt
+│           └── Views/
+│               ├── FastEdite_OutlinedTextField.kt            --
+│               └── FastEdite_OutlinedTextField_2.kt            --
+├── com/
+│   └── example/
+│       └── light_app_controles/
+│           ├── A/
+│           │   └── Main/
+│           │       ├── MainActivity.kt
+│           │       ├── MyApplication.kt
+│           │       └── Prompt/
+│           │           └── Ai/
+│           │               └── Instruction_Str_Replace.md
+│           ├── B/
+│           │   └── Screens/
+│           │       ├── MainScreen.kt
+│           │       └── Z/
+│           │           └── Screens/
+│           │               └── Test/
+│           │                   └── ID1/
+│           │                       └── Client_Map/
+│           │                           └── App/
+│           │                               └── Bon_Vent_Etate/
+│           │                                   └── View/
+│           │                                       ├── ID1/
+│           │                                       │   └── FloatingMenu_Plus_RoomCsvBigDatas/
+│           │                                       │       └── Feature/
+│           │                                       │           └── Options/
+│           │                                       │               ├── M1/
+│           │                                       │               │   └── Actions/
+│           │                                       │               │       ├── Action/
+│           │                                       │               │       │   ├── But1_Export_M1_Room_To_Csv.kt
+│           │                                       │               │       │   ├── But2_Export_M1_Csv_To_FireBase.kt
+│           │                                       │               │       │   ├── But3_Import_M1Csv_To_Room.kt
+│           │                                       │               │       │   ├── But6_Import_M1_FireBase_To_Csv.kt
+│           │                                       │               │       │   ├── But8_DeleteAll_M1_Room.kt
+│           │                                       │               │       │   └── But9_Import_M1_FireBase_To_Room.kt
+│           │                                       │               │       └── M01_FragMap_DropdownMenu.kt
+│           │                                       │               ├── M10/
+│           │                                       │               │   └── Actions/
+│           │                                       │               │       └── M10_FragMap_DropdownMenu.kt
+│           │                                       │               ├── M13/
+│           │                                       │               │   └── Actions/
+│           │                                       │               │       └── M13_FragMap_DropdownMenu.kt
+│           │                                       │               ├── M14/
+│           │                                       │               │   └── Actions/
+│           │                                       │               │       └── M14_FragMap_DropdownMenu.kt
+│           │                                       │               ├── M2Client_Operations_FragMap_DropdownMenu/
+│           │                                       │               │   └── Actions/
+│           │                                       │               │       ├── Action/
+│           │                                       │               │       │   ├── But1_Export_M2_Room_To_Csv.kt
+│           │                                       │               │       │   ├── But2_Export_M2_Csv_To_FireBase.kt
+│           │                                       │               │       │   ├── But3_Import_M2Csv_To_Room.kt
+│           │                                       │               │       │   ├── But6_Import_M2_FireBase_To_Csv.kt
+│           │                                       │               │       │   ├── But8_DeleteAll_M2_Room.kt
+│           │                                       │               │       │   └── But9_Import_M2_FireBase_To_Room.kt
+│           │                                       │               │       └── M2Client_Operations_FragMap_DropdownMenu.kt
+│           │                                       │               ├── M3/
+│           │                                       │               │   └── Actions/
+│           │                                       │               │       ├── Action/
+│           │                                       │               │       │   ├── But1_Export_M8_Room_To_Csv.kt
+│           │                                       │               │       │   ├── But2_Export_M8_Csv_To_FireBase.kt
+│           │                                       │               │       │   ├── But3_Import_M8Csv_To_Room.kt
+│           │                                       │               │       │   ├── But6_Import_M8_FireBase_To_Csv.kt
+│           │                                       │               │       │   ├── But8_DeleteAll_M8_Room.kt
+│           │                                       │               │       │   └── But9_Import_M8_FireBase_To_Room.kt
+│           │                                       │               │       └── M03_Operations_FragMap_DropdownMenu.kt
+│           │                                       │               ├── M8Bon_Operations_FragMap_DropdownMenu/
+│           │                                       │               │   └── Actions/
+│           │                                       │               │       ├── Action/
+│           │                                       │               │       │   ├── But1_Export_M8_Room_To_Csv.kt
+│           │                                       │               │       │   ├── But2_Export_M8_Csv_To_FireBase.kt
+│           │                                       │               │       │   ├── But3_Import_M8Csv_To_Room.kt
+│           │                                       │               │       │   ├── But6_Import_M8_FireBase_To_Csv.kt
+│           │                                       │               │       │   ├── But8_DeleteAll_M8_Room.kt
+│           │                                       │               │       │   └── But9_Import_M8_FireBase_To_Room.kt
+│           │                                       │               │       └── M8Bon_Operations_FragMap_DropdownMenu.kt
+│           │                                       │               ├── M9/
+│           │                                       │               │   └── Actions/
+│           │                                       │               │       ├── Action/
+│           │                                       │               │       │   ├── But1_Export_M9_Room_To_Csv.kt
+│           │                                       │               │       │   ├── But2_Export_M9_Csv_To_FireBase.kt
+│           │                                       │               │       │   ├── But3_Import_M9Csv_To_Room.kt
+│           │                                       │               │       │   ├── But6_Import_M9_FireBase_To_Csv.kt
+│           │                                       │               │       │   ├── But8_DeleteAll_M9_Room.kt
+│           │                                       │               │       │   └── But9_Import_M9_FireBase_To_Room.kt
+│           │                                       │               │       └── M09_FragMap_DropdownMenu.kt
+│           │                                       │               └── a/
+│           │                                       │                   └── Main/
+│           │                                       │                       ├── BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.kt
+│           │                                       │                       ├── MultiOperations_FragMap_DropdownMenu.kt
+│           │                                       │                       └── ViewModel/
+│           │                                       │                           └── FeatreID1_ViewModel.kt
+│           │                                       ├── ID2/
+│           │                                       │   └── CaptureListItems/
+│           │                                       │       └── Feature/
+│           │                                       │           └── Capture/
+│           │                                       │               ├── Afficheur_locale_Image_Captured.kt
+│           │                                       │               └── CapturableLayer_FINAL.kt
+│           │                                       ├── Z/
+│           │                                       │   └── Components/
+│           │                                       │       ├── AvertissementDialog.kt
+│           │                                       │       ├── EditableAmountField.kt
+│           │                                       │       ├── PubAbdelwahabElectroGroStore.kt
+│           │                                       │       └── Y_DatesHandler.kt
+│           │                                       └── a/
+│           │                                           └── Screens/
+│           │                                               └── a/
+│           │                                                   └── Vendeur_Boutiqe/
+│           │                                                       └── Screen/
+│           │                                                           ├── View/
+│           │                                                           │   ├── A_Item_Produit_App4.kt
+│           │                                                           │   ├── Components/
+│           │                                                           │   │   ├── A_Header/
+│           │                                                           │   │   │   └── View/
+│           │                                                           │   │   │       ├── A_Compact_Header_App4.kt
+│           │                                                           │   │   │       ├── DeleteProductHeader.kt
+│           │                                                           │   │   │       ├── EditableDoubleInfoCard.kt
+│           │                                                           │   │   │       ├── EditableInfoCard.kt
+│           │                                                           │   │   │       ├── FastInit_Double_Outlined_Edite_Modulable_Proto4.kt
+│           │                                                           │   │   │       ├── FastInit_Outlined_Int_Edite_Modulable_Proto4.kt
+│           │                                                           │   │   │       ├── InfoCard.kt
+│           │                                                           │   │   │       └── M16Categorie/
+│           │                                                           │   │   │           └── CategoryBadge.kt
+│           │                                                           │   │   ├── Big_Principale_FragID3.kt
+│           │                                                           │   │   └── SubColorCard_WithButton.kt
+│           │                                                           │   └── ViewS/
+│           │                                                           │       └── Views/
+│           │                                                           │           ├── Image_Displaye.kt
+│           │                                                           │           └── Lenceur_Vent_Handler/
+│           │                                                           │               └── View/
+│           │                                                           │                   ├── CartonVentHandler_App4.kt
+│           │                                                           │                   ├── Lenceur_Vent_Handler_App4.kt
+│           │                                                           │                   ├── Pricipale_Tariffs_Vendeurs.kt
+│           │                                                           │                   ├── TariffItem.kt
+│           │                                                           │                   ├── Tariffs_MainList.kt
+│           │                                                           │                   └── Z_EntreParEcriture_Tariff.kt
+│           │                                                           ├── ViewModel/
+│           │                                                           │   ├── A_ViewModel_NewProtoPatterns.kt
+│           │                                                           │   ├── ActiveDatasFragNewProto.kt
+│           │                                                           │   ├── Filter_Affichage_Mode_Proto.kt
+│           │                                                           │   ├── Initializer_ViewModel.kt
+│           │                                                           │   ├── ProductListFilterLogic.kt
+│           │                                                           │   ├── Setter_ViewModel.kt
+│           │                                                           │   └── UiState_NewProtoPatterns.kt
+│           │                                                           ├── a_Compact_Presentoire_App_Produits_FragID4.kt
+│           │                                                           └── b_List_LazyColumnList_App4.kt
+│           └── ui/
+│               └── theme/
+│                   ├── Color.kt
+│                   ├── Theme.kt
+│                   └── Type.kt
+└── skill_agent/
     ├── agy_to_project.md
     ├── as_click_run.md
     ├── build.md

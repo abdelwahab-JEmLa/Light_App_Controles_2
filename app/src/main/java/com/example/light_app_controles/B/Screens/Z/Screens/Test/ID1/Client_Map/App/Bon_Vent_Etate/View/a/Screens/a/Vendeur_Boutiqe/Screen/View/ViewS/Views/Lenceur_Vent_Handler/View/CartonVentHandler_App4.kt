@@ -1,4 +1,4 @@
-package com.example.light_app_controles.Feature.Fragment.View.ViewS.Views.Lenceur_Vent_Handler.View
+package com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.a.Vendeur_Boutiqe.Screen.View.ViewS.Views.Lenceur_Vent_Handler.View
 
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.ifTrue
 import V.DiviseParSections.App.SectionID10.PresenterElectroBoutiqueAbdelwahab.App.FragID5.Ancien_PresenterApp_FragID5.Fragment.View.ViewS.FastInit_Outlined_Int_Edite_Modulable_Proto4

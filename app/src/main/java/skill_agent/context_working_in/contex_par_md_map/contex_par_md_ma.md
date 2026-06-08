@@ -40,11 +40,11 @@ Provide a success confirmation message along with a direct clickable link to the
 Scan the workspace directories.
 
 #### 2. Run the Python Script to Overwrite the Map
-Run the python script `app/src/main/java/skill_agent/context_working_in/contex_par_md_map/generate_map.py` with the `--ecrase` flag using a terminal command:
+Run the python script `app/src/main/java/skill_agent/context_working_in/contex_par_md_map/generate_map.py` using a terminal command:
 ```powershell
-python app/src/main/java/skill_agent/context_working_in/contex_par_md_map/generate_map.py --ecrase
+python app/src/main/java/skill_agent/context_working_in/contex_par_md_map/generate_map.py
 ```
-This script will generate a clean map from scratch, discarding any previously saved `++` or `--` annotations.
+This script will generate a refreshed map from scratch, while keeping/preserving all existing `++` or `--` annotations.
 
 #### 3. Report Success
 Provide a success confirmation message along with a direct clickable link to [files_affiched.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/context_working_in/contex_par_md_map/files_affiched.md).
