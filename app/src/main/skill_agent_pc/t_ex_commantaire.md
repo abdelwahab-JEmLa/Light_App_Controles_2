@@ -40,6 +40,6 @@ This skill instructs the assistant on how to automatically navigate to a specifi
 ---
 
 ## 🔗 Direct Links
-* 📝 [t_ex_commantaire Skill](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_ex_commantaire.md)
+* 📝 [t_ex_commantaire Skill](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/t_ex_commantaire.md)
 * ✅ [Fix TODOs central skill (t_.md)](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_.md)
 * ℹ️ [Help Skill](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/help_skill.md)
