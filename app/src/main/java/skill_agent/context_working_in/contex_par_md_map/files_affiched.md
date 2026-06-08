@@ -3,7 +3,6 @@
 Voici l'arborescence des dossiers et des fichiers du contexte actif :
 
 Racine commune masquée : `app / src / main / java/` 
-
 ```diff
   ├── EntreApps/
 + │    └── Shared/            ++
@@ -249,7 +248,7 @@ Racine commune masquée : `app / src / main / java/`
   └── skill_agent/
     ├── agy_to_project.md
     ├── as_click_run.md
-    ├── build.md
+    ├── build.md      ca
     ├── build_.md
     ├── clean_pc.md
     ├── consize_comments.md
@@ -280,7 +279,7 @@ Racine commune masquée : `app / src / main / java/`
     ├── h_.md
     ├── help_skill.md
     ├── hw_.md
-    ├── launch_preview.md
+    ├── launch_preview.md         ca
     ├── log_.md
     ├── log_f.md
     ├── push_tagged.md
