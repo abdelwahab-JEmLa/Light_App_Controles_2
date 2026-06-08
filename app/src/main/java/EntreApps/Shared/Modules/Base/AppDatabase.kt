@@ -134,12 +134,6 @@ class EtateActuellementEstConverter {
 
     @TypeConverter
     fun toEtateActuellementEst(value: String?): M8BonVent.EtateActuellementEst {
-        if (value.isNullOrBlank()) return M8BonVent.EtateActuellementEst.CreeMaisNonDefinie
-        if (value == "Cette_Transaction_Type_Est_Credit") return M8BonVent.EtateActuellementEst.Credit
-        return try {
-            M8BonVent.EtateActuellementEst.valueOf(value)
-        } catch (e: IllegalArgumentException) {
-            M8BonVent.EtateActuellementEst.CreeMaisNonDefinie
-        }
+        return M8BonVent.EtateActuellementEst.fromStringSafe(value)
     }
 }

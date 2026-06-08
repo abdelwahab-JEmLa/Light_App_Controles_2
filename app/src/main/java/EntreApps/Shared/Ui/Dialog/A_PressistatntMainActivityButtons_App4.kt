@@ -265,6 +265,11 @@ fun PressistatntMainActivityButtons_App4(
                         val client = activeDatas.activeOnVent_M2Client
                         val clientBons = activeDatas.list_M8BonVent?.filter { it.parent_M2Client_KeyID == client?.keyID } ?: emptyList()
                         val remainingCredit = client?.getLastSituationCredit(clientBons)?.new_situation ?: 0.0
+                        if (client != null && client.currentCreditBalance == 0.0 && remainingCredit != 0.0) {
+                            androidx.compose.runtime.LaunchedEffect(client.keyID, remainingCredit) {
+                                viewModelNewProtoPatterns.update_m2(client.copy(currentCreditBalance = remainingCredit))
+                            }
+                        }
                         Text(
                             text = " | crédit: %.0f DA".format(remainingCredit),
                             style = MaterialTheme.typography.bodySmall,

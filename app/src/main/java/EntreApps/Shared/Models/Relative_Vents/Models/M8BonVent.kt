@@ -221,6 +221,16 @@ data class M8BonVent(
 
         companion object {
             const val keyModel = "ID8C2"
+
+            fun fromStringSafe(value: String?): EtateActuellementEst {
+                if (value.isNullOrBlank()) return CreeMaisNonDefinie
+                if (value == "Cette_Transaction_Type_Est_Credit") return Credit
+                return try {
+                    valueOf(value)
+                } catch (e: IllegalArgumentException) {
+                    CreeMaisNonDefinie
+                }
+            }
         }
     }
 
@@ -318,13 +328,7 @@ data class M8BonVent(
                     ignoreCase = true
                 ) ?: false,
                 etateActuellementEst = map["etateActuellementEst"]?.let {
-                    if (it == "Cette_Transaction_Type_Est_Credit") {
-                        EtateActuellementEst.Credit
-                    } else {
-                        runCatching { EtateActuellementEst.valueOf(it) }.getOrDefault(
-                            EtateActuellementEst.ON_MODE_COMMEND_ACTUELLEMENT
-                        )
-                    }
+                    EtateActuellementEst.fromStringSafe(it)
                 } ?: EtateActuellementEst.ON_MODE_COMMEND_ACTUELLEMENT,
                 vocaleKeyID = map["vocaleKeyID"] ?: "",
                 sonVocaleEstEcoute = map["sonVocaleEstEcoute"]?.equals("true", ignoreCase = true)
