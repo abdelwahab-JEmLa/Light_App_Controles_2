@@ -22,6 +22,7 @@ Identifiez le ou les commentaires `TODO` pertinents dans le code source (via `gr
 Pour le `TODO` ciblé, l'assistant doit :
 - Extraire un large bloc de code autour du `TODO` (par exemple, 15-20 lignes avant et après) pour donner un contexte visuel clair (highlight).
 - Identifier et lister **LE PLUS POSSIBLE de fichiers relatifs** (Models, ViewModels, Interfaces, composables parents, ActiveDatas, etc.) qui sont impliqués dans le flux d'exécution (flow) du `TODO`. Ne ratez AUCUN fichier dépendant dont l'IA pourrait avoir besoin, car s'il n'est pas listé ici, il sera ignoré et masqué par `read_ingor_` !
+- **CRITIQUE - Si le TODO contient `t_copiePattersApp`** : Vous DEVEZ obligatoirement chercher le pattern original dans le projet source `ClientJetPack` (chemin : `D:\AndroidStudioProjects\ClientJetPack`). Utilisez `git grep` (via ligne de commande) ou `grep_search` dans ce répertoire pour trouver les composants et fichiers équivalents qui démontrent comment la fonctionnalité y a été implémentée. Vous devez extraire et inclure ce code source original dans le fichier de contexte (`contex.md`) pour que l'IA suivante puisse l'utiliser.
 - **Rappel :** N'appliquez AUCUN correctif. NE SUPPRIMEZ PAS le TODO. Contentez-vous d'analyser.
 
 ### 3. Generate the Context File
