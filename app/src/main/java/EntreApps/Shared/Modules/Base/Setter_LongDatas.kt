@@ -38,7 +38,7 @@ import EntreApps.Shared.Models.Components.DisponibilityEtates
 class Setter_LongDatas(
     val appDatabase: AppDatabase,
     val  context: Context,
-) {      //<--
+) {
 
     suspend fun delete_All_M01Produit() {
         appDatabase.dao_M1Produit().deleteAll()
@@ -1089,8 +1089,6 @@ class Setter_LongDatas(
             runCatching { M8BonVent.Companion.to_Map(map) }.getOrNull()
         }
 
-        val xp4Bons = bons.filter { it.keyID.endsWith("xp4") }
-        Log.d("But6_FireBaseToCsv", "XP4 records fetched from Firebase: ${xp4Bons.map { it.keyID }}")
 
         if (importOnlyCredits) {
             bons = bons.filter { it.etateActuellementEst.credit_type }
@@ -1117,9 +1115,6 @@ class Setter_LongDatas(
         }
 
         bons.forEach { bon ->
-            if (bon.keyID.endsWith("xp4")) {
-                Log.d("But6_FireBaseToCsv", "Writing XP4 record to CSV: ${bon.keyID}")
-            }
             existingRows[bon.keyID] = bon.to_Map().values.map { (it?.toString() ?: "").escapeCsv() }
         }
 
@@ -1148,18 +1143,12 @@ class Setter_LongDatas(
             runCatching { M8BonVent.Companion.to_Map(map) }.getOrNull()
         }
 
-        val xp4Bons = bons.filter { it.keyID.endsWith("xp4") }
-        Log.d("But3_CsvToRoom", "XP4 records parsed from CSV: ${xp4Bons.map { it.keyID }}")
-
         if (importOnlyCredits) {
             bons = bons.filter { it.etateActuellementEst.credit_type }
         }
 
         if (bons.isNotEmpty()) {
             bons.forEach { bon ->
-                if (bon.keyID.endsWith("xp4")) {
-                    Log.d("But3_CsvToRoom", "Upserting XP4 record to Room database: ${bon.keyID}")
-                }
                 appDatabase.dao_M8BonVent().upsert(bon)
             }
         }
@@ -1470,14 +1459,12 @@ class Setter_LongDatas(
         selectedTariff: M13TarificationInfos
     ): kotlinx.coroutines.Job {
         return composScope.launch {
-            Log.d("BUG_DEBUG", "Room upsert starting for op: ${operation.keyID}")
             appDatabase.dao_M10OperationVentCouleur().upsert(operation)
             val tariffWithDefaults = selectedTariff.copy(
                 defaultNonSaved_Entre = false,
                 dernierTimeTampsSynchronisationAvecFireBase = System.currentTimeMillis()
             )
             appDatabase.dao_M13TarificationInfos().update(tariffWithDefaults)
-            Log.d("BUG_DEBUG", "Room upsert completed for op: ${operation.keyID}")
 
             // Firebase updates in background
             composScope.launch {
@@ -1489,9 +1476,7 @@ class Setter_LongDatas(
                         tariffWithDefaults.keyID to tariffWithDefaults.toFirebaseMap()
                     )
                     M13TarificationInfos.Companion.ref.updateChildren(tariffUpdates).await()
-                    Log.d("BUG_DEBUG", "Firebase updates sync completed for op: ${operation.keyID}")
                 } catch (e: Exception) {
-                    Log.e("BUG_DEBUG", "Firebase sync failed for op ${operation.keyID}: ${e.message}")
                 }
             }
         }
@@ -1567,7 +1552,6 @@ class Setter_LongDatas(
             M09AppCompt.Companion.ref.updateChildren(updates).await()
         }
     }
-
     // -------------------------------------------------------------------------
     // Bulk tariff update for all operations of a product
     // -------------------------------------------------------------------------

@@ -71,7 +71,6 @@ fun PressistatntMainActivityButtons_App4(
         if (resetSearch) activeDatas.filter_echatilaten = ""
         activeDatas.filterAffichageMode_Proto = mode
         activeDatas.filter_relode_tiger += 1
-        // Reload colors from DB so the depot filter is applied/skipped correctly for the new mode.
         viewModelNewProtoPatterns.retryLoadingData()
     }
 
@@ -166,8 +165,7 @@ fun PressistatntMainActivityButtons_App4(
         current_OnVent_M14VentPeriode_KeyID,
         activeDatas.list_M8BonVent,
         activeDatas.list_M10OperationVentCouleur,
-        uiState.list_Datas?.m13TarificationInfos,
-    ) {              // prixAchat null/zero guard applied in M8BonVent.sum_totale_et_benifice
+    ) {
         derivedStateOf {
             val periodKey = current_OnVent_M14VentPeriode_KeyID
                 ?.takeIf { it.isNotBlank() && it != "null" } ?: return@derivedStateOf null
@@ -268,7 +266,7 @@ fun PressistatntMainActivityButtons_App4(
                             onClick = { showConfirmDialog = true },
                             modifier = Modifier.size(18.dp)
                         ) {
-                            Icon(            //<--
+                            Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = "Add depot sales",
                                 tint = MaterialTheme.colorScheme.onSecondaryContainer,
@@ -465,7 +463,7 @@ fun PressistatntMainActivityButtons_App4(
                 modifier = Modifier,
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {  //row de modes panie..
+            ) {
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,

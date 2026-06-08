@@ -10,7 +10,6 @@ import EntreApps.Shared.Models.Relative_Vents.Models.M13TarificationInfos
 import EntreApps.Shared.Models.Relative_Vents.Models.M2Client
 import EntreApps.Shared.Models.Relative_Vents.Models.M8BonVent
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.ID1.FeatureID1_BigDataBase_Editeur_Par_Csv_Floating_Separated_Button.Feature.Modules.Setter_LongDatas
 import kotlinx.coroutines.CoroutineScope
@@ -20,7 +19,6 @@ import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-private const val TAG_SETTER = "Setter_ViewModel"
 
 class Setter_ViewModel(
     private val vm: A_ViewModel_NewProtoPatterns,
@@ -133,12 +131,10 @@ class Setter_ViewModel(
             vm.active_Datas.list_M10OperationVentCouleur =
                 (vm.active_Datas.list_M10OperationVentCouleur ?: emptyList()) + newOnly
 
-            Log.d("BUG_DEBUG", "addNew_listM10OperationVentCouleur: newOnly count = ${newOnly.size}")
             val jobs = upsert_M10OperationVentCouleur(newOnly)
 
             vm.viewModelScope.launch {
                 jobs?.joinAll()
-                Log.d("BUG_DEBUG", "addNew_listM10OperationVentCouleur: Room writes completed. Reloading...")
                 vm.retryLoadingData()
             }
         }
@@ -157,11 +153,6 @@ class Setter_ViewModel(
 
         val missingEntries = updatedList?.filter { it.keyID !in existingKeys }
         if (!missingEntries.isNullOrEmpty()) {
-            Log.e(
-                TAG_SETTER,
-                "update_listM10OperationVentCouleur: entry not found — aborting. " +
-                        "Missing keyIDs: ${missingEntries.map { it.keyID }}"
-            )
             return
         }
 
