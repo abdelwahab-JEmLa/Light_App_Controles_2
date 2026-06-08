@@ -29,6 +29,7 @@ Output a markdown table documenting each custom skill.
 | **Commit, Tag and Push** (`push_tagged.md`) | `push_taged`, `push_`, `p_` | Commite proprement les modifications locales, génère/incrémente intelligemment un tag Git, l'applique et pousse le tout sur GitHub. |
 | **Context Unique Working_IN** (`context_working_in/context_working_in.md`) | `agy_context_unique_workingIn_active`, `agy_context_unique_workingIn_desactive`, `c_w_a`, `c_w_d`, `c_w_e`, `cwa_<package>`, `cwa_`, `cwd_`, `cwe_` | Active (isole), Désactive (restaure), ou vérifie l'état du contexte restreint uniquement sur `Working_IN.Feature`. |
 | **Context Map Generator** (`context_working_in/contex_par_md_map/contex_par_md_ma.md`) | `cree_map`, `cree_map_ecrase_keep`, `cta_map`, `cw_map_d`, `map_colore`, `ctm_ref` | Gère le contexte actif via une arborescence ASCII annotée dans `files_affiched.md` (`++` = focus, `--` = ignore, `ctm_ref` = refresh et applique). |
+| **Context Map Line Counter** (`context_working_in/contex_par_md_map/loc_map.md`) | `??`, `loc_map`, `map_loc` | Calcule et affiche le nombre de lignes et de fichiers pour les dossiers/fichiers marqués avec `??` dans la carte de contexte. |
 | **Schedule App Launch & Tap Replay** (`tap/Schedule_agy_task_tap_l.md`) | `Schedule_agy_task_tap_l`, `schedule_tap_l`, `sch_tap_l`, `st_`, `arrete_sch` | Attend que l'app se lance depuis Android Studio pour exécuter tap_l, ou annule l'attente en cours (arrete_sch). |
 | **Tap Android FAB** (`tap/tap.md`) | `tap`, `tap <target>`, `tap_l`, `shel_tap_l` | Exécute un clic à haute vitesse en analysant l'arbre XML de l'UI (ciblant le FAB ou un texte) ou instantanément via le dernier tap rejoué (tap_l). |
 | **Real-Time Logcat Filter** (`log_f.md`) | `log_f`, `log_f ` followed by terms | Filtre et affiche en temps réel les logs de l'appareil par rapport aux mots-clés saisis dans le chat. |
@@ -58,6 +59,7 @@ Always present the user with clickable links to the skill files in the skills di
 * 📦 [Commit, Tag and Push](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/push_tagged.md)
 * 📂 [Context Unique Working_IN](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/context_working_in/context_working_in.md)
 * 🗺️ [Context Map Generator](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/context_working_in/contex_par_md_map/contex_par_md_ma.md)
+* 🗺️ [Context Map Line Counter](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/context_working_in/contex_par_md_map/loc_map.md)
 * ⏰ [Schedule App Launch & Tap Replay](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/tap/Schedule_agy_task_tap_l.md)
 * 👆 [Tap Android FAB](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/tap/tap.md)
 * 📋 [Real-Time Logcat Filter](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/log_f.md)

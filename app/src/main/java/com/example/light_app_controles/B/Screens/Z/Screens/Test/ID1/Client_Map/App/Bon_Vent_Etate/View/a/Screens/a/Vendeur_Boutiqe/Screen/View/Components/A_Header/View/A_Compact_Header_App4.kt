@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.light_app_controles.Feature.Fragment.View.Components.A_Header.View.DeleteProductHeader
+import com.example.light_app_controles.B.Screens.Z.Screens.Test.ID1.Client_Map.App.Bon_Vent_Etate.View.a.Screens.a.Vendeur_Boutiqe.Screen.View.Components.A_Header.View.DeleteProductHeader
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
