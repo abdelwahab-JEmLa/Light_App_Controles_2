@@ -41,8 +41,25 @@ def main():
         
     print(f"Found {len(files_to_process)} Excel file(s) to scan: {', '.join(files_to_process)}")
     
+    import zipfile
     for filename in files_to_process:
         excel_path = os.path.join(desktop, filename)
+        
+        # Fast check for comments in zip structure before loading
+        has_comments = False
+        try:
+            with zipfile.ZipFile(excel_path, 'r') as z:
+                for name in z.namelist():
+                    if "comments" in name.lower():
+                        has_comments = True
+                        break
+        except Exception as e:
+            has_comments = True  # Fallback to load if zip check fails
+            
+        if not has_comments:
+            print(f"[{filename}] No comments found (checked zip structure). Skipping.")
+            continue
+            
         print(f"\nOpening Excel file: {excel_path}")
         try:
             wb = openpyxl.load_workbook(excel_path)
@@ -203,6 +220,31 @@ def main():
                     modified = True
                     continue
 
+            # --- 2c. Custom Hide Other Columns (e.g. cache les autres line...) ---
+            has_hide_others_comment = False
+            keep_cols = set()
+            for col in range(1, ws.max_column + 1):
+                cell = ws.cell(row=1, column=col)
+                if cell.comment:
+                    text = cell.comment.text.lower()
+                    if "cache" in text and ("autre" in text or "line" in text or "col" in text or "laisse" in text):
+                        has_hide_others_comment = True
+                    keep_cols.add(col)
+            
+            if has_hide_others_comment and keep_cols:
+                col_names_kept = [ws.cell(row=1, column=c).value for c in keep_cols]
+                print(f"[{filename}] Found hide-others instructions in sheet '{sheet_name}'. Columns to keep: {col_names_kept}")
+                for col in range(1, ws.max_column + 1):
+                    col_letter = get_column_letter(col)
+                    if col in keep_cols:
+                        ws.column_dimensions[col_letter].hidden = False
+                        ws.cell(row=1, column=col).comment = None
+                    else:
+                        ws.column_dimensions[col_letter].hidden = True
+                print(f"[{filename}] Successfully hid other columns in sheet '{sheet_name}'.")
+                modified = True
+                continue
+
             # --- 3. Standard Constraint Filter (e.g. count_Don_Depot > 0) ---
             comment_found = False
             target_cell_coord = None
@@ -312,6 +354,17 @@ def main():
                 print(f"[{filename}] No matching constraint comments found in sheet '{sheet_name}'.")
                 
         if modified:
+            # Clean up legacy drawings if no comments are left to avoid Excel corruption
+            for sheet in wb.worksheets:
+                has_remaining_comments = False
+                for coord, cell in list(sheet._cells.items()):
+                    if cell.comment:
+                        has_remaining_comments = True
+                        break
+                if not has_remaining_comments:
+                    sheet.legacy_drawing = None
+                    if hasattr(sheet, '_comments'):
+                        sheet._comments.clear()
             try:
                 wb.save(excel_path)
                 print(f"[{filename}] Successfully saved modifications to {excel_path}")
