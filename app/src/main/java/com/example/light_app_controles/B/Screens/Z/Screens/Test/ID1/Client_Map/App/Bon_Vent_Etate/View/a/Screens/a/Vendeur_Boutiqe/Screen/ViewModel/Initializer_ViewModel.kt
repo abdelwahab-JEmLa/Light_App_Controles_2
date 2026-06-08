@@ -29,31 +29,15 @@ import kotlinx.coroutines.withTimeoutOrNull
 
 class Initializer_ViewModel(private val AViewModel_NewProtoPatterns: A_ViewModel_NewProtoPatterns) {
 
-    /** Full start: loads data AND starts the periodic compt-key watcher. Call only once. */
     fun run() {
         collect_ListDatas()
         startPeriodicComptKeyCheck()
     }
 
-    /**
-     * Lightweight reload: re-runs the data load pipeline without spawning another
-     * periodic-check loop. Use this for retries and on-screen re-entry so that
-     * [startPeriodicComptKeyCheck] is never launched more than once per ViewModel lifetime.
-     */
     fun reload() {
         collect_ListDatas()
     }
 
-    /**
-     * Periodically verifies that active_M9Compt.keyID matches the expected
-     * au_Lence_Set_Compt_Ac_KeyId. When they differ (or the compt is null),
-     * fetches from Firebase, upserts to the local DAO and refreshes active_Datas.
-     *
-     * Note: the initial seeding of active_M9Compt is handled synchronously in
-     * [loadAllDatasOnce] (local DB first, Firebase fallback). This loop only
-     * takes over afterwards to keep the compt in sync if the key changes at runtime
-     * (e.g. after a hot-swap of accounts).
-     */
     private fun startPeriodicComptKeyCheck() {
         AViewModel_NewProtoPatterns.viewModelScope.launch(Dispatchers.IO) {
             val expectedKey =
@@ -63,9 +47,8 @@ class Initializer_ViewModel(private val AViewModel_NewProtoPatterns: A_ViewModel
                 delay(5_000L)
 
                 val currentKey = AViewModel_NewProtoPatterns.active_Datas.active_M9Compt?.keyID
-                if (currentKey == expectedKey) continue          // already in sync — nothing to do
+                if (currentKey == expectedKey) continue
 
-                // Key mismatch (or compt is null) → pull from Firebase
                 val snap = withTimeoutOrNull(10_000L) {
                     M09AppCompt.ref.get().await()
                 }
@@ -77,7 +60,7 @@ class Initializer_ViewModel(private val AViewModel_NewProtoPatterns: A_ViewModel
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                    continue                                      // timed-out — retry next tick
+                    continue
                 }
 
                 val remote = snap.children
@@ -97,10 +80,9 @@ class Initializer_ViewModel(private val AViewModel_NewProtoPatterns: A_ViewModel
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                    continue                                      // not found remotely — retry next tick
+                    continue
                 }
 
-                // Persist locally then expose to the UI layer
                 AViewModel_NewProtoPatterns.dao_M9AppCompt.upsert(remote)
                 AViewModel_NewProtoPatterns.active_Datas.active_M9Compt = remote
             }

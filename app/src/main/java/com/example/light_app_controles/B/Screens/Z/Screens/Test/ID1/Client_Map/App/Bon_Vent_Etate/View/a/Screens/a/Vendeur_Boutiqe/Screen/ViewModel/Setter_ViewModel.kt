@@ -140,11 +140,6 @@ class Setter_ViewModel(
         }
     }
 
-    /**
-     * Updates existing M10 operations in-place.
-     * Aborts if any entry in [updatedList] does not already exist in the current list —
-     * those should go through [addNew_listM10OperationVentCouleur] instead.
-     */
     fun update_listM10OperationVentCouleur(
         updatedList: List<M10OperationVentCouleur>?,
     ) {
@@ -173,22 +168,12 @@ class Setter_ViewModel(
         upsert_M10OperationVentCouleur(updatedList)
     }
 
-    /**
-     * Removes [op] from in-memory state and propagates the delete to DAO + Firebase.
-     * Use this when quantity drops to 0 — do NOT route through [update_listM10OperationVentCouleur],
-     * which only maps/replaces and will silently keep the entry alive.
-     */
     fun delete_M10OperationVentCouleur(op: M10OperationVentCouleur) {
         vm.active_Datas.list_M10OperationVentCouleur =
             vm.active_Datas.list_M10OperationVentCouleur?.filter { it.keyID != op.keyID }
         setter_LongDatas.delete_M10OperationVentCouleur(op)
     }
 
-    /**
-     * Inserts only genuinely new entries (by keyID) into the current list.
-     * Entries whose keyID already exists are silently skipped — use
-     * [update_listM10OperationVentCouleur] to update existing ones.
-     */
     private fun addNew_ListM10OperationVentCouleur(datas: List<M10OperationVentCouleur>?) {
         if (datas.isNullOrEmpty()) return
         val existingKeys = vm.active_Datas.list_M10OperationVentCouleur
