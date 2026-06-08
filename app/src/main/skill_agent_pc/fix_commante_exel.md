@@ -56,6 +56,6 @@ Report the worksheets scanned, specific comments detected, formulas/filters appl
 ---
 
 ## 🔗 Direct Links
-* ⚙️ [PC Help Page (hw_)](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent_pc/hw_.md)
+* ⚙️ [PC Help Page (hw_)](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/hw_.md)
 * 🐍 [fix_excel_comments.py](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/copy_/fb_db/fix_excel_comments.py)
-* 📄 [Fix Excel Comment Skill Config](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent_pc/fix_commante_exel.md)
+* 📄 [Fix Excel Comment Skill Config](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/fix_commante_exel.md)

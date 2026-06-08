@@ -169,6 +169,6 @@ Parse the output of the cleanup/estimate command and display a beautifully forma
 ---
 
 ## 🔗 Direct Links
-* 🧹 [PC Cleaner Skill](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent_pc/clean_pc.md)
-* 💻 [PC Specialist Skill](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent_pc/skill_pc.md)
-* 📄 [Help Hardware (hw_)](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent_pc/hw_.md)
+* 🧹 [PC Cleaner Skill](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/clean_pc.md)
+* 💻 [PC Specialist Skill](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/skill_pc.md)
+* 📄 [Help Hardware (hw_)](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/hw_.md)

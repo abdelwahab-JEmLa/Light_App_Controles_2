@@ -78,7 +78,7 @@ Always present the user with clickable links to the skill files in the skills di
 
 ### 3. Detail and Explain a Specific Skill (e.g. h_cwe_ or h_<trigger>)
 If the user's request matches `h_pc` (or `hw_`, `help_pc`, `help_hw`, `skillpc_`):
-- Instantly redirect and load the PC Help Page at [hw_.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent_pc/hw_.md) and display its content. Do not scan or search any other directory.
+- Instantly redirect and load the PC Help Page at [hw_.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/hw_.md) and display its content. Do not scan or search any other directory.
 
 If the user's request matches `h_<trigger>` (such as `h_cwe_`):
 - Identify the corresponding skill using the trigger (e.g., `cwe_` points to the **Context Unique Working_IN** skill).

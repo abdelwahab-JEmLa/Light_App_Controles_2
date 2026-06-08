@@ -42,5 +42,5 @@ If the target name **does not contain an extension**:
 ---
 
 ## 🔗 Direct Links
-* 🖼️ [scr_ Skill Config](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent_pc/scr_.md)
-* ⚙️ [PC Help Page (hw_)](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent_pc/hw_.md)
+* 🖼️ [scr_ Skill Config](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/scr_.md)
+* ⚙️ [PC Help Page (hw_)](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/hw_.md)
