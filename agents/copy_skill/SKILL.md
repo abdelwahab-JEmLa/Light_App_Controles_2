@@ -36,14 +36,14 @@ The following files were targeted during the last execution:
   ```
 
 ### 3. Action: Manage Backup File (`c_`, `ca_`, `dc_`)
-These triggers interact with the `agents\copy_skill\references\hist_copie.md` file without touching the clipboard.
-- **Trigger `c_` (Delete & Recreate)**: Simply run `python "C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\agents\copy_skill\scripts\read_clipboard_files.py"`. This script **automatically recreates** `hist_copie.md` with clickable links and prints the final Markdown table to save you a tool call. If the script outputs `EMPTY`, then manually recreate `hist_copie.md` using the fallback files.
-- **Trigger `ca_` (Append Backup)**: Append only the clickable Markdown links of the targeted files to the end of `agents\copy_skill\references\hist_copie.md` (if they are not already present).
-- **Trigger `dc_` (Delete Backup)**: Delete the `agents\copy_skill\references\hist_copie.md` file.
+These triggers interact with the `app\src\main\java\skill_agent\copy_clipboard\references\hist_copie.md` file without touching the clipboard.
+- **Trigger `c_` (Delete & Recreate)**: L'objectif est d'écraser (overwrite) complètement `hist_copie.md` avec les nouveaux liens ciblés. Exécutez simplement `python "C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\agents\copy_skill\scripts\read_clipboard_files.py"`. S'il retourne `EMPTY` (ou si vous utilisez une liste de fichiers spécifiques), vous **devez écraser manuellement** `hist_copie.md` (Overwrite: true) en y insérant les nouveaux liens sous le format `### 🔗 [Fichier](file:///...)`.
+- **Trigger `ca_` (Append Backup)**: Append only the clickable Markdown links of the targeted files to the end of `app\src\main\java\skill_agent\copy_clipboard\references\hist_copie.md` (if they are not already present).
+- **Trigger `dc_` (Delete Backup)**: Delete the `app\src\main\java\skill_agent\copy_clipboard\references\hist_copie.md` file.
 
 ### 4. Report Success (Table)
 - Output a highly concise response containing:
-  1. **Lien de sauvegarde** : `[agents/copy_skill/references/hist_copie.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/agents/copy_skill/references/hist_copie.md)`.
+  1. **Lien de sauvegarde** : `[app/src/main/java/skill_agent/copy_clipboard/references/hist_copie.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_clipboard/references/hist_copie.md)`.
   2. **Temps d'exécution** : Calcule et affiche le temps écoulé (en secondes) depuis la requête de l'utilisateur.
   3. **Nom court du package**.
   4. **Tableau des fichiers** (Nom du fichier | Lignes).
