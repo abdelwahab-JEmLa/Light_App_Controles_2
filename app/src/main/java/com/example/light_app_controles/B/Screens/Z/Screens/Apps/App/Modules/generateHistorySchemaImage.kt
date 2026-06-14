@@ -42,7 +42,8 @@ private const val TAG = "SchemaImage"
 fun generateHistorySchemaImage(
     context: Context,
     cardData: ParentCommunicationCardData_2,
-    viewModel: A_ViewModel_SeparatedAppsCodingPattern
+    viewModel: A_ViewModel_SeparatedAppsCodingPattern,
+    histLimit: Int? = null
 ): Uri? {
     val studentId   = cardData.studentInfo.keyID
     val studentName = cardData.studentInfo.fullName
@@ -57,7 +58,8 @@ fun generateHistorySchemaImage(
         val allObs = viewModel.repo20ObsarvationEtudion.datasValue
         Log.d(TAG, "  total observations en mémoire: ${allObs.size}")
 
-        val rows = resolveObservations(cardData, viewModel)
+        val allRows = resolveObservations(cardData, viewModel)
+        val rows = if (histLimit != null) allRows.takeLast(histLimit) else allRows
         Log.d(TAG, "  observations filtrées pour cet étudiant: ${rows.size}")
 
         if (rows.isEmpty()) {

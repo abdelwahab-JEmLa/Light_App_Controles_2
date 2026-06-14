@@ -27,18 +27,20 @@ fun drawObservationHistoryTable(
     paintArabic: TextPaint,
     paintSmall: TextPaint,
     paintBorder: Paint,
-    aCentralFacade: A_ViewModel_SeparatedAppsCodingPattern
+    aCentralFacade: A_ViewModel_SeparatedAppsCodingPattern,
+    histLimit: Int? = null
 ): Float {
     if (aCentralFacade == null) return yPosition
 
     var currentY = yPosition
 
-    // Get last 5 observations (was 3)
     val repo20 = aCentralFacade.repo20ObsarvationEtudion
-    val last3Observations = repo20.datasValue
+    val allObs = repo20.datasValue
         .filter { it.etudiant_keyID == cardData.studentInfo.keyID }
         .sortedByDescending { it.creationTimestamps }
-        .take(4)  // ✅ Changed from 3 to 5
+        
+    val limit = histLimit ?: 4
+    val last3Observations = allObs.take(limit)
 
     if (last3Observations.isEmpty()) {
         return currentY

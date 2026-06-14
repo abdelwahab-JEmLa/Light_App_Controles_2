@@ -33,7 +33,8 @@ private const val TAG = "HistoryImage"
 fun generateHistoryImage(
     context: Context,
     cardData: ParentCommunicationCardData_2,
-    viewModel: A_ViewModel_SeparatedAppsCodingPattern
+    viewModel: A_ViewModel_SeparatedAppsCodingPattern,
+    histLimit: Int? = null
 ): Uri? {
     return try {
         val scale       = 2          // 2× resolution for sharpness
@@ -54,7 +55,8 @@ fun generateHistoryImage(
             contentWidth = contentWidth,
             cardData     = cardData,
             paints       = paints,
-            viewModel    = viewModel
+            viewModel    = viewModel,
+            histLimit    = histLimit
         )
 
         val totalHeight = (measuredHeight + 20f).toInt()   // 20px bottom padding
@@ -78,7 +80,7 @@ fun generateHistoryImage(
         drawObservationHistoryTable(
             canvas, cardData, marginLeft, yPos, pageWidth, marginRight,
             contentWidth, paints.bold, paints.normal, paints.small, paints.border,
-            aCentralFacade = viewModel
+            viewModel, histLimit
         )
 
         // ── 3. Save bitmap → JPG → URI ────────────────────────────────────────
@@ -102,7 +104,8 @@ private fun measureContentHeight(
     contentWidth: Int,
     cardData: ParentCommunicationCardData_2,
     paints: HistoryPaints,
-    viewModel: A_ViewModel_SeparatedAppsCodingPattern
+    viewModel: A_ViewModel_SeparatedAppsCodingPattern,
+    histLimit: Int? = null
 ): Float {
     // Use a real bitmap so Canvas doesn't throw on draw calls
     val dummy  = Bitmap.createBitmap(pageWidth, 4000, Bitmap.Config.ARGB_8888)
@@ -116,7 +119,7 @@ private fun measureContentHeight(
     yPos = drawObservationHistoryTable(
         canvas, cardData, marginLeft, yPos, pageWidth, marginRight,
         contentWidth, paints.bold, paints.normal, paints.small, paints.border,
-        aCentralFacade = viewModel
+        viewModel, histLimit
     )
 
     dummy.recycle()

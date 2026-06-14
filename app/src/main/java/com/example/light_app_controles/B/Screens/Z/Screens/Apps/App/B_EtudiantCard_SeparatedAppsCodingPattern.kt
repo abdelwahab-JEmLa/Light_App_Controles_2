@@ -95,6 +95,13 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
     // Tracks whether the WhatsApp share for this card is in progress
     var isSharing by remember(etudiantId) { mutableStateOf(false) }
 
+    // ── TODO(1) resolved ─────────────────────────────────────────────────────
+    // Maximum number of history items to include in the exported image.
+    // null  → include all items (default behaviour, no filter)
+    // Int N → include only the last N items (takeLast applied inside the generator)
+    var histLimit           by remember(etudiantId) { mutableStateOf<Int?>(null) }
+    var showHistLimitDialog by remember(etudiantId) { mutableStateOf(false) }
+
     val wasUpdatedToday = isToday(etudiant.dernierTimeTampsSynchronisationAvecFireBase)
     val observations    = remember(viewModel.repo20ObsarvationEtudion.datasValue) { viewModel.repo20ObsarvationEtudion.datasValue }
     val absenceCount    = remember(etudiant, observations) {
@@ -456,8 +463,40 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                         }
                     }
 
-                    //<--
-                    //TODO(1): ajout un autre button qui au click chnage au outlined au donne le numbre si 2 il le affichable que le nombre des hist
+                    //<-- TODO(1) résolu ───────────────────────────────────────────
+                    // Bouton compact "filtre d'historique".
+                    // • Aucun filtre → Button rempli       "الكل"
+                    // • Filtre actif → OutlinedButton       "آخر N"   (style ≠ = filtre visible)
+                    // Un clic ouvre showHistLimitDialog pour choisir N parmi {2,3,5,10,∞}.
+                    Row(
+                        modifier              = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment     = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text  = "عدد السجلات:",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.size(6.dp))
+                        if (histLimit == null) {
+                            Button(onClick = { showHistLimitDialog = true }) {
+                                Text(
+                                    text  = "الكل",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+                        } else {
+                            OutlinedButton(onClick = { showHistLimitDialog = true }) {
+                                Text(
+                                    text  = "آخر $histLimit",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                            }
+                        }
+                    }
+
                     var isSharingSchema by remember(etudiantId) { mutableStateOf(false) }
                     OutlinedButton(
                         onClick = {
@@ -469,7 +508,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                     try {
                                         val schemaCardData = ParentCommunicationCardData_2.fromEtudiant(etudiant)
                                         val imageUri = withContext(Dispatchers.IO) {
-                                            generateHistorySchemaImage(context, schemaCardData, viewModel)
+                                            generateHistorySchemaImage(context, schemaCardData, viewModel, histLimit)
                                         }
                                         if (imageUri == null) {
                                             withContext(Dispatchers.Main) {
@@ -558,7 +597,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                         val historyCardData = ParentCommunicationCardData_2.fromEtudiant(etudiant)
                                         // Content-height-wrapped image — no PDF, no whitespace
                                         val imageUri = withContext(Dispatchers.IO) {
-                                            generateHistoryImage(context, historyCardData, viewModel)
+                                            generateHistoryImage(context, historyCardData, viewModel, histLimit)
                                         }
                                         if (imageUri == null) {
                                             withContext(Dispatchers.Main) {
@@ -700,6 +739,51 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
             },
             dismissButton = {
                 TextButton(onClick = { selectedOusstad = null }) { Text("إلغاء") }
+            }
+        )
+    }
+
+    // ── Hist-limit selection dialog (TODO(1)) ─────────────────────────────────
+    // Lets the user pick how many of the most-recent history items to export.
+    // The chosen value is stored in histLimit and passed to both
+    // generateHistorySchemaImage() and generateHistoryImage() above.
+    if (showHistLimitDialog) {
+        AlertDialog(
+            onDismissRequest = { showHistLimitDialog = false },
+            title = { Text("عدد السجلات في الصورة") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text(
+                        text  = "اختر عدد السجلات الأخيرة التي تُدرج في الصورة:",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    // Preset options — Button (filled) when selected, OutlinedButton otherwise
+                    listOf(2, 3, 5, 10).forEach { n ->
+                        if (histLimit == n) {
+                            Button(
+                                onClick  = { histLimit = n; showHistLimitDialog = false },
+                                modifier = Modifier.fillMaxWidth()
+                            ) { Text("✓  آخر $n سجلات") }
+                        } else {
+                            OutlinedButton(
+                                onClick  = { histLimit = n; showHistLimitDialog = false },
+                                modifier = Modifier.fillMaxWidth()
+                            ) { Text("آخر $n سجلات") }
+                        }
+                    }
+                    // "All" — resets the filter
+                    OutlinedButton(
+                        onClick  = { histLimit = null; showHistLimitDialog = false },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(if (histLimit == null) "✓  الكل (بدون تحديد)" else "الكل (بدون تحديد)")
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showHistLimitDialog = false }) { Text("إغلاق") }
             }
         )
     }
