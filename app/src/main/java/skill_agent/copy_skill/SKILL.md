@@ -41,7 +41,8 @@ These triggers interact with the `app\src\main\java\skill_agent\copy_skill\refer
 ### 4. Report Success (Table)
 - Output a highly concise response containing:
   1. **Lien de sauvegarde** : `[app/src/main/java/skill_agent/copy_skill/references/hist_copie.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_skill/references/hist_copie.md)`.
-  2. **Temps d'exécution** : Calcule et affiche le temps écoulé (en secondes) depuis la requête de l'utilisateur.
-  3. **Nom court du package**.
-  4. **Tableau des fichiers** (Nom du fichier | Lignes).
+  2. **Copie Rapide** : Fournis un lien cliquable vers le script VBS pour que l'utilisateur puisse copier sans taper `cc_` : `[🚀 Exécuter la Copie (run_cc_silent.vbs)](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_skill/run_cc_silent.vbs)`
+  3. **Temps d'exécution** : Calcule et affiche le temps écoulé (en secondes) depuis la requête de l'utilisateur.
+  4. **Nom court du package**.
+  5. **Tableau des fichiers** (Nom du fichier | Lignes).
 - Do not output the code in the chat.
