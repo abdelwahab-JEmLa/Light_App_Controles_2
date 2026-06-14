@@ -53,7 +53,7 @@ if __name__ == "__main__":
         print("EMPTY")
         sys.exit(0)
         
-    hist_path = r"C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\copy_clipboard\references\hist_copie.md"
+    hist_path = r"C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\copy_skill\references\hist_copie.md"
     os.makedirs(os.path.dirname(hist_path), exist_ok=True)
     
     package = os.path.basename(os.path.dirname(files[0]))

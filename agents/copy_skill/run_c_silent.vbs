@@ -1,2 +1,0 @@
-Set WshShell = CreateObject("WScript.Shell")
-WshShell.Run "python ""C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\agents\copy_skill\scripts\read_clipboard_files.py""", 0, False

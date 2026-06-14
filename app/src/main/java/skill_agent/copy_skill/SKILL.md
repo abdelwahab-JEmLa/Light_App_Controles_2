@@ -21,29 +21,26 @@ The following files were targeted during the last execution:
 
 ### 1. Identify Target Directory & Files
 - **Case A: Default Trigger**: If the user triggers `cl_`, `cc_`, `cop_last`, `c_`, or `ca_` without a path, first check the **actual Windows Clipboard** using the native Python script to avoid PowerShell latency:
-  `python "C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\agents\copy_skill\scripts\read_clipboard_files.py"`
+  `python "C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\copy_skill\scripts\read_clipboard_files.py"`
   If the user manually copied files in Windows/Android Studio, this script will quickly extract their paths and line counts. If no files are in the clipboard, fallback to reading the **Last Copied Files** section above.
 - **Case B: Dynamic Request**: If a path is provided with `cop_` or `c_`, scan that directory recursively for `.kt` files. Overwrite the **Active Reference Package** and **Last Copied Files** sections in this file (`SKILL.md`).
 
 ### 2. Action: Copy to Clipboard (`cl_`, `cc_`, `cop_last`, `cop_`)
-- To ensure maximum execution speed, run the ultra-fast native Python scripts included in this skill's `scripts` directory instead of PowerShell `Set-Clipboard`:
+- Pour garantir la vitesse maximale (copie quasi-instantanée du contenu), exécutez le fichier batch :
   ```bash
-  # Pour copier des fichiers (remplace Set-Clipboard -Path) :
-  python "C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\agents\copy_skill\scripts\copy_files.py" "<file_path_1>" "<file_path_2>" ...
-  
-  # Pour copier du texte/des lignes :
-  python "C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\agents\copy_skill\scripts\copy_lines.py" "Texte à copier"
+  "C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\copy_skill\run_cc.bat"
   ```
+  *(Ce script lit automatiquement `hist_copie.md` et injecte le texte directement dans le presse-papiers via `fast_cc.py`)*
 
 ### 3. Action: Manage Backup File (`c_`, `ca_`, `dc_`)
-These triggers interact with the `app\src\main\java\skill_agent\copy_clipboard\references\hist_copie.md` file without touching the clipboard.
-- **Trigger `c_` (Delete & Recreate)**: L'objectif est d'écraser (overwrite) complètement `hist_copie.md` avec les nouveaux liens ciblés. Exécutez simplement `python "C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\agents\copy_skill\scripts\read_clipboard_files.py"`. S'il retourne `EMPTY` (ou si vous utilisez une liste de fichiers spécifiques), vous **devez écraser manuellement** `hist_copie.md` (Overwrite: true) en y insérant les nouveaux liens sous le format `### 🔗 [Fichier](file:///...)`.
-- **Trigger `ca_` (Append Backup)**: Append only the clickable Markdown links of the targeted files to the end of `app\src\main\java\skill_agent\copy_clipboard\references\hist_copie.md` (if they are not already present).
-- **Trigger `dc_` (Delete Backup)**: Delete the `app\src\main\java\skill_agent\copy_clipboard\references\hist_copie.md` file.
+These triggers interact with the `app\src\main\java\skill_agent\copy_skill\references\hist_copie.md` file without touching the clipboard.
+- **Trigger `c_` (Delete & Recreate)**: L'objectif est d'écraser (overwrite) complètement `hist_copie.md` avec les nouveaux liens ciblés. Exécutez simplement `python "C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\copy_skill\scripts\read_clipboard_files.py"`. S'il retourne `EMPTY` (ou si vous utilisez une liste de fichiers spécifiques), vous **devez écraser manuellement** `hist_copie.md` (Overwrite: true) en y insérant les nouveaux liens sous le format `### 🔗 [Fichier](file:///...)`.
+- **Trigger `ca_` (Append Backup)**: Append only the clickable Markdown links of the targeted files to the end of `app\src\main\java\skill_agent\copy_skill\references\hist_copie.md` (if they are not already present).
+- **Trigger `dc_` (Delete Backup)**: Delete the `app\src\main\java\skill_agent\copy_skill\references\hist_copie.md` file.
 
 ### 4. Report Success (Table)
 - Output a highly concise response containing:
-  1. **Lien de sauvegarde** : `[app/src/main/java/skill_agent/copy_clipboard/references/hist_copie.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_clipboard/references/hist_copie.md)`.
+  1. **Lien de sauvegarde** : `[app/src/main/java/skill_agent/copy_skill/references/hist_copie.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_skill/references/hist_copie.md)`.
   2. **Temps d'exécution** : Calcule et affiche le temps écoulé (en secondes) depuis la requête de l'utilisateur.
   3. **Nom court du package**.
   4. **Tableau des fichiers** (Nom du fichier | Lignes).
