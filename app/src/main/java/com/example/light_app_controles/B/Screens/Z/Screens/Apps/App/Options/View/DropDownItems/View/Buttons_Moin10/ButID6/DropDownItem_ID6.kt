@@ -169,11 +169,13 @@ fun DropDownItem_ID6(
                     else -> chosenTeacher!!.nom_arab
                 }
 
+                val displayTeacherText = if (teacherText.contains("انتقالي")) "دراسة حالة من الادارة" else teacherText
+
                 Text(
                     text = when {
                         isLoading && generationStatus.isNotEmpty() -> generationStatus
                         isLoading -> "جاري الإنشاء..."
-                        activeStudentsCount > 0 -> "$nomFun\n$monthText - $teacherText\n($activeStudentsCount طالب)"
+                        activeStudentsCount > 0 -> "$nomFun\n$monthText - $displayTeacherText\n($activeStudentsCount طالب)"
                         else -> nomFun
                     },
                     color = MaterialTheme.colorScheme.onSurface,

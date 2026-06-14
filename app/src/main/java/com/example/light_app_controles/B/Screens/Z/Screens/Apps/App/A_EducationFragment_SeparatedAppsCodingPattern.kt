@@ -49,6 +49,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.semantics.SemanticsPropertyKey
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -132,7 +134,7 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
         repo19Etudiant.setFilter(activeOusstad)
     }
 
-    val baseEtudiants = repo19Etudiant.filtered_datasValue
+    val baseEtudiants = repo19Etudiant.datasValue.filter { it.parent_ousstad_key == activeOusstad?.key }
 
     val etudiants = if (searchQuery.isNotBlank()) {
         baseEtudiants.filter { etudiant ->
@@ -172,6 +174,10 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+            .semantics(mergeDescendants = true) {
+                set(value = repo19Etudiant.datasValue.filter { it.parent_ousstad_key == "Kissm_Intikali" }, key = SemanticsPropertyKey("etudiants_kissm_intikali"))
+                set(value = repo19Etudiant.datasValue, key = SemanticsPropertyKey("etudiants_all"))
+            }
     ) {
         ScrollableInformationBanner(
             ousstadName = activeOusstad?.nom_arab ?: "",

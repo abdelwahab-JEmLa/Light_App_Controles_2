@@ -58,7 +58,10 @@ fun generatePdfDocument_6(
 
         // Calculate total sessions for the selected month
         val totalSessions = calculateSessionsForMonth(targetMonth)
-        val teacherNameArabic = selectedTeacher?.nom_arab ?: ""
+        var teacherNameArabic = selectedTeacher?.nom_arab ?: ""
+        if (teacherNameArabic.contains("انتقالي")) {
+            teacherNameArabic = "دراسة حالة من الادارة"
+        }
 
         val absenceIcon = try {
             val iconStream = context.resources.openRawResource(
@@ -392,8 +395,9 @@ fun generatePdfDocument_6(
                 when {
                     stats.totalAbsences == 0 -> {
                         // Perfect attendance - green
+                        val textePresence = if (teacherNameArabic == "دراسة حالة من الادارة") "كثيرة" else "تم\nحضور\nال$totalSessions\nحصص"
                         drawRTLText(
-                            canvas, "تم\nحضور\nال$totalSessions\nحصص",
+                            canvas, textePresence,
                             xPosition + 3f, yPosition + 12f, (colWidths[0] - 6f).toInt(),
                             paintSuccess, Layout.Alignment.ALIGN_CENTER
                         )
