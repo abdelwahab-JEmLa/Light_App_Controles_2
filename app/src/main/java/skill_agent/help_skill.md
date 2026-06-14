@@ -10,6 +10,7 @@ This skill instructs the assistant on how to automatically display a clean docum
 - "help_"
 - "h_cwe_"
 - "h_<trigger_phrase>"
+- "h_consize"
 
 ---
 
@@ -42,7 +43,7 @@ Output a markdown table documenting each custom skill.
 | **Semantics Inspector** (`sem_.md`) | `sem_`, `sem_d`, `Todo: sem_`, `Todo: filter` | Injecte la sémantique d'une variable ou filtre (`TODO: sem_` ou `TODO: filter`), puis extrait instantanément les données d'accessibilité avec un dump ADB sans re-compiler/re-déployer l'application. |
 | **Concise Code** (`consize_comments.md`) | `consize_commants`, `co_`, `con_`, `con_c`, `TODO: con_c` | Enlève les commentaires, les logs et les semantics pour rendre le code le plus concis possible. Supporte le mode automatique individuel (`TODO: co_`) ou par package (`TODO: con_c`). |
 | **Real-Time Logcat Inspector** (`log_.md`) | `log_`, `Todo: log_`, `logcat`, `adb_log` | Filtre les logs de l'appareil par rapport au tag ou au contexte spécifié dans le code ou le chat, et les affiche. |
-| **Copy Package / Sibling Files** (`cop_last.md`) | `cop_last`, `cop_`, `cl_`, `copy_package` | Copie tous les fichiers frères et sous-fichiers du package actif dans le presse-papiers, et l'enregistre pour les futurs appels. |
+| **Copy to Clipboard & Backup** (`copy_clipboard.md`) | `cl_`, `cc_`, `cop_last`, `cop_`, `c_`, `ca_`, `dc_` | Copie les fichiers dans le presse-papiers (`cl_`/`cc_`) et/ou les sauvegarde dans un fichier texte dans le dossier copy_clipboard (`c_`/`ca_`). |
 | **Fast Build, Export & Deploy** (`build_.md`) | `build_`, `b_` | Compile l'application, crée la structure `Playe_Store\<Version>\0.\A_AllInOne\` sur le Bureau, compresse le dossier, puis déploie le ZIP et le dossier extrait sur la carte SD du téléphone. |
 | **Fast Launch Preview** (`launch_preview.md`) | `lp_`, `lance_preview` | Compile, installe et lance le preview de l'application de la façon la plus rapide possible. |
 | **Todo Bubelle - UI Bug Hunter** (`t_/todo_bubelle.md`) | `todo_bubelle`, `todo_b`, `fix_ui`, `bubelle` | Capture l'écran, analyse les bulles d'erreur/anomalies UI, identifie le composable responsable, applique un correctif dans le code, relance l'app (`lance_r`) et prend un screenshot de vérification (`scr_s`). |
@@ -75,7 +76,7 @@ Always present the user with clickable links to the skill files in the skills di
 * 🔍 [Semantics Inspector](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/sem_.md)
 * 📝 [Concise Code](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/consize_comments.md)
 * 📋 [Real-Time Logcat Inspector](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/log_.md)
-* 📋 [Copy Package / Sibling Files](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/cop_last.md)
+* 📋 [Copy to Clipboard & Backup](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_clipboard/copy_clipboard.md)
 * 📦 [Fast Build, Export & Deploy](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/build_.md)
 * ⚡ [Fast Launch Preview](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/launch_preview.md)
 * 🐛 [Todo Bubelle - UI Bug Hunter](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_/todo_bubelle.md)
@@ -86,7 +87,10 @@ Always present the user with clickable links to the skill files in the skills di
 
 ### 3. Detail and Explain a Specific Skill (e.g. h_cwe_ or h_<trigger>)
 If the user's request matches `h_pc` (or `hw_`, `help_pc`, `help_hw`, `skillpc_`):
-- Instantly redirect and load the PC Help Page at [hw_.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/hw_.md) and display its content. Do not scan or search any other directory.
+- Instantly redirect and load the PC Help Page at [hw_.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/hw_.md) and display its content. Do not scan or search any directory.
+
+If the user's request matches `h_consize` (or `h_consize_comments`, `h_co_`, `h_con_c`):
+- Instantly redirect and load the Concise Code skill at [`consize_comments.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/consize_comments.md) and display its full content or a detailed explanation.
 
 If the user's request matches `h_<trigger>` (such as `h_cwe_`):
 - Identify the corresponding skill using the trigger (e.g., `cwe_` points to the **Context Unique Working_IN** skill).

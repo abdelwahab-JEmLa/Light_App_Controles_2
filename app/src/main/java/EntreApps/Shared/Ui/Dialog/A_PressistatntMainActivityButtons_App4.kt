@@ -1,5 +1,6 @@
 package EntreApps.Shared.Ui.Dialog
 
+import EntreApps.Shared.Ui.Dialog.BonVentClientDisplay
 import EntreApps.Shared.Ui.Dialog.ButtonID7.Action.But7_Cree_Images_Bons
 import EntreApps.Shared.Ui.Dialog.ButtonID7.Action.Datas
 import EntreApps.Shared.Ui.Dialog.ButtonID8.Action.Button_8_Imgs_Send_whatsappBuisness_Stored_Bon_App4
@@ -56,7 +57,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
-import java.util.concurrent.TimeUnit
 
 @Composable
 fun PressistatntMainActivityButtons_App4(
@@ -426,51 +426,13 @@ fun PressistatntMainActivityButtons_App4(
             }
 
             HorizontalDivider()
-            Text("Bon Vent")         //<--
-            //TODO(1): <extract java/Depedencies_Modulable/<nom>.kt
-            run {
-                val activeClient = activeDatas.activeOnVent_M2Client
-                var isTextCollapsed by remember { mutableStateOf(true) }
-                val nomClient = activeClient?.nom ?: ""
-                val phoneDisplay = formatPhoneDisplay(
-                    numTelephone = activeClient?.numTelephone ?: "",
-                    nomClient = nomClient
-                )
-
-                val clientDisplayText = if (activeClient == null) {
-                    "Aucun client"
-                } else if (isTextCollapsed) {
-                    "$nomClient$phoneDisplay"
-                } else {
-                    on_vent_bon?.let { bon ->
-                        val timeElapsed = getTimeElapsedString(bon.creationTimestamps)
-                        val ventsTrouve = on_vent_couleurs?.filter {
-                            it.etateDelivery == M10OperationVentCouleur.EtateDelivery.Trouve
-                        } ?: emptyList()
-                        val totalProducts = ventsTrouve.groupBy { it.parent_M1Produit_KeyId }.size
-                        val totalValue = ventsTrouve.sumOf { vent ->
-                            val tariff = listM13tarificationinfos?.find { it.keyID == vent.parentM13TarificationKeyID }
-                            val prix = tariff?.prixCurrency ?: 0.0
-                            vent.quantity * prix
-                        }
-                        if (bon.parent_M2Client_DebugInfos.isNotEmpty() &&
-                            bon.parent_M2Client_DebugInfos != "Non Defini"
-                        ) {
-                            "$nomClient$phoneDisplay - $timeElapsed - $totalProducts P - ${String.format("%.2f", totalValue)} DA"
-                        } else "Rechercher Client"
-                    } ?: "Aucun bon ouvert"
-                }
-
-                Text(
-                    text = clientDisplayText,
-                    modifier = Modifier
-                        .background(Color(0xFF4CAF50), shape = RoundedCornerShape(4.dp))
-                        .padding(horizontal = 6.dp, vertical = 2.dp)
-                        .clickable { isTextCollapsed = !isTextCollapsed },
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
+            Text("Bon Vent")
+            BonVentClientDisplay(
+                activeClient = activeDatas.activeOnVent_M2Client,
+                on_vent_bon = on_vent_bon,
+                on_vent_couleurs = on_vent_couleurs,
+                listM13tarificationinfos = listM13tarificationinfos,
+            )
             Row {
                 activeOnVent_M8BonVent_benefice?.let { benef ->
                     if (benef > 0.0) {
@@ -632,44 +594,4 @@ private fun ModeMenuItem(
     )
 }
 
-private fun getTimeElapsedString(creationTimestamp: Long): String {
-    val elapsed = System.currentTimeMillis() - creationTimestamp
-    val days = TimeUnit.MILLISECONDS.toDays(elapsed)
-    val hours = TimeUnit.MILLISECONDS.toHours(elapsed) % 24
-    val minutes = TimeUnit.MILLISECONDS.toMinutes(elapsed) % 60
 
-    return when {
-        days > 0 -> "${days}j ${hours}h"
-        hours > 0 -> "${hours}h ${minutes}m"
-        minutes > 0 -> "${minutes}m"
-        else -> "< 1m"
-    }
-}
-
-private fun dzSignificantDigits(phone: String): String {
-    val d = phone.filter { it.isDigit() }
-    return when {
-        d.startsWith("213") -> d.removePrefix("213")
-        d.startsWith("0")   -> d.removePrefix("0")
-        else                -> d
-    }
-}
-
-private fun formatPhoneDisplay(numTelephone: String, nomClient: String = ""): String {
-    if (numTelephone.isBlank()) return ""
-    val sig = dzSignificantDigits(numTelephone)
-    if (sig == "553885037") return ""
-    if (sig.takeLast(4) == "5037") return ""
-
-    val normalized = ("0$sig").filter { it.isDigit() }
-    if (!normalized.startsWith("0") || normalized.length < 9) return ""
-
-    val operatorLabel = when (normalized.getOrNull(1)) {
-        '5' -> "Ned"
-        '7' -> "Dj"
-        '6' -> "Mo"
-        else -> ""
-    }
-    val lastTwo = normalized.takeLast(2)
-    return " \uD83D\uDCDE${operatorLabel}:$lastTwo"
-}

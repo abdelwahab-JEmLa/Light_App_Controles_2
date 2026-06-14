@@ -53,3 +53,9 @@ Ensure that:
 - The code syntactically compiles successfully (no missing imports, no dangling brackets, or broken references).
 - The logical behavior (control flow, UI elements, user interaction) is completely unchanged.
 - Perform a fast build of the application (`build`) to verify that no compilation errors were introduced.
+
+### 6. Copy Files to Clipboard and Backup (con_c only)
+If the batch trigger `con_c` or its `TODO` variant was used, automatically execute the backup process:
+- **Copy to Clipboard**: Use PowerShell `Set-Clipboard` to copy the processed files.
+- **Copy to `copied_files_pour_faste.md`**: Concatenate their full text content and append or overwrite it in `copied_files_pour_faste.md` (similar to the `c_` skill).
+- **Display a Table**: Output a Markdown table in the chat listing each processed file and the number of lignes (lines) copied for that file.
