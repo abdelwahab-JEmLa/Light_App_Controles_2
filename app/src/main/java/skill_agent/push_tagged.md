@@ -58,3 +58,4 @@ Provide the user with a detailed summary showing:
 - **Commit hash & Message** : The hash and full commit message.
 - **Définition/Description** : The tag's annotation description/definition.
 - **Confirmation de push** : Confirmation that both branch and tags were successfully pushed to GitHub.
+- **Temps/Date** : The exact time and date when the commit and push occurred.
