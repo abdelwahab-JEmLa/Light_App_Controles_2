@@ -360,6 +360,21 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
             }
 
             Divider()
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        text = if (activeCentralValues.affiche_last_histoque_seulement)
+                            "إظهار آخر سجل فقط (مفعل)"
+                        else
+                            "إظهار آخر سجل فقط",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                },
+                onClick = {
+                    activeCentralValues.affiche_last_histoque_seulement = !activeCentralValues.affiche_last_histoque_seulement
+                }
+            )
             DropDownItem_ButID8(aCentralFacade = aCentralFacade)
             DropDownItem_ID6(aCentralFacade = aCentralFacade)
             DropDownItem_Imprime_pdf_List_Talaba(aCentralFacade = aCentralFacade)

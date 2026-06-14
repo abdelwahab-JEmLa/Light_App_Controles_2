@@ -33,6 +33,7 @@ class ActiveDatas_SeparatedAppsCodingPattern {
     var outlined_filter_searcher_floating_abouve_all by mutableStateOf("")
     var displaye_dialog_mois_moinAcPlus_6_du_current by mutableStateOf(false)
     var filter_les_absents by mutableStateOf(false)
+    var affiche_last_histoque_seulement by mutableStateOf(false)
     var displaye_sections_education_du_mois: Calendar? by mutableStateOf(null)
     var active_Ousstad_Tahfid: Ousstad_Tahfid? by mutableStateOf(
         run {

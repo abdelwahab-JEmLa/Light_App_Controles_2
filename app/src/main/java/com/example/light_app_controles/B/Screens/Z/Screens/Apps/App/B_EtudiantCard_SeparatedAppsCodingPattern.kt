@@ -456,7 +456,8 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                         }
                     }
 
-
+                    //<--
+                    //TODO(1): ajout un autre button qui au click chnage au outlined au donne le numbre si 2 il le affichable que le nombre des hist
                     var isSharingSchema by remember(etudiantId) { mutableStateOf(false) }
                     OutlinedButton(
                         onClick = {

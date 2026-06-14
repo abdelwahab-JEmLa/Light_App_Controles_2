@@ -95,11 +95,12 @@ fun generateHistorySchemaImage(
 private fun resolveObservations(
     cardData: ParentCommunicationCardData_2,
     viewModel: A_ViewModel_SeparatedAppsCodingPattern
-): List<ObsRow> =
-    viewModel.repo20ObsarvationEtudion.datasValue
+): List<ObsRow> {
+    val limit = if (viewModel.activeCentralValues.affiche_last_histoque_seulement) 1 else 5
+    return viewModel.repo20ObsarvationEtudion.datasValue
         .filter { it.etudiant_keyID == cardData.studentInfo.keyID }
         .sortedBy { it.creationTimestamps }   // oldest → newest so the chart reads left → right
-        .takeLast(5)                          // max 5 most-recent observations
+        .takeLast(limit)                      // max limit most-recent observations
         .map { obs ->
             val takyimName = obs.takyim.arabicName
             val typeLabel = when (obs.type) {
@@ -117,6 +118,7 @@ private fun resolveObservations(
                 rangeLabel  = "${formatAyaSchema(obs.min_soura, obs.min_aya)} ← ${formatAyaSchema(obs.ila_soura, obs.ila_aya)}",
             )
         }
+}
 
 private fun measureSchemaHeight(
     context: Context,
