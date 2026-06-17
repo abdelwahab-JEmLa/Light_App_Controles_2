@@ -1,9 +1,16 @@
+---
+name: zip_colle
+description: Extract the latest downloaded zip/rar or direct kotlin file from downloads, find its matching file in the project, and overwrite/update it. Trigger this when the user says "zip_colle", "colle_", or "colle".
+---
+
 # Zip Colle (zip_colle)
 
 Ce skill instruit l'assistant pour récupérer le dernier fichier téléchargé (archive `.rar`/`.zip` ou fichier Kotlin `.kt` direct), chercher leurs correspondances exactes dans le projet et les écraser avec les nouvelles versions.
 
 ## Trigger Phrases
 - "zip_colle"
+- "colle_"
+- "colle"
 
 ## Objectif
 Mettre à jour rapidement des fichiers sources du projet avec de nouvelles versions envoyées par une IA externe (ou téléchargées) sous forme d'archive ou de fichier direct, sans avoir à copier-coller manuellement chaque fichier.

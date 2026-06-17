@@ -30,19 +30,31 @@ To locate all files related to the target TODO (using fast search/grep tools), i
 - Trace and gather all related files that form the architectural flow of that TODO (such as data models e.g., `M19Etudiant.kt`, repository enums e.g., `SOUAR.kt`, generation modules e.g., `generatePdfDocument.kt`, drawing renderers e.g., `drawMokarrarCell.kt`, and custom skill files e.g., `t_.md`).
 - Collect up to 20 files total. Do not exceed this limit to avoid cluttering the context window.
 
-### 2. Inspect and Include Visual/Image Context (if applicable)
-- Check for image files starting with `img_` or named `img.jpg`/`img.png` on the Desktop (`C:\Users\Abou Mohamed\Desktop`) or in the workspace to capture visual bugs/output screens.
-- View and analyze the image, include a description of the visual layout/bug in the context file, and explicitly state in the context file that this screenshot is attached for the external AI to visually inspect and review the interface layout/bug.
-- Add the image link to `hist_copie.md` so the copying script places the actual image file in the clipboard alongside the code files.
+### 2. Inspect and Include Visual/Image Context (if requested)
+- **CRITICAL CONDITIONAL RULE**: Only check for and include image files if the user explicitly mentions keywords such as "image", "screenshot", "capture", "visuel", "screen", "photo", or "png"/"jpg" in their request. If none of these keywords are mentioned, skip this step entirely and do NOT add any image files to `hist_copie.md` or the clipboard.
+- If requested:
+  - Check for image files starting with `img_` or named `img.jpg`/`img.png` on the Desktop (`C:\Users\Abou Mohamed\Desktop`) or in the workspace to capture visual bugs/output screens.
+  - View and analyze the image, include a description of the visual layout/bug in the context file, and explicitly state in the context file that this screenshot is attached for the external AI to visually inspect and review the interface layout/bug.
+  - Add the image link to `hist_copie.md` so the copying script places the actual image file in the clipboard alongside the code files.
 
 ### 3. Generate Context Summary (`ctsave_`) with Deep-Thinking Instructions
-- Compile the architectural flow and analysis into a session context markdown file under `app/src/main/java/skill_agent/copy_context/copy_au_externale_chat_ai/historique_explication/<session_id>_agy.md`.
+- Create a session folder inside `app/src/main/java/skill_agent/copy_context/copy_au_externale_chat_ai/historique_explication/` named using the format:
+  `<MM_dd HH_mm_ss> <Title>` (e.g. `06_17 17_28 Absences_PDF_Toggle`).
+- Write the session context markdown file named `context_agy.md` inside this session folder.
 - **CRITICAL**: 
   - **Standard Case**: Include a clear directive in the context file instructing the external thinking AI to review the entire architectural flow of the gathered files (model, enum, generators, drawing cells), highlighting that the external AI is the primary reasoning/thinking model for this verification. Additionally, explicitly ask the external AI to be time-efficient and try not to take too much time during its reasoning process.
-  - **Quick Case (`cc_sans_explication`/`cc_se`)**: If the user triggered `cc_sans_explication` (or `cc_se`), write the text `"fix todo avec la facon la plus rapide"`, followed by the exact code snippet showing where the TODO is located, and include a brief reference to `t_.md` as the active skill file. Do not write any other explanations, analysis, or details.
+  - **Quick Case (`cc_sans_explication`/`cc_se`)**: If the user triggered `cc_sans_explication` (or `cc_se`):
+    1. Write the text `"fix todo avec la facon la plus rapide"`, followed by the exact code snippet showing where the TODO is located, and include a brief reference to `t_.md` as the active skill file. Do not write any other explanations, analysis, or details.
+    2. **Optimize Context & Token Usage**: For secondary or less important files (e.g., large configuration files, verbose helper classes, or files with code that is not directly related to the TODO), create the directory `app/src/main/java/skill_agent/copy_context/copy_au_externale_chat_ai/historique_explication/<MM_dd HH_mm_ss> <Title>/files_edited/`.
+    3. Place the temporary truncated copies of these files in this `files_edited/` folder.
+    4. In these copies, remove/truncate unnecessary lines of code (such as unrelated methods, large comments, or boilerplate code) to avoid distracting the external AI and to optimize token counts and copy/paste times. **CRITICAL**: Do NOT delete the `package` declaration (it must remain intact) or imports essential for the files.
+    5. **CRITICAL COMPILER SAFETY**: Wrap the entire content of each file inside `files_edited/` in a multi-line block comment (`/*` at the very beginning of the file, and `*/` at the very end of the file). This is extremely important to prevent Android Studio's compiler from parsing them and throwing "Conflicting overloads" or "Duplicate class" errors, while keeping the contents fully readable for the external AI.
+    6. Write the paths of these optimized temporary files in `hist_copie.md` instead of the original project paths, so the clipboard contains only the lean context.
 
 ### 4. Overwrite `hist_copie.md`
-- Write the Markdown links of the context file, all gathered source code files, and the visual assets to `app/src/main/java/skill_agent/copy_context/copy_skill/references/hist_copie.md` in the exact format:
+- Write the Markdown links of the context file, all gathered source code files, and the visual assets to `app/src/main/java/skill_agent/copy_context/copy_skill/references/hist_copie.md`.
+- **CRITICAL**: For `cc_se`, also write a copy of this `hist_copie.md` file inside the created session folder at `app/src/main/java/skill_agent/copy_context/copy_au_externale_chat_ai/historique_explication/<MM_dd HH_mm_ss> <Title>/hist_copie.md` to maintain a permanent record of the file links copied in that session.
+- Format for links:
   ```markdown
   ### 🔗 [Filename.kt](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/...)
   ```

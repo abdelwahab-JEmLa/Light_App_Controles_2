@@ -171,7 +171,8 @@ fun DropDownItem_ID6(
 
                 val displayTeacherText = if (teacherText.contains("انتقالي")) "دراسة حالة من الادارة" else teacherText
 
-                Text(
+                Text(           //<--
+                //TODO(1): ajou t un button qui toggle l affichage des absens ou non 
                     text = when {
                         isLoading && generationStatus.isNotEmpty() -> generationStatus
                         isLoading -> "جاري الإنشاء..."

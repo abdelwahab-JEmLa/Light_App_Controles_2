@@ -757,7 +757,8 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                 onClick  = { histLimit = n; showHistLimitDialog = false },
                                 modifier = Modifier.fillMaxWidth()
                             ) { Text("✓  آخر $n سجلات") }
-                        } else {
+                        } else {        //<--
+                        //TODO(1): ajou 1
                             OutlinedButton(
                                 onClick  = { histLimit = n; showHistLimitDialog = false },
                                 modifier = Modifier.fillMaxWidth()
