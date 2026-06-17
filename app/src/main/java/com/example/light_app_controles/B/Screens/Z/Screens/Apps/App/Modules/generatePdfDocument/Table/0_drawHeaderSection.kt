@@ -13,7 +13,6 @@ import androidx.core.graphics.toColorInt
 
 /**
  * Draws the header section with school logo, introduction text and poetry.
- * TODO(1) FIXED: ecole_logo1 is drawn full-width at the very top of the page
  * (from marginLeft to pageWidth-marginRight). Text starts below the logo.
  */
 fun drawHeaderSection(

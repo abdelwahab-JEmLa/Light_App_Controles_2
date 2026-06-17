@@ -35,6 +35,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -74,7 +75,6 @@ fun DropDownItem_ID6(
     var showTeacherDialog by remember { mutableStateOf(false) }
     var chosenMonth by remember { mutableStateOf(selectedMonth) }
     var chosenTeacher by remember { mutableStateOf(selectedTeacher) }
-    // TODO(1) resolved: toggles whether the PDF shows only students with zero absences
     // (true, original default) or all students sorted by absence count (false).
     var hideAbsentStudents by remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
@@ -205,37 +205,42 @@ fun DropDownItem_ID6(
             trailingIcon = {
                 Row {
                     // Absence display toggle button
-                    OutlinedButton(
+                    OutlinedIconButton(
                         onClick = { hideAbsentStudents = !hideAbsentStudents },
-                        modifier = Modifier.padding(end = 4.dp)
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                            .size(36.dp)
                     ) {
                         Icon(
                             imageVector = if (hideAbsentStudents) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                             contentDescription = if (hideAbsentStudents) "إظهار الغائبين في القائمة" else "إخفاء الغائبين عن القائمة",
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
 
                     // Month selector button
-                    OutlinedButton(
+                    OutlinedIconButton(
                         onClick = { showMonthDialog = true },
-                        modifier = Modifier.padding(end = 4.dp)
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                            .size(36.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.CalendarMonth,
                             contentDescription = "اختر الشهر",
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
 
                     // Teacher selector button
-                    OutlinedButton(
-                        onClick = { showTeacherDialog = true }
+                    OutlinedIconButton(
+                        onClick = { showTeacherDialog = true },
+                        modifier = Modifier.size(36.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = "اختر الأستاذ",
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }

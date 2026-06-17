@@ -11,6 +11,8 @@ Ce skill instruit l'assistant pour récupérer le dernier fichier téléchargé 
 - "zip_colle"
 - "colle_"
 - "colle"
+- "ok_"
+- "ok"
 
 ## Objectif
 Mettre à jour rapidement des fichiers sources du projet avec de nouvelles versions envoyées par une IA externe (ou téléchargées) sous forme d'archive ou de fichier direct, sans avoir à copier-coller manuellement chaque fichier.

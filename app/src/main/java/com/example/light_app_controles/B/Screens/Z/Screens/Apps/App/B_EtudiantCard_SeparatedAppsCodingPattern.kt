@@ -757,13 +757,24 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                 onClick  = { histLimit = n; showHistLimitDialog = false },
                                 modifier = Modifier.fillMaxWidth()
                             ) { Text("✓  آخر $n سجلات") }
-                        } else {        //<--
-                        //TODO(1): ajou 1
+                        } else {
                             OutlinedButton(
                                 onClick  = { histLimit = n; showHistLimitDialog = false },
                                 modifier = Modifier.fillMaxWidth()
                             ) { Text("آخر $n سجلات") }
                         }
+                    }                         //<--
+                    // "Last" — single most-recent record
+                    if (histLimit == 1) {
+                        Button(
+                            onClick  = { histLimit = 1; showHistLimitDialog = false },
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text("✓  آخر سجل") }
+                    } else {
+                        OutlinedButton(
+                            onClick  = { histLimit = 1; showHistLimitDialog = false },
+                            modifier = Modifier.fillMaxWidth()
+                        ) { Text("آخر سجل") }
                     }
                     // "All" — resets the filter
                     OutlinedButton(

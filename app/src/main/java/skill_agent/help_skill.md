@@ -62,7 +62,7 @@ Output two separate markdown tables documenting each custom skill.
 | **Todo to External Chat** (`copy_context/copy_au_externale_chat_ai/todo_to_extarnale_chat.md`) | `todo_to_extarnale_chat`, `con_cop`, `copy_context`, `cont_copie`, `con_copie`, `cop_cont`, `cc_` | Utilise une IA rapide pour rassembler les fichiers et images liés à un TODO, puis les copie pour une IA dotée de Deep Thinking. |
 | **Copy to Clipboard & Backup** (`copy_context/copy_skill/SKILL.md`) | `cl_`, `cc_`, `cop_last`, `cop_`, `c_`, `ca_`, `dc_` | Copie les fichiers dans le presse-papiers (`cl_`/`cc_`) et/ou les sauvegarde dans un fichier texte dans le dossier copy_skill (`c_`/`ca_`). |
 | **Copy Package / Sibling Files** (`copy_context/cop_last.md`) | `cl_`, `cop_last`, `cop_`, `copy_package` | Copie, formate et charge le dernier lot ou un dossier de fichiers Kotlin directement dans le presse-papiers. |
-| **Zip Colle** (`copy_context/copy_au_externale_chat_ai/zip_colle.md`) | `zip_colle`, `colle_`, `colle` | Récupère le dernier téléchargement (archive zip/rar ou kt direct) et met à jour les fichiers sources du projet. |
+| **Zip Colle** (`copy_context/copy_au_externale_chat_ai/zip_colle.md`) | `zip_colle`, `colle_`, `colle`, `ok_`, `ok` | Récupère le dernier téléchargement (archive zip/rar ou kt direct) et met à jour les fichiers sources du projet. |
 
 
 ### 2. Present Clickable Links
