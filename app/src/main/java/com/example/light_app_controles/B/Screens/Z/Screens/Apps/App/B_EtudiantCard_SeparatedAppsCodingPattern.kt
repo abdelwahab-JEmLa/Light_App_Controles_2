@@ -411,9 +411,8 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                                 putExtra(android.content.Intent.EXTRA_STREAM, imageUri)
                                                 putExtra(android.content.Intent.EXTRA_TEXT,
                                                     "السلام عليكم و رحمة الله و بركاته\n\n" +
-                                                            "هذا مقرر ابنكم للحلقة القادمة" +
-                                                            " يرجى حثه على بداية التحظير ان لم يكن قد بدأ\n" +
-                                                            "جزاكم الله خيرًا 🌿\n" )
+                                                            "هذا مقرر ابنكم للحلقة القادمة\n\n" +
+                                                            "يرجى سماع عرضه ولو مرة إن أمكن حتى يتحفز على التركيز عند حضوره وإعطاؤنا علامة تقريبية هنا، جزاكم الله خيرًا 🌿")
                                                 putExtra("jid", "$n@s.whatsapp.net")
                                                 addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
                                             }
@@ -461,11 +460,6 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                             }
                         }
                     }
-
-                    // Bouton co+mpact "filtre d'historique".
-                    // • Aucun filtre → Button rempli       "الكل"
-                    // • Filtre actif → OutlinedButton       "آخر N"   (style ≠ = filtre visible)
-                    // Un clic ouvre showHistLimitDialog pour choisir N parmi {2,3,5,10,∞}.
                     Row(
                         modifier              = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End,
