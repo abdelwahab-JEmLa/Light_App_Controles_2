@@ -48,11 +48,18 @@ Copy the built APK `app-debug.apk` to the newly created local folder:
 Copy-Item -Path "app\build\outputs\apk\debug\app-debug.apk" -Destination "C:\Users\Abou Mohamed\Desktop\Playe_Store\app_tahfid\<VERSION>\app-debug.apk" -Force
 ```
 
+### 5.5. Compress the Export Folder
+Zip the `<VERSION>` directory to `<VERSION>.zip` under the `app_tahfid` folder on Desktop:
+```powershell
+Compress-Archive -Path "C:\Users\Abou Mohamed\Desktop\Playe_Store\app_tahfid\<VERSION>" -DestinationPath "C:\Users\Abou Mohamed\Desktop\Playe_Store\app_tahfid\<VERSION>.zip" -Force
+```
+
 ### 6. Create Phone Storage Directory & Deploy via ADB
-Create the destination folder structure on the phone and push the compiled APK directly to the phone's SD Card storage using the ADB tool:
+Create the destination folder structure on the phone and push both the ZIP archive and the raw compiled APK folder to the phone's SD Card storage using the ADB tool:
 ```powershell
 & "C:\Users\Abou Mohamed\AppData\Local\Android\Sdk\platform-tools\adb.exe" shell mkdir -p /sdcard/Abdelwahab_jeMla.com/Playe_Store/app_tahfid/<VERSION>/
-& "C:\Users\Abou Mohamed\AppData\Local\Android\Sdk\platform-tools\adb.exe" push "C:\Users\Abou Mohamed\Desktop\Playe_Store\app_tahfid\<VERSION>\app-debug.apk" "/sdcard/Abdelwahab_jeMla.com/Playe_Store/app_tahfid/<VERSION>/"
+& "C:\Users\Abou Mohamed\AppData\Local\Android\Sdk\platform-tools\adb.exe" push "C:\Users\Abou Mohamed\Desktop\Playe_Store\app_tahfid\<VERSION>.zip" "/sdcard/Abdelwahab_jeMla.com/Playe_Store/app_tahfid/"
+& "C:\Users\Abou Mohamed\AppData\Local\Android\Sdk\platform-tools\adb.exe" push "C:\Users\Abou Mohamed\Desktop\Playe_Store\app_tahfid\<VERSION>\" "/sdcard/Abdelwahab_jeMla.com/Playe_Store/app_tahfid/<VERSION>"
 ```
 
 ### 7. Report Success
@@ -60,5 +67,7 @@ Provide the user with a detailed summary showing:
 - **Branche Active** : The active Git branch verified in step 1.
 - **Version Détectée** : The versionName read from `build.gradle.kts`.
 - **Chemin de l'export local** : Clickable link to the local folder on Desktop.
-- **Chemin de déploiement SD Card (APK)** : The destination path on the Android device (`/sdcard/Abdelwahab_jeMla.com/Playe_Store/app_tahfid/<VERSION>/app-debug.apk`).
-- **Confirmation de transfert** : Confirmation that compilation succeeded and the APK was pushed to the phone.
+- **Fichier ZIP créé** : Clickable link to the generated zip file.
+- **Chemin de déploiement SD Card (ZIP)** : The ZIP destination path on the Android device (`/sdcard/Abdelwahab_jeMla.com/Playe_Store/app_tahfid/<VERSION>.zip`).
+- **Chemin de déploiement SD Card (APK)** : The destination path of the raw folder on the Android device (`/sdcard/Abdelwahab_jeMla.com/Playe_Store/app_tahfid/<VERSION>/app-debug.apk`).
+- **Confirmation de transfert** : Confirmation that compilation succeeded, the ZIP archive was created, and both were pushed to the phone.
