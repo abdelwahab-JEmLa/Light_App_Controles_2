@@ -29,9 +29,10 @@ Utilisez un script ou une commande (Python/PowerShell) pour lister les fichiers 
 
 ### 3. Trouver et Remplacer les fichiers `.kt`
 Pour le fichier `.kt` direct, ou pour *chaque* fichier `.kt` extrait de l'archive :
-1. Cherchez son chemin correspondant exact dans le projet (`C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\`) en utilisant son nom (ex: via `grep_search` ou un script Python de recherche globale).
-2. Si un fichier correspondant est trouvé, écrasez son contenu avec celui du fichier téléchargé/extrait. 
-   *(Utilisez l'outil `write_to_file` avec `Overwrite: true`, ou exécutez un script Python/Bash pour le faire).*
+1. **Recherche prioritaire dans l'historique** : Lisez le fichier de référence de copie `app/src/main/java/skill_agent/copy_context/copy_skill/references/hist_copie.md`. Si ce fichier contient un lien markdown vers un fichier du projet ayant le même nom de fichier exact (ex: `DropDownItem_ID6.kt`), récupérez et utilisez directement le chemin absolu spécifié dans le lien.
+2. **Recherche de secours** : Si le nom du fichier n'est pas présent dans `hist_copie.md`, cherchez son chemin correspondant exact dans le projet (`C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\`) en utilisant son nom (ex: via `grep_search` ou une recherche récursive PowerShell).
+3. Si un fichier correspondant est trouvé, écrasez son contenu avec celui du fichier téléchargé/extrait. 
+   *(Utilisez l'outil `write_to_file` avec `Overwrite: true`, ou exécutez une commande de copie/déplacement).*
 
 ### 4. Nettoyage et Rapport
 1. Si une archive a été extraite, supprimez le dossier d'extraction temporaire.

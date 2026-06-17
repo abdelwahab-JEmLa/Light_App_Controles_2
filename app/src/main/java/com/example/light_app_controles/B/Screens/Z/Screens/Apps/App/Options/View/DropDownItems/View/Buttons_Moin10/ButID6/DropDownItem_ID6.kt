@@ -25,6 +25,8 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.TableChart
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -72,6 +74,9 @@ fun DropDownItem_ID6(
     var showTeacherDialog by remember { mutableStateOf(false) }
     var chosenMonth by remember { mutableStateOf(selectedMonth) }
     var chosenTeacher by remember { mutableStateOf(selectedTeacher) }
+    // TODO(1) resolved: toggles whether the PDF shows only students with zero absences
+    // (true, original default) or all students sorted by absence count (false).
+    var hideAbsentStudents by remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
 
     // FIXED: Get the actual current teacher from focused values
@@ -171,8 +176,7 @@ fun DropDownItem_ID6(
 
                 val displayTeacherText = if (teacherText.contains("انتقالي")) "دراسة حالة من الادارة" else teacherText
 
-                Text(           //<--
-                //TODO(1): ajou t un button qui toggle l affichage des absens ou non 
+                Text(
                     text = when {
                         isLoading && generationStatus.isNotEmpty() -> generationStatus
                         isLoading -> "جاري الإنشاء..."
@@ -191,6 +195,7 @@ fun DropDownItem_ID6(
                         repo20Observation = repo20Observation,
                         selectedMonth = chosenMonth,
                         selectedTeacher = chosenTeacher,
+                        hideAbsentStudents = hideAbsentStudents,
                         onLoadingChange = { isLoading = it },
                         onStatusChange = { generationStatus = it }
                     )
@@ -199,6 +204,18 @@ fun DropDownItem_ID6(
             enabled = !isLoading && activeStudentsCount > 0,
             trailingIcon = {
                 Row {
+                    // Absence display toggle button
+                    OutlinedButton(
+                        onClick = { hideAbsentStudents = !hideAbsentStudents },
+                        modifier = Modifier.padding(end = 4.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (hideAbsentStudents) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                            contentDescription = if (hideAbsentStudents) "إظهار الغائبين في القائمة" else "إخفاء الغائبين عن القائمة",
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+
                     // Month selector button
                     OutlinedButton(
                         onClick = { showMonthDialog = true },
@@ -279,6 +296,7 @@ fun createAndOpenPdfDocument(
     repo20Observation: Repo20ObsarvationEtudion,
     selectedMonth: Calendar?,
     selectedTeacher: Ousstad_Tahfid?,
+    hideAbsentStudents: Boolean = true,
     onLoadingChange: (Boolean) -> Unit,
     onStatusChange: (String) -> Unit
 ) {
@@ -410,7 +428,8 @@ fun createAndOpenPdfDocument(
                     etudiants = activeEtudiants,
                     observations = observations,
                     selectedTeacher = selectedTeacher,
-                    selectedMonth = selectedMonth
+                    selectedMonth = selectedMonth,
+                    affiche_que_aucune_n_ai_absent = hideAbsentStudents
                 )
             }
 

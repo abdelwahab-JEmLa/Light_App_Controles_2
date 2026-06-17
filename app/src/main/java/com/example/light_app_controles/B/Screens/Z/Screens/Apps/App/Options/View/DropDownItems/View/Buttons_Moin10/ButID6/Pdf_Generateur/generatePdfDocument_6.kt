@@ -30,9 +30,6 @@ private const val NOMB_ETUDION_PAR_PAGE_FIRST = 5
 private const val NOMB_ETUDION_PAR_PAGE = 8
 private const val COLUMN_HEIGHT_ETUDION = 60f
 private const val FIRST_HEADER_HEIGHT = 20f
-// If true: show ONLY students with zero absences, sorted by most-recently-created first.
-// If false: show all students, sorted by unjustified-absence count (most absent first).
-private const val affiche_que_aucune_n_ai_absent = true
 
 fun generatePdfDocument_6(
     context: Context,
@@ -40,7 +37,11 @@ fun generatePdfDocument_6(
     etudiants: List<M19Etudiant> = emptyList(),
     observations: List<M20ObsarvationEtudion> = emptyList(),
     selectedTeacher: Ousstad_Tahfid? = Ousstad_Tahfid.Abdelwahab_Osstad,
-    selectedMonth: Calendar? = null
+    selectedMonth: Calendar? = null,
+    // If true: show ONLY students with zero absences, sorted by most-recently-created first.
+    // If false: show all students, sorted by unjustified-absence count (most absent first).
+    // Was a hardcoded private const; now toggleable from the UI (see DropDownItem_ID6).
+    affiche_que_aucune_n_ai_absent: Boolean = true
 ): File? {
     return try {
         val outputDir = context.cacheDir
