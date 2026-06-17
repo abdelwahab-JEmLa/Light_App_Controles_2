@@ -31,10 +31,10 @@ To locate all files related to the target TODO (using fast search/grep tools), i
 - **CRITICAL**: **NEVER** include internal agent skill instructions (like `t_.md`, `todo_to_extarnale_chat.md`, etc.) in the gathered files or clipboard copy payload.
 - Collect up to 10 files total. Do not exceed this limit to avoid cluttering the context window.
 
-### 2. Inspect and Include Visual/Image Context (if requested)
-- **CRITICAL CONDITIONAL RULE**: Only check for and include image files if the user explicitly mentions keywords such as "image", "screenshot", "capture", "visuel", "screen", "photo", or "png"/"jpg" in their request. If none of these keywords are mentioned, skip this step entirely and do NOT add any image files to `hist_copie.md` or the clipboard.
-- If requested:
-  - Check for image files starting with `img_` or named `img.jpg`/`img.png` on the Desktop (`C:\Users\Abou Mohamed\Desktop`) or in the workspace to capture visual bugs/output screens.
+### 2. Inspect and Include Visual/Image Context (if requested or triggered by TODO)
+- **CRITICAL CONDITIONAL RULE**: Only check for and include image files if the user explicitly mentions keywords such as "image", "screenshot", "capture", "visuel", "screen", "photo", or "png"/"jpg" in their request, OR if the target TODO comment contains the keyword `img_`. If none of these conditions are met, skip this step entirely and do NOT add any image files to `hist_copie.md` or the clipboard.
+- If requested or triggered by the TODO containing `img_`:
+  - Check for image files starting with `img_`, named `img.jpg`/`img.png`, or files matching `Screenshot_*` on the Desktop (`C:\Users\Abou Mohamed\Desktop`) or in the workspace to capture visual bugs/output screens.
   - View and analyze the image, include a description of the visual layout/bug in the context file, and explicitly state in the context file that this screenshot is attached for the external AI to visually inspect and review the interface layout/bug.
   - Add the image link to `hist_copie.md` so the copying script places the actual image file in the clipboard alongside the code files.
 

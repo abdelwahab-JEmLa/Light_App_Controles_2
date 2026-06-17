@@ -74,7 +74,11 @@ fun DropDownItem_ID6(
     var showMonthDialog by remember { mutableStateOf(false) }
     var showTeacherDialog by remember { mutableStateOf(false) }
     var chosenMonth by remember { mutableStateOf(selectedMonth) }
-    var chosenTeacher by remember { mutableStateOf(selectedTeacher) }
+    var chosenTeacher by remember { mutableStateOf<Ousstad_Tahfid?>(
+        if (selectedTeacher == null || selectedTeacher == Ousstad_Tahfid.Non_Defini_Actuellemen)
+            Ousstad_Tahfid.Abdelwahab_Osstad
+        else selectedTeacher
+    ) }
     // (true, original default) or all students sorted by absence count (false).
     var hideAbsentStudents by remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
@@ -131,8 +135,7 @@ fun DropDownItem_ID6(
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = if (isLoading) 8.dp else 4.dp)
     ) {
-        DropdownMenuItem(      //<--
-        //TODO(1): pk le height de button est trop comme au img_ regle le
+        DropdownMenuItem(
             leadingIcon = {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     if (isLoading) {
@@ -177,7 +180,7 @@ fun DropDownItem_ID6(
 
                 val displayTeacherText = if (teacherText.contains("انتقالي")) "دراسة حالة من الادارة" else teacherText
 
-                Text(
+                Text(              //<--
                     text = when {
                         isLoading && generationStatus.isNotEmpty() -> generationStatus
                         isLoading -> "جاري الإنشاء..."
