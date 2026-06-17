@@ -1,3 +1,25 @@
+Note for the AI: The helper files under files_edited/ are truncated and wrapped in block comments (/* ... */) strictly to avoid compilation conflicts in the local Android Studio environment. Please read their contents as reference APIs and implement your fix within the main active file.
+
+fix todo avec la facon la plus rapide (ne pas ecrire "todo resolved" ou "TODO resolved" a la fin)
+
+### TODO Location:
+File: `DropDownItem_ID6.kt` (around line 134)
+```kotlin
+        DropdownMenuItem(      //<--
+        //TODO(1): pk le height de button est trop comme au img_ regle le
+```
+
+### Visual/Image Context:
+A screenshot has been attached to show the layout bug:
+- In the active dropdown menu dialog, there is a giant lilac empty rectangle (card/DropdownMenuItem) stretching down and occupying almost the entire screen height.
+- This lilac container is the `DropDownItem_ID6` card (colored in `primaryContainer` because `activeStudentsCount > 0`).
+- The contents of `DropDownItem_ID6` (such as text "قائمة متابعة الغيابات (PDF)" and icons) are pushed or invisible.
+- This issue is caused by using three `OutlinedButton`s inside the `trailingIcon` parameter of `DropdownMenuItem`. Since `OutlinedButton` has high minimum height constraints (and touch target expansion), placing multiple of them inside the `trailingIcon` slot breaks the layout measurements and causes the dropdown menu height to inflate/stretch uncontrollably.
+- To fix this, we should replace `OutlinedButton` with a more compact button, such as `IconButton` or `OutlinedIconButton` with a custom size (e.g. `32.dp` or `36.dp`) and a smaller inner icon size (e.g. `16.dp` or `18.dp`).
+
+## 📄 [DropDownItem_ID6.kt](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Apps/App/Options/View/DropDownItems/View/Buttons_Moin10/ButID6/DropDownItem_ID6.kt)
+
+```kotlin
 package Application5.App.View.DropDownItems.View.ButID6
 
 import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
@@ -34,7 +56,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -161,6 +182,7 @@ fun DropDownItem_ID6(
                         }
                     )
                 }
+
             },
             text = {
                 val monthText = if (chosenMonth != null) {
@@ -206,38 +228,37 @@ fun DropDownItem_ID6(
             trailingIcon = {
                 Row {
                     // Absence display toggle button
-                    IconButton(
+                    OutlinedButton(
                         onClick = { hideAbsentStudents = !hideAbsentStudents },
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.padding(end = 4.dp)
                     ) {
                         Icon(
                             imageVector = if (hideAbsentStudents) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                             contentDescription = if (hideAbsentStudents) "إظهار الغائبين في القائمة" else "إخفاء الغائبين عن القائمة",
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(16.dp)
                         )
                     }
 
                     // Month selector button
-                    IconButton(
+                    OutlinedButton(
                         onClick = { showMonthDialog = true },
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.padding(end = 4.dp)
                     ) {
                         Icon(
                             imageVector = Icons.Default.CalendarMonth,
                             contentDescription = "اختر الشهر",
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(16.dp)
                         )
                     }
 
                     // Teacher selector button
-                    IconButton(
-                        onClick = { showTeacherDialog = true },
-                        modifier = Modifier.size(32.dp)
+                    OutlinedButton(
+                        onClick = { showTeacherDialog = true }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = "اختر الأستاذ",
-                            modifier = Modifier.size(18.dp)
+                            modifier = Modifier.size(16.dp)
                         )
                     }
                 }
@@ -516,3 +537,4 @@ private fun openPdfWithViewer(context: Context, pdfFile: File) {
         Toast.makeText(context, "❌ خطأ في فتح الملف: ${e.message}", Toast.LENGTH_LONG).show()
     }
 }
+```

@@ -1,0 +1,4 @@
+### 🔗 [context_agy.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/copy_au_externale_chat_ai/historique_explication/06_17%2018_30_02%20ButID6_Height_Fix/context_agy.md)
+### 🔗 [A_Floating_Separated_FragMap_Button_4.kt](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/copy_au_externale_chat_ai/historique_explication/06_17%2018_30_02%20ButID6_Height_Fix/files_edited/A_Floating_Separated_FragMap_Button_4.kt)
+### 🔗 [DropDownItem_ID6.kt](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Apps/App/Options/View/DropDownItems/View/Buttons_Moin10/ButID6/DropDownItem_ID6.kt)
+### 🔗 [Screenshot_20260617_175319.png](file:///C:/Users/Abou%20Mohamed/Desktop/Screenshot_20260617_175319.png)
