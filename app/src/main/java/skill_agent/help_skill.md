@@ -43,6 +43,7 @@ Output two separate markdown tables documenting each custom skill.
 | **Real-Time Logcat Inspector** (`log_.md`) | `log_`, `Todo: log_`, `logcat`, `adb_log` | Filtre les logs de l'appareil par rapport au tag ou au contexte spécifié dans le code ou le chat, et les affiche. |
 | **Fast Build, Export & Deploy** (`build/build_.md`) | `build_`, `b_` | Compile l'application, crée la structure `Playe_Store\<Version>\0.\A_AllInOne\` sur le Bureau, compresse le dossier, puis déploie le ZIP et le dossier extrait sur la carte SD du téléphone. |
 | **Build & Deploy Tahfid APK** (`build/build_apk_au_playe_store_phone/SKILL.md`) | `build_PS`, `build_apk_au_playe_store_phone`, `build_tahfid`, `b_tahfid`, `bt_`, `b_v+1` | Compile l'application Tahfid Quran, crée le dossier `app_tahfid/<version>` sur le Bureau et le déploie via ADB dans `/sdcard/Abdelwahab_jeMla.com/Playe_Store/app_tahfid/<version>/`. |
+| **Copy Last Build to Phone** (`build/cop_b_aau_phone/SKILL.md`) | `cop_b_aau_phone`, `colle_b`, `push_last_build`, `cop_b_phone` | Pousse le dernier build du Bureau (dossier et ZIP) vers le téléphone connecté via ADB sans re-compiler. |
 | **Fast Launch Preview** (`launch_preview.md`) | `lp_`, `lance_preview` | Compile, installe et lance le preview de l'application de la façon la plus rapide possible. |
 | **Todo Bubelle - UI Bug Hunter** (`t_/todo_bubelle.md`) | `todo_bubelle`, `todo_b`, `fix_ui`, `bubelle` | Capture l'écran, analyse les bulles d'erreur/anomalies UI, identifie le composable responsable, applique un correctif dans le code, relance l'app (`lance_r`) et prend un screenshot de vérification (`scr_s`). |
 | **Fast Build and Install** (`build.md`) | `build` | Compile et installe rapidement l'application en mode hors-ligne optimisé (`--offline --parallel --build-cache --configuration-cache`). |
@@ -89,6 +90,7 @@ Always present the user with clickable links to the skill files in the skills di
 * 🐛 [Todo Bubelle - UI Bug Hunter](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_/todo_bubelle.md)
 * 🛠️ [Fast Build and Install](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/build/build.md)
 * 📱 [Build & Deploy Tahfid APK](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/build/build_apk_au_playe_store_phone/SKILL.md)
+* 📱 [Copy Last Build to Phone](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/build/cop_b_aau_phone/SKILL.md)
 * 📸 [Annotated Screen Capture](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/screenshot.md)
 * 🚀 [AS Click Run](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/as_click_run.md)
 * 📝 [Fix Specified Comments (t_ex_commantaire)](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/t_ex_commantaire.md)

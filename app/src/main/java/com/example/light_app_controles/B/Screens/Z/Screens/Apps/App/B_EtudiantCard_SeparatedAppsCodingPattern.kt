@@ -411,7 +411,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                                 putExtra(android.content.Intent.EXTRA_STREAM, imageUri)
                                                 putExtra(android.content.Intent.EXTRA_TEXT,
                                                     "السلام عليكم و رحمة الله و بركاته\n\n" +
-                                                            "هذا مقرر ابنكم للحلقة القادمة\n\n" +
+                                                            "هذا مقرر الحفظ القادم ان شاء الله\n\n" +
                                                             "يرجى سماع عرضه ولو مرة إن أمكن حتى يتحفز على التركيز عند حضوره وإعطاؤنا علامة تقريبية هنا، جزاكم الله خيرًا 🌿")
                                                 putExtra("jid", "$n@s.whatsapp.net")
                                                 addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
