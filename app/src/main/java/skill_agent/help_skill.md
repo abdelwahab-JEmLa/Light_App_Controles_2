@@ -47,6 +47,7 @@ Output two separate markdown tables documenting each custom skill.
 | **Fast Build and Install** (`build.md`) | `build` | Compile et installe rapidement l'application en mode hors-ligne optimisé (`--offline --parallel --build-cache --configuration-cache`). |
 | **AS Click Run** (`as_click_run.md`) | `as_click_run`, `as_run`, `r_`, `click_run` | Compile, installe et lance l'application sur l'appareil connecté de manière rapide via Gradle et ADB. |
 | **Annotated Screen Capture** (`screenshot.md`) | `scr_s` | Capture l'écran de l'appareil Android ou de l'émulateur connecté avec des boîtes de délimitation étiquetées et l'affiche. |
+| **Skill Creator** (`skill_creatore/skill-creator/SKILL.md`) | `skill-creator`, `create_skill` | Crée de nouveaux skills, modifie, améliore ou évalue les performances des skills existants. |
 
 #### 📂 Skills de Contexte & Copie (copy_context)
 
@@ -56,10 +57,10 @@ Output two separate markdown tables documenting each custom skill.
 | **Context Map Generator** (`copy_context/context_working_in/contex_par_md_map/contex_par_md_ma.md`) | `cree_map`, `cree_map_ecrase_keep`, `cta_map`, `cw_map_d`, `map_colore`, `ctm_ref` | Gère le contexte actif via une arborescence ASCII annotée dans `files_affiched.md` (`++` = focus, `--` = ignore, `ctm_ref` = refresh et applique). |
 | **Context Map Line Counter** (`copy_context/context_working_in/contex_par_md_map/loc_map.md`) | `??`, `loc_map`, `map_loc` | Calcule et affiche le nombre de lignes et de fichiers pour les dossiers/fichiers marqués avec `??` dans la carte de contexte. |
 | **Context Transfer** (`copy_context/contexTrensefert/conTr_.md`) | `conT_`, `conTr_`, `/contexTrensefert`, `context_transfer`, `ctsave_`, `ctc_`, `ctecrase_`, `cwc_`, `ct_deepRead_`, `ct_l` | Documente l'architecture du projet et sert de guide pour transférer le contexte de développement des modules (CSV/Firebase/Room) d'une session à l'autre. |
-| **Context Copier** (`copy_context/cont_copie.md`) | `cont_copie`, `con_copie` | Lit un TODO, cherche tous les fichiers relatifs pour le contexte, crée un .md explicatif, et met à jour hist_copie.md pour tout copier au presse-papiers pour une autre IA. |
+| **Context Copier** (`copy_context/copy_au_externale_chat_ai/copy_context.md`) | `cont_copie`, `con_copie`, `copy_context` | Récupère le contexte global pour résoudre un TODO et le copie vers une IA dotée de Deep Thinking. |
 | **Copy to Clipboard & Backup** (`copy_context/copy_skill/SKILL.md`) | `cl_`, `cc_`, `cop_last`, `cop_`, `c_`, `ca_`, `dc_` | Copie les fichiers dans le presse-papiers (`cl_`/`cc_`) et/ou les sauvegarde dans un fichier texte dans le dossier copy_skill (`c_`/`ca_`). |
 | **Copy Package / Sibling Files** (`copy_context/cop_last.md`) | `cl_`, `cop_last`, `cop_`, `copy_package` | Copie, formate et charge le dernier lot ou un dossier de fichiers Kotlin directement dans le presse-papiers. |
-| **Zip Colle** (`copy_context/zip_colle.md`) | `zip_colle` | Récupère le dernier téléchargement (archive zip/rar ou kt direct) et met à jour les fichiers sources du projet. |
+| **Zip Colle** (`copy_context/copy_au_externale_chat_ai/zip_colle.md`) | `zip_colle` | Récupère le dernier téléchargement (archive zip/rar ou kt direct) et met à jour les fichiers sources du projet. |
 
 
 ### 2. Present Clickable Links
@@ -89,6 +90,7 @@ Always present the user with clickable links to the skill files in the skills di
 * 📸 [Annotated Screen Capture](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/screenshot.md)
 * 🚀 [AS Click Run](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/as_click_run.md)
 * 📝 [Fix Specified Comments (t_ex_commantaire)](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/t_ex_commantaire.md)
+* 🛠️ [Skill Creator](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/skill_creatore/skill-creator/SKILL.md)
 
 #### 📂 Liens des Configuration des Skills de Contexte & Copie (copy_context)
 
@@ -96,10 +98,10 @@ Always present the user with clickable links to the skill files in the skills di
 * 🗺️ [Context Map Generator](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/context_working_in/contex_par_md_map/contex_par_md_ma.md)
 * 🗺️ [Context Map Line Counter](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/context_working_in/contex_par_md_map/loc_map.md)
 * 🔄 [Context Transfer](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/contexTrensefert/conTr_.md)
-* 📝 [Context Copier](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/cont_copie.md)
+* 📝 [Context Copier (copy_context)](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/copy_au_externale_chat_ai/copy_context.md)
 * 📋 [Copy to Clipboard & Backup](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/copy_skill/SKILL.md)
 * 📋 [Copy Package / Sibling Files](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/cop_last.md)
-* 📦 [Zip Colle](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/zip_colle.md)
+* 📦 [Zip Colle](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/copy_au_externale_chat_ai/zip_colle.md)
 
 
 ### 3. Detail and Explain a Specific Skill (e.g. h_cwe_ or h_<trigger>)

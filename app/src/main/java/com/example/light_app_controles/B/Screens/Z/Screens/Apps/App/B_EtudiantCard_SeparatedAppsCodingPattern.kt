@@ -454,7 +454,8 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                     modifier           = Modifier.size(18.dp),
                                     tint               = Color(0xFFF57C00)   // amber — distinct from green/teal/violet
                                 )
-                                Text(
+                                Text(         //<--
+                                //TODO(1): 
                                     text  = "إرسال المقرر فقط",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = Color(0xFFF57C00)
