@@ -208,7 +208,6 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
         }
     }
 
-    // ── FIX TODO(1): draggable FAB starts collapsed; menu appears on tap ──────
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier

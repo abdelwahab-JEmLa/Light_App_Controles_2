@@ -95,7 +95,6 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
     // Tracks whether the WhatsApp share for this card is in progress
     var isSharing by remember(etudiantId) { mutableStateOf(false) }
 
-    // ── TODO(1) resolved ─────────────────────────────────────────────────────
     // Maximum number of history items to include in the exported image.
     // null  → include all items (default behaviour, no filter)
     // Int N → include only the last N items (takeLast applied inside the generator)
@@ -455,7 +454,6 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                     tint               = Color(0xFFF57C00)   // amber — distinct from green/teal/violet
                                 )
                                 Text(         //<--
-                                //TODO(1): 
                                     text  = "إرسال المقرر فقط",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = Color(0xFFF57C00)
@@ -743,7 +741,6 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
         )
     }
 
-    // ── Hist-limit selection dialog (TODO(1)) ─────────────────────────────────
     // Lets the user pick how many of the most-recent history items to export.
     // The chosen value is stored in histLimit and passed to both
     // generateHistorySchemaImage() and generateHistoryImage() above.

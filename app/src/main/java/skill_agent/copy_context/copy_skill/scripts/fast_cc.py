@@ -35,7 +35,7 @@ def set_clipboard_files(files):
     user32.CloseClipboard()
 
 def fast_cc():
-    hist_path = r"C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\copy_skill\references\hist_copie.md"
+    hist_path = r"C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\copy_context\copy_skill\references\hist_copie.md"
     
     if not os.path.exists(hist_path):
         print("EMPTY")
