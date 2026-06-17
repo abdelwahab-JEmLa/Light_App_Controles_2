@@ -52,4 +52,4 @@ Always output a highly concise response containing ONLY:
 3. **Important**: Never output a text block, full contents, or "block note" representing the code of the files. Keep the message extremely lightweight, confirming that the files are now ready to be pasted with `Ctrl+V`.
 
 ### 5. Update Reference Package & Help Catalog
-- Automatically copy and synchronize this skill file to both the project's folder `app/src/main/java/skill_agent/cop_last.md`, `C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\copy_\copie_.md`, and the CLI's directory `C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\cop_last.md`.
+- Automatically copy and synchronize this skill file to both the project's folder `app/src/main/java/skill_agent/copy_context/cop_last.md`, `C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\copy_\copie_.md`, and the CLI's directory `C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\cop_last.md`.

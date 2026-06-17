@@ -463,8 +463,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                         }
                     }
 
-                    //<-- TODO(1) résolu ───────────────────────────────────────────
-                    // Bouton compact "filtre d'historique".
+                    // Bouton co+mpact "filtre d'historique".
                     // • Aucun filtre → Button rempli       "الكل"
                     // • Filtre actif → OutlinedButton       "آخر N"   (style ≠ = filtre visible)
                     // Un clic ouvre showHistLimitDialog pour choisir N parmi {2,3,5,10,∞}.

@@ -24,14 +24,14 @@ Ce skill permet à l'assistant d'extraire un `TODO` d'un fichier, de rassembler 
 - Le but est d'avoir un contexte complet (100% autonome) pour que l'autre IA ne manque d'aucune information.
 
 ### 3. Créer le Markdown Explicatif du Contexte
-- Créer (ou écraser) un fichier explicatif, par exemple : `app/src/main/java/skill_agent/copy_skill/references/context_explicatif.md`.
+- Créer (ou écraser) un fichier explicatif, par exemple : `app/src/main/java/skill_agent/copy_context/copy_skill/references/context_explicatif.md`.
 - Ce fichier doit contenir :
   1. **L'Objectif principal** : Copie exacte du `TODO`.
   2. **Le Fichier Cible** : Où le `TODO` doit être implémenté.
   3. **L'Architecture / Dépendances** : Une explication courte de comment les autres fichiers fournis s'emboîtent et ce qu'ils font par rapport à la demande.
 
 ### 4. Mettre à jour `hist_copie.md` (Comportement `c_`)
-- L'assistant écrase le fichier `app/src/main/java/skill_agent/copy_skill/references/hist_copie.md` (Overwrite: true).
+- L'assistant écrase le fichier `app/src/main/java/skill_agent/copy_context/copy_skill/references/hist_copie.md` (Overwrite: true).
 - Il y insère les liens cliquables Markdown pour **tous les fichiers rassemblés** :
   - Le fichier contenant le TODO.
   - Le fichier `context_explicatif.md`.
@@ -41,7 +41,7 @@ Ce skill permet à l'assistant d'extraire un `TODO` d'un fichier, de rassembler 
 ### 5. Copier au Presse-papiers (`cc_`)
 - Exécuter automatiquement le script de copie rapide :
   ```bash
-  & "C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\copy_skill\run_cc.bat"
+  & "C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\copy_context\copy_skill\run_cc.bat"
   ```
 - Cela injecte immédiatement le contenu concaténé de tous ces fichiers dans le presse-papiers de Windows.
 

@@ -106,7 +106,7 @@ For `com.example.light_app_controles.Modules.Base.SQL.Daos`, generate:
 Open `.antigravityignore` and `.geminiignore` (create them with the base template if they do not exist). Check if these package rules already exist; if not, append them to the bottom of both files.
 
 #### 3. Update Skill Configuration's Mapped Packages List
-Extract the last segment of the package name (e.g. `Daos`). Save the mapping `<short_name> = <package>` under the **Mapped Packages** section at the bottom of the skill files `C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\context_working_in.md` and `C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\context_working_in.md`.
+Extract the last segment of the package name (e.g. `Daos`). Save the mapping `<short_name> = <package>` under the **Mapped Packages** section at the bottom of the skill files `C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\context_working_in.md` and `C:\Users\Abou Mohamed\AndroidStudioProjects\Light_App_Controles\app\src\main\java\skill_agent\copy_context\context_working_in\context_working_in.md`.
 
 #### 4. Report Success
 Confirm to the user that the package has been added and mapped, and show direct links to [.antigravityignore](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/.antigravityignore) and [.geminiignore](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/.geminiignore).
