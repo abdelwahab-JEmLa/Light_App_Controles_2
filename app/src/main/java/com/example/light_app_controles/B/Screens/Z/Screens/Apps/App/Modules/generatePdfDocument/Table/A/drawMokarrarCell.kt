@@ -45,28 +45,65 @@ fun drawMokarrarCell(
 
     // Parse mokarrarDetails
     val mokarrarText = cardData.hifdProgress.mokarrarDetails
-    val fromMatch = Regex("من الآية (\\d+)").find(mokarrarText)
-    val toMatch = Regex("إلى (\\d+)").find(mokarrarText)
-    val toEndMatch = mokarrarText.contains("نهاية السورة") || mokarrarText.contains("نهاية")
-    val souraName = mokarrarText.substringBefore("من").trim()
-    val fromAya = fromMatch?.groupValues?.get(1) ?: "1"
+    val lines = mokarrarText.split("\n").map { it.trim() }.filter { it.isNotEmpty() }
+    val limitSurahName = lines.getOrNull(0) ?: ""
 
-    // ✅ FIXED: Helper function to format aya display
+    // Helper function to format aya display
     fun formatAyaDisplay(ayaNumber: String): String {
         return when {
             ayaNumber == "0" -> "نهاية"
+            ayaNumber == "نهاية" -> "نهاية"
             ayaNumber.toIntOrNull() == 0 -> "نهاية"
             else -> "الآية $ayaNumber"
         }
     }
 
-    // ═══════════════════════════════════════════════════
-    // من Section - CENTERED & COLORED
-    // ═══════════════════════════════════════════════════
-    val fromText = if (souraName.isNotEmpty()) {
-        "من $souraName ${formatAyaDisplay(fromAya)}"
+    var fromText = ""
+    var toText = ""
+
+    if (lines.size >= 3 || (lines.size == 2 && lines[1].endsWith("إلى"))) {
+        // Different souras case
+        val line1 = lines[1]
+        val line2 = lines.getOrNull(2) ?: ""
+
+        val fromMatch = Regex("من الآية (\\d+|نهاية)").find(line1)
+        val startVerse = fromMatch?.groupValues?.get(1) ?: "1"
+
+        val hasAyaWord = line2.contains("الآية")
+        val startSurahName = if (hasAyaWord) {
+            line2.substringBefore("الآية").trim()
+        } else if (line2.contains("نهاية")) {
+            line2.substringBefore("نهاية").trim()
+        } else {
+            line2.trim()
+        }
+
+        val toMatch = Regex("(الآية|إلى)\\s+(\\d+)").find(line2)
+        val endVerse = toMatch?.groupValues?.get(2) 
+            ?: if (line2.contains("نهاية")) "نهاية" else "1"
+
+        fromText = "من $startSurahName ${formatAyaDisplay(startVerse)}"
+        
+        toText = if (endVerse == "نهاية") {
+            "إلى نهاية $limitSurahName"
+        } else {
+            "إلى $limitSurahName ${formatAyaDisplay(endVerse)}"
+        }
     } else {
-        mokarrarText
+        // Same soura case
+        val line1 = lines.getOrNull(1) ?: ""
+        val fromMatch = Regex("من الآية (\\d+|نهاية)").find(line1)
+        val toMatch = Regex("إلى (\\d+|نهاية)").find(line1)
+        
+        val startVerse = fromMatch?.groupValues?.get(1) ?: "1"
+        val endVerse = toMatch?.groupValues?.get(1) ?: "1"
+
+        fromText = "من $limitSurahName ${formatAyaDisplay(startVerse)}"
+        toText = if (endVerse == "نهاية") {
+            "إلى نهاية $limitSurahName"
+        } else {
+            "إلى $limitSurahName ${formatAyaDisplay(endVerse)}"
+        }
     }
 
     val fromPaint = TextPaint(paintArabic).apply {
@@ -110,19 +147,6 @@ fun drawMokarrarCell(
     // إلى Section - CENTERED & COLORED
     // ✅ FIXED: Now handles aya=0 case
     // ═══════════════════════════════════════════════════
-    val toText = if (souraName.isNotEmpty()) {
-        when {
-            toEndMatch -> "إلى نهاية $souraName"
-            toMatch != null -> {
-                val toAya = toMatch.groupValues[1]
-                // ✅ FIXED: Use formatAyaDisplay for "to" aya as well
-                "إلى $souraName ${formatAyaDisplay(toAya)}"
-            }
-            else -> "إلى $souraName"
-        }
-    } else {
-        mokarrarText
-    }
 
     val toPaint = TextPaint(paintArabic).apply {
         textSize = paintArabic.textSize + 2f  // Bigger: 15f
