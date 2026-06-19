@@ -1,0 +1,6 @@
+### 🔗 [context_agy.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/copy_au_externale_chat_ai/historique_explication/06_17%2018_41_08%20DropDownItem_ID6_Fix/context_agy.md)
+### 🔗 [DropDownItem_ID6.kt](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Apps/App/Options/View/DropDownItems/View/Buttons_Moin10/ButID6/DropDownItem_ID6.kt)
+### 🔗 [A_Floating_Separated_FragMap_Button_4.kt](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Apps/App/Options/A_Floating_Separated_FragMap_Button_4.kt)
+### 🔗 [generatePdfDocument_6.kt](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/com/example/light_app_controles/B/Screens/Z/Screens/Apps/App/Options/View/DropDownItems/View/Buttons_Moin10/ButID6/Pdf_Generateur/generatePdfDocument_6.kt)
+### 🔗 [Ousstad_Tahfid.kt](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/com/example/light_app_controles/Models/Components/Ousstad_Tahfid.kt)
+### 🔗 [Screenshot_20260617_175319.png](file:///C:/Users/Abou%20Mohamed/Desktop/Screenshot_20260617_175319.png)
