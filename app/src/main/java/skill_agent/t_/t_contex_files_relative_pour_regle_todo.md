@@ -23,7 +23,8 @@ Identifiez le ou les commentaires `TODO` pertinents dans le code source (via `gr
 
 **🚨 CETTE ÉTAPE EST LA PLUS IMPORTANTE. Ne bâclez pas. Lisez TOUT en profondeur.**
 
-Pour le `TODO` ciblé, l'assistant doit :
+Pour le `TODO` ciblé, l'assistant doit :agf
+
 
 1. **Lire intégralement le fichier principal** contenant le TODO (pas juste 15 lignes autour — la fonction/composable ENTIÈRE).
 2. **Identifier TOUS les fichiers relatifs** (Models, ViewModels, Interfaces, composables parents, ActiveDatas, etc.) impliqués dans le flux d'exécution du TODO. **Ne ratez AUCUN fichier dépendant** car s'il n'est pas listé, il sera ignoré et masqué par `read_ingor_` !

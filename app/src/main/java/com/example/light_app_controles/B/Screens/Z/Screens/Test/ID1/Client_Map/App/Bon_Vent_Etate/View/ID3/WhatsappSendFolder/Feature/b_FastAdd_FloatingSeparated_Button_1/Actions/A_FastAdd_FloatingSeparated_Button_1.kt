@@ -86,8 +86,6 @@ fun A_FastAdd_FloatingSeparated_Button_1(
     ),
     bons: List<M8BonVent>? = emptyList(),
     relative_M2Client: M2Client?,
-    onSendWhatsApp: (phoneNumber: String, isWhatsAppBusiness: Boolean) -> Unit = { _, _ -> },
-    onUpdateClient: (M2Client) -> Unit = {},
     onCommit: (bon: M8BonVent, newSituation: M8BonVent) -> Unit,
 ) {
     val updatedButtonState = buttonState.copy(its_Active = true)
@@ -194,52 +192,6 @@ fun A_FastAdd_FloatingSeparated_Button_1(
                     HorizontalDivider(thickness = 3.dp, color = Color.Red)
 
                     if (showWhatsAppItems) {
-                        DropdownItem_WhatsApp_FixedAbdelwahab(
-                            isWhatsAppBusiness = false,
-                            iconTint = Color(0xFF25D366),
-                            labelPrefix = "WhatsApp",
-                            onSend = { phone, isBusiness ->
-                                showDropdown = false
-                                activeItem = ActiveDropdownItem.None
-                                onSendWhatsApp(phone, isBusiness)
-                            },
-                        )
-
-                        DropdownItem_WhatsApp_FixedAbdelwahab(
-                            isWhatsAppBusiness = true,
-                            iconTint = Color(0xFF00897B),
-                            labelPrefix = "WhatsApp Business",
-                            onSend = { phone, isBusiness ->
-                                showDropdown = false
-                                activeItem = ActiveDropdownItem.None
-                                onSendWhatsApp(phone, isBusiness)
-                            },
-                        )
-
-                        HorizontalDivider(thickness = 1.dp, color = Color.LightGray)
-
-                        if (relative_M2Client != null) {
-                            DropdownItem_WhatsApp_Worker(
-                                currentNomWorker = relative_M2Client.nom_worker,
-                                currentNumWorker = relative_M2Client.num_worker,
-                                isActive = activeItem == ActiveDropdownItem.WorkerPhone,
-                                onActivate = { activeItem = ActiveDropdownItem.WorkerPhone },
-                                onWorkerSaved = { nom, num ->
-                                    onUpdateClient(
-                                        relative_M2Client.copy(nom_worker = nom, num_worker = num)
-                                    )
-                                    activeItem = ActiveDropdownItem.None
-                                },
-                                onSend = { phone ->
-                                    showDropdown = false
-                                    activeItem = ActiveDropdownItem.None
-                                    onSendWhatsApp(phone, false)
-                                },
-                            )
-                        }
-
-                        HorizontalDivider(thickness = 3.dp, color = Color.Red)
-
 
                         val targeted = Cordon_files(
                             "Image_Compose_Screen",

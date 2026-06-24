@@ -38,7 +38,7 @@ fun MainScreen(
             }
             .fillMaxSize()
     ) {
-        val activeFeature = remember { Feature.ButtonPressedShadowPreview }
+        val activeFeature = remember { Feature.Credit_Bon_Whatsapp_Sender }
         when (activeFeature) {
             Feature.CleanupScreen -> CleanupScreen(appDatabase = appDatabase)
             Feature.M3CouleurList_Screen -> M3CouleurList_Screen()

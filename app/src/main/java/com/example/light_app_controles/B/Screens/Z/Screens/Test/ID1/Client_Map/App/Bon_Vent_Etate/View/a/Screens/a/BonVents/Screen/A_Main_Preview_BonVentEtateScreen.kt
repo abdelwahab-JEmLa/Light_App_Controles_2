@@ -58,6 +58,7 @@ import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.compose.ui.platform.LocalLocale
 
 private val CREDIT_VERSEMENT_STATES = setOf(
     M8BonVent.EtateActuellementEst.COMMANDE_LIVRAI,
@@ -105,8 +106,8 @@ fun Main_Preview_BonVentEtateScreen(
     var whatsappSendRequest by remember { mutableStateOf<Pair<String, Boolean>?>(null) }
     val listState = rememberLazyListState()
 
-    val sdfFull  = SimpleDateFormat("MMdd_HHmmss", Locale.getDefault())
-    val sdfShort = SimpleDateFormat("mm-ss-SSS",   Locale.getDefault())
+    val sdfFull  = SimpleDateFormat("MMdd_HHmmss", LocalLocale.current.platformLocale)
+    val sdfShort = SimpleDateFormat("mm-ss-SSS",   LocalLocale.current.platformLocale)
 
     fun buildImageName(idx: Int, key: String): String {
         val pts  = key.split("|")
@@ -337,12 +338,6 @@ fun Main_Preview_BonVentEtateScreen(
         A_FastAdd_FloatingSeparated_Button_1(
             relative_M2Client = relative_M2Client,
             bons = allBons,
-            onSendWhatsApp = { phoneNumber, isWhatsAppBusiness ->
-                whatsappSendRequest = Pair(phoneNumber, isWhatsAppBusiness)
-            },
-            onUpdateClient = { updatedClient ->
-                scope.launch { appDatabase.dao_M2Client().upsert(updatedClient) }
-            }
         ) { bon1, bon2 ->
             val updated = allBons.toMutableList().also {
                 it.add(0, bon2)
