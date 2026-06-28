@@ -4,7 +4,6 @@ import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
 import Application5.App.MonthSelectionDialog_SeparatedAppsCodingPattern
 import Application5.App.Options.FabButton_When_Its_EducationFragment
 import Application5.App.Options.FabDropdownMenu_WhenIts_FragmentEducation
-import Application5.App.Options.VideoPresentationDialog
 import Application5.App.Repository.M19Etudiant
 import Application5.App.View.DropDownItems.View.ButID8.SessionsEducationDialog.Dialog.SessionsEducationDialog
 import androidx.compose.foundation.Image

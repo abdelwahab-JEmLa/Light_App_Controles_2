@@ -3,17 +3,10 @@ package Application5.App.Options
 import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
 import Application5.App.Repository.M19Etudiant
 import Application5.App.Repository.M20ObsarvationEtudion
-import Application5.App.View.DropDownItems.View.But10.DropDownItem_Imprime_pdf_collecte_numeros_whatsapp
 import Application5.App.View.DropDownItems.View.But11.DropDownItem_Imprime_pdf_collecte_numeros_whatsapp_amine
-import Application5.App.View.DropDownItems.View.But2.DropDownItem_Imprime_pdf_communication_ac_parent
-import Application5.App.View.DropDownItems.View.But4.DropDownItem_Imprime_pdf_List_Talaba
 import Application5.App.View.DropDownItems.View.But5.DropDownItem_Imprime_pdf_Case_A_Cochet
-import Application5.App.View.DropDownItems.View.But9.DropDownItem_Send_Cards_WhatsApp_Parent
 import Application5.App.View.DropDownItems.View.ButID6.DropDownItem_ID6
-import Application5.App.View.DropDownItems.View.ButID8.DropDownItem_ButID8
 import EntreApps.Shared.Models.Components.Ousstad_Tahfid
-import EntreApps.Shared.Models.Compts.AbdelwahabTravailleChezGros_KeyId
-import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import android.text.format.DateUtils
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -100,24 +93,10 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
     val activeCentralValues = aCentralFacade.activeCentralValues
     val activeOusstad = activeCentralValues.active_Ousstad_Tahfid
 
-    // Get active Ousstad and determine parent key
-    fun getActiveOussstadKey(): String {
-        val params = M00CentralParametresOfAllApps()
-
-        return when (activeOusstad) {
-            Ousstad_Tahfid.Abdelwahab_Osstad -> AbdelwahabTravailleChezGros_KeyId.keyId
-            Ousstad_Tahfid.Amine_Madrassa -> params.amine_madrasa_Compt_KeyId
-            Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata -> params.kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId
-            Ousstad_Tahfid.Kissm_Intikali -> "Kissm_Intikali"
-            Ousstad_Tahfid.Non_Defini_Actuellemen -> "Non_Defini_Actuellemen"
-            null -> AbdelwahabTravailleChezGros_KeyId.keyId // Default fallback
-        }
-    }
-
     // Count students not updated today
     val studentsNotUpdatedToday by remember(activeOusstad) {
         derivedStateOf {
-            val targetKey = getActiveOussstadKey()
+            val targetKey = getActiveOussstadKey(activeCentralValues.active_Ousstad_Tahfid)
             repo19.datasValue.filter { etudiant ->
                 etudiant.parent_ousstad_key == targetKey &&
                         !DateUtils.isToday(etudiant.dernierTimeTampsSynchronisationAvecFireBase)
@@ -141,7 +120,7 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
     fun add() {
         if (studentName.isNotBlank()) {
             // Set active Ousstad as parent
-            val activeOussstadKey = getActiveOussstadKey()
+            val activeOussstadKey = getActiveOussstadKey(activeCentralValues.active_Ousstad_Tahfid)
 
             val newStudent = M19Etudiant(
                 nom = studentName.trim(),
@@ -379,14 +358,12 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
 
             HorizontalDivider()
 
-          //  DropDownItem_ButID8(aCentralFacade = aCentralFacade)
+            //  DropDownItem_ButID8(aCentralFacade = aCentralFacade)
             DropDownItem_ID6(aCentralFacade = aCentralFacade)
-        //    DropDownItem_Imprime_pdf_List_Talaba(aCentralFacade = aCentralFacade)
+            //    DropDownItem_Imprime_pdf_List_Talaba(aCentralFacade = aCentralFacade)
             //DropDownItem_Imprime_pdf_communication_ac_parent(viewModel = aCentralFacade)
             Divider_Modfied()
 
-         DropDownItem_Imprime_pdf_collecte_numeros_whatsapp(aCentralFacade = aCentralFacade)
-            DropDownItem_Send_Cards_WhatsApp_Parent(aCentralFacade = aCentralFacade)
             DropDownItem_Imprime_pdf_Case_A_Cochet(aCentralFacade = aCentralFacade)
             DropDownItem_Imprime_pdf_collecte_numeros_whatsapp_amine(aCentralFacade = aCentralFacade)
             Divider_Modfied()
@@ -463,7 +440,8 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
                             )
                         },
                         onClick = {
-                            activeCentralValues.affiche_last_histoque_seulement = !activeCentralValues.affiche_last_histoque_seulement
+                            activeCentralValues.affiche_last_histoque_seulement =
+                                !activeCentralValues.affiche_last_histoque_seulement
                         }
                     )
                 }
@@ -488,7 +466,7 @@ fun FabButton_When_Its_EducationFragment(
         shape = CircleShape,
     ) {
         Box {
-            if (showWarningState) {
+            if (false) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -534,59 +512,6 @@ fun FabButton_When_Its_EducationFragment(
                     imageVector = if (isFabVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                     contentDescription = "Toggle FAB",
                     modifier = Modifier.align(Alignment.Center),
-                    tint = Color.White
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun VideoPresentationDialog(onDismiss: () -> Unit) {
-    androidx.compose.ui.window.Dialog(onDismissRequest = onDismiss) {
-        val context = androidx.compose.ui.platform.LocalContext.current
-        val exoPlayer = androidx.compose.runtime.remember {
-            com.google.android.exoplayer2.ExoPlayer.Builder(context).build().apply {
-                val uri = android.net.Uri.parse("android.resource://${context.packageName}/raw/presentation_start")
-                val mediaItem = com.google.android.exoplayer2.MediaItem.fromUri(uri)
-                setMediaItem(mediaItem)
-                prepare()
-                playWhenReady = true
-            }
-        }
-
-        androidx.compose.runtime.DisposableEffect(Unit) {
-            onDispose {
-                exoPlayer.release()
-            }
-        }
-
-        androidx.compose.foundation.layout.Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(400.dp)
-                .background(Color.Black)
-        ) {
-            androidx.compose.ui.viewinterop.AndroidView(
-                factory = { ctx ->
-                    com.google.android.exoplayer2.ui.PlayerView(ctx).apply {
-                        player = exoPlayer
-                    }
-                },
-                update = { view ->
-                    view.player = exoPlayer
-                },
-                modifier = Modifier.fillMaxSize()
-            )
-            androidx.compose.material3.IconButton(
-                onClick = onDismiss,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(8.dp)
-            ) {
-                Icon(
-                    imageVector = androidx.compose.material.icons.Icons.Default.Close,
-                    contentDescription = "Fermer",
                     tint = Color.White
                 )
             }

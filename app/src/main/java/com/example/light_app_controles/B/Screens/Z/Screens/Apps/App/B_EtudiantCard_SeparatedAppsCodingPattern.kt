@@ -6,6 +6,7 @@ import Application5.App.Dialog.Dialog.Sub.A_Takiyim.TakiyimSelectionDialog_Separ
 import Application5.App.Dialog.Dialog.Sub.A_Takiyim.processTakiyimEvaluation
 import Application5.App.Dialog.Dialog.Sub.Utils.MoulahadaSouloukSelectionDialog_SeparatedAppsCodingPattern
 import Application5.App.Dialog.Dialog.Sub.Utils.SouraSelectionDialog_SeparatedAppsCodingPattern
+import Application5.App.Options.getActiveOussstadKey
 import Application5.App.Repository.M19Etudiant
 import Application5.App.View.DropDownItems.View.But2.convertSingleCardToJpg
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.ParentCommunicationCardData_2
@@ -13,6 +14,10 @@ import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.generat
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.generatePdfDocument
 import Application5.App.View.DropDownItems.View.But2.getStoredCardUriForStudent
 import EntreApps.Shared.Models.Components.Ousstad_Tahfid
+import EntreApps.Shared.Models.Compts
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.ifTrue
+import EntreApps.Shared.Models.Utilisateur
 import android.text.format.DateUtils.isToday
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
@@ -76,21 +81,21 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
     viewModel: A_ViewModel_SeparatedAppsCodingPattern
 ) {
     val etudiantId = etudiant.keyID
-    val context    = LocalContext.current
-    val scope      = rememberCoroutineScope()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
-    var showDetailsDialog              by remember(etudiantId) { mutableStateOf(false) }
-    var showSouraDialog                by remember(etudiantId) { mutableStateOf(false) }
-    var showMokarrareDialog            by remember(etudiantId) { mutableStateOf(false) }
-    var showTakiyimDialog              by remember(etudiantId) { mutableStateOf(false) }
+    var showDetailsDialog by remember(etudiantId) { mutableStateOf(false) }
+    var showSouraDialog by remember(etudiantId) { mutableStateOf(false) }
+    var showMokarrareDialog by remember(etudiantId) { mutableStateOf(false) }
+    var showTakiyimDialog by remember(etudiantId) { mutableStateOf(false) }
     var showMoulahada3alaSouloukDialog by remember(etudiantId) { mutableStateOf(false) }
-    var showIstedrakSouraDialog        by remember(etudiantId) { mutableStateOf(false) }
-    var showIstedrakMokarrareDialog    by remember(etudiantId) { mutableStateOf(false) }
-    var showIstedrakTakiyimDialog      by remember(etudiantId) { mutableStateOf(false) }
+    var showIstedrakSouraDialog by remember(etudiantId) { mutableStateOf(false) }
+    var showIstedrakMokarrareDialog by remember(etudiantId) { mutableStateOf(false) }
+    var showIstedrakTakiyimDialog by remember(etudiantId) { mutableStateOf(false) }
 
-    var isExpanded              by remember(etudiantId) { mutableStateOf(false) }
+    var isExpanded by remember(etudiantId) { mutableStateOf(false) }
     var showOussstadDropdownMenu by remember(etudiantId) { mutableStateOf(false) }
-    var selectedOusstad         by remember(etudiantId) { mutableStateOf<Ousstad_Tahfid?>(null) }
+    var selectedOusstad by remember(etudiantId) { mutableStateOf<Ousstad_Tahfid?>(null) }
 
     // Tracks whether the WhatsApp share for this card is in progress
     var isSharing by remember(etudiantId) { mutableStateOf(false) }
@@ -98,12 +103,13 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
     // Maximum number of history items to include in the exported image.
     // null  → include all items (default behaviour, no filter)
     // Int N → include only the last N items (takeLast applied inside the generator)
-    var histLimit           by remember(etudiantId) { mutableStateOf<Int?>(null) }
+    var histLimit by remember(etudiantId) { mutableStateOf<Int?>(null) }
     var showHistLimitDialog by remember(etudiantId) { mutableStateOf(false) }
 
     val wasUpdatedToday = isToday(etudiant.dernierTimeTampsSynchronisationAvecFireBase)
-    val observations    = remember(viewModel.repo20ObsarvationEtudion.datasValue) { viewModel.repo20ObsarvationEtudion.datasValue }
-    val absenceCount    = remember(etudiant, observations) {
+    val observations =
+        remember(viewModel.repo20ObsarvationEtudion.datasValue) { viewModel.repo20ObsarvationEtudion.datasValue }
+    val absenceCount = remember(etudiant, observations) {
         etudiant.calculateUnjustifiedAbsences(observations)
     }
 
@@ -132,12 +138,13 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                         generatePdfDocument(
                             context,
                             listOf(ParentCommunicationCardData_2.fromEtudiant(etudiant)),
-                            viewModel=viewModel,
+                            viewModel = viewModel,
                         )
                     }
                     if (pdfFile == null || !pdfFile.exists()) {
                         withContext(Dispatchers.Main) {
-                            Toast.makeText(context, "❌ فشل إنشاء بطاقة PDF", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "❌ فشل إنشاء بطاقة PDF", Toast.LENGTH_SHORT)
+                                .show()
                         }
                         return@launch
                     }
@@ -150,7 +157,8 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
 
                 if (imageUri == null) {
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "❌ فشل تحويل البطاقة إلى صورة", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "❌ فشل تحويل البطاقة إلى صورة", Toast.LENGTH_SHORT)
+                            .show()
                     }
                     return@launch
                 }
@@ -171,14 +179,16 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                         type = "image/jpeg"
                         setPackage("com.whatsapp.w4b")
                         putExtra(android.content.Intent.EXTRA_STREAM, imageUri)
-                        putExtra(android.content.Intent.EXTRA_TEXT,
+                        putExtra(
+                            android.content.Intent.EXTRA_TEXT,
                             "السلام عليكم و رحمة الله و بركاته\n\n" +
                                     "هذه البطاقة هي أداة تواصل\n" +
                                     "لمتابعة سير حفظ ابنكم ليلبسكم الله حلة الكرامة بما أقرأتماه و صبرتما\n\n" +
                                     "وحلتان من الفردوس قد كسيت ... لوالديه لها الأكوان لم تقم\n" +
                                     "قالا: بماذا كسيناها؟ فقيل: بما ... أقرأتما ابنكما فاشكر لذي النعم\n\n" +
                                     "يرجى سماع عرضه ليترسخ للمرة القادمة\n" +
-                                    "يرجى متابعة ووضع علامة إن أمكن، جزاكم الله خيرًا 🌿")
+                                    "يرجى متابعة ووضع علامة إن أمكن، جزاكم الله خيرًا 🌿"
+                        )
                         putExtra("jid", "$formattedPhone@s.whatsapp.net")
                         addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
@@ -194,6 +204,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
             }
         }
     }
+
     val repo19Etudiant = viewModel.repo19Etudiant
     val repo20Observation = viewModel.repo20ObsarvationEtudion
 
@@ -227,10 +238,10 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector        = Icons.Default.EventSeat,
+                        imageVector = Icons.Default.EventSeat,
                         contentDescription = "Chaise",
-                        tint               = MaterialTheme.colorScheme.primary,
-                        modifier           = Modifier.size(28.dp)
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(28.dp)
                     )
 
                     Box(
@@ -241,7 +252,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text  = "${etudiant.positon_don_classe}",
+                            text = "${etudiant.positon_don_classe}",
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
@@ -251,12 +262,12 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                 Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
-                    text  = etudiant.nom.ifBlank { "---" },
+                    text = etudiant.nom.ifBlank { "---" },
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
-                    text  = etudiant.prenom.ifBlank { "---" },
+                    text = etudiant.prenom.ifBlank { "---" },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -267,24 +278,24 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text  = "${etudiant.age} سنة",
+                        text = "${etudiant.age} سنة",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary
                     )
 
                     if (absenceCount > 0) {
                         Row(
-                            verticalAlignment   = Alignment.CenterVertically,
+                            verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
                             Text(
-                                text  = "غياب: $absenceCount",
+                                text = "غياب: $absenceCount",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.error
                             )
 
                             IconButton(
-                                onClick  = {
+                                onClick = {
                                     repo19Etudiant.upsert(
                                         etudiant.copy(
                                             imprime_justification = !etudiant.imprime_justification
@@ -294,7 +305,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                 modifier = Modifier.size(20.dp)
                             ) {
                                 Icon(
-                                    imageVector        = Icons.Default.Print,
+                                    imageVector = Icons.Default.Print,
                                     contentDescription = "Imprimer justification",
                                     tint = if (etudiant.imprime_justification)
                                         MaterialTheme.colorScheme.primary
@@ -315,57 +326,64 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
             ) {
                 IconButton(onClick = { isExpanded = !isExpanded }) {
                     Icon(
-                        imageVector        = if (isExpanded) Icons.Default.ExpandLess
+                        imageVector = if (isExpanded) Icons.Default.ExpandLess
                         else Icons.Default.ExpandMore,
                         contentDescription = if (isExpanded) "إخفاء الخيارات" else "إظهار الخيارات",
-                        tint               = MaterialTheme.colorScheme.secondary
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 }
             }
-
+            val params = M00CentralParametresOfAllApps()
+            val utilisateur = when (params.au_Lence_Set_Compt_Ac_KeyId) {
+                Compts.AbdelwahabTravailleChezGros_KeyId.keyId -> Utilisateur.Abdelwahab_Osstad
+                else -> Utilisateur.Admin
+            }
             // ── Expanded actions ─────────────────────────────────────────────
             AnimatedVisibility(
                 visible = isExpanded,
-                enter   = expandVertically(),
-                exit    = shrinkVertically()
+                enter = expandVertically(),
+                exit = shrinkVertically()
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // ── Full card share button (icon top, smaller text) ───────
-                    OutlinedButton(
-                        onClick  = { if (!isSharing) shareCardOnWhatsApp() },
-                        enabled  = !isSharing,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        if (isSharing) {
-                            CircularProgressIndicator(
-                                modifier    = Modifier.size(16.dp),
-                                strokeWidth = 2.dp
-                            )
-                            Spacer(modifier = Modifier.size(6.dp))
-                            Text(
-                                text  = "جاري الإرسال…",
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        } else {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(2.dp)
-                            ) {
-                                Icon(
-                                    imageVector        = Icons.Default.Share,
-                                    contentDescription = null,
-                                    modifier           = Modifier.size(18.dp),
-                                    tint               = Color(0xFF25D366)
-                                )
-                                Text(
-                                    text  = "إرسال البطاقة واتساب",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = Color(0xFF25D366)
+                    (utilisateur == Utilisateur.Abdelwahab_Osstad).ifTrue {
 
+                        // ── Full card share button (icon top, smaller text) ───────
+                        OutlinedButton(
+                            onClick = { if (!isSharing) shareCardOnWhatsApp() },
+                            enabled = !isSharing,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            if (isSharing) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    strokeWidth = 2.dp
                                 )
+                                Spacer(modifier = Modifier.size(6.dp))
+                                Text(
+                                    text = "جاري الإرسال…",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            } else {
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Share,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(18.dp),
+                                        tint = Color(0xFF25D366)
+                                    )
+                                    Text(
+                                        text = "إرسال البطاقة واتساب",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Color(0xFF25D366)
+
+                                    )
+                                }
                             }
                         }
                     }
@@ -381,7 +399,8 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                 isSharingMokarrar = true
                                 scope.launch {
                                     try {
-                                        val mokarrarCardData = ParentCommunicationCardData_2.fromEtudiant(etudiant)
+                                        val mokarrarCardData =
+                                            ParentCommunicationCardData_2.fromEtudiant(etudiant)
                                         val imageUri = withContext(Dispatchers.IO) {
                                             generateMokarrarImage(
                                                 context,
@@ -405,22 +424,33 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                                 if (n.startsWith("0")) n = n.drop(1)
                                                 n = "213$n"
                                             }
-                                            val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                                                type = "image/jpeg"
-                                                setPackage("com.whatsapp.w4b")
-                                                putExtra(android.content.Intent.EXTRA_STREAM, imageUri)
-                                                putExtra(android.content.Intent.EXTRA_TEXT,
-                                                    "السلام عليكم و رحمة الله و بركاته\n\n" +
-                                                            "هذا مقرر الحفظ القادم ان شاء الله\n\n" +
-                                                            "يرجى سماع عرضه ولو مرة إن أمكن حتى يتحفز على التركيز عند حضوره وإعطاؤنا علامة تقريبية هنا، جزاكم الله خيرًا 🌿")
-                                                putExtra("jid", "$n@s.whatsapp.net")
-                                                addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                            }
+                                            val intent =
+                                                android.content.Intent(android.content.Intent.ACTION_SEND)
+                                                    .apply {
+                                                        type = "image/jpeg"
+                                                        setPackage("com.whatsapp.w4b")
+                                                        putExtra(
+                                                            android.content.Intent.EXTRA_STREAM,
+                                                            imageUri
+                                                        )
+                                                        putExtra(
+                                                            android.content.Intent.EXTRA_TEXT,
+                                                            "السلام عليكم و رحمة الله و بركاته\n\n" +
+                                                                    "هذا مقرر الحفظ القادم ان شاء الله\n\n" +
+                                                                    "يرجى سماع عرضه ولو مرة إن أمكن حتى يتحفز على التركيز عند حضوره وإعطاؤنا علامة تقريبية هنا، جزاكم الله خيرًا 🌿"
+                                                        )
+                                                        putExtra("jid", "$n@s.whatsapp.net")
+                                                        addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                                    }
                                             context.startActivity(intent)
                                         }
                                     } catch (e: Exception) {
                                         withContext(Dispatchers.Main) {
-                                            Toast.makeText(context, "❌ خطأ: ${e.message}", Toast.LENGTH_LONG).show()
+                                            Toast.makeText(
+                                                context,
+                                                "❌ خطأ: ${e.message}",
+                                                Toast.LENGTH_LONG
+                                            ).show()
                                         }
                                     } finally {
                                         isSharingMokarrar = false
@@ -428,17 +458,17 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                 }
                             }
                         },
-                        enabled  = !isSharingMokarrar,
+                        enabled = !isSharingMokarrar,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         if (isSharingMokarrar) {
                             CircularProgressIndicator(
-                                modifier    = Modifier.size(16.dp),
+                                modifier = Modifier.size(16.dp),
                                 strokeWidth = 2.dp
                             )
                             Spacer(modifier = Modifier.size(6.dp))
                             Text(
-                                text  = "جاري الإرسال…",
+                                text = "جاري الإرسال…",
                                 style = MaterialTheme.typography.labelSmall
                             )
                         } else {
@@ -447,41 +477,40 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                 verticalArrangement = Arrangement.spacedBy(2.dp)
                             ) {
                                 Icon(
-                                    imageVector        = Icons.Default.Share,
+                                    imageVector = Icons.Default.Share,
                                     contentDescription = null,
-                                    modifier           = Modifier.size(18.dp),
-                                    tint               = Color(0xFFF57C00)   // amber — distinct from green/teal/violet
+                                    modifier = Modifier.size(18.dp),
+                                    tint = Color(0xFFF57C00)   // amber — distinct from green/teal/violet
                                 )
                                 Text(
-                                    text  = "إرسال المقرر فقط",
+                                    text = "إرسال المقرر فقط",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = Color(0xFFF57C00)
                                 )
                             }
                         }
                     }
-                    Row(
-                        modifier              = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment     = Alignment.CenterVertically
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.End
                     ) {
                         Text(
-                            text  = "عدد السجلات:",
+                            text = "عدد السجلات:",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Spacer(modifier = Modifier.size(6.dp))
+                        Spacer(modifier = Modifier.size(4.dp))
                         if (histLimit == null) {
                             Button(onClick = { showHistLimitDialog = true }) {
                                 Text(
-                                    text  = "الكل",
+                                    text = "الكل",
                                     style = MaterialTheme.typography.labelSmall
                                 )
                             }
                         } else {
                             OutlinedButton(onClick = { showHistLimitDialog = true }) {
                                 Text(
-                                    text  = "آخر $histLimit",
+                                    text = "آخر $histLimit",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = MaterialTheme.colorScheme.primary
                                 )
@@ -498,9 +527,15 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                 isSharingSchema = true
                                 scope.launch {
                                     try {
-                                        val schemaCardData = ParentCommunicationCardData_2.fromEtudiant(etudiant)
+                                        val schemaCardData =
+                                            ParentCommunicationCardData_2.fromEtudiant(etudiant)
                                         val imageUri = withContext(Dispatchers.IO) {
-                                            generateHistorySchemaImage(context, schemaCardData, viewModel, histLimit)
+                                            generateHistorySchemaImage(
+                                                context,
+                                                schemaCardData,
+                                                viewModel,
+                                                histLimit
+                                            )
                                         }
                                         if (imageUri == null) {
                                             withContext(Dispatchers.Main) {
@@ -518,22 +553,33 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                                 if (n.startsWith("0")) n = n.drop(1)
                                                 n = "213$n"
                                             }
-                                            val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                                                type = "image/jpeg"
-                                                setPackage("com.whatsapp.w4b")
-                                                putExtra(android.content.Intent.EXTRA_STREAM, imageUri)
-                                                putExtra(android.content.Intent.EXTRA_TEXT,
-                                                    "السلام عليكم و رحمة الله و بركاته\n\n" +
-                                                            "هذه أداة تواصل لتوضيح مدى تقدم ابنكم في الحفظ\n" +
-                                                            "جزاكم الله خيرًا 🌿")
-                                                putExtra("jid", "$n@s.whatsapp.net")
-                                                addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                            }
+                                            val intent =
+                                                android.content.Intent(android.content.Intent.ACTION_SEND)
+                                                    .apply {
+                                                        type = "image/jpeg"
+                                                        setPackage("com.whatsapp.w4b")
+                                                        putExtra(
+                                                            android.content.Intent.EXTRA_STREAM,
+                                                            imageUri
+                                                        )
+                                                        putExtra(
+                                                            android.content.Intent.EXTRA_TEXT,
+                                                            "السلام عليكم و رحمة الله و بركاته\n\n" +
+                                                                    "هذه أداة تواصل لتوضيح مدى تقدم ابنكم في الحفظ\n" +
+                                                                    "جزاكم الله خيرًا 🌿"
+                                                        )
+                                                        putExtra("jid", "$n@s.whatsapp.net")
+                                                        addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                                    }
                                             context.startActivity(intent)
                                         }
                                     } catch (e: Exception) {
                                         withContext(Dispatchers.Main) {
-                                            Toast.makeText(context, "❌ خطأ: ${e.message}", Toast.LENGTH_LONG).show()
+                                            Toast.makeText(
+                                                context,
+                                                "❌ خطأ: ${e.message}",
+                                                Toast.LENGTH_LONG
+                                            ).show()
                                         }
                                     } finally {
                                         isSharingSchema = false
@@ -541,17 +587,17 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                 }
                             }
                         },
-                        enabled  = !isSharingSchema,
+                        enabled = !isSharingSchema,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         if (isSharingSchema) {
                             CircularProgressIndicator(
-                                modifier    = Modifier.size(16.dp),
+                                modifier = Modifier.size(16.dp),
                                 strokeWidth = 2.dp
                             )
                             Spacer(modifier = Modifier.size(6.dp))
                             Text(
-                                text  = "جاري الإرسال…",
+                                text = "جاري الإرسال…",
                                 style = MaterialTheme.typography.labelSmall
                             )
                         } else {
@@ -560,13 +606,13 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                 verticalArrangement = Arrangement.spacedBy(2.dp)
                             ) {
                                 Icon(
-                                    imageVector        = Icons.Default.BarChart,
+                                    imageVector = Icons.Default.BarChart,
                                     contentDescription = null,
-                                    modifier           = Modifier.size(18.dp),
-                                    tint               = Color(0xFF7B1FA2)   // violet — distinct des deux autres
+                                    modifier = Modifier.size(18.dp),
+                                    tint = Color(0xFF7B1FA2)   // violet — distinct des deux autres
                                 )
                                 Text(
-                                    text  = "إرسال مخطط التقدم",
+                                    text = "إرسال مخطط التقدم",
                                     style = MaterialTheme.typography.labelSmall,
                                     color = Color(0xFF7B1FA2)
                                 )
@@ -574,118 +620,36 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                         }
                     }
 
-                    // ── History-only image share button ───────────────────────
-                    // Uses generateHistoryImage — content-height-wrapped Bitmap,
-                    // no PDF intermediate, no trailing whitespace.
-                    var isSharingHistory by remember(etudiantId) { mutableStateOf(false) }
-                    OutlinedButton(
-                        onClick = {
-                            if (!isSharingHistory) {
-                                val rawPhone = etudiant.num_telephone_parent.trim()
-                                val phone = rawPhone.ifBlank { "0553885037" }
-                                isSharingHistory = true
-                                scope.launch {
-                                    try {
-                                        val historyCardData = ParentCommunicationCardData_2.fromEtudiant(etudiant)
-                                        // Content-height-wrapped image — no PDF, no whitespace
-                                        val imageUri = withContext(Dispatchers.IO) {
-                                            generateHistoryImage(context, historyCardData, viewModel, histLimit)
-                                        }
-                                        if (imageUri == null) {
-                                            withContext(Dispatchers.Main) {
-                                                Toast.makeText(context, "❌ فشل إنشاء صورة سجل المتابعة", Toast.LENGTH_SHORT).show()
-                                            }
-                                            return@launch
-                                        }
-                                        withContext(Dispatchers.Main) {
-                                            var n = phone.replace(Regex("[^0-9]"), "")
-                                            if (!n.startsWith("213")) {
-                                                if (n.startsWith("0")) n = n.drop(1)
-                                                n = "213$n"
-                                            }
-                                            val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                                                type = "image/jpeg"
-                                                setPackage("com.whatsapp.w4b")
-                                                putExtra(android.content.Intent.EXTRA_STREAM, imageUri)
-                                                putExtra(android.content.Intent.EXTRA_TEXT,
-                                                    "السلام عليكم و رحمة الله و بركاته\n\n" +
-                                                            "هذا سجل متابعة حفظ ابنكم\n" +
-                                                            "يرجى سماع عرضه ليترسخ للمرة القادمة\n" +
-                                                            "يرجى متابعة ووضع علامة إن أمكن، جزاكم الله خيرًا 🌿")
-                                                putExtra("jid", "$n@s.whatsapp.net")
-                                                addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                            }
-                                            context.startActivity(intent)
-                                        }
-                                    } catch (e: Exception) {
-                                        withContext(Dispatchers.Main) {
-                                            Toast.makeText(context, "❌ خطأ: ${e.message}", Toast.LENGTH_LONG).show()
-                                        }
-                                    } finally {
-                                        isSharingHistory = false
-                                    }
-                                }
-                            }
-                        },
-                        enabled  = !isSharingHistory,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        if (isSharingHistory) {
-                            CircularProgressIndicator(
-                                modifier    = Modifier.size(16.dp),
-                                strokeWidth = 2.dp
-                            )
-                            Spacer(modifier = Modifier.size(6.dp))
-                            Text(
-                                text  = "جاري الإرسال…",
-                                style = MaterialTheme.typography.labelSmall
-                            )
-                        } else {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.spacedBy(2.dp)
+
+                    (utilisateur == Utilisateur.Abdelwahab_Osstad).ifTrue {
+                        // ── Teacher-transfer button ───────────────────────────────
+                        Box(modifier = Modifier.fillMaxWidth()) {
+                            OutlinedButton(
+                                onClick = { showOussstadDropdownMenu = true },
+                                modifier = Modifier.fillMaxWidth()
                             ) {
                                 Icon(
-                                    imageVector        = Icons.Default.Share,
+                                    imageVector = Icons.Default.SwapHoriz,
                                     contentDescription = null,
-                                    modifier           = Modifier.size(18.dp),
-                                    tint               = Color(0xFF128C7E)
+                                    modifier = Modifier.size(20.dp)
                                 )
-                                Text(
-                                    text  = "إرسال سجل المتابعة",
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = Color(0xFF128C7E)
-                                )
+                                Spacer(modifier = Modifier.size(8.dp))
+                                Text("تحويل للأستاذ")
                             }
-                        }
-                    }
-                    // ── Teacher-transfer button ───────────────────────────────
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        OutlinedButton(
-                            onClick  = { showOussstadDropdownMenu = true },
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Icon(
-                                imageVector        = Icons.Default.SwapHoriz,
-                                contentDescription = null,
-                                modifier           = Modifier.size(20.dp)
-                            )
-                            Spacer(modifier = Modifier.size(8.dp))
-                            Text("تحويل للأستاذ")
-                        }
 
-                        DropdownMenu(
-                            expanded          = showOussstadDropdownMenu,
-                            onDismissRequest  = { showOussstadDropdownMenu = false }
-                        ) {
-                            Ousstad_Tahfid.values().forEach { ousstad ->
-                                DropdownMenuItem(
-                                    text    = { Text(ousstad.nom_arab) },
-                                    onClick = {
-                                        selectedOusstad          = ousstad
-                                        showOussstadDropdownMenu = false
-                                    }
-                                )
+                            DropdownMenu(
+                                expanded = showOussstadDropdownMenu,
+                                onDismissRequest = { showOussstadDropdownMenu = false }
+                            ) {
+                                Ousstad_Tahfid.values().forEach { ousstad ->
+                                    DropdownMenuItem(
+                                        text = { Text(ousstad.nom_arab) },
+                                        onClick = {
+                                            selectedOusstad = ousstad
+                                            showOussstadDropdownMenu = false
+                                        }
+                                    )
+                                }
                             }
                         }
                     }
@@ -699,12 +663,12 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
         AlertDialog(
             onDismissRequest = { selectedOusstad = null },
             title = { Text("تأكيد تحويل الطالب") },
-            text  = {
+            text = {
                 Column {
                     Text("هل تريد تحويل الطالب ${etudiant.nom} ${etudiant.prenom} إلى:")
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text  = selectedOusstad?.nom_arab ?: "",
+                        text = selectedOusstad?.nom_arab ?: "",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -745,7 +709,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text(
-                        text  = "اختر عدد السجلات الأخيرة التي تُدرج في الصورة:",
+                        text = "اختر عدد السجلات الأخيرة التي تُدرج في الصورة:",
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -754,12 +718,12 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                     listOf(2, 3, 5, 10).forEach { n ->
                         if (histLimit == n) {
                             Button(
-                                onClick  = { histLimit = n; showHistLimitDialog = false },
+                                onClick = { histLimit = n; showHistLimitDialog = false },
                                 modifier = Modifier.fillMaxWidth()
                             ) { Text("✓  آخر $n سجلات") }
                         } else {
                             OutlinedButton(
-                                onClick  = { histLimit = n; showHistLimitDialog = false },
+                                onClick = { histLimit = n; showHistLimitDialog = false },
                                 modifier = Modifier.fillMaxWidth()
                             ) { Text("آخر $n سجلات") }
                         }
@@ -767,18 +731,18 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                     // "Last" — single most-recent record
                     if (histLimit == 1) {
                         Button(
-                            onClick  = { histLimit = 1; showHistLimitDialog = false },
+                            onClick = { histLimit = 1; showHistLimitDialog = false },
                             modifier = Modifier.fillMaxWidth()
                         ) { Text("✓  آخر سجل") }
                     } else {
                         OutlinedButton(
-                            onClick  = { histLimit = 1; showHistLimitDialog = false },
+                            onClick = { histLimit = 1; showHistLimitDialog = false },
                             modifier = Modifier.fillMaxWidth()
                         ) { Text("آخر سجل") }
                     }
                     // "All" — resets the filter
                     OutlinedButton(
-                        onClick  = { histLimit = null; showHistLimitDialog = false },
+                        onClick = { histLimit = null; showHistLimitDialog = false },
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(if (histLimit == null) "✓  الكل (بدون تحديد)" else "الكل (بدون تحديد)")
@@ -794,42 +758,42 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
     // ── Sub-dialogs (unchanged) ───────────────────────────────────────────────
     if (showDetailsDialog) {
         EtudiantDetailsDialog_SeparatedAppsCodingPattern(
-            viewModel=viewModel,
-            etudiant          = etudiant,
-            repo19Etudiant    = repo19Etudiant,
+            viewModel = viewModel,
+            etudiant = etudiant,
+            repo19Etudiant = repo19Etudiant,
             repo20Observation = repo20Observation,
-            onDismiss         = { showDetailsDialog = false },
+            onDismiss = { showDetailsDialog = false },
             onShowSouraDialog = {
                 showDetailsDialog = false
-                showSouraDialog   = true
+                showSouraDialog = true
             },
             onShowMokarrareSouraDialog = {
-                showDetailsDialog  = false
+                showDetailsDialog = false
                 showMokarrareDialog = true
             },
             onShowMokarrareDialog = {
-                showDetailsDialog  = false
+                showDetailsDialog = false
                 showMokarrareDialog = true
             },
             onShowTakiyimDialog = {
-                showDetailsDialog  = false
-                showTakiyimDialog  = true
+                showDetailsDialog = false
+                showTakiyimDialog = true
             },
             onShowMoulahada3alaSouloukDialog = {
-                showDetailsDialog              = false
+                showDetailsDialog = false
                 showMoulahada3alaSouloukDialog = true
             },
             onShowIstedrakSouraDialog = {
-                showDetailsDialog        = false
-                showIstedrakSouraDialog  = true
+                showDetailsDialog = false
+                showIstedrakSouraDialog = true
             },
             onShowIstedrakMokarrareDialog = {
-                showDetailsDialog           = false
+                showDetailsDialog = false
                 showIstedrakMokarrareDialog = true
             },
             onShowIstedrakTakiyimDialog = {
-                showDetailsDialog          = false
-                showIstedrakTakiyimDialog  = true
+                showDetailsDialog = false
+                showIstedrakTakiyimDialog = true
             }
         )
     }
@@ -837,17 +801,17 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
     if (showSouraDialog) {
         SouraSelectionDialog_SeparatedAppsCodingPattern(
             currentSoura = etudiant.dernier_Soura_Wassale_Laha,
-            onDismiss    = { showSouraDialog = false; showDetailsDialog = true },
-            onSelect     = { selectedSoura ->
+            onDismiss = { showSouraDialog = false; showDetailsDialog = true },
+            onSelect = { selectedSoura ->
                 repo19Etudiant.upsert(
                     etudiant.copy(
-                        mokarrare_hifde            = etudiant.dernier_Soura_Wassale_Laha,
-                        mokarrare_hifde_sater      = etudiant.dernier_Soura_sater,
+                        mokarrare_hifde = etudiant.dernier_Soura_Wassale_Laha,
+                        mokarrare_hifde_sater = etudiant.dernier_Soura_sater,
                         dernier_Soura_Wassale_Laha = selectedSoura,
-                        dernier_Soura_sater        = 1
+                        dernier_Soura_sater = 1
                     )
                 )
-                showSouraDialog   = false
+                showSouraDialog = false
                 showDetailsDialog = true
             }
         )
@@ -856,13 +820,13 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
     if (showMokarrareDialog) {
         SouraSelectionDialog_SeparatedAppsCodingPattern(
             currentSoura = etudiant.mokarrare_hifde,
-            onDismiss    = { showMokarrareDialog = false; showDetailsDialog = true },
-            onSelect     = { selectedSoura ->
+            onDismiss = { showMokarrareDialog = false; showDetailsDialog = true },
+            onSelect = { selectedSoura ->
                 repo19Etudiant.upsert(
                     etudiant.copy(mokarrare_hifde = selectedSoura, mokarrare_hifde_sater = 1)
                 )
                 showMokarrareDialog = false
-                showDetailsDialog   = true
+                showDetailsDialog = true
             }
         )
     }
@@ -870,11 +834,11 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
     if (showTakiyimDialog) {
         TakiyimSelectionDialog_SeparatedAppsCodingPattern(
             currentTakiyim = etudiant.dernier_takyim_dabte,
-            etudiantKeyID  = etudiant.keyID,
+            etudiantKeyID = etudiant.keyID,
             repo20ObsarvationEtudion = viewModel.repo20ObsarvationEtudion,
-            activeOusstad  = viewModel.activeCentralValues.active_Ousstad_Tahfid,
-            onDismiss      = { showTakiyimDialog = false; showDetailsDialog = true },
-            onSelect       = { selectedTakiyim, selectedMoulahadat ->
+            activeOusstad = viewModel.activeCentralValues.active_Ousstad_Tahfid,
+            onDismiss = { showTakiyimDialog = false; showDetailsDialog = true },
+            onSelect = { selectedTakiyim, selectedMoulahadat ->
                 val updatedEtudiant = processTakiyimEvaluation(
                     etudiant = etudiant,
                     selectedTakiyim = selectedTakiyim,
@@ -891,11 +855,11 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
     if (showMoulahada3alaSouloukDialog) {
         MoulahadaSouloukSelectionDialog_SeparatedAppsCodingPattern(
             currentMoulahada = etudiant.moulahada_3ala_soulouk,
-            onDismiss        = { showMoulahada3alaSouloukDialog = false; showDetailsDialog = true },
-            onSelect         = { selectedMoulahada ->
+            onDismiss = { showMoulahada3alaSouloukDialog = false; showDetailsDialog = true },
+            onSelect = { selectedMoulahada ->
                 repo19Etudiant.upsert(etudiant.copy(moulahada_3ala_soulouk = selectedMoulahada))
                 showMoulahada3alaSouloukDialog = false
-                showDetailsDialog              = true
+                showDetailsDialog = true
             }
         )
     }
@@ -903,13 +867,13 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
     if (showIstedrakSouraDialog) {
         SouraSelectionDialog_SeparatedAppsCodingPattern(
             currentSoura = etudiant.istedrak_kadim_Akher_Soura_Wassale_Laha,
-            onDismiss    = { showIstedrakSouraDialog = false; showDetailsDialog = true },
-            onSelect     = { selectedSoura ->
+            onDismiss = { showIstedrakSouraDialog = false; showDetailsDialog = true },
+            onSelect = { selectedSoura ->
                 repo19Etudiant.upsert(
                     etudiant.copy(istedrak_kadim_Akher_Soura_Wassale_Laha = selectedSoura)
                 )
                 showIstedrakSouraDialog = false
-                showDetailsDialog       = true
+                showDetailsDialog = true
             }
         )
     }
@@ -917,13 +881,13 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
     if (showIstedrakMokarrareDialog) {
         SouraSelectionDialog_SeparatedAppsCodingPattern(
             currentSoura = etudiant.istedrak_kadim_Moukarare,
-            onDismiss    = { showIstedrakMokarrareDialog = false; showDetailsDialog = true },
-            onSelect     = { selectedSoura ->
+            onDismiss = { showIstedrakMokarrareDialog = false; showDetailsDialog = true },
+            onSelect = { selectedSoura ->
                 repo19Etudiant.upsert(
                     etudiant.copy(istedrak_kadim_Moukarare = selectedSoura)
                 )
                 showIstedrakMokarrareDialog = false
-                showDetailsDialog           = true
+                showDetailsDialog = true
             }
         )
     }
@@ -931,16 +895,16 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
     if (showIstedrakTakiyimDialog) {
         TakiyimSelectionDialog_SeparatedAppsCodingPattern(
             currentTakiyim = etudiant.istedrak_kadim_Takyim_hali,
-            etudiantKeyID  = etudiant.keyID,
+            etudiantKeyID = etudiant.keyID,
             repo20ObsarvationEtudion = viewModel.repo20ObsarvationEtudion,
-            activeOusstad  = viewModel.activeCentralValues.active_Ousstad_Tahfid,
-            onDismiss      = { showIstedrakTakiyimDialog = false; showDetailsDialog = true },
-            onSelect       = { selectedTakiyim, _ ->
+            activeOusstad = viewModel.activeCentralValues.active_Ousstad_Tahfid,
+            onDismiss = { showIstedrakTakiyimDialog = false; showDetailsDialog = true },
+            onSelect = { selectedTakiyim, _ ->
                 repo19Etudiant.upsert(
                     etudiant.copy(istedrak_kadim_Takyim_hali = selectedTakiyim)
                 )
                 showIstedrakTakiyimDialog = false
-                showDetailsDialog         = true
+                showDetailsDialog = true
             }
         )
     }
