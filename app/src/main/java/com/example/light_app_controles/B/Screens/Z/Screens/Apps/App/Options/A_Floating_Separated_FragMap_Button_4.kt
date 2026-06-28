@@ -100,10 +100,12 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
     val activeOusstad = activeCentralValues.active_Ousstad_Tahfid
 
     // Count students not updated today
-    val studentsNotUpdatedToday by remember {
+    val studentsNotUpdatedToday by remember(activeOusstad) {
         derivedStateOf {
+            val targetKey = getActiveOussstadKey()
             repo19.datasValue.filter { etudiant ->
-                !DateUtils.isToday(etudiant.dernierTimeTampsSynchronisationAvecFireBase)
+                etudiant.parent_ousstad_key == targetKey &&
+                        !DateUtils.isToday(etudiant.dernierTimeTampsSynchronisationAvecFireBase)
             }
         }
     }
