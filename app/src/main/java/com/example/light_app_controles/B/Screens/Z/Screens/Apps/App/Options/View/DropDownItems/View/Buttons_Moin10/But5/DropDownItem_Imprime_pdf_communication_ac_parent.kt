@@ -38,7 +38,7 @@ import java.util.Locale
 
 @Composable
 fun DropDownItem_Imprime_pdf_Case_A_Cochet(
-    nomFun: String = "بطاقة التواصل مع الولي (PDF) - شبكة",
+    nomFun: String = " (PDF) - شبكة",
     aCentralFacade: A_ViewModel_SeparatedAppsCodingPattern,
     repo19Etudiant: Repo19Etudiant = aCentralFacade.repo19Etudiant,
     context: Context = LocalContext.current

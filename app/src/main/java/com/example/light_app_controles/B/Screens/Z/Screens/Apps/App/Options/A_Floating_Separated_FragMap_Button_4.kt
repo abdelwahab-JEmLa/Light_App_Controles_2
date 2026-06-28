@@ -4,6 +4,7 @@ import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
 import Application5.App.Repository.M19Etudiant
 import Application5.App.Repository.M20ObsarvationEtudion
 import Application5.App.View.DropDownItems.View.But10.DropDownItem_Imprime_pdf_collecte_numeros_whatsapp
+import Application5.App.View.DropDownItems.View.But11.DropDownItem_Imprime_pdf_collecte_numeros_whatsapp_amine
 import Application5.App.View.DropDownItems.View.But2.DropDownItem_Imprime_pdf_communication_ac_parent
 import Application5.App.View.DropDownItems.View.But4.DropDownItem_Imprime_pdf_List_Talaba
 import Application5.App.View.DropDownItems.View.But5.DropDownItem_Imprime_pdf_Case_A_Cochet
@@ -384,10 +385,10 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
             //DropDownItem_Imprime_pdf_communication_ac_parent(viewModel = aCentralFacade)
             Divider_Modfied()
 
-       //     DropDownItem_Imprime_pdf_collecte_numeros_whatsapp(aCentralFacade = aCentralFacade)
+         DropDownItem_Imprime_pdf_collecte_numeros_whatsapp(aCentralFacade = aCentralFacade)
             DropDownItem_Send_Cards_WhatsApp_Parent(aCentralFacade = aCentralFacade)
             DropDownItem_Imprime_pdf_Case_A_Cochet(aCentralFacade = aCentralFacade)
-
+            DropDownItem_Imprime_pdf_collecte_numeros_whatsapp_amine(aCentralFacade = aCentralFacade)
             Divider_Modfied()
 
             if (showTextField) {
