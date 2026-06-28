@@ -7,6 +7,9 @@ import Application5.App.View.DropDownItems.View.But11.DropDownItem_Imprime_pdf_c
 import Application5.App.View.DropDownItems.View.But5.DropDownItem_Imprime_pdf_Case_A_Cochet
 import Application5.App.View.DropDownItems.View.ButID6.DropDownItem_ID6
 import EntreApps.Shared.Models.Components.Ousstad_Tahfid
+import EntreApps.Shared.Models.Compts
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps
+import EntreApps.Shared.Models.Utilisateur
 import android.text.format.DateUtils
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -250,7 +253,13 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
 
                     Spacer(modifier = Modifier.size(8.dp))
 
-                    if (activeOusstad != Ousstad_Tahfid.Amine_Madrassa && activeOusstad != Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata) {
+                    val params = M00CentralParametresOfAllApps()
+                    val utilisateur = when (params.au_Lence_Set_Compt_Ac_KeyId) {
+                        Compts.AbdelwahabTravailleChezGros_KeyId.keyId -> Utilisateur.Abdelwahab_Osstad
+                        else -> Utilisateur.Admin
+                    }
+
+                    if (utilisateur == Utilisateur.Abdelwahab_Osstad) {
                         DropdownMenuItem(
                             leadingIcon = {
                                 Icon(

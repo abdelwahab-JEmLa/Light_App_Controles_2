@@ -260,7 +260,7 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
                         onDismissRequest = { showVideoMenu = false }
                     ) {
                         androidx.compose.material3.DropdownMenuItem(
-                            text = { androidx.compose.material3.Text("فديو التعريفي للواجهة الرئيسة") },
+                            text = { androidx.compose.material3.Text("1- فديو التعريفي للواجهة الرئيسة") },
                             onClick = {
                                 showFloatingVideo = true
                                 showVideoMenu = false
