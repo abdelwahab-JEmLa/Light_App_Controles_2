@@ -282,40 +282,6 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary
                     )
-
-                    if (absenceCount > 0) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Text(
-                                text = "غياب: $absenceCount",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.error
-                            )
-
-                            IconButton(
-                                onClick = {
-                                    repo19Etudiant.upsert(
-                                        etudiant.copy(
-                                            imprime_justification = !etudiant.imprime_justification
-                                        )
-                                    )
-                                },
-                                modifier = Modifier.size(20.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Print,
-                                    contentDescription = "Imprimer justification",
-                                    tint = if (etudiant.imprime_justification)
-                                        MaterialTheme.colorScheme.primary
-                                    else
-                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-                                    modifier = Modifier.size(16.dp)
-                                )
-                            }
-                        }
-                    }
                 }
             }
 

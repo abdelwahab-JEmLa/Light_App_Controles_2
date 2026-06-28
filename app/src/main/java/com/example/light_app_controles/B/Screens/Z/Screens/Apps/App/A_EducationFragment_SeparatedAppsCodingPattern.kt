@@ -1,3 +1,5 @@
+@file:Suppress("COMPOSE_APPLIER_CALL_MISMATCH")
+
 package com.example.light_app_controles.B.Screens.Z.Screens.Apps.App
 
 import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
@@ -66,6 +68,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -167,13 +170,16 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
 
     // ── Screen dimensions for drag bounds ──────────────────────────────────────
     val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.toFloat()
-    val screenHeight = configuration.screenHeightDp.toFloat()
+    val density = LocalDensity.current
+    val screenWidthPx = with(density) { configuration.screenWidthDp.dp.toPx() }
+    val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
+    val buttonBoundXPx = with(density) { 80.dp.toPx() }
+    val buttonBoundYPx = with(density) { 80.dp.toPx() }
 
     // ── FAB state: collapsed by default, opens on tap ─────────────────────────
     var showFabMenu by remember { mutableStateOf(false) }
-    var fabOffsetX by remember { mutableFloatStateOf(screenWidth - 80f) }
-    var fabOffsetY by remember { mutableFloatStateOf(screenHeight - 200f) }
+    var fabOffsetX by remember { mutableFloatStateOf(screenWidthPx - buttonBoundXPx) }
+    var fabOffsetY by remember { mutableFloatStateOf(screenHeightPx - with(density) { 200.dp.toPx() }) }
 
     Column(
         modifier = modifier
@@ -226,8 +232,8 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()
-                        fabOffsetX = (fabOffsetX + dragAmount.x).coerceIn(0f, screenWidth - 80f)
-                        fabOffsetY = (fabOffsetY + dragAmount.y).coerceIn(0f, screenHeight - 80f)
+                        fabOffsetX = (fabOffsetX + dragAmount.x).coerceIn(0f, screenWidthPx - buttonBoundXPx)
+                        fabOffsetY = (fabOffsetY + dragAmount.y).coerceIn(0f, screenHeightPx - buttonBoundYPx)
                     }
                 }
         ) {
@@ -254,7 +260,7 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
                         onDismissRequest = { showVideoMenu = false }
                     ) {
                         androidx.compose.material3.DropdownMenuItem(
-                            text = { androidx.compose.material3.Text("Présentation vidéo") },
+                            text = { androidx.compose.material3.Text("فديو التعريفي للواجهة الرئيسة") },
                             onClick = {
                                 showFloatingVideo = true
                                 showVideoMenu = false
@@ -543,8 +549,8 @@ fun FloatingDraggableVideoPlayer(onDismiss: () -> Unit) {
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()
-                        offsetX = (offsetX + dragAmount.x).coerceIn(0f, screenWidthPx - playerWidthPx)
-                        offsetY = (offsetY + dragAmount.y).coerceIn(0f, screenHeightPx - with(density) { 270.dp.toPx() })
+                        offsetX += dragAmount.x
+                        offsetY += dragAmount.y
                     }
                 },
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -569,7 +575,7 @@ fun FloatingDraggableVideoPlayer(onDismiss: () -> Unit) {
             }
         }
 
-        androidx.compose.ui.viewinterop.AndroidView(
+        AndroidView(
             factory = { ctx ->
                 com.google.android.exoplayer2.ui.PlayerView(ctx).apply {
                     player = exoPlayer

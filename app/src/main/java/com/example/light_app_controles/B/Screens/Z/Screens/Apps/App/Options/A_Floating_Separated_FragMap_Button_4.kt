@@ -378,7 +378,7 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
                     OutlinedTextField(
                         value = studentName,
                         onValueChange = { studentName = it },
-                        label = { Text("Nom de l'étudiant") },
+                        label = { Text("اسم التلميذ الجديد") },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         trailingIcon = {
