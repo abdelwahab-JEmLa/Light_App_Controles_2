@@ -43,7 +43,6 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -289,9 +288,9 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
                         )
 
                         if (showOussstadSelection) {
-                            Divider(modifier = Modifier.padding(vertical = 4.dp))
+                            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
-                            Ousstad_Tahfid.values()
+                            Ousstad_Tahfid.entries
                                 .forEach { ousstad ->
                                     DropdownMenuItem(
                                         leadingIcon = {
@@ -330,7 +329,7 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
                 }
             }
 
-            Divider()
+            HorizontalDivider()
 
             Card(
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -375,7 +374,7 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
                 )
             }
 
-            Divider()
+            HorizontalDivider()
             Card(
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                 colors = CardDefaults.cardColors(

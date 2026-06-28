@@ -74,19 +74,33 @@ fun DropDownItem_ID6(
     var showMonthDialog by remember { mutableStateOf(false) }
     var showTeacherDialog by remember { mutableStateOf(false) }
     var chosenMonth by remember { mutableStateOf(selectedMonth ?: Calendar.getInstance()) }
-    var chosenTeacher by remember { mutableStateOf<Ousstad_Tahfid?>(
-        if (selectedTeacher == null || selectedTeacher == Ousstad_Tahfid.Non_Defini_Actuellemen)
-            Ousstad_Tahfid.Abdelwahab_Osstad
-        else selectedTeacher
-    ) }
     // (true, original default) or all students sorted by absence count (false).
-    var hideAbsentStudents by remember { mutableStateOf(true) }
+    var hideAbsentStudents by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     // FIXED: Get the actual current teacher from focused values
     val currentUtilisateur = remember(aCentralFacade.activeCentralValues) {
         aCentralFacade.activeCentralValues.active_Ousstad_Tahfid
             ?: Utilisateur.Admin // Fallback to Admin if no teacher is selected
+    }
+
+    val isRestrictedTeacher = remember(currentUtilisateur) {
+        currentUtilisateur == Utilisateur.Amine_Madrassa ||
+                currentUtilisateur == Utilisateur.kissme_talaba_li_dirassatihim_mena_idata
+    }
+
+    var chosenTeacher by remember(currentUtilisateur, selectedTeacher) {
+        mutableStateOf<Ousstad_Tahfid?>(
+            when (currentUtilisateur) {
+                Utilisateur.Amine_Madrassa -> Ousstad_Tahfid.Amine_Madrassa
+                Utilisateur.kissme_talaba_li_dirassatihim_mena_idata -> Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata
+                else -> {
+                    if (selectedTeacher == null || selectedTeacher == Ousstad_Tahfid.Non_Defini_Actuellemen)
+                        Ousstad_Tahfid.Abdelwahab_Osstad
+                    else selectedTeacher
+                }
+            }
+        )
     }
 
     val activeStudentsCount = remember(repo19Etudiant.datasValue, chosenTeacher) {
@@ -180,7 +194,7 @@ fun DropDownItem_ID6(
 
                 val displayTeacherText = if (teacherText.contains("انتقالي")) "دراسة حالة من الادارة" else teacherText
 
-                Text(              //<--
+                Text(
                     text = when {
                         isLoading && generationStatus.isNotEmpty() -> generationStatus
                         isLoading -> "جاري الإنشاء..."
@@ -233,15 +247,17 @@ fun DropDownItem_ID6(
                     }
 
                     // Teacher selector button
-                    IconButton(
-                        onClick = { showTeacherDialog = true },
-                        modifier = Modifier.size(32.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "اختر الأستاذ",
-                            modifier = Modifier.size(18.dp)
-                        )
+                    if (!isRestrictedTeacher) {
+                        IconButton(
+                            onClick = { showTeacherDialog = true },
+                            modifier = Modifier.size(32.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = "اختر الأستاذ",
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -505,7 +521,16 @@ private fun openPdfWithViewer(context: Context, pdfFile: File) {
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
         }
 
-        if (intent.resolveActivity(context.packageManager) != null) {
+        // Try to open with Adobe Acrobat Reader first
+        val adobeIntent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(uri, "application/pdf")
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+            setPackage("com.adobe.reader")
+        }
+
+        if (adobeIntent.resolveActivity(context.packageManager) != null) {
+            context.startActivity(adobeIntent)
+        } else if (intent.resolveActivity(context.packageManager) != null) {
             context.startActivity(intent)
         } else {
             Toast.makeText(
