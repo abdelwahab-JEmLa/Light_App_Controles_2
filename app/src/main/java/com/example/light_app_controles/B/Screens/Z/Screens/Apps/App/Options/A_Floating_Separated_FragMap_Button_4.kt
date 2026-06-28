@@ -99,17 +99,6 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
     val activeCentralValues = aCentralFacade.activeCentralValues
     val activeOusstad = activeCentralValues.active_Ousstad_Tahfid
 
-    // Count students not updated today
-    val studentsNotUpdatedToday by remember(activeOusstad) {
-        derivedStateOf {
-            val targetKey = getActiveOussstadKey()
-            repo19.datasValue.filter { etudiant ->
-                etudiant.parent_ousstad_key == targetKey &&
-                        !DateUtils.isToday(etudiant.dernierTimeTampsSynchronisationAvecFireBase)
-            }
-        }
-    }
-
     // Get active Ousstad and determine parent key
     fun getActiveOussstadKey(): String {
         val params = M00CentralParametresOfAllApps()
@@ -121,6 +110,17 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
             Ousstad_Tahfid.Kissm_Intikali -> "Kissm_Intikali"
             Ousstad_Tahfid.Non_Defini_Actuellemen -> "Non_Defini_Actuellemen"
             null -> AbdelwahabTravailleChezGros_KeyId.keyId // Default fallback
+        }
+    }
+
+    // Count students not updated today
+    val studentsNotUpdatedToday by remember(activeOusstad) {
+        derivedStateOf {
+            val targetKey = getActiveOussstadKey()
+            repo19.datasValue.filter { etudiant ->
+                etudiant.parent_ousstad_key == targetKey &&
+                        !DateUtils.isToday(etudiant.dernierTimeTampsSynchronisationAvecFireBase)
+            }
         }
     }
 
