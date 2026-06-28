@@ -4,6 +4,7 @@ import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
 import Application5.App.MonthSelectionDialog_SeparatedAppsCodingPattern
 import Application5.App.Options.FabButton_When_Its_EducationFragment
 import Application5.App.Options.FabDropdownMenu_WhenIts_FragmentEducation
+import Application5.App.Options.VideoPresentationDialog
 import Application5.App.Repository.M19Etudiant
 import Application5.App.View.DropDownItems.View.ButID8.SessionsEducationDialog.Dialog.SessionsEducationDialog
 import androidx.compose.foundation.Image
@@ -31,7 +32,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.foundation.border
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,6 +52,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.semantics
@@ -175,7 +181,10 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
             .semantics(mergeDescendants = true) {
-                set(value = repo19Etudiant.datasValue.filter { it.parent_ousstad_key == "Kissm_Intikali" }, key = SemanticsPropertyKey("etudiants_kissm_intikali"))
+                set(
+                    value = repo19Etudiant.datasValue.filter { it.parent_ousstad_key == "Kissm_Intikali" },
+                    key = SemanticsPropertyKey("etudiants_kissm_intikali")
+                )
                 set(value = repo19Etudiant.datasValue, key = SemanticsPropertyKey("etudiants_all"))
             }
     ) {
@@ -209,6 +218,9 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
+        var showVideoMenu by remember { mutableStateOf(false) }
+        var showFloatingVideo by remember { mutableStateOf(false) }
+
         Box(
             modifier = Modifier
                 .offset { IntOffset(fabOffsetX.roundToInt(), fabOffsetY.roundToInt()) }
@@ -220,14 +232,52 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
                     }
                 }
         ) {
-            // The button is always visible; menu only shows after a tap.
-            FabButton_When_Its_EducationFragment(
-                showWarningState = etudiants.isNotEmpty() && !hasUpdateToday,
-                isFabVisible = showFabMenu,
-                its_Targeted_Frag = true,
-                onToggleFabVisibility = { showFabMenu = !showFabMenu },
-                onShowDropdown = { showFabMenu = true }
-            )
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                androidx.compose.foundation.layout.Box {
+                    androidx.compose.material3.FloatingActionButton(
+                        onClick = { showVideoMenu = true },
+                        shape = androidx.compose.foundation.shape.CircleShape,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(56.dp)
+                    ) {
+                        Icon(          
+                            imageVector = androidx.compose.material.icons.Icons.Default.PlayArrow,
+                            contentDescription = "تعريف اولي بالتطبيق",
+                            tint = Color.White
+                        )
+                    }
+                    
+                    androidx.compose.material3.DropdownMenu(
+                        expanded = showVideoMenu,
+                        onDismissRequest = { showVideoMenu = false }
+                    ) {
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { androidx.compose.material3.Text("Présentation vidéo") },
+                            onClick = {
+                                showFloatingVideo = true
+                                showVideoMenu = false
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = androidx.compose.material.icons.Icons.Default.PlayArrow,
+                                    contentDescription = null
+                                )
+                            }
+                        )
+                    }
+                }
+
+                FabButton_When_Its_EducationFragment(
+                    showWarningState = etudiants.isNotEmpty() && !hasUpdateToday,
+                    isFabVisible = showFabMenu,
+                    its_Targeted_Frag = true,
+                    onToggleFabVisibility = { showFabMenu = !showFabMenu },
+                    onShowDropdown = { showFabMenu = true }
+                )
+            }
 
             // Rendered only when the FAB was tapped — starts hidden.
             if (showFabMenu) {
@@ -236,6 +286,12 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
                     onDismissDropdown = { showFabMenu = false }
                 )
             }
+        }
+        
+        if (showFloatingVideo) {
+            FloatingDraggableVideoPlayer(
+                onDismiss = { showFloatingVideo = false }
+            )
         }
     }
 }
@@ -312,7 +368,6 @@ fun ScrollableInformationBanner(
                 )
             }
         }
-
         Card(
             modifier = Modifier
                 .width(320.dp)
@@ -442,4 +497,90 @@ fun isSameDay(timestamp1: Long, timestamp2: Long): Boolean {
     val cal2 = Calendar.getInstance().apply { timeInMillis = timestamp2 }
     return cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR) &&
             cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
+}
+
+@Composable
+fun FloatingDraggableVideoPlayer(onDismiss: () -> Unit) {
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    val screenWidthPx = with(density) { configuration.screenWidthDp.dp.toPx() }
+    val screenHeightPx = with(density) { configuration.screenHeightDp.dp.toPx() }
+    val playerWidthPx = with(density) { 320.dp.toPx() }
+    val playerHeightPx = with(density) { 240.dp.toPx() }
+
+    var offsetX by remember { mutableStateOf(screenWidthPx / 2f - playerWidthPx / 2f) }
+    var offsetY by remember { mutableStateOf(screenHeightPx / 2f - playerHeightPx / 2f) }
+
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val exoPlayer = remember {
+        com.google.android.exoplayer2.ExoPlayer.Builder(context).build().apply {
+            val uri = android.net.Uri.parse("android.resource://${context.packageName}/raw/presentation_start")
+            val mediaItem = com.google.android.exoplayer2.MediaItem.fromUri(uri)
+            setMediaItem(mediaItem)
+            prepare()
+            playWhenReady = true
+        }
+    }
+
+    androidx.compose.runtime.DisposableEffect(Unit) {
+        onDispose {
+            exoPlayer.release()
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
+            .size(width = 320.dp, height = 270.dp)
+            .background(Color.Black, shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+            .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+            .border(2.dp, MaterialTheme.colorScheme.primary, androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+    ) {
+        androidx.compose.foundation.layout.Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(30.dp)
+                .background(Color.DarkGray)
+                .pointerInput(Unit) {
+                    detectDragGestures { change, dragAmount ->
+                        change.consume()
+                        offsetX = (offsetX + dragAmount.x).coerceIn(0f, screenWidthPx - playerWidthPx)
+                        offsetY = (offsetY + dragAmount.y).coerceIn(0f, screenHeightPx - with(density) { 270.dp.toPx() })
+                    }
+                },
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            androidx.compose.material3.Text(
+                text = "Présentation",
+                color = Color.White,
+                modifier = Modifier.padding(start = 12.dp),
+                style = MaterialTheme.typography.labelSmall
+            )
+            androidx.compose.material3.IconButton(
+                onClick = onDismiss,
+                modifier = Modifier.size(30.dp)
+            ) {
+                Icon(
+                    imageVector = androidx.compose.material.icons.Icons.Default.Close,
+                    contentDescription = "Fermer",
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+        }
+
+        androidx.compose.ui.viewinterop.AndroidView(
+            factory = { ctx ->
+                com.google.android.exoplayer2.ui.PlayerView(ctx).apply {
+                    player = exoPlayer
+                    useController = true
+                }
+            },
+            update = { view ->
+                view.player = exoPlayer
+            },
+            modifier = Modifier.fillMaxSize()
+        )
+    }
 }

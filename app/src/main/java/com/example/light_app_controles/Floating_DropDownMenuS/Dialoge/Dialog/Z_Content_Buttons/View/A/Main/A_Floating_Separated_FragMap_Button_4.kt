@@ -5,6 +5,9 @@ import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.B_FragMap_Dropdo
 import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
 import EntreApps.Shared.Models.Relative_Produits.Models.M16CategorieProduit
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps
+import EntreApps.Shared.Models.Utilisateur
+import EntreApps.Shared.Models.Compts
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -65,6 +68,19 @@ fun Floating_Separated_Button(
         colors = Pair(Color.Red, Color.Blue)
     ),
 ) {
+    val isAmineMadrassa = remember {
+        val params = M00CentralParametresOfAllApps()
+        val utilisateur = when (params.au_Lence_Set_Compt_Ac_KeyId) {
+            params.abdelmomen_Compt_KeyId -> Utilisateur.Abdelmoumen
+            params.walid_Compt_KeyId -> Utilisateur.Walid
+            Compts.AbdelwahabTravailleChezGros_KeyId.keyId -> Utilisateur.Abdelwahab_Osstad
+            params.amine_madrasa_Compt_KeyId -> Utilisateur.Amine_Madrassa
+            else -> Utilisateur.Admin
+        }
+        utilisateur == Utilisateur.Amine_Madrassa
+    }
+
+    if (isAmineMadrassa) return
     val isShowingAll = true
     val updatedButtonState = buttonState.copy(its_Active = isShowingAll)
 
@@ -94,7 +110,7 @@ fun Floating_Separated_Button(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                FloatingActionButton(
+                FloatingActionButton(              //<--
                     modifier = Modifier.size(48.dp),
                     onClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)

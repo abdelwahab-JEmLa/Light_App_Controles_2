@@ -73,7 +73,7 @@ fun DropDownItem_ID6(
     var generationStatus by remember { mutableStateOf("") }
     var showMonthDialog by remember { mutableStateOf(false) }
     var showTeacherDialog by remember { mutableStateOf(false) }
-    var chosenMonth by remember { mutableStateOf(selectedMonth) }
+    var chosenMonth by remember { mutableStateOf(selectedMonth ?: Calendar.getInstance()) }
     var chosenTeacher by remember { mutableStateOf<Ousstad_Tahfid?>(
         if (selectedTeacher == null || selectedTeacher == Ousstad_Tahfid.Non_Defini_Actuellemen)
             Ousstad_Tahfid.Abdelwahab_Osstad

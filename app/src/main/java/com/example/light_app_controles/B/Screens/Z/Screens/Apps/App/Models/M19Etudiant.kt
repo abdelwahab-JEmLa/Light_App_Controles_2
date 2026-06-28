@@ -56,6 +56,8 @@ data class M19Etudiant(
         Jayid_Jiddan("جيد جداً"),
         Fawk_Jayid("فوق الجيد"),
         Jayid("جيد"),
+        Fawk_Hassan("فوق الحسن"),
+        Hassan("حسن"),
         Fawk_Makbol("فوق المقبول"),
         Maqboul("مقبول"),
         Lam_Yahfed("لم يحفظ")
