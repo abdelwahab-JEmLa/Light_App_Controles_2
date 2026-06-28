@@ -269,7 +269,9 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
                     Spacer(modifier = Modifier.size(8.dp))
 
                     if (activeOusstad != Ousstad_Tahfid.Amine_Madrassa) {
-                        DropdownMenuItem(
+                        DropdownMenuItem(          //<--
+                        //TODO(2.C Relative Au Todo(1): 
+                                //... assure que ca soit ici 
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.School,

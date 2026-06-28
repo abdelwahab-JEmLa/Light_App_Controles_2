@@ -23,7 +23,9 @@ enum class Ousstad_Tahfid(
         "dimanch/jeudi",
         "قسم انتقالي",
         "Kissm_Intikali"
-    ),
+    ),               //<--
+    //TODO(1): cree kissme_talaba_li_dirassatihim_mena_idata       //<--
+    //TODO(1): fait que ca soit tou comme  Amine_Madrassa  
     Amine_Madrassa(
         "dimanch/jeudi",
         "أمين",
