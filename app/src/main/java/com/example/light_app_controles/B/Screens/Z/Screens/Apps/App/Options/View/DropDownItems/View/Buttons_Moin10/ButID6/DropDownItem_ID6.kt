@@ -79,21 +79,20 @@ fun DropDownItem_ID6(
     val scope = rememberCoroutineScope()
 
     // FIXED: Get the actual current teacher from focused values
-    val currentUtilisateur = remember(aCentralFacade.activeCentralValues) {
-        aCentralFacade.activeCentralValues.active_filter_du_utilisateur
-            ?: Utilisateur.Admin // Fallback to Admin if no teacher is selected
+    val currentTeacher = remember(aCentralFacade.activeCentralValues) {
+        aCentralFacade.activeCentralValues.active_Ousstad_Tahfid
     }
 
-    val isRestrictedTeacher = remember(currentUtilisateur) {
-        currentUtilisateur == Utilisateur.Amine_Madrassa ||
-                currentUtilisateur == Utilisateur.kissme_talaba_li_dirassatihim_mena_idata
+    val isRestrictedTeacher = remember(currentTeacher) {
+        currentTeacher == Ousstad_Tahfid.Amine_Madrassa ||
+                currentTeacher == Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata
     }
 
-    var chosenTeacher by remember(currentUtilisateur, selectedTeacher) {
+    var chosenTeacher by remember(currentTeacher, selectedTeacher) {
         mutableStateOf<Ousstad_Tahfid?>(
-            when (currentUtilisateur) {
-                Utilisateur.Amine_Madrassa -> Ousstad_Tahfid.Amine_Madrassa
-                Utilisateur.kissme_talaba_li_dirassatihim_mena_idata -> Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata
+            when (currentTeacher) {
+                Ousstad_Tahfid.Amine_Madrassa -> Ousstad_Tahfid.Amine_Madrassa
+                Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata -> Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata
                 else -> {
                     if (selectedTeacher == null || selectedTeacher == Ousstad_Tahfid.Non_Defini_Actuellemen)
                         Ousstad_Tahfid.Abdelwahab_Osstad
