@@ -377,60 +377,15 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
             }
 
             HorizontalDivider()
-            Card(
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = if (activeCentralValues.affiche_last_histoque_seulement)
-                        MaterialTheme.colorScheme.secondaryContainer
-                    else
-                        MaterialTheme.colorScheme.surfaceVariant
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-            ) {
-                DropdownMenuItem(
-                    leadingIcon = {
-                        Icon(
-                            imageVector = if (activeCentralValues.affiche_last_histoque_seulement)
-                                Icons.Default.Visibility
-                            else
-                                Icons.Default.VisibilityOff,
-                            contentDescription = null,
-                            tint = if (activeCentralValues.affiche_last_histoque_seulement)
-                                MaterialTheme.colorScheme.secondary
-                            else
-                                MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    },
-                    text = {
-                        Text(
-                            text = if (activeCentralValues.affiche_last_histoque_seulement)
-                                "إظهار آخر سجل فقط (مفعل)"
-                            else
-                                "إظهار آخر سجل فقط",
-                            color = if (activeCentralValues.affiche_last_histoque_seulement)
-                                MaterialTheme.colorScheme.secondary
-                            else
-                                MaterialTheme.colorScheme.onSurface,
-                            style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = if (activeCentralValues.affiche_last_histoque_seulement)
-                                FontWeight.Bold
-                            else
-                                FontWeight.Normal
-                        )
-                    },
-                    onClick = {
-                        activeCentralValues.affiche_last_histoque_seulement = !activeCentralValues.affiche_last_histoque_seulement
-                    }
-                )
-            }
+
           //  DropDownItem_ButID8(aCentralFacade = aCentralFacade)
             DropDownItem_ID6(aCentralFacade = aCentralFacade)
         //    DropDownItem_Imprime_pdf_List_Talaba(aCentralFacade = aCentralFacade)
             //DropDownItem_Imprime_pdf_communication_ac_parent(viewModel = aCentralFacade)
             Divider_Modfied()
 
-            DropDownItem_Imprime_pdf_collecte_numeros_whatsapp(aCentralFacade = aCentralFacade)
-           // DropDownItem_Send_Cards_WhatsApp_Parent(aCentralFacade = aCentralFacade)
+       //     DropDownItem_Imprime_pdf_collecte_numeros_whatsapp(aCentralFacade = aCentralFacade)
+            DropDownItem_Send_Cards_WhatsApp_Parent(aCentralFacade = aCentralFacade)
             DropDownItem_Imprime_pdf_Case_A_Cochet(aCentralFacade = aCentralFacade)
 
             Divider_Modfied()
@@ -462,6 +417,52 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
                                         MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                                 )
                             }
+                        }
+                    )
+                }
+                Card(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (activeCentralValues.affiche_last_histoque_seulement)
+                            MaterialTheme.colorScheme.secondaryContainer
+                        else
+                            MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
+                    DropdownMenuItem(
+                        leadingIcon = {
+                            Icon(
+                                imageVector = if (activeCentralValues.affiche_last_histoque_seulement)
+                                    Icons.Default.Visibility
+                                else
+                                    Icons.Default.VisibilityOff,
+                                contentDescription = null,
+                                tint = if (activeCentralValues.affiche_last_histoque_seulement)
+                                    MaterialTheme.colorScheme.secondary
+                                else
+                                    MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        },
+                        text = {
+                            Text(
+                                text = if (activeCentralValues.affiche_last_histoque_seulement)
+                                    "إظهار آخر سجل فقط (مفعل)"
+                                else
+                                    "إظهار آخر سجل فقط",
+                                color = if (activeCentralValues.affiche_last_histoque_seulement)
+                                    MaterialTheme.colorScheme.secondary
+                                else
+                                    MaterialTheme.colorScheme.onSurface,
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = if (activeCentralValues.affiche_last_histoque_seulement)
+                                    FontWeight.Bold
+                                else
+                                    FontWeight.Normal
+                            )
+                        },
+                        onClick = {
+                            activeCentralValues.affiche_last_histoque_seulement = !activeCentralValues.affiche_last_histoque_seulement
                         }
                     )
                 }
