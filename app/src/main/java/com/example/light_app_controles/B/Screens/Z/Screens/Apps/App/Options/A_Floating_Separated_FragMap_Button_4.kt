@@ -116,6 +116,7 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
         return when (activeOusstad) {
             Ousstad_Tahfid.Abdelwahab_Osstad -> AbdelwahabTravailleChezGros_KeyId.keyId
             Ousstad_Tahfid.Amine_Madrassa -> params.amine_madrasa_Compt_KeyId
+            Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata -> params.kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId
             Ousstad_Tahfid.Kissm_Intikali -> "Kissm_Intikali"
             Ousstad_Tahfid.Non_Defini_Actuellemen -> "Non_Defini_Actuellemen"
             null -> AbdelwahabTravailleChezGros_KeyId.keyId // Default fallback
@@ -251,7 +252,7 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
                             Text(
                                 text = "الأستاذ النشط:",
                                 style = MaterialTheme.typography.labelMedium,
-                                color = if (activeOusstad == Ousstad_Tahfid.Amine_Madrassa)
+                                color = if (activeOusstad == Ousstad_Tahfid.Amine_Madrassa || activeOusstad == Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata)
                                     MaterialTheme.colorScheme.secondary
                                 else
                                     MaterialTheme.colorScheme.onPrimaryContainer
@@ -268,10 +269,8 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
 
                     Spacer(modifier = Modifier.size(8.dp))
 
-                    if (activeOusstad != Ousstad_Tahfid.Amine_Madrassa) {
-                        DropdownMenuItem(          //<--
-                        //TODO(2.C Relative Au Todo(1): 
-                                //... assure que ca soit ici 
+                    if (activeOusstad != Ousstad_Tahfid.Amine_Madrassa && activeOusstad != Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata) {
+                        DropdownMenuItem(
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Default.School,

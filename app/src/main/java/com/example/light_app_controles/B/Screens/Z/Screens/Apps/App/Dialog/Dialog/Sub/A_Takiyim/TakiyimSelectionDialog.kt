@@ -88,6 +88,7 @@ fun TakiyimSelectionDialog_SeparatedAppsCodingPattern(
         when (activeOusstad) {
             Ousstad_Tahfid.Abdelwahab_Osstad ->Compts.AbdelwahabTravailleChezGros_KeyId.keyId
             Ousstad_Tahfid.Amine_Madrassa -> params.amine_madrasa_Compt_KeyId
+            Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata -> params.kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId
             Ousstad_Tahfid.Kissm_Intikali -> "Kissm_Intikali"
             Ousstad_Tahfid.Non_Defini_Actuellemen -> "Non_Defini_Actuellemen"
             null -> latestObservation?.parent_ousstad_key ?: ""

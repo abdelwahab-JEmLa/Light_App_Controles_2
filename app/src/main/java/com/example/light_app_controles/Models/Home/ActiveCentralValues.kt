@@ -113,12 +113,14 @@ data class ActiveCentralValues(
             params.walid_Compt_KeyId -> Utilisateur.Walid
             Compts.AbdelwahabTravailleChezGros_KeyId.keyId -> Utilisateur.Abdelwahab_Osstad
             params.amine_madrasa_Compt_KeyId -> Utilisateur.Amine_Madrassa
+            params.kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId -> Utilisateur.kissme_talaba_li_dirassatihim_mena_idata
             else -> Utilisateur.Admin
         }
 
         when (utilisateur) {
             Utilisateur.Abdelwahab_Osstad -> Ousstad_Tahfid.Abdelwahab_Osstad
             Utilisateur.Amine_Madrassa -> Ousstad_Tahfid.Amine_Madrassa
+            Utilisateur.kissme_talaba_li_dirassatihim_mena_idata -> Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata
             Utilisateur.Admin -> null
             else -> null
         }
@@ -131,6 +133,7 @@ data class ActiveCentralValues(
             params.walid_Compt_KeyId -> Utilisateur.Walid
             Compts.AbdelwahabTravailleChezGros_KeyId.keyId -> Utilisateur.Abdelwahab_Osstad
             params.amine_madrasa_Compt_KeyId -> Utilisateur.Amine_Madrassa
+            params.kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId -> Utilisateur.kissme_talaba_li_dirassatihim_mena_idata
             else -> Utilisateur.Admin
         }
     },

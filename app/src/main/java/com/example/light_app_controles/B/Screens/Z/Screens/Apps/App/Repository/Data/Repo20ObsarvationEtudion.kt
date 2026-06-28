@@ -35,6 +35,7 @@ class Repo20ObsarvationEtudion(
             val targetKeyId = when (currentFilter) {
                 Utilisateur.Abdelwahab_Osstad -> Compts.AbdelwahabTravailleChezGros_KeyId.keyId
                 Utilisateur.Amine_Madrassa -> params.amine_madrasa_Compt_KeyId
+                Utilisateur.kissme_talaba_li_dirassatihim_mena_idata -> params.kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId
                 Utilisateur.Abdelmoumen -> params.abdelmomen_Compt_KeyId
                 Utilisateur.Walid -> params.walid_Compt_KeyId
                 Utilisateur.kissm_intikali_madrasa_Compt_Osstad -> params.kissm_intikali_madrasa_Compt_KeyId

@@ -34,11 +34,10 @@ data class M00CentralParametresOfAllApps(
     val walid_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s7",
     val abdelmomen_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s4",
     val amine_madrasa_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s8",
-    val kissm_intikali_madrasa_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s9", //<--
-    //TODO(1): cree une kissme_talaba_li_dirassatihim_mena_idata fait que ca soit tou comme  Amine_Madrassa
+    val kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s8",
+    val kissm_intikali_madrasa_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s9",
 //────────────────────────────au_Lence_Set_Compt_Ac_KeyId──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-    val au_Lence_Set_Compt_Ac_KeyId: String = Compts.AbdelwahabTravailleChezGros_KeyId.keyId,       //<--
-    //TODO(1): fait que ca soit ici 
+    val au_Lence_Set_Compt_Ac_KeyId: String = "-OTmoNn0cljrRuhVR2s8",
 //──────────────────────────────Dimine Rapid────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
     val au_Lence_Diminue_DatasFB: Boolean = false,     //Dimine Delete Fait Gaffe!!!!!!!!!!    //Ca M11AchatOperation.remove_ref() et  cleanupp Vents Operation et cleanupp Bon Vents
     val au_Lence_remove_Datas_OperationVents: Boolean = false,     //Dimine Delete Fait Gaffe!!!!!!!!!!
@@ -125,6 +124,7 @@ data class M00CentralParametresOfAllApps(
             val params = M00CentralParametresOfAllApps()
             return when (currentComptKeyId) {
                 params.amine_madrasa_Compt_KeyId -> Utilisateur.Amine_Madrassa
+                params.kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId -> Utilisateur.kissme_talaba_li_dirassatihim_mena_idata
                 params.abdelmomen_Compt_KeyId -> Utilisateur.Abdelmoumen
                 params.walid_Compt_KeyId -> Utilisateur.Walid
                 else -> Utilisateur.Admin
@@ -178,6 +178,11 @@ enum class Utilisateur(
         M00CentralParametresOfAllApps().amine_madrasa_Compt_KeyId,
         "dimanch/jeudi",
         "أمين"
+    ),
+    kissme_talaba_li_dirassatihim_mena_idata(
+        M00CentralParametresOfAllApps().kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId,
+        "dimanch/jeudi",
+        "أمين"
     );
 
     override fun toString(): String {
@@ -193,7 +198,8 @@ enum class Utilisateur(
             Abdelwahab_Osstad -> Abdelmoumen
             Abdelmoumen -> Walid
             Walid -> Amine_Madrassa
-            Amine_Madrassa -> kissm_intikali_madrasa_Compt_Osstad
+            Amine_Madrassa -> kissme_talaba_li_dirassatihim_mena_idata
+            kissme_talaba_li_dirassatihim_mena_idata -> kissm_intikali_madrasa_Compt_Osstad
             kissm_intikali_madrasa_Compt_Osstad -> Admin
         }
     }
@@ -207,6 +213,7 @@ enum class Utilisateur(
             Abdelwahab_Osstad -> "Abdelwahab Oustade"
             Abdelmoumen -> "Abdelmoumen"
             Amine_Madrassa -> "Amine Madrassa"
+            kissme_talaba_li_dirassatihim_mena_idata -> "kissme_talaba_li_dirassatihim_mena_idata"
             Walid -> "Walid"
             kissm_intikali_madrasa_Compt_Osstad -> "kissm_intikali_madrasa_Compt_Osstad"
         }

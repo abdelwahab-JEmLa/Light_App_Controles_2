@@ -75,9 +75,10 @@ fun Floating_Separated_Button(
             params.walid_Compt_KeyId -> Utilisateur.Walid
             Compts.AbdelwahabTravailleChezGros_KeyId.keyId -> Utilisateur.Abdelwahab_Osstad
             params.amine_madrasa_Compt_KeyId -> Utilisateur.Amine_Madrassa
+            params.kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId -> Utilisateur.kissme_talaba_li_dirassatihim_mena_idata
             else -> Utilisateur.Admin
         }
-        utilisateur == Utilisateur.Amine_Madrassa
+        utilisateur == Utilisateur.Amine_Madrassa || utilisateur == Utilisateur.kissme_talaba_li_dirassatihim_mena_idata
     }
 
     if (isAmineMadrassa) return
