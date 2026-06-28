@@ -26,7 +26,7 @@ enum class Ousstad_Tahfid(
     ),
     kissme_talaba_li_dirassatihim_mena_idata(
         "dimanch/jeudi",
-        "أمين",
+        "قسم طلبة",
         M00CentralParametresOfAllApps.get_Default().kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId
     ),
     Amine_Madrassa(

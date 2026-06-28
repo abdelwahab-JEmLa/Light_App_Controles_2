@@ -34,10 +34,10 @@ data class M00CentralParametresOfAllApps(
     val walid_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s7",
     val abdelmomen_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s4",
     val amine_madrasa_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s8",
-    val kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s8",
+    val kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s10",
     val kissm_intikali_madrasa_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s9",
 //────────────────────────────au_Lence_Set_Compt_Ac_KeyId──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-    val au_Lence_Set_Compt_Ac_KeyId: String = "-OTmoNn0cljrRuhVR2s8",
+    val au_Lence_Set_Compt_Ac_KeyId: String = "-OTmoNn0cljrRuhVR2s10",
 //──────────────────────────────Dimine Rapid────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
     val au_Lence_Diminue_DatasFB: Boolean = false,     //Dimine Delete Fait Gaffe!!!!!!!!!!    //Ca M11AchatOperation.remove_ref() et  cleanupp Vents Operation et cleanupp Bon Vents
     val au_Lence_remove_Datas_OperationVents: Boolean = false,     //Dimine Delete Fait Gaffe!!!!!!!!!!
@@ -182,7 +182,7 @@ enum class Utilisateur(
     kissme_talaba_li_dirassatihim_mena_idata(
         M00CentralParametresOfAllApps().kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId,
         "dimanch/jeudi",
-        "أمين"
+        "قسم طلبة"
     );
 
     override fun toString(): String {
