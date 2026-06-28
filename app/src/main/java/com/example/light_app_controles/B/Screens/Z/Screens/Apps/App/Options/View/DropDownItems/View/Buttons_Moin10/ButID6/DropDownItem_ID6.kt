@@ -80,7 +80,7 @@ fun DropDownItem_ID6(
 
     // FIXED: Get the actual current teacher from focused values
     val currentUtilisateur = remember(aCentralFacade.activeCentralValues) {
-        aCentralFacade.activeCentralValues.active_Ousstad_Tahfid
+        aCentralFacade.activeCentralValues.active_filter_du_utilisateur
             ?: Utilisateur.Admin // Fallback to Admin if no teacher is selected
     }
 
