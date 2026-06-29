@@ -2,6 +2,7 @@
 package com.example.light_app_controles.Floating_DropDownMenuS.Dialoge.Dialog.Z_Content_Buttons.View.A.Main
 
 import A_Main.Shared.Views.Dialogs.Floating_DropDownMenu.Dialog.B_FragMap_DropdownMenu
+import EntreApps.Shared.Models.Components.Ousstad_Tahfid
 import EntreApps.Shared.Models.Relative_Produits.Models.M01Produit
 import EntreApps.Shared.Models.Relative_Produits.Models.M16CategorieProduit
 import EntreApps.Shared.Models.Relative_Produits.Models.M3CouleurProduitInfos
@@ -61,6 +62,7 @@ fun Floating_Separated_Button(
     list_m16: List<M16CategorieProduit>? = emptyList(),
     list_m1: List<M01Produit>? = emptyList(),
     list_m3: List<M3CouleurProduitInfos>? = emptyList(),
+    activeOusstad: Ousstad_Tahfid? = null,
     on_vent_key: String = "",
     buttonState: Button_State = Button_State.get_Default().copy(
         text_Label = "",
@@ -68,18 +70,8 @@ fun Floating_Separated_Button(
         colors = Pair(Color.Red, Color.Blue)
     ),
 ) {
-    val isAmineMadrassa = remember {
-        val params = M00CentralParametresOfAllApps()
-        val utilisateur = when (params.au_Lence_Set_Compt_Ac_KeyId) {
-            params.abdelmomen_Compt_KeyId -> Utilisateur.Abdelmoumen
-            params.walid_Compt_KeyId -> Utilisateur.Walid
-            Compts.AbdelwahabTravailleChezGros_KeyId.keyId -> Utilisateur.Abdelwahab_Osstad
-            params.amine_madrasa_Compt_KeyId -> Utilisateur.Amine_Madrassa
-            params.kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId -> Utilisateur.kissme_talaba_li_dirassatihim_mena_idata
-            else -> Utilisateur.Admin
-        }
-        utilisateur == Utilisateur.Amine_Madrassa || utilisateur == Utilisateur.kissme_talaba_li_dirassatihim_mena_idata
-    }
+    val isAmineMadrassa = activeOusstad == Ousstad_Tahfid.Amine_Madrassa || 
+                          activeOusstad == Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata
 
     if (isAmineMadrassa) return
     val isShowingAll = true

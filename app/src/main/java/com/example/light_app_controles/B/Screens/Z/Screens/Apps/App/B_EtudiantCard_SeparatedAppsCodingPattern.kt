@@ -103,7 +103,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
     // Maximum number of history items to include in the exported image.
     // null  → include all items (default behaviour, no filter)
     // Int N → include only the last N items (takeLast applied inside the generator)
-    var histLimit by remember(etudiantId) { mutableStateOf<Int?>(null) }
+    var histLimit by remember(etudiantId) { mutableStateOf<Int?>(3) }
     var showHistLimitDialog by remember(etudiantId) { mutableStateOf(false) }
 
     val wasUpdatedToday = isToday(etudiant.dernierTimeTampsSynchronisationAvecFireBase)
@@ -243,7 +243,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(28.dp)
                     )
-
+                    /*
                     Box(
                         modifier = Modifier
                             .size(32.dp)
@@ -256,7 +256,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
-                    }
+                    }     */
                 }
 
                 Spacer(modifier = Modifier.height(2.dp))
@@ -299,11 +299,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                     )
                 }
             }
-            val params = M00CentralParametresOfAllApps()
-            val utilisateur = when (params.au_Lence_Set_Compt_Ac_KeyId) {
-                Compts.AbdelwahabTravailleChezGros_KeyId.keyId -> Utilisateur.Abdelwahab_Osstad
-                else -> Utilisateur.Admin
-            }
+            val activeOusstad = viewModel.activeCentralValues.active_Ousstad_Tahfid
             // ── Expanded actions ─────────────────────────────────────────────
             AnimatedVisibility(
                 visible = isExpanded,
@@ -314,7 +310,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    (utilisateur == Utilisateur.Abdelwahab_Osstad).ifTrue {
+                    (activeOusstad == Ousstad_Tahfid.Abdelwahab_Osstad).ifTrue {
 
                         // ── Full card share button (icon top, smaller text) ───────
                         OutlinedButton(
@@ -587,7 +583,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                     }
 
 
-                    (utilisateur == Utilisateur.Abdelwahab_Osstad).ifTrue {
+                    (activeOusstad == Ousstad_Tahfid.Abdelwahab_Osstad).ifTrue {
                         // ── Teacher-transfer button ───────────────────────────────
                         Box(modifier = Modifier.fillMaxWidth()) {
                             OutlinedButton(

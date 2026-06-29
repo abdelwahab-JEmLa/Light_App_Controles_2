@@ -7,9 +7,6 @@ import Application5.App.View.DropDownItems.View.But11.DropDownItem_Imprime_pdf_c
 import Application5.App.View.DropDownItems.View.But5.DropDownItem_Imprime_pdf_Case_A_Cochet
 import Application5.App.View.DropDownItems.View.ButID6.DropDownItem_ID6
 import EntreApps.Shared.Models.Components.Ousstad_Tahfid
-import EntreApps.Shared.Models.Compts
-import EntreApps.Shared.Models.M00CentralParametresOfAllApps
-import EntreApps.Shared.Models.Utilisateur
 import android.text.format.DateUtils
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -32,6 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PersonOff
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material.icons.filled.School
@@ -253,13 +251,7 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
 
                     Spacer(modifier = Modifier.size(8.dp))
 
-                    val params = M00CentralParametresOfAllApps()
-                    val utilisateur = when (params.au_Lence_Set_Compt_Ac_KeyId) {
-                        Compts.AbdelwahabTravailleChezGros_KeyId.keyId -> Utilisateur.Abdelwahab_Osstad
-                        else -> Utilisateur.Admin
-                    }
-
-                    if (utilisateur == Utilisateur.Abdelwahab_Osstad) {
+                    if (activeOusstad == Ousstad_Tahfid.Abdelwahab_Osstad) {
                         DropdownMenuItem(
                             leadingIcon = {
                                 Icon(
@@ -503,25 +495,34 @@ fun FabButton_When_Its_EducationFragment(
                         modifier = Modifier.size(28.dp)
                     )
                 }
-            } else {
                 Image(
+                    painter = painterResource(id = R.drawable.logo),
+                    contentDescription = null,
                     modifier = Modifier
                         .fillMaxSize()
+                        .padding(4.dp),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Menu",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(12.dp)
                         .clickable {
                             when (its_Targeted_Frag) {
                                 false -> onToggleFabVisibility()
                                 true -> onShowDropdown()
                             }
-                        },
-                    painter = painterResource(id = R.drawable.logo),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
+                        }
                 )
                 Icon(
-                    imageVector = if (isFabVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                    imageVector = if (isFabVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                     contentDescription = "Toggle FAB",
                     modifier = Modifier.align(Alignment.Center),
-                    tint = Color.White
+                    tint = Color.Red
                 )
             }
         }

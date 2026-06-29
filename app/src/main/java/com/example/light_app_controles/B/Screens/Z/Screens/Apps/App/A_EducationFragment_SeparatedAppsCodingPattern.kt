@@ -8,6 +8,7 @@ import Application5.App.Options.FabButton_When_Its_EducationFragment
 import Application5.App.Options.FabDropdownMenu_WhenIts_FragmentEducation
 import Application5.App.Repository.M19Etudiant
 import Application5.App.View.DropDownItems.View.ButID8.SessionsEducationDialog.Dialog.SessionsEducationDialog
+import EntreApps.Shared.Models.Components.Ousstad_Tahfid
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -37,6 +38,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.foundation.border
+import androidx.compose.material.icons.filled.School
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -54,6 +56,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.SemanticsPropertyKey
@@ -86,6 +89,7 @@ import kotlin.math.roundToInt
 fun A_EducationFragment_SeparatedAppsCodingPattern(
     modifier: Modifier = Modifier,
     appDatabase: AppDatabase,
+    initialOusstad: Ousstad_Tahfid? = null,
 ) {
     val context = LocalContext.current
 
@@ -109,6 +113,12 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
     var selectedEtudiantForSessions by remember { mutableStateOf<M19Etudiant?>(null) }
 
     val activeOusstad = activeDatas.active_Ousstad_Tahfid
+
+    LaunchedEffect(initialOusstad) {
+        if (initialOusstad != null) {
+            viewModel.update_activeDatas(active_Ousstad_Tahfid = initialOusstad)
+        }
+    }
 
     if (activeDatas.displaye_dialog_mois_moinAcPlus_6_du_current) {
         MonthSelectionDialog_SeparatedAppsCodingPattern(
@@ -181,42 +191,58 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
     var fabOffsetX by remember { mutableFloatStateOf(screenWidthPx - buttonBoundXPx) }
     var fabOffsetY by remember { mutableFloatStateOf(screenHeightPx - with(density) { 200.dp.toPx() }) }
 
-    Column(
+    Box(
         modifier = modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-            .semantics(mergeDescendants = true) {
-                set(
-                    value = repo19Etudiant.datasValue.filter { it.parent_ousstad_key == "Kissm_Intikali" },
-                    key = SemanticsPropertyKey("etudiants_kissm_intikali")
-                )
-                set(value = repo19Etudiant.datasValue, key = SemanticsPropertyKey("etudiants_all"))
-            }
     ) {
-        ScrollableInformationBanner(
-            ousstadName = activeOusstad?.nom_arab ?: "",
-            modifier = Modifier.fillMaxWidth()
+        Image(
+            painter = painterResource(id = R.drawable.logo_ecole_gpt),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            alpha = 0.08f,
+            modifier = Modifier.fillMaxSize()
         )
 
-        if (etudiants.isEmpty()) {
-            EmptyState(
-                modifier = Modifier.fillMaxSize(),
-                isFiltered = isSearchActive && searchQuery.isNotBlank()
-            )
-        } else {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(items = etudiants) { etudiant ->
-                    B_EtudiantCard_SeparatedAppsCodingPattern(
-                        viewModel = viewModel,
-                        etudiant = etudiant,
-                        modifier = Modifier.fillMaxWidth(),
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .semantics(mergeDescendants = true) {
+                    set(
+                        value = repo19Etudiant.datasValue.filter { it.parent_ousstad_key == "Kissm_Intikali" },
+                        key = SemanticsPropertyKey("etudiants_kissm_intikali")
                     )
+                    set(
+                        value = repo19Etudiant.datasValue,
+                        key = SemanticsPropertyKey("etudiants_all")
+                    )
+                }
+        ) {
+            ScrollableInformationBanner(
+                ousstadName = activeOusstad?.nom_arab ?: "",
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            if (etudiants.isEmpty()) {
+                EmptyState(
+                    modifier = Modifier.fillMaxSize(),
+                    isFiltered = isSearchActive && searchQuery.isNotBlank()
+                )
+            } else {
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(items = etudiants) { etudiant ->
+                        B_EtudiantCard_SeparatedAppsCodingPattern(
+                            viewModel = viewModel,
+                            etudiant = etudiant,
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
             }
         }
@@ -232,8 +258,12 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
                 .pointerInput(Unit) {
                     detectDragGestures { change, dragAmount ->
                         change.consume()
-                        fabOffsetX = (fabOffsetX + dragAmount.x).coerceIn(0f, screenWidthPx - buttonBoundXPx)
-                        fabOffsetY = (fabOffsetY + dragAmount.y).coerceIn(0f, screenHeightPx - buttonBoundYPx)
+                        fabOffsetX =
+                            (fabOffsetX + dragAmount.x).coerceIn(0f, screenWidthPx - buttonBoundXPx)
+                        fabOffsetY = (fabOffsetY + dragAmount.y).coerceIn(
+                            0f,
+                            screenHeightPx - buttonBoundYPx
+                        )
                     }
                 }
         ) {
@@ -249,16 +279,21 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
                         modifier = Modifier.size(56.dp)
                     ) {
                         Icon(          
-                            imageVector = androidx.compose.material.icons.Icons.Default.PlayArrow,
+                            imageVector = androidx.compose.material.icons.Icons.Default.School,
                             contentDescription = "تعريف اولي بالتطبيق",
                             tint = Color.White
                         )
                     }
-                    
                     androidx.compose.material3.DropdownMenu(
                         expanded = showVideoMenu,
                         onDismissRequest = { showVideoMenu = false }
                     ) {
+                        androidx.compose.material3.DropdownMenuItem(
+                            text = { androidx.compose.material3.Text("فديوهات تعلم استخدام التطبيق", fontWeight = FontWeight.Bold) },
+                            onClick = { },
+                            enabled = false
+                        )
+                        androidx.compose.material3.HorizontalDivider()
                         androidx.compose.material3.DropdownMenuItem(
                             text = { androidx.compose.material3.Text("1- فديو التعريفي للواجهة الرئيسة") },
                             onClick = {
@@ -356,7 +391,7 @@ fun ScrollableInformationBanner(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
@@ -378,12 +413,24 @@ fun ScrollableInformationBanner(
                 .width(320.dp)
                 .height(140.dp),
             shape = RoundedCornerShape(12.dp),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f)
+                containerColor = MaterialTheme.colorScheme.primaryContainer
             )
         ) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
+                                MaterialTheme.colorScheme.tertiary.copy(alpha = 0.8f)
+                            )
+                        )
+                    ), 
+                contentAlignment = Alignment.Center
+            ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
@@ -394,17 +441,17 @@ fun ScrollableInformationBanner(
                             fontWeight = FontWeight.Medium,
                             fontSize = 14.sp
                         ),
-                        color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.7f),
+                        color = Color.White.copy(alpha = 0.8f),
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "قسم حفظة القرآن",
+                        text = ousstadName,
                         style = MaterialTheme.typography.headlineMedium.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 24.sp
                         ),
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        color = Color.White,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -537,9 +584,16 @@ fun FloatingDraggableVideoPlayer(onDismiss: () -> Unit) {
         modifier = Modifier
             .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
             .size(width = 320.dp, height = 270.dp)
-            .background(Color.Black, shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+            .background(
+                Color.Black,
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+            )
             .clip(androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
-            .border(2.dp, MaterialTheme.colorScheme.primary, androidx.compose.foundation.shape.RoundedCornerShape(12.dp))
+            .border(
+                2.dp,
+                MaterialTheme.colorScheme.primary,
+                androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
+            )
     ) {
         androidx.compose.foundation.layout.Row(
             modifier = Modifier

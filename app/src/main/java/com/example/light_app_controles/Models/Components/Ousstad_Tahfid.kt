@@ -6,13 +6,19 @@ import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 enum class Ousstad_Tahfid(
     val ayam_tadriss: String = "dimanch/jeudi",
     val nom_arab: String = "",
-    val key: String = ""
+    val key: String = "",
+    val num: String = "",
+    val login_nom: String = "",
+    val login_mp: String = ""
 ) {
     Abdelwahab_Osstad(
         "dimanch/jeudi",
         "عبدالوهاب حمنيش",
-        Compts.AbdelwahabTravailleChezGros_KeyId.keyId
-
+        Compts.AbdelwahabTravailleChezGros_KeyId.keyId,
+        "+213 553885037",
+        //<--
+        "ab",
+        ""
     ),
     Non_Defini_Actuellemen(
         "dimanch/jeudi",
@@ -32,7 +38,10 @@ enum class Ousstad_Tahfid(
     Amine_Madrassa(
         "dimanch/jeudi",
         "أمين",
-        M00CentralParametresOfAllApps.get_Default().amine_madrasa_Compt_KeyId
+        M00CentralParametresOfAllApps.get_Default().amine_madrasa_Compt_KeyId,
+        "+213 553885037",
+        "امين",
+        "0000"
     )
     ;
 }

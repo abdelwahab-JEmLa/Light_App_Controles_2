@@ -480,6 +480,10 @@ fun createAndOpenPdfDocument(
                 saveResult.fold(
                     onSuccess = { savedPath ->
                         openPdfWithViewer(context, pdfFile)
+                        val teacherPhone = selectedTeacher?.num ?: ""
+                        if (teacherPhone.isNotBlank()) {
+                            sharePdfViaWhatsAppBusiness(context, pdfFile, teacherPhone)
+                        }
                         Toast.makeText(
                             context,
                             "✅ تم إنشاء وحفظ قائمة ${activeEtudiants.size} طالب\n$savedPath",
@@ -541,5 +545,37 @@ private fun openPdfWithViewer(context: Context, pdfFile: File) {
     } catch (e: Exception) {
         Log.e("AttendanceReport", "❌ خطأ في فتح PDF", e)
         Toast.makeText(context, "❌ خطأ في فتح الملف: ${e.message}", Toast.LENGTH_LONG).show()
+    }
+}
+
+private fun sharePdfViaWhatsAppBusiness(context: Context, pdfFile: File, phone: String) {
+    try {
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            pdfFile
+        )
+        val formattedPhone = run {
+            var n = phone.replace(Regex("[^0-9]"), "")
+            if (!n.startsWith("213")) {
+                if (n.startsWith("0")) n = n.drop(1)
+                n = "213$n"
+            }
+            n
+        }
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "application/pdf"
+            setPackage("com.whatsapp.w4b")
+            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(
+                Intent.EXTRA_TEXT,
+                "السلام عليكم و رحمة الله و بركاته\n\nإليكم ملف قائمة الطلاب وحضورهم."
+            )
+            putExtra("jid", "$formattedPhone@s.whatsapp.net")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        Log.e("AttendanceReport", "❌ خطأ في إرسال PDF عبر واتساب", e)
     }
 }
