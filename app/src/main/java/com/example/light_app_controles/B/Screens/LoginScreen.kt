@@ -58,8 +58,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.light_app_controles.R
+import com.example.light_app_controles.BuildConfig
 import kotlinx.coroutines.delay
-
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.animation.core.animateFloat
 @Composable
 fun LoginScreen(
     onLoginSuccess: (Ousstad_Tahfid) -> Unit
@@ -72,20 +81,23 @@ fun LoginScreen(
 
     val cardAlpha by animateFloatAsState(
         targetValue = if (showContent) 1f else 0f,
-        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
         label = "cardAlpha"
     )
 
     LaunchedEffect(Unit) {
-        delay(200)
+        delay(500)
         showContent = true
     }
 
     fun tryLogin() {
         val matched = Ousstad_Tahfid.entries.firstOrNull { ousstad ->
             ousstad.login_nom.isNotEmpty() &&
-            ousstad.login_nom == loginNom &&
-            ousstad.login_mp == loginMp
+                    ousstad.login_nom == loginNom &&
+                    ousstad.login_mp == loginMp
         }
         if (matched != null) {
             onLoginSuccess(matched)
@@ -95,7 +107,6 @@ fun LoginScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Background: logo_ecole_gpt blurred
         Image(
             painter = painterResource(id = R.drawable.logo_ecole_gpt),
             contentDescription = null,
@@ -105,7 +116,6 @@ fun LoginScreen(
             contentScale = ContentScale.Crop
         )
 
-        // Dark overlay gradient
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -127,7 +137,6 @@ fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo
             AnimatedVisibility(
                 visible = showContent,
                 enter = fadeIn() + slideInVertically(initialOffsetY = { -60 })
@@ -136,8 +145,7 @@ fun LoginScreen(
                     Image(
                         painter = painterResource(id = R.drawable.logo_ecole_gpt),
                         contentDescription = "شعار المدرسة",
-                        modifier = Modifier
-                            .size(110.dp)
+                        modifier = Modifier.size(110.dp)
                     )
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
@@ -147,18 +155,66 @@ fun LoginScreen(
                         color = Color.White,
                         textAlign = TextAlign.Center
                     )
+                    val displayVersion = remember(BuildConfig.VERSION_NAME) {
+                        Regex("""\d+\.\d+\.\d+""").find(BuildConfig.VERSION_NAME)?.value
+                            ?: BuildConfig.VERSION_NAME
+                    }
+                    Text(
+                        text = "Version : $displayVersion",
+                        fontSize = 11.sp,
+                        color = Color(0xFFB0C4DE),
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = "مدرسة البر لتحفيظ القرآن الكريم",
                         fontSize = 15.sp,
                         color = Color(0xFFB0C4DE),
                         textAlign = TextAlign.Center
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    var duaTextWidthPx by remember { mutableStateOf(300f) }
+
+                    val shimmerTransition = rememberInfiniteTransition(label = "duaShimmer")
+                    val shimmerProgress by shimmerTransition.animateFloat(
+                        initialValue = -1f,
+                        targetValue = 2f,
+                        animationSpec = infiniteRepeatable(
+                            animation = tween(durationMillis = 2800, easing = LinearEasing),
+                            repeatMode = RepeatMode.Restart
+                        ),
+                        label = "shimmerProgress"
+                    )
+
+                    Text(
+                        text = "نسأل الله أن يجعله لنا ولكم\nصدقة جارية لتسهيل برامج تحفيظ كتاب الله",
+                        style = TextStyle(
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
+                            lineHeight = 19.sp,
+                            textAlign = TextAlign.Center,
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    Color(0xFFB0C4DE),
+                                    Color(0xFFFFD700), // doré
+                                    Color(0xFFB0C4DE)
+                                ),
+                                start = Offset(duaTextWidthPx * shimmerProgress - duaTextWidthPx / 2f, 0f),
+                                end = Offset(duaTextWidthPx * shimmerProgress + duaTextWidthPx / 2f, 0f)
+                            )
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .onGloballyPositioned { coordinates ->
+                                duaTextWidthPx = coordinates.size.width.toFloat()
+                            }
+                    )
                 }
             }
 
             Spacer(modifier = Modifier.height(36.dp))
 
-            // Login card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -183,10 +239,12 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // Nom field
                     OutlinedTextField(
                         value = loginNom,
-                        onValueChange = { loginNom = it; errorMessage = "" },
+                        onValueChange = {
+                            loginNom = it
+                            errorMessage = ""
+                        },
                         label = { Text("اسم المستخدم", color = Color(0xFFB0C4DE)) },
                         leadingIcon = {
                             Icon(
@@ -210,7 +268,6 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(14.dp))
 
-                    // MP field
                     OutlinedTextField(
                         value = loginMp,
                         onValueChange = { loginMp = it; errorMessage = "" },
@@ -246,7 +303,6 @@ fun LoginScreen(
                         keyboardActions = KeyboardActions(onDone = { tryLogin() })
                     )
 
-                    // Error
                     if (errorMessage.isNotEmpty()) {
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
@@ -259,7 +315,6 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    // Login button
                     Button(
                         onClick = { tryLogin() },
                         modifier = Modifier

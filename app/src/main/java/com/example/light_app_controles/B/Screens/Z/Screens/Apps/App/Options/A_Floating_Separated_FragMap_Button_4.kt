@@ -7,6 +7,7 @@ import Application5.App.View.DropDownItems.View.But11.DropDownItem_Imprime_pdf_c
 import Application5.App.View.DropDownItems.View.But5.DropDownItem_Imprime_pdf_Case_A_Cochet
 import Application5.App.View.DropDownItems.View.ButID6.DropDownItem_ID6
 import EntreApps.Shared.Models.Components.Ousstad_Tahfid
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps
 import android.text.format.DateUtils
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -48,12 +49,14 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -234,7 +237,7 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
                             Text(
                                 text = "الأستاذ النشط:",
                                 style = MaterialTheme.typography.labelMedium,
-                                color = if (activeOusstad == Ousstad_Tahfid.Amine_Madrassa || activeOusstad == Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata)
+                                color = if (activeOusstad?.its_non_admine_ousstade == true)
                                     MaterialTheme.colorScheme.secondary
                                 else
                                     MaterialTheme.colorScheme.onPrimaryContainer
@@ -251,7 +254,7 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
 
                     Spacer(modifier = Modifier.size(8.dp))
 
-                    if (activeOusstad == Ousstad_Tahfid.Abdelwahab_Osstad) {
+                    if (activeOusstad?.its_non_admine_ousstade == false|| M00CentralParametresOfAllApps.get_Default().itsDevMode) {
                         DropdownMenuItem(
                             leadingIcon = {
                                 Icon(
@@ -504,26 +507,38 @@ fun FabButton_When_Its_EducationFragment(
                     contentScale = ContentScale.Crop
                 )
             } else {
-                Icon(
-                    imageVector = Icons.Default.Menu,
-                    contentDescription = "Menu",
-                    tint = Color.White,
+                LaunchedEffect(Unit) {
+                    delay(4000)
+                    when (its_Targeted_Frag) {
+                        false -> onToggleFabVisibility()
+                        true -> onShowDropdown()
+                    }
+                }
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(12.dp)
                         .clickable {
                             when (its_Targeted_Frag) {
                                 false -> onToggleFabVisibility()
                                 true -> onShowDropdown()
                             }
                         }
-                )
-                Icon(
-                    imageVector = if (isFabVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
-                    contentDescription = "Toggle FAB",
-                    modifier = Modifier.align(Alignment.Center),
-                    tint = Color.Red
-                )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Menu,
+                        contentDescription = "Menu",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(12.dp)
+                    )
+                    Icon(
+                        imageVector = if (isFabVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                        contentDescription = "Toggle FAB",
+                        modifier = Modifier.align(Alignment.Center),
+                        tint = Color.Red
+                    )
+                }
             }
         }
     }

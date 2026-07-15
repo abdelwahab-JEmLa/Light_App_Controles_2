@@ -153,6 +153,14 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
     }
 
     LaunchedEffect(activeOusstad) {
+        delay(2000)
+        val hasStudentsForActiveOusstad = repo19Etudiant.datasValue.any { it.parent_ousstad_key == activeOusstad?.key }
+        if (!hasStudentsForActiveOusstad) {
+            repo19Etudiant.refresh_Datas()
+        }
+    }
+
+    LaunchedEffect(activeOusstad) {
         repo19Etudiant.setFilter(activeOusstad)
     }
 

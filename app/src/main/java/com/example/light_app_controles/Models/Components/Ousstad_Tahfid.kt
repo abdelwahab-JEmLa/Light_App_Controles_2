@@ -9,7 +9,8 @@ enum class Ousstad_Tahfid(
     val key: String = "",
     val num: String = "",
     val login_nom: String = "",
-    val login_mp: String = ""
+    val login_mp: String = "",
+    val its_non_admine_ousstade: Boolean = false,
 ) {
     Abdelwahab_Osstad(
         "dimanch/jeudi",
@@ -33,15 +34,27 @@ enum class Ousstad_Tahfid(
     kissme_talaba_li_dirassatihim_mena_idata(
         "dimanch/jeudi",
         "قسم طلبة للدراسة من الادارة",
-        M00CentralParametresOfAllApps.get_Default().kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId
+        M00CentralParametresOfAllApps.get_Default().kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId,
+        "",
+        "",
+        "",
+    ),
+    kissme_talaba_tam_tahwilahom_mena_idata(
+        "dimanch/jeudi",
+        "تم تحويلهم من الادارة",
+        "kissme_talaba_tam_tahwilahom_mena_idata",
+        "",
+        "",
+        "",
     ),
     Amine_Madrassa(
-        "dimanch/jeudi",
+        "dimanch/mardi/jeudi",
         "أمين",
         M00CentralParametresOfAllApps.get_Default().amine_madrasa_Compt_KeyId,
         "+213 553885037",
         "امين",
-        "0000"
+        "0000",
+        true
     )
     ;
 }

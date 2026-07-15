@@ -16,6 +16,7 @@ import Application5.App.View.DropDownItems.View.But2.getStoredCardUriForStudent
 import EntreApps.Shared.Models.Components.Ousstad_Tahfid
 import EntreApps.Shared.Models.Compts
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
+import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.ifFalse
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.ifTrue
 import EntreApps.Shared.Models.Utilisateur
 import android.text.format.DateUtils.isToday
@@ -310,7 +311,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    (activeOusstad == Ousstad_Tahfid.Abdelwahab_Osstad).ifTrue {
+                    (activeOusstad == Ousstad_Tahfid.Abdelwahab_Osstad || activeOusstad == Ousstad_Tahfid.Amine_Madrassa).ifTrue {
 
                         // ── Full card share button (icon top, smaller text) ───────
                         OutlinedButton(
@@ -582,8 +583,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                         }
                     }
 
-
-                    (activeOusstad == Ousstad_Tahfid.Abdelwahab_Osstad).ifTrue {
+                    if (activeOusstad?.its_non_admine_ousstade == false|| M00CentralParametresOfAllApps.get_Default().itsDevMode) {
                         // ── Teacher-transfer button ───────────────────────────────
                         Box(modifier = Modifier.fillMaxWidth()) {
                             OutlinedButton(

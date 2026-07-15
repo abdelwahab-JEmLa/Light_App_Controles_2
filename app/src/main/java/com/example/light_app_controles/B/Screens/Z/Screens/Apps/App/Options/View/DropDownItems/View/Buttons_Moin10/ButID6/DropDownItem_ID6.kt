@@ -84,8 +84,7 @@ fun DropDownItem_ID6(
     }
 
     val isRestrictedTeacher = remember(currentTeacher) {
-        currentTeacher == Ousstad_Tahfid.Amine_Madrassa ||
-                currentTeacher == Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata
+        currentTeacher?.its_non_admine_ousstade == true
     }
 
     var chosenTeacher by remember(currentTeacher, selectedTeacher) {
@@ -93,6 +92,7 @@ fun DropDownItem_ID6(
             when (currentTeacher) {
                 Ousstad_Tahfid.Amine_Madrassa -> Ousstad_Tahfid.Amine_Madrassa
                 Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata -> Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata
+                Ousstad_Tahfid.kissme_talaba_tam_tahwilahom_mena_idata -> Ousstad_Tahfid.kissme_talaba_tam_tahwilahom_mena_idata
                 else -> {
                     if (selectedTeacher == null || selectedTeacher == Ousstad_Tahfid.Non_Defini_Actuellemen)
                         Ousstad_Tahfid.Abdelwahab_Osstad

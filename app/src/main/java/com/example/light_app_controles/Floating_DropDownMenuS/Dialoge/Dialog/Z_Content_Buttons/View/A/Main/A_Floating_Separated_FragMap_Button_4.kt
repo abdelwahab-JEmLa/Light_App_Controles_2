@@ -70,8 +70,7 @@ fun Floating_Separated_Button(
         colors = Pair(Color.Red, Color.Blue)
     ),
 ) {
-    val isAmineMadrassa = activeOusstad == Ousstad_Tahfid.Amine_Madrassa || 
-                          activeOusstad == Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata
+    val isAmineMadrassa = activeOusstad?.its_non_admine_ousstade == true
 
     if (isAmineMadrassa) return
     val isShowingAll = true

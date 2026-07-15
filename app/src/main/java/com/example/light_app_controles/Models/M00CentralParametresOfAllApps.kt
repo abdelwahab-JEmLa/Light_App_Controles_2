@@ -128,6 +128,7 @@ data class M00CentralParametresOfAllApps(
             return when (currentComptKeyId) {
                 params.amine_madrasa_Compt_KeyId -> Utilisateur.Amine_Madrassa
                 params.kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId -> Utilisateur.kissme_talaba_li_dirassatihim_mena_idata
+                "kissme_talaba_tam_tahwilahom_mena_idata" -> Utilisateur.kissme_talaba_tam_tahwilahom_mena_idata
                 params.abdelmomen_Compt_KeyId -> Utilisateur.Abdelmoumen
                 params.walid_Compt_KeyId -> Utilisateur.Walid
                 else -> Utilisateur.Admin
@@ -186,6 +187,11 @@ enum class Utilisateur(
         M00CentralParametresOfAllApps().kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId,
         "dimanch/jeudi",
         "قسم طلبة"
+    ),
+    kissme_talaba_tam_tahwilahom_mena_idata(
+        "kissme_talaba_tam_tahwilahom_mena_idata",
+        "dimanch/jeudi",
+        "تم تحويلهم من الادارة"
     );
 
     override fun toString(): String {
@@ -202,7 +208,8 @@ enum class Utilisateur(
             Abdelmoumen -> Walid
             Walid -> Amine_Madrassa
             Amine_Madrassa -> kissme_talaba_li_dirassatihim_mena_idata
-            kissme_talaba_li_dirassatihim_mena_idata -> kissm_intikali_madrasa_Compt_Osstad
+            kissme_talaba_li_dirassatihim_mena_idata -> kissme_talaba_tam_tahwilahom_mena_idata
+            kissme_talaba_tam_tahwilahom_mena_idata -> kissm_intikali_madrasa_Compt_Osstad
             kissm_intikali_madrasa_Compt_Osstad -> Admin
         }
     }
@@ -217,6 +224,7 @@ enum class Utilisateur(
             Abdelmoumen -> "Abdelmoumen"
             Amine_Madrassa -> "Amine Madrassa"
             kissme_talaba_li_dirassatihim_mena_idata -> "kissme_talaba_li_dirassatihim_mena_idata"
+            kissme_talaba_tam_tahwilahom_mena_idata -> "kissme_talaba_tam_tahwilahom_mena_idata"
             Walid -> "Walid"
             kissm_intikali_madrasa_Compt_Osstad -> "kissm_intikali_madrasa_Compt_Osstad"
         }
