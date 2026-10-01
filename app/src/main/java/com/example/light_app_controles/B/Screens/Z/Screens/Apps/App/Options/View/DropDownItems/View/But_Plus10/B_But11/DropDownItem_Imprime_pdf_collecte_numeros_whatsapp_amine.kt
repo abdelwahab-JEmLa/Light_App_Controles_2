@@ -88,7 +88,13 @@ fun DropDownItem_Imprime_pdf_collecte_numeros_whatsapp_amine(
                 withContext(Dispatchers.Main) {
                     saveResult.fold(
                         onSuccess = {
-                            if (pdfFile != null) openPdfWithViewer(context, pdfFile)
+                            if (pdfFile != null) {
+                                openPdfWithViewer(context, pdfFile)
+                                val teacherPhone = activeOusstad?.num ?: ""
+                                if (teacherPhone.isNotBlank()) {
+                                    sharePdfViaWhatsAppBusiness(context, pdfFile, teacherPhone)
+                                }
+                            }
                             Toast.makeText(context, "✅ تم إنشاء ملف PDF (20 صفحة فردية)", Toast.LENGTH_LONG).show()
                         },
                         onFailure = {
@@ -339,4 +345,36 @@ private fun drawRTL(
     canvas.translate(x, y)
     layout.draw(canvas)
     canvas.restore()
+}
+
+private fun sharePdfViaWhatsAppBusiness(context: Context, pdfFile: File, phone: String) {
+    try {
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            pdfFile
+        )
+        val formattedPhone = run {
+            var n = phone.replace(Regex("[^0-9]"), "")
+            if (n.startsWith("0")) {
+                n = "213" + n.substring(1)
+            }
+            n
+        }
+
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "application/pdf"
+            setPackage("com.whatsapp.w4b")
+            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(
+                Intent.EXTRA_TEXT,
+                "السلام عليكم، تفضل ملف PDF:\n${pdfFile.name}"
+            )
+            putExtra("jid", "$formattedPhone@s.whatsapp.net")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        Log.e("WhatsAppShare", "❌ خطأ في المشاركة عبر واتساب: ${e.message}", e)
+    }
 }

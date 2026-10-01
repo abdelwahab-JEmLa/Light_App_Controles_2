@@ -181,7 +181,8 @@ enum class Utilisateur(
     Amine_Madrassa(
         M00CentralParametresOfAllApps().amine_madrasa_Compt_KeyId,
         "dimanch/jeudi",
-        "أمين"
+        "أمين",
+        num_telephone = "+213 799030302"
     ),
     kissme_talaba_li_dirassatihim_mena_idata(
         M00CentralParametresOfAllApps().kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId,

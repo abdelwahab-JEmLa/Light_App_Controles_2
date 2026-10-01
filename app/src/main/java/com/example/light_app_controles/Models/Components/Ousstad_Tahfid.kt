@@ -51,7 +51,7 @@ enum class Ousstad_Tahfid(
         "dimanch/mardi/jeudi",
         "أمين",
         M00CentralParametresOfAllApps.get_Default().amine_madrasa_Compt_KeyId,
-        "+213 553885037",
+        "+213 799030302",
         "امين",
         "0000",
         true

@@ -366,9 +366,9 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
             DropDownItem_ID6(aCentralFacade = aCentralFacade)
             //    DropDownItem_Imprime_pdf_List_Talaba(aCentralFacade = aCentralFacade)
             //DropDownItem_Imprime_pdf_communication_ac_parent(viewModel = aCentralFacade)
-            Divider_Modfied()
-
-            DropDownItem_Imprime_pdf_Case_A_Cochet(aCentralFacade = aCentralFacade)
+            if (activeOusstad != Ousstad_Tahfid.Amine_Madrassa) {
+                DropDownItem_Imprime_pdf_Case_A_Cochet(aCentralFacade = aCentralFacade)
+            }
             DropDownItem_Imprime_pdf_collecte_numeros_whatsapp_amine(aCentralFacade = aCentralFacade)
             Divider_Modfied()
 
