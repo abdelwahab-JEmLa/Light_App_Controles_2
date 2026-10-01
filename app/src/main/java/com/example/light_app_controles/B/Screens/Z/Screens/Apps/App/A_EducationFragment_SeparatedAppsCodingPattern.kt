@@ -263,6 +263,19 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
     Box(modifier = Modifier.fillMaxSize()) {
         var showVideoMenu by remember { mutableStateOf(false) }
         var showFloatingVideo by remember { mutableStateOf(false) }
+        var selectedVideoResId by remember { mutableStateOf<Int?>(null) }
+        var selectedVideoTitle by remember { mutableStateOf("") }
+
+        val tutorialVideos = remember {
+            listOf(
+                TutorialVideoItem("1. فيديو التعريفي للواجهة الرئيسة", R.raw.wajiha),
+                TutorialVideoItem("2. شرح طريقة إدخال طالب جديد", R.raw.idkhal_taleb),
+                TutorialVideoItem("3. تقييم الطالب و إدخال علامة الحصة", R.raw.takyim),
+                TutorialVideoItem("4. إرسال ورقة المتابعة و المقرر للولي", R.raw.irsqal_waliy),
+                TutorialVideoItem("5. التعامل مع الواتساب التجاري للتواصل مع الولي", R.raw.whatss_app),
+                TutorialVideoItem("6. إرسال قائمة الطلبة للإدارة بطريقة سهلة", R.raw.takarir_idara)
+            )
+        }
 
         Box(
             modifier = Modifier
@@ -301,24 +314,28 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
                         onDismissRequest = { showVideoMenu = false }
                     ) {
                         androidx.compose.material3.DropdownMenuItem(
-                            text = { androidx.compose.material3.Text("فديوهات تعلم استخدام التطبيق", fontWeight = FontWeight.Bold) },
+                            text = { androidx.compose.material3.Text("فيديوهات تعلم استخدام التطبيق", fontWeight = FontWeight.Bold) },
                             onClick = { },
                             enabled = false
                         )
                         androidx.compose.material3.HorizontalDivider()
-                        androidx.compose.material3.DropdownMenuItem(
-                            text = { androidx.compose.material3.Text("1- فديو التعريفي للواجهة الرئيسة") },
-                            onClick = {
-                                showFloatingVideo = true
-                                showVideoMenu = false
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = androidx.compose.material.icons.Icons.Default.PlayArrow,
-                                    contentDescription = null
-                                )
-                            }
-                        )
+                        tutorialVideos.forEach { video ->
+                            androidx.compose.material3.DropdownMenuItem(
+                                text = { androidx.compose.material3.Text(video.title) },
+                                onClick = {
+                                    selectedVideoResId = video.rawResId
+                                    selectedVideoTitle = video.title
+                                    showFloatingVideo = true
+                                    showVideoMenu = false
+                                },
+                                leadingIcon = {
+                                    Icon(
+                                        imageVector = androidx.compose.material.icons.Icons.Default.PlayArrow,
+                                        contentDescription = null
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
 
@@ -340,8 +357,10 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
             }
         }
         
-        if (showFloatingVideo) {
+        if (showFloatingVideo && selectedVideoResId != null) {
             FloatingDraggableVideoPlayer(
+                videoResId = selectedVideoResId!!,
+                title = selectedVideoTitle,
                 onDismiss = { showFloatingVideo = false }
             )
         }
@@ -695,8 +714,17 @@ fun isSameDay(timestamp1: Long, timestamp2: Long): Boolean {
             cal1.get(Calendar.DAY_OF_YEAR) == cal2.get(Calendar.DAY_OF_YEAR)
 }
 
+data class TutorialVideoItem(
+    val title: String,
+    val rawResId: Int
+)
+
 @Composable
-fun FloatingDraggableVideoPlayer(onDismiss: () -> Unit) {
+fun FloatingDraggableVideoPlayer(
+    videoResId: Int,
+    title: String,
+    onDismiss: () -> Unit
+) {
     val configuration = androidx.compose.ui.platform.LocalConfiguration.current
     val density = androidx.compose.ui.platform.LocalDensity.current
     val screenWidthPx = with(density) { configuration.screenWidthDp.dp.toPx() }
@@ -704,13 +732,14 @@ fun FloatingDraggableVideoPlayer(onDismiss: () -> Unit) {
     val playerWidthPx = with(density) { 320.dp.toPx() }
     val playerHeightPx = with(density) { 240.dp.toPx() }
 
+    var isFullScreen by remember { mutableStateOf(false) }
     var offsetX by remember { mutableStateOf(screenWidthPx / 2f - playerWidthPx / 2f) }
     var offsetY by remember { mutableStateOf(screenHeightPx / 2f - playerHeightPx / 2f) }
 
     val context = androidx.compose.ui.platform.LocalContext.current
-    val exoPlayer = remember {
+    val exoPlayer = remember(videoResId) {
         com.google.android.exoplayer2.ExoPlayer.Builder(context).build().apply {
-            val uri = android.net.Uri.parse("android.resource://${context.packageName}/raw/presentation_start")
+            val uri = android.net.Uri.parse("android.resource://${context.packageName}/$videoResId")
             val mediaItem = com.google.android.exoplayer2.MediaItem.fromUri(uri)
             setMediaItem(mediaItem)
             prepare()
@@ -718,14 +747,18 @@ fun FloatingDraggableVideoPlayer(onDismiss: () -> Unit) {
         }
     }
 
-    androidx.compose.runtime.DisposableEffect(Unit) {
+    androidx.compose.runtime.DisposableEffect(exoPlayer) {
         onDispose {
             exoPlayer.release()
         }
     }
 
-    Column(
-        modifier = Modifier
+    val containerModifier = if (isFullScreen) {
+        Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+    } else {
+        Modifier
             .offset { IntOffset(offsetX.roundToInt(), offsetY.roundToInt()) }
             .size(width = 320.dp, height = 270.dp)
             .background(
@@ -738,28 +771,50 @@ fun FloatingDraggableVideoPlayer(onDismiss: () -> Unit) {
                 MaterialTheme.colorScheme.primary,
                 androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
             )
+    }
+
+    Column(
+        modifier = containerModifier
     ) {
         androidx.compose.foundation.layout.Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(30.dp)
+                .height(32.dp)
                 .background(Color.DarkGray)
-                .pointerInput(Unit) {
-                    detectDragGestures { change, dragAmount ->
-                        change.consume()
-                        offsetX += dragAmount.x
-                        offsetY += dragAmount.y
-                    }
-                },
+                .then(
+                    if (!isFullScreen) {
+                        Modifier.pointerInput(Unit) {
+                            detectDragGestures { change, dragAmount ->
+                                change.consume()
+                                offsetX += dragAmount.x
+                                offsetY += dragAmount.y
+                            }
+                        }
+                    } else Modifier
+                ),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             androidx.compose.material3.Text(
-                text = "Présentation",
+                text = title,
                 color = Color.White,
-                modifier = Modifier.padding(start = 12.dp),
-                style = MaterialTheme.typography.labelSmall
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 12.dp, end = 8.dp),
+                style = MaterialTheme.typography.labelSmall,
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
             )
+            androidx.compose.material3.IconButton(
+                onClick = { isFullScreen = !isFullScreen },
+                modifier = Modifier.size(30.dp)
+            ) {
+                androidx.compose.material3.Text(
+                    text = if (isFullScreen) "🗗" else "⛶",
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
             androidx.compose.material3.IconButton(
                 onClick = onDismiss,
                 modifier = Modifier.size(30.dp)

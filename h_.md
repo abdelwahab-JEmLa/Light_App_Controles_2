@@ -1,97 +1,195 @@
+---
+name: h_
+description: Afficher l'aide des skills disponibles. Trigger this whenever the user requests h_, help_, help_skill, or help_skills.
+---
+
 # Table des Skills Antigravity (AGY)
 
-Voici la liste complète des compétences personnalisées disponibles dans ce projet. Vous pouvez
-déclencher chaque skill en saisissant son mot-clé (trigger phrase) dans le chat.
+Voici la liste complète des compétences personnalisées disponibles, organisées par sections thématiques.
+Déclenchez chaque skill en saisissant son mot-clé (trigger phrase) dans le chat.
 
 ---
 
-## 🛠️ Catalogue des Skills Généraux
+## 📂 1. Définition et Règles du Skill `h_` (`regle h_`)
 
-| Nom du Skill                       | Fichier                                                                                                                                                  | Mots-clés (Triggers)                                                                                       | Description                                                                                                                                                                                                     |
-|:-----------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Semantics Inspector**            | [`sem_.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/sem_.md)                             | `sem_`, `sem_d`, `Todo: sem_`, `Todo: filter`                                                              | Injecte la sémantique d'une variable ou filtre (`TODO: sem_` ou `TODO: filter`), puis extrait instantanément les données d'accessibilité avec un dump ADB sans re-compiler/re-déployer l'application.           |
-| **Annotated Screen Capture**       | [`screenshot.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/screenshot.md)                 | `scr_s`                                                                                                    | Capture l'écran de l'appareil Android ou de l'émulateur connecté avec des boîtes de délimitation étiquetées et l'affiche.                                                                                       |
-| **Tap Android FAB**                | [`tap/tap.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/tap/tap.md)                           | `tap`, `tap <target>`, `tap_l`, `shel_tap_l`                                                               | Exécute un clic à haute vitesse en analysant l'arbre XML de l'UI (ciblant le FAB ou un texte) ou instantanément via le dernier tap rejoué (tap_l).                              |
-| **Schedule App Launch & Tap Replay**| [`tap/Schedule_agy_task_tap_l.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/tap/Schedule_agy_task_tap_l.md) | `Schedule_agy_task_tap_l`, `schedule_tap_l`, `sch_tap_l`, `st_`, `arrete_sch`                             | Attend que l'app se lance depuis Android Studio pour exécuter tap_l, ou annule l'attente en cours (arrete_sch).                            |
-| **Fast Build and Install**         | [`build/build.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/build/build.md)                           | `build`                                                                                                    | Compile et installe rapidement l'application en mode hors-ligne optimisé (`--offline --parallel --build-cache --configuration-cache`).                                                                          |
-| **Fast Build, Export & Deploy**    | [`build/build_.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/build/build_.md)                         | `build_`, `b_`                                                                                             | Compile l'application, crée la structure `Playe_Store\<Version>\0.\A_AllInOne\` sur le Bureau, compresse le dossier, puis déploie le ZIP et le dossier extrait sur la carte SD du téléphone.                    |
-| **Build & Deploy Tahfid APK**       | [`build_apk_au_playe_store_phone/SKILL.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/build/build_apk_au_playe_store_phone/SKILL.md) | `build_PS`, `build_apk_au_playe_store_phone`, `build_tahfid`, `b_tahfid`, `bt_`, `b_v+1`                                         | Compile l'application Tahfid Quran, crée le dossier `app_tahfid/<version>` sur le Bureau et le déploie via ADB dans `/sdcard/Abdelwahab_jeMla.com/Playe_Store/app_tahfid/<version>/`.                                |
-| **Copy Last Build to Phone**       | [`cop_b_aau_phone/SKILL.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/build/cop_b_aau_phone/SKILL.md) | `cop_b_aau_phone`, `colle_b`, `push_last_build`, `cop_b_phone`                                         | Pousse le dernier build du Bureau (dossier et ZIP) vers le téléphone connecté via ADB sans re-compiler. |
-| **Commit, Tag and Push**           | [`push_tagged.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/push_tagged.md)               | `push_taged`, `push_`, `p_`                                                                                | Commite proprement les modifications locales, génère/incrémente intelligemment un tag Git, l'applique et pousse le tout sur GitHub.                                                                             |
-| **Todo Bubelle - UI Bug Hunter**   | [`todo_bubelle.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/todo_bubelle.md)             | `todo_bubelle`, `todo_b`, `fix_ui`, `bubelle`                                                              | Capture l'écran, analyse les bulles d'erreur/anomalies UI, identifie le composable responsable, applique un correctif dans le code, relance l'app (`lance_r`) et prend un screenshot de vérification (`scr_s`). |
-| **Concise Code**                   | [`consize_comments.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/consize_comments.md)     | `consize_commants`, `co_`, `con_`, `con_c`, `TODO: con_c`                              | Enlève les commentaires, les logs et semantics pour rendre le code le plus concis possible. `con_c` copie aussi les fichiers modifiés et affiche un tableau des lignes.                   |
-| **Fast Launch Preview**            | [`launch_preview.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/launch_preview.md)         | `lp_`, `lance_preview`                                                                                     | Compile, installe et lance le preview de l'application de la façon la plus rapide possible.                                                                                                                     |
-| **Fix TODOs**                      | [`t_.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_.md)                                 | `t_`, `t_models`, `t_flow`, `t_usage`, `>clientApp`, `>ca`, `fix_todo`                                                   | Résout automatiquement les TODOs ou délègue aux skills correspondants (ex: `TODO: log_`, `TODO: sem_`, `TODO: con_c`, `TODO: room_d`), puis affiche le diff de code à la fin.                                   |
-| **Extract Dependency**            | [`t_extract.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_/t_extract.md)                 | `t_extract`, `extract_todo`, `TODO: extract`                                                               | Extrait automatiquement les blocs de code ou dépendances marqués par `TODO: extract` dans `java/extarnaleDepandencie/Dependencie_Id/<titre_presentatif>.kt`. |
-| **Real-Time Logcat Inspector**     | [`log_.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/log_.md)                             | `log_`, `Todo: log_`, `logcat`, `adb_log`                                                                  | Filtre les logs de l'appareil par rapport au tag ou au contexte spécifié dans le code ou le chat, et les affiche.                                                                                               |
-| **Real-Time Logcat Filter**        | [`log_f.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/log_f.md)                           | `log_f`, `log_f ` followed by terms                                                                        | Filtre et affiche en temps réel les logs de l'appareil par rapport aux mots-clés saisis dans le chat.                                                                                                           |
-| **Room Database Query**            | [`room_d/room_d.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/room_d/room_d.md)           | `room_d`, `Todo: room_d`                                                                                   | Exécute des requêtes de base de données à chaud et les affiche sous forme de tableau Markdown.                                                                                                                  |
-| **FragMap Data Flow**              | [`fm_.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/fm_.md)                                 | `fm_`, `fm_flow`                                                                                           | Affiche le résumé du flux de synchronisation des bases de données FragMap (Room, CSV, Firebase).                                                                                                               |
-| **Help Skills**                    | [`help_skill.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/help_skill.md)                 | `help_skill`, `h_`, `help_`                                                                                | Affiche ce tableau d'aide documentant l'ensemble des Skills disponibles.                                                                                                                                        |
-| **AGY to Project Synchronizer**    | [`agy_to_project.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/agy_to_project.md)       | `agy_to_project`, `agy_to_proj`, `a_t_p`                                                                   | Synchronise et remplace les skills et le fichier `h_.md` du dossier AGY global vers le projet local.                                                                                                            |
-| **Client Chained TODOs**           | [t_appClient_chain_todo.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_appClient_chain_todo.md) | `t_appClient_chain_todo`, `t>cli`, `>clientApp`, `>ca`                                                     | Résout et nettoie automatiquement les TODOs chaînés et dépendants (avec indicateurs comme `//<--`, `//...`) dans le projet externe ClientJetPack. |
-| **Copy Coding Patterns**           | [t_copiePattersApp.md](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_copiePattersApp.md) | `t_copiePattersApp`, `t>copiePattersApp`, `copiePattersApp`                                                | Copie et adapte les patterns de code et implémentations du projet ClientJetPack vers le projet local Light App. |
-| **Fix Specified Comments**         | [`t_ex_commantaire.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/t_ex_commantaire.md) | `t_ex_commantaire`, `t_ex_commentaire`, `ex_commantaire`, `fix_ex_commantaire`, `t_exe_<file_name>`, `t_ex_<file_name>` | Navigue vers un fichier spécifique, y localise les commentaires d'instruction ou TODOs, applique le correctif demandé et supprime le commentaire. |
-| **AS Click Run**                   | [`as_click_run.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/as_click_run.md)             | `as_click_run`, `as_run`, `r_`, `click_run`                                                                | Compile, installe et lance l'application sur l'appareil connecté de manière rapide via Gradle et ADB.                                                                                    |
-| **PC Specialist**                  | [`skill_pc.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/skill_pc.md)                      | `skill_pc`, `pc_spec`, `pc_status`, `diagnose_pc`                                                          | Exécute des diagnostics complets sur le PC hôte Windows (CPU, RAM, Disque, Réseau, Processus) et génère un rapport de performance.                                                                                |
-| **Help Hardware**                  | [`hw_.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/hw_.md)                                  | `hw_`, `help_hw`, `help_pc`, `skillpc_`, `h_pc`                                                                        | Affiche le tableau d'aide documentant l'ensemble des Skills dédiés au PC/Matériel (diagnostics, contrôle AS, ADB, capture d'écran, etc.).                                                                         |
-| **View Desktop Image 1**           | [`scr_1.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/scr_1.md)                           | `scr_1`, `scr1`, `image_1`, `image1`                                                                       | Trouve l'image `image1` ou `image_1` (PNG/JPG) sur le Bureau, l'ouvre pour l'assistant et en fait l'analyse. |
-| **Fix Excel Comment & Filter**     | [`fix_commante_exel.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/fix_commante_exel.md) | `fix_excels`, `fix_excels_`, `fix_commante_exel_`, `fix_comment_excel_`, `fix_excel_`, `fix_excel` | Trouve les commentaires de contrainte (ex: `dep>0`) dans les fichiers Excel du Bureau, applique le filtre et supprime le commentaire. |
-| **Skill Creator**                  | [`skill-creator/SKILL.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/skill_creatore/skill-creator/SKILL.md) | `skill-creator`, `create_skill` | Crée de nouveaux skills, modifie, améliore ou évalue les performances des skills existants. |
+### 📋 Rôle & Description
+Le skill `h_` est le catalogue d'aide central des compétences personnalisées de l'agent. Il affiche le catalogue complet organisé par sections ou permet une recherche ciblée (`h_ <terme>`).
+
+### 📌 Édition de Skill vs Exécution (`regle h_` / `edite h_`)
+- Lorsqu'utilisateur demande de **"régler"**, **"éditer"**, **"modifier"** ou **"configurer"** le skill `h_` (ex: `regle h_`, `regle le h_`, `edite h_`, `modifier h_`) :
+  1. **NE PAS exécuter** le skill `h_` (ne pas afficher la table d'aide).
+  2. **Proposer puis éditer uniquement** les fichiers de définition du skill [SKILL.md](file:///C:/Users/Abou%20Mohamed/.gemini/config/skills/h_/SKILL.md) (dans `config/skills/h_/` et `antigravity-cli/skills/a__skill_help/h_/`).
+  3. Toujours générer l'artefact `learning_proposal.md` et demander l'accord explicite avant d'écrire.
+- L'exécution du skill `h_` (affichage du catalogue d'aide) ne doit se faire **QUE si l'utilisateur saisit le mot-clé seul** (ex: `h_`, `help_`).
+
+### 📌 Localisation des répertoires du skill `h_`
+- **Config Global** : [C:\Users\Abou Mohamed\.gemini\config\skills\h_\SKILL.md](file:///C:/Users/Abou%20Mohamed/.gemini/config/skills/h_/SKILL.md)
+- **CLI Central** : [C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\a__skill_help\h_\SKILL.md](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/a__skill_help/h_/SKILL.md)
+
+> ⚠️ Ces deux fichiers doivent toujours être synchronisés (même contenu).
 
 ---
 
-## 📂 Skills de Contexte & Copie (copy_context)
+## ⭐ 2. Major Skills (Les plus utilisés)
 
-| Nom du Skill                       | Fichier                                                                                                                                                  | Mots-clés (Triggers)                                                                                       | Description                                                                                                                                                                                                     |
-|:-----------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Context Unique Working_IN**      | [`context_working_in.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/context_working_in.md) | `agy_context_unique_workingIn_active`, `agy_context_unique_workingIn_desactive`, `c_w_a`, `c_w_d`, `c_w_e`, `cwa_<package>`, `cwa_`, `cwd_`, `cwe_` | Active (isole), Désactive (restaure), ou vérifie l'état du contexte restreint uniquement sur `Working_IN.Feature`.                                                                                              |
-| **Context Transfer**                | [`conTr_.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/contexTrensefert/conTr_.md)                         | `conT_`, `conTr_`, `/contexTrensefert`, `context_transfer`, `ctsave_`, `ctc_`, `ctecrase_`, `cwc_`, `ct_deepRead_`                 | Documente l'architecture du projet et sert de guide pour transférer le contexte de développement des modules (CSV/Firebase/Room) d'une session à l'autre.                                                      |
-| **Todo to External Chat**          | [`todo_to_extarnale_chat.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/copy_au_externale_chat_ai/todo_to_extarnale_chat.md) | `todo_to_extarnale_chat`, `con_cop`, `copy_context`, `cont_copie`, `con_copie`, `cop_cont`, `cc_` | Utilise une IA rapide pour rassembler les fichiers et images liés à un TODO, puis les copie pour une IA dotée de Deep Thinking. |
-| **Copy to Clipboard & Backup**     | [`copy_skill`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/copy_skill/SKILL.md)                           | `cl_`, `cc_`, `cop_last`, `cop_`, `c_`, `ca_`, `dc_`                       | Copie dans le presse-papiers (`cl_`/`cc_`). `c_` recrée `hist_copie.md`, `ca_` y ajoute, `dc_` supprime.                                              |
-| **Copy Package / Sibling Files**     | [`cop_last.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/cop_last.md)                           | `cl_`, `cop_last`, `cop_`, `copy_package`                       | Copie, formate et charge le dernier lot ou un dossier de fichiers Kotlin directement dans le presse-papiers.                                              |
-| **Zip Colle**                      | [`zip_colle.md`](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/copy_au_externale_chat_ai/zip_colle.md) | `zip_colle`, `colle_`, `colle`                                                                             | Récupère le dernier téléchargement (archive zip/rar ou kt direct) et met à jour les fichiers sources du projet. |
+> Les compétences les plus fréquemment utilisées au quotidien. Mémorisez leurs triggers !
+
+| Skill | Triggers | Description courte |
+|:---|:---|:---|
+| [t_](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Todo_Skills/t_) | `t_`, `fix_todo`, `t_ai`, `t_agy`, `t_models`, `t_usage` | Résout automatiquement les TODOs du codebase actif. `t_ai` cible le répertoire AGY avec scan 2-passes filtré + sync vers skills globaux miroirs. |
+| [lit_patterns (c_)](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Copy_Skills/a__Section_Pattern_Copie/lit_patterns) | `c_p`, `c_`, `tc`, `t_c`, `lit_patterns`, `read_c_p`, `integre_ici` | Cherche, copie et adapte des patterns/composables entre projets |
+| [zip_colle (z_)](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Copy_Skills/zip_colle) | `z_`, `z_c`, `zip_colle`, `colle_`, `ok_` | Extrait et remplace des fichiers Kotlin depuis les téléchargements |
+| [build_client (b+1)](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Puch_Skills/build_client) | `b+1`, `b_c`, `b_c_all`, `build_client` | Compile l'app client JetPack et incrémente la version |
+| [p_v](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Puch_Skills/p_v) | `p_v` | Commit avec la version comme message + tag + push |
+| [h_](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/a__skill_help/h_/SKILL.md) | `h_`, `h_ <terme>` | Affiche ce catalogue ou filtre par terme |
+| [log_](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/z__Autres/log_) | `log_` | Inspecte le logcat ADB en temps réel |
+| [p_skills](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Puch_Skills/p_skills) | `p_skills`, `p_sk` | Synchronise les skills entre AGY Global et le projet Android |
+
+### 🔍 Skill `c_` / `lit_patterns` — Détail
+
+> **Alias :** `c_`, `c_p`, `tc`, `t_c`, `lit_patterns`, `read_c_p`, `integre_ici`, `<interg`
+
+Ce skill est le couteau suisse du **copier-adapter de code** entre projets. Il permet de :
+- Chercher des patterns / composables dans le projet source (via TODOs ou instruction directe)
+- Les copier et les adapter automatiquement aux paramètres locaux de la destination
+- Résoudre les projets cibles via `references.json`
+- Nettoyer les TODOs après intégration
+
+**Localisation du SKILL.md :**
+[lit_patterns/SKILL.md](file:///C:/Users/Abou%20Mohamed/.gemini/config/skills/Copy_Skills/a__Section_Pattern_Copie/lit_patterns/SKILL.md)
 
 ---
 
-## 🔗 Liens Directs vers les Fichiers de configuration des Skills
+## 📂 3. Skills par Sections (`antigravity-cli/skills/`)
 
-Vous pouvez éditer et configurer directement ces fichiers dans le répertoire de l'agent :
+Les compétences spécialisées sont organisées par sous-dossiers thématiques dans :
+`C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\`
 
-* ℹ️ [Help Skill](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/help_skill.md)
-* 🔍 [Semantics Inspector](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/sem_.md)
-* 🛠️ [Fast Build and Install](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/build/build.md)
-* 📦 [Fast Build, Export & Deploy](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/build/build_.md)
-* 📱 [Build & Deploy Tahfid APK](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/build/build_apk_au_playe_store_phone/SKILL.md)
-* 📱 [Copy Last Build to Phone](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/build/cop_b_aau_phone/SKILL.md)
-* 📸 [Annotated Screen Capture](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/screenshot.md)
-* 👆 [Tap Android FAB](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/tap/tap.md)
-* ⏰ [Schedule App Launch & Tap Replay](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/tap/Schedule_agy_task_tap_l.md)
-* 🐛 [Todo Bubelle - UI Bug Hunter](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/todo_bubelle.md)
-* 📝 [Concise Code](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/consize_comments.md)
-* ⚡ [Fast Launch Preview](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/launch_preview.md)
-* ✅ [Fix TODOs and Launch](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_.md)
-* 📤 [Extract Dependency](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_/t_extract.md)
-* 📋 [Real-Time Logcat Inspector](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/log_.md)
-* 📋 [Real-Time Logcat Filter](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/log_f.md)
-* 📦 [Commit, Tag and Push](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/push_tagged.md)
-* 💾 [Room Database Query](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/room_d/room_d.md)
-* 🔄 [FragMap Data Flow](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/fm_.md)
-* 🔄 [AGY to Project Synchronizer](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/agy_to_project.md)
-* 📋 [Client Chained TODOs](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_appClient_chain_todo.md)
-* 📋 [Copy Coding Patterns](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/t_copiePattersApp.md)
-* 🚀 [AS Click Run](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/as_click_run.md)
-* 🖥️ [PC Specialist](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/skill_pc.md)
-* ⚙️ [PC Help Page (hw_)](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/hw_.md)
-* 📝 [Fix Specified Comments (t_ex_commantaire)](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/t_ex_commantaire.md)
-* 📊 [Fix Excel Comment (fix_commante_exel)](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/skill_agent_pc/fix_commante_exel.md)
-* 🛠️ [Skill Creator](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/skill_creatore/skill-creator/SKILL.md)
+---
 
-### 📂 Configuration des Skills de Contexte & Copie (copy_context)
+### 📁 `Copy_Skills/` — Copie de code, patterns et fichiers
+> Compétences liées à la copie de code, la réutilisation de patterns et le transfert de fichiers entre projets.
 
-* 📂 [Context Unique Working_IN](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/context_working_in.md)
-* 🔄 [Context Transfer](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/contexTrensefert/conTr_.md)
-* 📝 [Todo to External Chat (todo_to_extarnale_chat)](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/copy_au_externale_chat_ai/todo_to_extarnale_chat.md)
-* 📋 [Copy to Clipboard & Backup](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/copy_skill/SKILL.md)
-* 📋 [Copy Package / Sibling Files](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/cop_last.md)
-* 📦 [Zip Colle](file:///C:/Users/Abou%20Mohamed/AndroidStudioProjects/Light_App_Controles/app/src/main/java/skill_agent/copy_context/copy_au_externale_chat_ai/zip_colle.md)
+| Skill | Triggers | Description courte |
+|:---|:---|:---|
+| [To_Externale_Ai](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Copy_Skills/To_Externale_Ai) | `cc_`, `cc_se`, `con_cop`, `copy_context`, `todo_to_extarnale_chat` | Copie le contexte TODO vers un chat IA externe |
+| [copie_paterns_et_fit](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Copy_Skills/copie_paterns_et_fit) | `copie_paterns_et_fit`, `t_c_client`, `t_copie_compos_et_fit` | Copie et adapte des patterns/composables entre projets |
+| [t_contex_files_relative_pour_regle_todo](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Copy_Skills/t_contex_files_relative_pour_regle_todo) | `t_contex`, `todo_context`, `save_c` | Extrait le contexte complet d'un TODO dans un fichier Markdown |
+| [t_extract](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Copy_Skills/t_extract) | `t_extract`, `extract_todo`, `TODO: extract` | Extrait des blocs de code ou dépendances identifiés |
+| [zip_colle](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Copy_Skills/zip_colle) | `zip_colle`, `colle_`, `colle`, `z_`, `z_c`, `ok_` | Extrait et remplace des fichiers Kotlin depuis les téléchargements |
+| [cop_last](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Copy_Skills/cop_last) | `cop_last` | Copie le dernier fichier actif |
+| [copy_skill](file:///C:/Users/Abou%20Mohamed/.gemini/config/skills/Copy_Skills/copy_skill) | `c_`, `cl_`, `cc_`, `cop_last`, `cop_`, `ca_`, `ca+t`, `dc_`, `copy_skill` | Copie des fichiers vers le presse-papiers et sauvegarde dans hist_copie.md (support +t) |
+| [copy_save_au_frech_list_copy_uncomited_edited_files](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Copy_Skills/copy_save_au_frech_list_copy_uncomited_edited_files) | `copy_uncomited`, `cu_`, `sc_u`, `save_uncomited_`, `copy_edited` | Copie tous les fichiers non commités (edited) du projet Android actif et sauvegarde leurs chemins dans `cop_last/list_copied_files` |
+
+---
+
+### 📁 `Puch_Skills/` — Build, Git push/tag/fusion
+> Compétences liées à la compilation d'APKs, au versioning, aux commits, tags et fusions de branches Git.
+
+| Skill | Triggers | Description courte |
+|:---|:---|:---|
+| [build_apk_au_playe_store_phone](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Puch_Skills/build_apk_au_playe_store_phone) | `bt_`, `b_v+1`, `build_tahfid`, `build_PS` | Compile et déploie l'APK Tahfid sur le téléphone |
+| [build_client](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Puch_Skills/build_client) | `b_c`, `b+1`, `b_c_all`, `build_client` | Compile l'app client JetPack et incrémente la version |
+| [smart_build_router](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Puch_Skills/smart_build_router) | `b+1`, `b_+1`, `b+1+z`, `b_v+1+z` | Router de build : redirige vers Tahfid ou Client selon le workspace |
+| [p_v](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Puch_Skills/p_v) | `p_v` | Commit avec la version comme message + tag `par_version_instaled` + push |
+| [push_tagged](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Puch_Skills/push_tagged) | `push_`, `p_`, `push_taged`, `p_tag=cleanup` | Commit, tag auto-versionné et push distant |
+| [p_skills](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Puch_Skills/p_skills) | `p_skills`, `p_sk`, `p_ski`, `revers_p_skill`, `r_p_sk`, `rev_p_sk`, `rev_p_ski`, `reverse_p_sk`, `reverse_c_sk`, `rev_c_sk` | Synchronisation bidirectionnelle des skills entre AGY Global et le projet Android (`a__GeminiAi_Agent_AGY`) |
+| [fusion_au_master](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Puch_Skills/fusion_au_master) | `fusion_au_master`, `fusion`, `merge_master` | Fusionne la branche courante vers master/main |
+| [fusion_app_tahfide](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Puch_Skills/fusion_app_tahfide) | `fusion_tahfid`, `fusion_a_tahfid`, `merge_tahfid` | Fusionne la branche courante vers app_tahfid_quran |
+| [git_branch_todos](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Puch_Skills/git_branch_todos) | `b_t`, `gbt_`, `git_branch_todos`, `sub_branch_todo` | Crée une branche Git à partir de la liste des TODOs |
+
+---
+
+### 📁 `Todo_Skills/` — Détection, résolution et gestion des TODOs
+> Compétences liées à la détection, résolution automatique, export et traçabilité des TODOs dans le codebase.
+
+| Skill | Triggers | Description courte |
+|:---|:---|:---|
+| [t_](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Todo_Skills/t_) | `t_`, `fix_todo`, `t_ai`, `t_agy`, `t_models`, `t_usage` | Résout automatiquement les TODOs. `t_ai` = scan AGY 2-passes filtré (kt/md séparés) + sync skills globaux miroirs. |
+| [chain_todos_au_autres_projects](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Todo_Skills/chain_todos_au_autres_projects) | `chain_todos_au_autres_projects`, `t>cli`, `>clientApp`, `>light app` | Détecte et traite les TODOs inter-projets |
+| [t_appClient_chain_todo](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Todo_Skills/t_appClient_chain_todo) | `t>cli`, `>ca`, `clientApp` | TODOs chaînés vers l'application cliente |
+| [t_contex_files_relative_pour_regle_todo](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Todo_Skills/t_contex_files_relative_pour_regle_todo) | `t_contex`, `todo_context`, `save_c` | Extrait le contexte complet d'un TODO dans un fichier Markdown |
+| [t_extract](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Todo_Skills/t_extract) | `t_extract`, `TODO: extract` | Extrait les blocs de code ou dépendances marqués |
+| [git_branch_todos](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Todo_Skills/git_branch_todos) | `b_t`, `gbt_`, `t_bra` | Crée une branche Git à partir des TODOs |
+| [t_branche_a_tahfid](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Todo_Skills/t_branche_a_tahfid) | `t_branche_a_tahfid`, `tb_tahfid`, `t_bt_`, `tb_` | Crée une branche et rapport de TODOs pour Tahfid |
+| [search_last_todo_historique_git](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Todo_Skills/search_last_todo_historique_git) | `search_last_todo` | Historique et traçabilité des modifications TODO dans Git |
+| [To_Externale_Ai](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Todo_Skills/To_Externale_Ai) | `cc_`, `cc_se`, `con_cop`, `copy_context` | Export du contexte TODO vers un chat IA externe |
+
+---
+
+### 📁 `Installe_Skill_Skills/` — Création et installation de skills
+> Compétences liées à la création, la configuration et l'installation globale de nouveaux skills.
+
+| Skill | Triggers | Description courte |
+|:---|:---|:---|
+| [installer_globale_skill](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Installe_Skill_Skills/installer_globale_skill) | `installe_<skill>`, `install global <skill>`, `installe_t_` | Copie un skill local vers le répertoire global |
+| [add_trigger_au_skill](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Installe_Skill_Skills/add_trigger_au_skill) | `tig_b_t_<term>`, `add_trigger_au_skill` | Ajoute un nouveau trigger à un skill existant |
+| [skill_creatore](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/Installe_Skill_Skills/skill_creatore) | `skill_creatore` | Assistant de création de nouveau skill |
+
+---
+
+### 📁 `z__Autres/` — Skills divers (Compose, debug, logcat, DB…)
+> Compétences variées : navigation Compose, debug logcat, Room/Firebase, styles, et amélioration de skills.
+
+| Skill | Triggers | Description courte |
+|:---|:---|:---|
+| [affiche_parent_val](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/z__Autres/affiche_parent_val) | `affiche_parent_val`, `lien_ver_paren_val`, `<lien parent` | Trouve le composable parent propriétaire d'une valeur |
+| [passe_paramater_a_ici](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/z__Autres/passe_paramater_a_ici) | `<a_ici`, `a_ici_`, `passe_a_ici`, `passe_param_ici`, `<passe todo.relative` | Propage un état/valeur vers le bas de la hiérarchie Compose |
+| [passe_on_au_ici](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/z__Autres/passe_on_au_ici) | `<passe_on todo.relative`, `on_a_ici_`, `passe_on_ici`, `passe_on_au_ici` | Remonte un callback on_ vers le parent dans la hiérarchie Compose |
+| [passe_recieve_val](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/z__Autres/passe_recieve_val) | `passe_recieve_val` | Propage un état/callback avec minimum de tokens |
+| [supp_val_et_remplace_par_passed_paramater_depuit_parent_val](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/z__Autres/supp_val_et_remplace_par_passed_paramater_depuit_parent_val) | `supp_val_`, `remplace_par_param_`, `val_to_param` | Supprime une valeur locale et la remplace par un paramètre passé |
+| [consize_comments](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/z__Autres/consize_comments) | `consize_comments`, `ccl_` | Supprime les commentaires, logs et semantics pour code concis |
+| [read_ingor_](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/z__Autres/read_ingor_) | `read_ingor_<file>`, `read_i_list`, `read_ignor_last`, `ccl_` | Isole temporairement des fichiers pour économiser les tokens |
+| [log_](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/z__Autres/log_) | `log_` | Inspecte le logcat ADB en temps réel selon les TODOs |
+| [sem_](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/z__Autres/sem_) | `sem_` | Injecte des semantics et inspecte la hiérarchie UI Android |
+| [tap](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/z__Autres/tap) | `tap` | Capture l'écran, identifie le FAB et exécute un tap ADB |
+| [tap_lit_debug_log_cat](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/z__Autres/tap_lit_debug_log_cat) | `tap_lit` | Tap + lecture du logcat pour debug rapide |
+| [fm_](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/z__Autres/fm_) | `fm_`, `fm_flow` | Synchro Room/CSV/Firebase dans les écrans FragMap |
+| [learn_improve_skill_depuit_convesation_imp_](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/z__Autres/learn_improve_skill_depuit_convesation_imp_) | `/improve`, `imp_`, `improv_`, `iprov_`, `improve_t_`, `i_t_`, `/learn/learn` | Améliore un skill à partir des corrections de la conversation |
+
+---
+
+### 📁 `a__skill_help/` — Aide des skills
+> Le catalogue d'aide lui-même.
+
+| Skill | Triggers | Description courte |
+|:---|:---|:---|
+| [h_](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/a__skill_help/h_/SKILL.md) | `h_`, `help_`, `help_skill`, `help_skills` | Affiche ce catalogue d'aide des skills |
+
+---
+
+## 📂 4. Gestion des Références de Projets (`r_<nom>` / `ref_<nom>` / `ref_json`)
+
+**Répertoire de référence** :
+```
+C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\b__References_Files\
+```
+
+Lorsque l'assistant rencontre un mot-clé ou déclencheur sous la forme **`r_<nom>`** (par exemple `r_aa__GeminiAi_Agent_AGY`, `r_DevApp`, `r_agy_c`) ou **`ref_<nom>`** (par exemple `ref_DevApp`), cela désigne directement une référence issue de **`ref_json`** (`references.json`), c'est-à-dire **`ref_json_<la_ref>`**. L'assistant **doit** :
+1. Chercher le fichier de configuration dans le répertoire [`b__References_Files`](file:///C:/Users/Abou%20Mohamed/.gemini/antigravity-cli/skills/b__References_Files) (ex: `references.json`, ou tout autre fichier de mapping présent dans ce dossier).
+2. Le lire via PowerShell :
+   ```powershell
+   Get-Content -Path "C:\Users\Abou Mohamed\.gemini\antigravity-cli\skills\b__References_Files\references.json"
+   ```
+3. Rechercher dans `projects` la clé ou la liste `noms` correspondant à `<nom>` (en ignorant le préfixe `r_` ou `ref_`, de manière insensible à la casse).
+4. Extraire le chemin `path` spécifié pour ce projet / référence.
+5. Appliquer ce `path` comme répertoire racine cible pour toutes les opérations liées à cette référence.
+
+> 💡 **Notation raccourcie** : `r_<nom>` = `ref_<nom>` = `ref_json_<nom>`.
+> ⚠️ **Chemin canonique** : Toujours résoudre `ref_json` depuis `b__References_Files\`. Ne pas utiliser l'ancien chemin `antigravity-cli\references.json` sauf si `b__References_Files` est absent.
+
+---
+
+
+## 🔍 5. Instructions de Recherche / Filtrage
+
+Si l'utilisateur ajoute un terme ou une requête après le mot-clé (ex: `h_ t_`, `h_ build`, `h_<terme>`) :
+1. Extraire la `<requête>` recherchée.
+2. **Exact Match Check** : Vérifier si la `<requête>` correspond exactement à l'un des **Triggers** d'un skill de n'importe quelle section.
+   - Si c'est le cas, ne pas afficher le tableau. Lire et afficher directement l'intégralité du fichier `SKILL.md` correspondant dans le chat.
+3. **Filtre de recherche** : Si ce n'est pas un match exact, filtrer **tous les tableaux de sections** en ne conservant que les lignes où la `<requête>` correspond (partiellement ou totalement) à :
+   - Le **Nom du Skill**
+   - Les **Triggers**
+   - La **Description courte**
+4. Afficher uniquement les compétences correspondantes sous forme de tableau à 3 colonnes (Skill, Triggers, Description). Si aucun match n'est trouvé, afficher un message l'indiquant et lister le catalogue complet.
+
