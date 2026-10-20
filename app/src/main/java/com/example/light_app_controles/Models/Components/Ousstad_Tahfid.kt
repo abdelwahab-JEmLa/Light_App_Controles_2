@@ -11,15 +11,27 @@ enum class Ousstad_Tahfid(
     val login_nom: String = "",
     val login_mp: String = "",
     val its_non_admine_ousstade: Boolean = false,
+    val qr_image_nom: String = "",
 ) {
+    Mounir_Osstad(
+        "dimanch/jeudi",
+        "منير",
+        Compts.Mounir_Oustad_KeyId.keyId,
+        "+213  559 51 62 65",
+        "منير",
+        "1111",
+        true,
+        "منير.jpg"
+    ),
     Abdelwahab_Osstad(
         "dimanch/jeudi",
         "عبدالوهاب حمنيش",
         Compts.AbdelwahabTravailleChezGros_KeyId.keyId,
         "+213 553885037",
-        //<--
         "ab",
-        ""
+        "4321",
+        false,
+        "ab.png"
     ),
     Non_Defini_Actuellemen(
         "dimanch/jeudi",
@@ -47,15 +59,15 @@ enum class Ousstad_Tahfid(
         "",
         "",
     ),
-    Amine_Madrassa(
-        "dimanch/mardi/jeudi",
-        "أمين",
-        M00CentralParametresOfAllApps.get_Default().amine_madrasa_Compt_KeyId,
+    Abdelmoumen_Madrassa(
+        "lundi/mardi",
+        "عبدالمومن فرحي",
+        M00CentralParametresOfAllApps.get_Default().abdelmomen_madrasa_Compt_KeyId,
         "+213 799030302",
-        "امين",
-        "0000",
-        true
+        "عبدالمومن",
+        "1234",
+        true,
+        "عبدالمومن.jpeg"
     )
     ;
 }
-

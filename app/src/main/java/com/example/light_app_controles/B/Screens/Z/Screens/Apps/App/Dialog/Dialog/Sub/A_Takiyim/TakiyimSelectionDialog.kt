@@ -53,7 +53,6 @@ import kotlinx.coroutines.Dispatchers
 import android.util.Log
 import Application5.App.Agent.GeminiObservationAgent
 import androidx.compose.material3.Divider
-import androidx.compose.material3.HorizontalDivider
 
 
 @Composable
@@ -86,8 +85,9 @@ fun TakiyimSelectionDialog_SeparatedAppsCodingPattern(
     val teacherKeyID = remember(activeOusstad) {
         val params = M00CentralParametresOfAllApps()
         when (activeOusstad) {
+            Ousstad_Tahfid.Mounir_Osstad -> Compts.Mounir_Oustad_KeyId.keyId
             Ousstad_Tahfid.Abdelwahab_Osstad ->Compts.AbdelwahabTravailleChezGros_KeyId.keyId
-            Ousstad_Tahfid.Amine_Madrassa -> params.amine_madrasa_Compt_KeyId
+            Ousstad_Tahfid.Abdelmoumen_Madrassa -> params.abdelmomen_madrasa_Compt_KeyId
             Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata -> params.kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId
             Ousstad_Tahfid.kissme_talaba_tam_tahwilahom_mena_idata -> "kissme_talaba_tam_tahwilahom_mena_idata"
             Ousstad_Tahfid.Kissm_Intikali -> "Kissm_Intikali"

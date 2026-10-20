@@ -1,4 +1,4 @@
-package com.example.light_app_controles.B.Screens.Z.Screens.Apps.App
+﻿package com.example.light_app_controles.B.Screens.Z.Screens.Apps.App
 
 import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
 import Application5.App.Dialog.Dialog.EtudiantDetailsDialog_SeparatedAppsCodingPattern
@@ -6,25 +6,19 @@ import Application5.App.Dialog.Dialog.Sub.A_Takiyim.TakiyimSelectionDialog_Separ
 import Application5.App.Dialog.Dialog.Sub.A_Takiyim.processTakiyimEvaluation
 import Application5.App.Dialog.Dialog.Sub.Utils.MoulahadaSouloukSelectionDialog_SeparatedAppsCodingPattern
 import Application5.App.Dialog.Dialog.Sub.Utils.SouraSelectionDialog_SeparatedAppsCodingPattern
-import Application5.App.Options.getActiveOussstadKey
 import Application5.App.Repository.M19Etudiant
 import Application5.App.View.DropDownItems.View.But2.convertSingleCardToJpg
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.ParentCommunicationCardData_2
-import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.generateHistoryImage
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.generatePdfDocument
 import Application5.App.View.DropDownItems.View.But2.getStoredCardUriForStudent
 import EntreApps.Shared.Models.Components.Ousstad_Tahfid
-import EntreApps.Shared.Models.Compts
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps
-import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.ifFalse
 import EntreApps.Shared.Models.M00CentralParametresOfAllApps.Companion.ifTrue
-import EntreApps.Shared.Models.Utilisateur
 import android.text.format.DateUtils.isToday
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,14 +29,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.EventSeat
 import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
-import androidx.compose.material.icons.filled.Print
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -65,7 +58,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -120,7 +112,8 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
     // ─────────────────────────────────────────────────────────────────────────
     fun shareCardOnWhatsApp() {
         val rawPhone = etudiant.num_telephone_parent.trim()
-        val phone = rawPhone.ifBlank { "0553885037" }
+        val activeOusstad = viewModel.activeCentralValues.active_Ousstad_Tahfid
+        val phone = rawPhone.ifBlank { activeOusstad?.num?.ifBlank { "0553885037" } ?: "0553885037" }
 
 
         isSharing = true
@@ -311,54 +304,14 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    (activeOusstad == Ousstad_Tahfid.Abdelwahab_Osstad || activeOusstad == Ousstad_Tahfid.Amine_Madrassa).ifTrue {
-
-                        // ── Full card share button (icon top, smaller text) ───────
-                        OutlinedButton(
-                            onClick = { if (!isSharing) shareCardOnWhatsApp() },
-                            enabled = !isSharing,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            if (isSharing) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(16.dp),
-                                    strokeWidth = 2.dp
-                                )
-                                Spacer(modifier = Modifier.size(6.dp))
-                                Text(
-                                    text = "جاري الإرسال…",
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            } else {
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    verticalArrangement = Arrangement.spacedBy(2.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Share,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(18.dp),
-                                        tint = Color(0xFF25D366)
-                                    )
-                                    Text(
-                                        text = "إرسال البطاقة واتساب",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = Color(0xFF25D366)
-
-                                    )
-                                }
-                            }
-                        }
-                    }
-                    // ── Mokarrar-only image share button ─────────────────────
-                    // Generates header + student name + Hifd table + Istedrak
-                    // table as a compact JPEG — no history, no footer.
                     var isSharingMokarrar by remember(etudiantId) { mutableStateOf(false) }
+                    var mokarrarImageNotFound by remember(etudiantId) { mutableStateOf(false) }
                     OutlinedButton(
                         onClick = {
                             if (!isSharingMokarrar) {
                                 val rawPhone = etudiant.num_telephone_parent.trim()
-                                val phone = rawPhone.ifBlank { "0553885037" }
+                                val phone = rawPhone.ifBlank { activeOusstad?.num?.ifBlank { "0553885037" } ?: "0553885037" }
+                                mokarrarImageNotFound = false
                                 isSharingMokarrar = true
                                 scope.launch {
                                     try {
@@ -373,10 +326,11 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                         }
                                         if (imageUri == null) {
                                             withContext(Dispatchers.Main) {
+                                                mokarrarImageNotFound = true
                                                 Toast.makeText(
                                                     context,
-                                                    "❌ فشل إنشاء صورة المقرر",
-                                                    Toast.LENGTH_SHORT
+                                                    "❌ صورة QR غير متوفرة — المقرر موجود لكن صورة QR غير موجودة في الهاتف",
+                                                    Toast.LENGTH_LONG
                                                 ).show()
                                             }
                                             return@launch
@@ -434,6 +388,23 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                                 text = "جاري الإرسال…",
                                 style = MaterialTheme.typography.labelSmall
                             )
+                        } else if (mokarrarImageNotFound) {
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Warning,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp),
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                                Text(
+                                    text = "صورة QR غير متوفرة",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            }
                         } else {
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -486,7 +457,7 @@ fun B_EtudiantCard_SeparatedAppsCodingPattern(
                         onClick = {
                             if (!isSharingSchema) {
                                 val rawPhone = etudiant.num_telephone_parent.trim()
-                                val phone = rawPhone.ifBlank { "0553885037" }
+                                val phone = rawPhone.ifBlank { activeOusstad?.num?.ifBlank { "0553885037" } ?: "0553885037" }
                                 isSharingSchema = true
                                 scope.launch {
                                     try {

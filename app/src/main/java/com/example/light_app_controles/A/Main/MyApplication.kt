@@ -28,6 +28,9 @@ class MyApplication : Application() {
 
         initializeFirebase()
 
+        // Création des dossiers requis sur le stockage externe si non disponibles
+        AppDirectoriesInitializer.ensureDirectoriesExist(this)
+
         Log.d(TAG, "Application initialized successfully")
     }
 

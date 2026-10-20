@@ -109,18 +109,20 @@ data class ActiveCentralValues(
     var active_Ousstad_Tahfid: Ousstad_Tahfid? = run {
         val params = M00CentralParametresOfAllApps()
         val utilisateur = when (params.au_Lence_Set_Compt_Ac_KeyId) {
-            params.abdelmomen_Compt_KeyId -> Utilisateur.Abdelmoumen
+            params.abdelmomen_Compt_KeyId -> Utilisateur.Abdelmoumen_Madrassa
             params.walid_Compt_KeyId -> Utilisateur.Walid
+            Compts.Mounir_Oustad_KeyId.keyId -> Utilisateur.Mounir_Osstad
             Compts.AbdelwahabTravailleChezGros_KeyId.keyId -> Utilisateur.Abdelwahab_Osstad
-            params.amine_madrasa_Compt_KeyId -> Utilisateur.Amine_Madrassa
+            params.abdelmomen_madrasa_Compt_KeyId -> Utilisateur.Abdelmoumen_Madrassa
             params.kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId -> Utilisateur.kissme_talaba_li_dirassatihim_mena_idata
             "kissme_talaba_tam_tahwilahom_mena_idata" -> Utilisateur.kissme_talaba_tam_tahwilahom_mena_idata
             else -> Utilisateur.Admin
         }
 
         when (utilisateur) {
+            Utilisateur.Mounir_Osstad -> Ousstad_Tahfid.Mounir_Osstad
             Utilisateur.Abdelwahab_Osstad -> Ousstad_Tahfid.Abdelwahab_Osstad
-            Utilisateur.Amine_Madrassa -> Ousstad_Tahfid.Amine_Madrassa
+            Utilisateur.Abdelmoumen_Madrassa -> Ousstad_Tahfid.Abdelmoumen_Madrassa
             Utilisateur.kissme_talaba_li_dirassatihim_mena_idata -> Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata
             Utilisateur.kissme_talaba_tam_tahwilahom_mena_idata -> Ousstad_Tahfid.kissme_talaba_tam_tahwilahom_mena_idata
             Utilisateur.Admin -> null
@@ -131,10 +133,11 @@ data class ActiveCentralValues(
     var active_filter_du_utilisateur: Utilisateur? = run {
         val params = M00CentralParametresOfAllApps()
         when (params.au_Lence_Set_Compt_Ac_KeyId) {
-            params.abdelmomen_Compt_KeyId -> Utilisateur.Abdelmoumen
+            params.abdelmomen_Compt_KeyId -> Utilisateur.Abdelmoumen_Madrassa
             params.walid_Compt_KeyId -> Utilisateur.Walid
+            Compts.Mounir_Oustad_KeyId.keyId -> Utilisateur.Mounir_Osstad
             Compts.AbdelwahabTravailleChezGros_KeyId.keyId -> Utilisateur.Abdelwahab_Osstad
-            params.amine_madrasa_Compt_KeyId -> Utilisateur.Amine_Madrassa
+            params.abdelmomen_madrasa_Compt_KeyId -> Utilisateur.Abdelmoumen_Madrassa
             params.kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId -> Utilisateur.kissme_talaba_li_dirassatihim_mena_idata
             "kissme_talaba_tam_tahwilahom_mena_idata" -> Utilisateur.kissme_talaba_tam_tahwilahom_mena_idata
             else -> Utilisateur.Admin

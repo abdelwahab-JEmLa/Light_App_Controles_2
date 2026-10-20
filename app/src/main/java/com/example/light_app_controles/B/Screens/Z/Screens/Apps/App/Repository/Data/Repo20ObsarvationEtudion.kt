@@ -33,11 +33,12 @@ class Repo20ObsarvationEtudion(
         } else {
             val params = M00CentralParametresOfAllApps()
             val targetKeyId = when (currentFilter) {
+                Utilisateur.Mounir_Osstad -> Compts.Mounir_Oustad_KeyId.keyId
                 Utilisateur.Abdelwahab_Osstad -> Compts.AbdelwahabTravailleChezGros_KeyId.keyId
-                Utilisateur.Amine_Madrassa -> params.amine_madrasa_Compt_KeyId
+                Utilisateur.Abdelmoumen_Madrassa -> params.abdelmomen_madrasa_Compt_KeyId
                 Utilisateur.kissme_talaba_li_dirassatihim_mena_idata -> params.kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId
                 Utilisateur.kissme_talaba_tam_tahwilahom_mena_idata -> "kissme_talaba_tam_tahwilahom_mena_idata"
-                Utilisateur.Abdelmoumen -> params.abdelmomen_Compt_KeyId
+                Utilisateur.Abdelmoumen_Madrassa -> params.abdelmomen_Compt_KeyId
                 Utilisateur.Walid -> params.walid_Compt_KeyId
                 Utilisateur.kissm_intikali_madrasa_Compt_Osstad -> params.kissm_intikali_madrasa_Compt_KeyId
                 Utilisateur.Admin -> return@derivedStateOf _datas.value

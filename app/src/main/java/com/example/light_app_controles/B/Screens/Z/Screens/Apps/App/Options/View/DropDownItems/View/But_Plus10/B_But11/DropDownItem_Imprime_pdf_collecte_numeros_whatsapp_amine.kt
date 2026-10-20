@@ -1,4 +1,4 @@
-package Application5.App.View.DropDownItems.View.But11
+﻿package Application5.App.View.DropDownItems.View.But11
 
 import Application5.App.A_ViewModel_SeparatedAppsCodingPattern
 import Application5.App.View.DropDownItems.View.But2.generatePdfDocument.Table.PdfSaverUtility_Tahfid
@@ -65,13 +65,13 @@ fun DropDownItem_Imprime_pdf_collecte_numeros_whatsapp_amine(
                 val teacherName = activeOusstad?.nom_arab ?: "غير محدد"
 
                 val barcodeResName = when (activeOusstad) {
-                    Ousstad_Tahfid.Amine_Madrassa -> "whats_app_code_bar_amine"
+                    Ousstad_Tahfid.Abdelmoumen_Madrassa -> "whats_app_code_bar_amine"
                     Ousstad_Tahfid.Abdelwahab_Osstad -> "whats_app_code_bar_abdelwahab"
                     else -> "whats_app_code_bar_abdelwahab"
                 }
 
                 val pdfFile = withContext(Dispatchers.IO) {
-                    generateWhatsAppCollectAminePdf20Pages(context, teacherName, barcodeResName)
+                    generateWhatsAppCollectAminePdf20Pages(context, teacherName, barcodeResName, activeOusstad)
                 }
 
                 val saveResult = withContext(Dispatchers.IO) {
@@ -121,7 +121,7 @@ fun DropDownItem_Imprime_pdf_collecte_numeros_whatsapp_amine(
         ),
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
-        DropdownMenuItem(
+        DropdownMenuItem(      
             leadingIcon = {
                 if (isLoading) CircularProgressIndicator(modifier = Modifier.padding(4.dp), strokeWidth = 2.dp)
                 else Icon(Icons.Default.ContactPhone, null, tint = MaterialTheme.colorScheme.secondary)
@@ -141,7 +141,8 @@ fun DropDownItem_Imprime_pdf_collecte_numeros_whatsapp_amine(
 private fun generateWhatsAppCollectAminePdf20Pages(
     context: Context,
     teacherName: String,
-    barcodeResName: String
+    barcodeResName: String,
+    activeOusstad: Ousstad_Tahfid? = null
 ): File? {
     return try {
         val pdfFile = File(context.cacheDir, "whatsapp_collect_amine_20pages_form_${System.currentTimeMillis()}.pdf")
@@ -197,8 +198,51 @@ private fun generateWhatsAppCollectAminePdf20Pages(
         }.getOrNull()
 
         val barCodeBitmap: Bitmap? = runCatching {
-            val resId = context.resources.getIdentifier(barcodeResName, "drawable", context.packageName)
-            if (resId != 0) BitmapFactory.decodeResource(context.resources, resId) else null
+            var loadedBitmap: Bitmap? = null
+            val qrDirectory = com.example.light_app_controles.A.Main.AppDirectoriesInitializer.getQrImagesDir()
+            if (activeOusstad != null && qrDirectory.exists()) {
+                val extensions = listOf("", ".png", ".jpg", ".jpeg", ".webp")
+                val baseNames = listOfNotNull(
+                    activeOusstad.qr_image_nom.takeIf { it.isNotBlank() },
+                    activeOusstad.qr_image_nom.substringBeforeLast(".").takeIf { it.isNotBlank() },
+                    activeOusstad.login_nom.takeIf { it.isNotBlank() },
+                    activeOusstad.nom_arab.takeIf { it.isNotBlank() },
+                    activeOusstad.name
+                ).distinct()
+
+                for (base in baseNames) {
+                    for (ext in extensions) {
+                        val fileName = if (ext.isEmpty() || base.endsWith(ext, ignoreCase = true)) base else "$base$ext"
+                        val file = File(qrDirectory, fileName)
+                        if (file.exists() && file.isFile) {
+                            loadedBitmap = BitmapFactory.decodeFile(file.absolutePath)
+                            if (loadedBitmap != null) break
+                        }
+                    }
+                    if (loadedBitmap != null) break
+                }
+
+                if (loadedBitmap == null) {
+                    val files = qrDirectory.listFiles() ?: emptyArray()
+                    val matchTerms = listOfNotNull(
+                        activeOusstad.login_nom.takeIf { it.isNotBlank() },
+                        activeOusstad.nom_arab.split(" ").firstOrNull { it.isNotBlank() },
+                        activeOusstad.name
+                    )
+                    for (file in files) {
+                        if (file.isFile && matchTerms.any { term -> file.name.contains(term, ignoreCase = true) }) {
+                            loadedBitmap = BitmapFactory.decodeFile(file.absolutePath)
+                            if (loadedBitmap != null) break
+                        }
+                    }
+                }
+            }
+            if (loadedBitmap == null) {
+                val resId = context.resources.getIdentifier(barcodeResName, "drawable", context.packageName)
+                if (resId != 0) BitmapFactory.decodeResource(context.resources, resId) else null
+            } else {
+                loadedBitmap
+            }
         }.getOrNull()
 
         // Generate 20 pages

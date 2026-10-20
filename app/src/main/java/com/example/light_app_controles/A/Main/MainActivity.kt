@@ -59,9 +59,12 @@ class MainActivity : ComponentActivity() {
                     ) == PackageManager.PERMISSION_GRANTED
         }
 
-        if (hasStorageAccess && showStorageDialog) {
-            showStorageDialog = false
-            permissionsChecked = true
+        if (hasStorageAccess) {
+            AppDirectoriesInitializer.ensureDirectoriesExist(this)
+            if (showStorageDialog) {
+                showStorageDialog = false
+                permissionsChecked = true
+            }
         }
 
         if (!permissionsChecked && hasStorageAccess) {
@@ -119,6 +122,7 @@ class MainActivity : ComponentActivity() {
     fun handlePermissions() {
         if (permissionHandler.arePermissionsGranted()) {
             permissionsChecked = true
+            AppDirectoriesInitializer.ensureDirectoriesExist(this)
             return
         }
 
@@ -127,6 +131,7 @@ class MainActivity : ComponentActivity() {
             override fun onPermissionsGranted() {
                 permissionsChecked = true
                 showStorageDialog = false
+                AppDirectoriesInitializer.ensureDirectoriesExist(this@MainActivity)
                 Toast.makeText(
                     this@MainActivity,
                     "✓ جميع الأذونات ممنوحة - الصور ستظهر الآن",

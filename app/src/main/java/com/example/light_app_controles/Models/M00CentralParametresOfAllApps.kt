@@ -12,6 +12,7 @@ import com.google.firebase.database.database
 enum class Compts(val keyId: String) {
     AbdelwahabTravailleChezGros_KeyId("-OV9dYujH9cA3yEx8AY2"),
     Telephone_de_presentation("-OTmoNn0cljrRuhVR2sp"),
+    Mounir_Oustad_KeyId("-OTmoNn0cljrRuhVR2s11"),
 }
 
 @Entity
@@ -34,7 +35,7 @@ data class M00CentralParametresOfAllApps(
     val jamale_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s6",
     val walid_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s7",
     val abdelmomen_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s4",
-    val amine_madrasa_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s8",
+    val abdelmomen_madrasa_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s8",
     val kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s10",
     val kissm_intikali_madrasa_Compt_KeyId: String = "-OTmoNn0cljrRuhVR2s9",
 //────────────────────────────au_Lence_Set_Compt_Ac_KeyId──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -126,10 +127,11 @@ data class M00CentralParametresOfAllApps(
         fun get_utilisateur(currentComptKeyId: String): Utilisateur {
             val params = M00CentralParametresOfAllApps()
             return when (currentComptKeyId) {
-                params.amine_madrasa_Compt_KeyId -> Utilisateur.Amine_Madrassa
+                Compts.Mounir_Oustad_KeyId.keyId -> Utilisateur.Mounir_Osstad
+                params.abdelmomen_madrasa_Compt_KeyId -> Utilisateur.Abdelmoumen_Madrassa
                 params.kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId -> Utilisateur.kissme_talaba_li_dirassatihim_mena_idata
                 "kissme_talaba_tam_tahwilahom_mena_idata" -> Utilisateur.kissme_talaba_tam_tahwilahom_mena_idata
-                params.abdelmomen_Compt_KeyId -> Utilisateur.Abdelmoumen
+                params.abdelmomen_Compt_KeyId -> Utilisateur.Abdelmoumen_Madrassa
                 params.walid_Compt_KeyId -> Utilisateur.Walid
                 else -> Utilisateur.Admin
             }
@@ -156,33 +158,35 @@ enum class Utilisateur(
     val hour_earn: Double = 1200.00,
 ) {
     Admin("", "", "المسؤول"),
+    Mounir_Osstad(
+        Compts.Mounir_Oustad_KeyId.keyId,
+        "dimanch/jeudi",
+        "منير",
+        "+213  559 51 62 65",
+        1530.00,
+    ),
     Abdelwahab_Osstad(
         Compts.AbdelwahabTravailleChezGros_KeyId.keyId,
         "dimanch/jeudi",
         "عبدالوهاب حمنيش",
         "+213 553 88 50 37",
-        1530.00
+        1530.00 ,
     ),
     kissm_intikali_madrasa_Compt_Osstad(
         M00CentralParametresOfAllApps().kissm_intikali_madrasa_Compt_KeyId,
         "dimanch/jeudi",
         "قسم انتقالي"
     ),
-    Abdelmoumen(
-        M00CentralParametresOfAllApps().abdelmomen_Compt_KeyId,
-        "dimanch/jeudi",
-        "عبدالمؤمن"
-    ),
     Walid(
         M00CentralParametresOfAllApps().walid_Compt_KeyId,
         "dimanch/jeudi",
         "وليد"
     ),
-    Amine_Madrassa(
-        M00CentralParametresOfAllApps().amine_madrasa_Compt_KeyId,
-        "dimanch/jeudi",
-        "أمين",
-        num_telephone = "+213 799030302"
+    Abdelmoumen_Madrassa(
+        M00CentralParametresOfAllApps().abdelmomen_madrasa_Compt_KeyId,
+        "lundi/mardi",
+        "عبدالمومن",
+        num_telephone = "+213 776474827"  ,
     ),
     kissme_talaba_li_dirassatihim_mena_idata(
         M00CentralParametresOfAllApps().kissme_talaba_li_dirassatihim_mena_idata_Compt_KeyId,
@@ -205,10 +209,10 @@ enum class Utilisateur(
     fun toggle(): Utilisateur {
         return when (this) {
             Admin -> Abdelwahab_Osstad
-            Abdelwahab_Osstad -> Abdelmoumen
-            Abdelmoumen -> Walid
-            Walid -> Amine_Madrassa
-            Amine_Madrassa -> kissme_talaba_li_dirassatihim_mena_idata
+            Abdelwahab_Osstad -> Abdelmoumen_Madrassa
+            Abdelmoumen_Madrassa -> Mounir_Osstad
+            Mounir_Osstad -> Walid
+            Walid -> Abdelmoumen_Madrassa
             kissme_talaba_li_dirassatihim_mena_idata -> kissme_talaba_tam_tahwilahom_mena_idata
             kissme_talaba_tam_tahwilahom_mena_idata -> kissm_intikali_madrasa_Compt_Osstad
             kissm_intikali_madrasa_Compt_Osstad -> Admin
@@ -222,8 +226,8 @@ enum class Utilisateur(
         return when (this) {
             Admin -> "Admin (Tous)"
             Abdelwahab_Osstad -> "Abdelwahab Oustade"
-            Abdelmoumen -> "Abdelmoumen"
-            Amine_Madrassa -> "Amine Madrassa"
+            Abdelmoumen_Madrassa -> "Abdelmoumen_Madrassa"
+            Mounir_Osstad -> "منير"
             kissme_talaba_li_dirassatihim_mena_idata -> "kissme_talaba_li_dirassatihim_mena_idata"
             kissme_talaba_tam_tahwilahom_mena_idata -> "kissme_talaba_tam_tahwilahom_mena_idata"
             Walid -> "Walid"
@@ -237,7 +241,7 @@ enum class Utilisateur(
          * Get next utilisateur from current, or return Admin if null
          */
         fun toggleFrom(current: Utilisateur?): Utilisateur {
-            return current?.toggle() ?: Abdelmoumen
+            return current?.toggle() ?: Abdelmoumen_Madrassa
         }
 
         /**

@@ -9,7 +9,6 @@ import Application5.App.View.DropDownItems.View.ButID6.Pdf.PdfSaverUtility_But6
 import Application5.App.View.DropDownItems.View.ButID6.Pdf_Generateur.ParentCommunicationCardData_But6
 import Application5.App.View.DropDownItems.View.ButID6.Pdf_Generateur.generatePdfDocument_6
 import EntreApps.Shared.Models.Components.Ousstad_Tahfid
-import EntreApps.Shared.Models.Utilisateur
 import android.content.Context
 import android.content.Intent
 import android.util.Log
@@ -90,7 +89,7 @@ fun DropDownItem_ID6(
     var chosenTeacher by remember(currentTeacher, selectedTeacher) {
         mutableStateOf<Ousstad_Tahfid?>(
             when (currentTeacher) {
-                Ousstad_Tahfid.Amine_Madrassa -> Ousstad_Tahfid.Amine_Madrassa
+                Ousstad_Tahfid.Abdelmoumen_Madrassa -> Ousstad_Tahfid.Abdelmoumen_Madrassa
                 Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata -> Ousstad_Tahfid.kissme_talaba_li_dirassatihim_mena_idata
                 Ousstad_Tahfid.kissme_talaba_tam_tahwilahom_mena_idata -> Ousstad_Tahfid.kissme_talaba_tam_tahwilahom_mena_idata
                 else -> {

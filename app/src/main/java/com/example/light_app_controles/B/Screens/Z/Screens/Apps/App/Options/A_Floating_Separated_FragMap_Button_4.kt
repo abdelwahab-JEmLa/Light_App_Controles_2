@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,7 +28,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.PersonOff
 import androidx.compose.material.icons.filled.Remove
@@ -366,7 +364,7 @@ fun FabDropdownMenu_WhenIts_FragmentEducation(
             DropDownItem_ID6(aCentralFacade = aCentralFacade)
             //    DropDownItem_Imprime_pdf_List_Talaba(aCentralFacade = aCentralFacade)
             //DropDownItem_Imprime_pdf_communication_ac_parent(viewModel = aCentralFacade)
-            if (activeOusstad != Ousstad_Tahfid.Amine_Madrassa) {
+            if (activeOusstad != Ousstad_Tahfid.Abdelmoumen_Madrassa) {
                 DropDownItem_Imprime_pdf_Case_A_Cochet(aCentralFacade = aCentralFacade)
             }
             DropDownItem_Imprime_pdf_collecte_numeros_whatsapp_amine(aCentralFacade = aCentralFacade)

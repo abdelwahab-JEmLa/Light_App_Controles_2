@@ -9,6 +9,7 @@ import Application5.App.Options.FabDropdownMenu_WhenIts_FragmentEducation
 import Application5.App.Repository.M19Etudiant
 import Application5.App.View.DropDownItems.View.ButID8.SessionsEducationDialog.Dialog.SessionsEducationDialog
 import EntreApps.Shared.Models.Components.Ousstad_Tahfid
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -263,17 +264,17 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
     Box(modifier = Modifier.fillMaxSize()) {
         var showVideoMenu by remember { mutableStateOf(false) }
         var showFloatingVideo by remember { mutableStateOf(false) }
-        var selectedVideoResId by remember { mutableStateOf<Int?>(null) }
+        var selectedVideoUri by remember { mutableStateOf<android.net.Uri?>(null) }
         var selectedVideoTitle by remember { mutableStateOf("") }
 
         val tutorialVideos = remember {
             listOf(
-                TutorialVideoItem("1. فيديو التعريفي للواجهة الرئيسة", R.raw.wajiha),
-                TutorialVideoItem("2. شرح طريقة إدخال طالب جديد", R.raw.idkhal_taleb),
-                TutorialVideoItem("3. تقييم الطالب و إدخال علامة الحصة", R.raw.takyim),
-                TutorialVideoItem("4. إرسال ورقة المتابعة و المقرر للولي", R.raw.irsqal_waliy),
-                TutorialVideoItem("5. التعامل مع الواتساب التجاري للتواصل مع الولي", R.raw.whatss_app),
-                TutorialVideoItem("6. إرسال قائمة الطلبة للإدارة بطريقة سهلة", R.raw.takarir_idara)
+                TutorialVideoItem("1. فيديو التعريفي للواجهة الرئيسة", "wajiha.mp4"),
+                TutorialVideoItem("2. شرح طريقة إدخال طالب جديد", "idkhal_taleb.mp4"),
+                TutorialVideoItem("3. تقييم الطالب و إدخال علامة الحصة", "takyim.mp4"),
+                TutorialVideoItem("4. إرسال ورقة المتابعة و المقرر للولي", "irsqal_waliy.mp4"),
+                TutorialVideoItem("5. التعامل مع الواتساب التجاري للتواصل مع الولي", "whatss_app.mp4"),
+                TutorialVideoItem("6. إرسال قائمة الطلبة للإدارة بطريقة سهلة", "takarir_idara.mp4")
             )
         }
 
@@ -323,9 +324,15 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
                             androidx.compose.material3.DropdownMenuItem(
                                 text = { androidx.compose.material3.Text(video.title) },
                                 onClick = {
-                                    selectedVideoResId = video.rawResId
-                                    selectedVideoTitle = video.title
-                                    showFloatingVideo = true
+                                    val videoDirectory = com.example.light_app_controles.A.Main.AppDirectoriesInitializer.getVideosDir()
+                                    val videoFile = java.io.File(videoDirectory, video.fileName)
+                                    if (videoFile.exists()) {
+                                        selectedVideoUri = android.net.Uri.fromFile(videoFile)
+                                        selectedVideoTitle = video.title
+                                        showFloatingVideo = true
+                                    } else {
+                                        Toast.makeText(context, "غير متوفر يرجى طليه من المبرمج عبدالوهاب", Toast.LENGTH_LONG).show()
+                                    }
                                     showVideoMenu = false
                                 },
                                 leadingIcon = {
@@ -357,9 +364,9 @@ fun A_EducationFragment_SeparatedAppsCodingPattern(
             }
         }
         
-        if (showFloatingVideo && selectedVideoResId != null) {
+        if (showFloatingVideo && selectedVideoUri != null) {
             FloatingDraggableVideoPlayer(
-                videoResId = selectedVideoResId!!,
+                videoUri = selectedVideoUri!!,
                 title = selectedVideoTitle,
                 onDismiss = { showFloatingVideo = false }
             )
@@ -716,12 +723,12 @@ fun isSameDay(timestamp1: Long, timestamp2: Long): Boolean {
 
 data class TutorialVideoItem(
     val title: String,
-    val rawResId: Int
+    val fileName: String
 )
 
 @Composable
 fun FloatingDraggableVideoPlayer(
-    videoResId: Int,
+    videoUri: android.net.Uri,
     title: String,
     onDismiss: () -> Unit
 ) {
@@ -737,10 +744,9 @@ fun FloatingDraggableVideoPlayer(
     var offsetY by remember { mutableStateOf(screenHeightPx / 2f - playerHeightPx / 2f) }
 
     val context = androidx.compose.ui.platform.LocalContext.current
-    val exoPlayer = remember(videoResId) {
+    val exoPlayer = remember(videoUri) {
         com.google.android.exoplayer2.ExoPlayer.Builder(context).build().apply {
-            val uri = android.net.Uri.parse("android.resource://${context.packageName}/$videoResId")
-            val mediaItem = com.google.android.exoplayer2.MediaItem.fromUri(uri)
+            val mediaItem = com.google.android.exoplayer2.MediaItem.fromUri(videoUri)
             setMediaItem(mediaItem)
             prepare()
             playWhenReady = true
