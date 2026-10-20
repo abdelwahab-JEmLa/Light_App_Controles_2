@@ -197,53 +197,7 @@ private fun generateWhatsAppCollectAminePdf20Pages(
             if (resId != 0) BitmapFactory.decodeResource(context.resources, resId) else null
         }.getOrNull()
 
-        val barCodeBitmap: Bitmap? = runCatching {
-            var loadedBitmap: Bitmap? = null
-            val qrDirectory = com.example.light_app_controles.A.Main.AppDirectoriesInitializer.getQrImagesDir()
-            if (activeOusstad != null && qrDirectory.exists()) {
-                val extensions = listOf("", ".png", ".jpg", ".jpeg", ".webp")
-                val baseNames = listOfNotNull(
-                    activeOusstad.qr_image_nom.takeIf { it.isNotBlank() },
-                    activeOusstad.qr_image_nom.substringBeforeLast(".").takeIf { it.isNotBlank() },
-                    activeOusstad.login_nom.takeIf { it.isNotBlank() },
-                    activeOusstad.nom_arab.takeIf { it.isNotBlank() },
-                    activeOusstad.name
-                ).distinct()
-
-                for (base in baseNames) {
-                    for (ext in extensions) {
-                        val fileName = if (ext.isEmpty() || base.endsWith(ext, ignoreCase = true)) base else "$base$ext"
-                        val file = File(qrDirectory, fileName)
-                        if (file.exists() && file.isFile) {
-                            loadedBitmap = BitmapFactory.decodeFile(file.absolutePath)
-                            if (loadedBitmap != null) break
-                        }
-                    }
-                    if (loadedBitmap != null) break
-                }
-
-                if (loadedBitmap == null) {
-                    val files = qrDirectory.listFiles() ?: emptyArray()
-                    val matchTerms = listOfNotNull(
-                        activeOusstad.login_nom.takeIf { it.isNotBlank() },
-                        activeOusstad.nom_arab.split(" ").firstOrNull { it.isNotBlank() },
-                        activeOusstad.name
-                    )
-                    for (file in files) {
-                        if (file.isFile && matchTerms.any { term -> file.name.contains(term, ignoreCase = true) }) {
-                            loadedBitmap = BitmapFactory.decodeFile(file.absolutePath)
-                            if (loadedBitmap != null) break
-                        }
-                    }
-                }
-            }
-            if (loadedBitmap == null) {
-                val resId = context.resources.getIdentifier(barcodeResName, "drawable", context.packageName)
-                if (resId != 0) BitmapFactory.decodeResource(context.resources, resId) else null
-            } else {
-                loadedBitmap
-            }
-        }.getOrNull()
+        val barCodeBitmap: Bitmap? = loadTeacherQrBitmap(context, activeOusstad, barcodeResName)
 
         // Generate 20 pages
         for (pageIndex in 0 until 20) {
@@ -421,4 +375,126 @@ private fun sharePdfViaWhatsAppBusiness(context: Context, pdfFile: File, phone: 
     } catch (e: Exception) {
         Log.e("WhatsAppShare", "❌ خطأ في المشاركة عبر واتساب: ${e.message}", e)
     }
+}
+
+private fun loadTeacherQrBitmap(
+    context: Context,
+    activeOusstad: Ousstad_Tahfid?,
+    barcodeResName: String
+): Bitmap? {
+    if (activeOusstad == null) return null
+
+    fun normalize(text: String): String {
+        return text.lowercase(Locale.ROOT)
+            .replace(" ", "")
+            .replace("-", "")
+            .replace("_", "")
+            .replace("أ", "ا")
+            .replace("إ", "ا")
+            .replace("آ", "ا")
+            .replace("ؤ", "و")
+            .replace("ئ", "ي")
+            .replace("ى", "ي")
+            .replace("ة", "ه")
+    }
+
+    fun decodeStreamSafely(file: File): Bitmap? {
+        return try {
+            if (file.exists() && file.isFile && file.length() > 0) {
+                file.inputStream().use { stream ->
+                    BitmapFactory.decodeStream(stream)
+                }
+            } else null
+        } catch (e: Exception) {
+            Log.e("CollecteAmine", "Error decoding ${file.absolutePath}: ${e.message}")
+            null
+        }
+    }
+
+    val rawTerms = mutableListOf<String>()
+    rawTerms.add(activeOusstad.name)
+    if (activeOusstad.login_nom.isNotBlank()) rawTerms.add(activeOusstad.login_nom)
+    if (activeOusstad.qr_image_nom.isNotBlank()) {
+        rawTerms.add(activeOusstad.qr_image_nom)
+        rawTerms.add(activeOusstad.qr_image_nom.substringBeforeLast("."))
+    }
+    if (activeOusstad.nom_arab.isNotBlank()) {
+        rawTerms.add(activeOusstad.nom_arab)
+        rawTerms.addAll(activeOusstad.nom_arab.split(" ").filter { it.isNotBlank() })
+    }
+
+    when (activeOusstad) {
+        Ousstad_Tahfid.Abdelmoumen_Madrassa -> {
+            rawTerms.addAll(listOf("amine", "moumen", "abdelmoumen", "abdelmomen", "فرحي", "عبدالمومن", "عبدالمؤمن", "عبد المومن", "عبد المؤمن"))
+        }
+        Ousstad_Tahfid.Abdelwahab_Osstad -> {
+            rawTerms.addAll(listOf("ab", "abdelwahab", "حمنيش", "عبدالوهاب", "عبد الوهاب"))
+        }
+        Ousstad_Tahfid.Mounir_Osstad -> {
+            rawTerms.addAll(listOf("منير", "mounir"))
+        }
+        else -> {}
+    }
+
+    val normalizedTerms = rawTerms.map { normalize(it) }.filter { it.isNotBlank() }.distinct()
+    val validExtensions = listOf("png", "jpg", "jpeg", "webp")
+
+    // 1. Primary QR folder
+    val qrDir = com.example.light_app_controles.A.Main.AppDirectoriesInitializer.getQrImagesDir()
+    if (qrDir.exists()) {
+        val files = qrDir.listFiles() ?: emptyArray()
+        for (file in files) {
+            if (file.isFile && validExtensions.any { file.name.endsWith(".$it", ignoreCase = true) }) {
+                val normName = normalize(file.name.substringBeforeLast("."))
+                if (normalizedTerms.any { normName.contains(it) || it.contains(normName) }) {
+                    val bmp = decodeStreamSafely(file)
+                    if (bmp != null) return bmp
+                }
+            }
+        }
+    }
+
+    // 2. Secondary directories on SD card (App Root, Downloads, Pictures, SD Card root)
+    val candidateDirs = listOf(
+        com.example.light_app_controles.A.Main.AppDirectoriesInitializer.getAppRootDir(),
+        File("/sdcard/Download"),
+        File("/sdcard/Pictures"),
+        File("/storage/emulated/0/Download"),
+        File("/storage/emulated/0/Pictures"),
+        android.os.Environment.getExternalStorageDirectory()
+    )
+
+    fun searchRecursively(dir: File, currentDepth: Int): Bitmap? {
+        if (!dir.exists() || !dir.isDirectory || currentDepth > 2) return null
+        val files = dir.listFiles() ?: return null
+        for (file in files) {
+            if (file.isFile) {
+                if (validExtensions.any { file.name.endsWith(".$it", ignoreCase = true) }) {
+                    val normName = normalize(file.name.substringBeforeLast("."))
+                    if (normalizedTerms.any { normName.contains(it) || it.contains(normName) }) {
+                        val bmp = decodeStreamSafely(file)
+                        if (bmp != null) return bmp
+                    }
+                }
+            } else if (file.isDirectory && currentDepth < 2) {
+                val name = file.name
+                if (!name.startsWith(".") && !name.equals("Android", ignoreCase = true)) {
+                    val found = searchRecursively(file, currentDepth + 1)
+                    if (found != null) return found
+                }
+            }
+        }
+        return null
+    }
+
+    for (dir in candidateDirs) {
+        val bmp = searchRecursively(dir, 1)
+        if (bmp != null) return bmp
+    }
+
+    // 3. Fallback to resource drawable if available
+    return runCatching {
+        val resId = context.resources.getIdentifier(barcodeResName, "drawable", context.packageName)
+        if (resId != 0) BitmapFactory.decodeResource(context.resources, resId) else null
+    }.getOrNull()
 }

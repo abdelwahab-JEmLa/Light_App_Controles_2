@@ -63,7 +63,7 @@ enum class Ousstad_Tahfid(
         "lundi/mardi",
         "عبدالمومن فرحي",
         M00CentralParametresOfAllApps.get_Default().abdelmomen_madrasa_Compt_KeyId,
-        "+213 799030302",
+        "+213 776 47 48 27",
         "عبدالمومن",
         "1234",
         true,
